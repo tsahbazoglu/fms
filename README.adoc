@@ -24,8 +24,12 @@ You will get both the data structure and Web GUI in one shot.
 
 Check out our demo project and its config.js to discover all the features.
 
-
-
+== Demo
+|===
+|url      | http://uys.tspb.org.tr
+|username | DENEME_KURUM
+|pswd     | 123
+|===
 
 == License
 
