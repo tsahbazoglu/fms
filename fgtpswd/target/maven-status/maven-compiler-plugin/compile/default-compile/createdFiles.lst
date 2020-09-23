@@ -1,0 +1,8 @@
+tr/org/tspb/fp/FgtPswdTokenManager.class
+tr/org/tspb/fp/fpop.class
+tr/org/tspb/fp/MyWriteUtil.class
+tr/org/tspb/fp/fpmx.class
+tr/org/tspb/fp/fphi.class
+tr/org/tspb/fp/PPolicyProvider.class
+tr/org/tspb/fp/VerifyRecaptcha.class
+cdi/qualifier/shahbazov/com/BasePolicyProvider.class

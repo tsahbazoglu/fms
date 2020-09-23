@@ -1,0 +1,20 @@
+.myinnerdiv{
+    margin:0 auto;
+    border: solid;
+    border-color: #0074C8;
+    -moz-border-radius: 15px;
+    border-radius: 15px;
+}
+
+.container{
+    padding-top:10%;
+    margin:0 auto;
+}
+
+.field-icon {
+    float: right;
+    margin-left: -25px;
+    margin-top: -25px;
+    position: relative;
+    z-index: 2;
+}
