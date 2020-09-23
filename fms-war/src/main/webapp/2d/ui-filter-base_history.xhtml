@@ -1,0 +1,130 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:f="http://java.sun.com/jsf/core"
+      xmlns:h="http://java.sun.com/jsf/html"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:c="http://java.sun.com/jsp/jstl/core"
+      xmlns:mydynamic="http://java.sun.com/jsf/composite/mydinamic"
+      xmlns:mygrid="http://java.sun.com/jsf/composite/telmangrid">
+
+    <h:head>
+        <title></title>
+        <script>
+            function myClick(e) {
+                var evt = e || window.event
+                if (evt.keyCode == 13) {
+                    rcFilter();
+                }
+            }
+        </script>
+    </h:head>
+
+    <h:outputText value="Basit Filtre" style="font-size: 22px;font-weight: bolder;color: #b3b3b3;"/>
+
+    <h:form id="id-2d-form-history-quick-filter">
+        <p:panelGrid columns="10">
+            <c:forEach items="#{filterService.quickFilters}" var="columnMap">
+                <h:panelGroup>
+                    <h:outputText value="#{columnMap.shortName}" escape="false"/> 
+                    <br/>
+                    <mydynamic:uysDateTimeEntry 
+                        myvalue="#{filterService.guiFilterHistory[columnMap.field]}" 
+                        label="#{columnMap.label}" 
+                        rendered="#{columnMap.componentType eq twoDimViewCtrl.inputDate}"
+                        myconverter="#{columnMap.myconverter}"
+                        mypattern="#{columnMap.datePattern}"
+                        dateChange="#{twoDimViewCtrl.dateChange}"
+                        />
+                    <p:selectOneMenu 
+                        value="#{filterService.guiFilterHistory[columnMap.field]}"
+                        rendered="#{columnMap!=null and columnMap.componentType eq twoDimViewCtrl.selectOneMenu}"
+                        converter="#{columnMap.myconverter}"
+                        filter="true" 
+                        filterMatchMode="contains"   
+                        caseSensitive="true"
+                        style="width: 180px"
+                        >
+                        <p:ajax 
+                            listener="#{twoDimViewCtrl.valueChangeListenerTableSearch}"
+                            update="#{updateAjaxMB.action2DHistory}"
+                            />
+                        <f:selectItems value="#{columnMap.selectItemsHistory}"/>  
+                        <f:attribute name="myField" value="#{columnMap}"/>
+                        <f:attribute name="myKey" value="#{columnMap.field}"/>  
+                    </p:selectOneMenu>
+                    <h:selectOneMenu 
+                        value="#{filterService.guiFilterHistory[columnMap.field]}"
+                        rendered="#{columnMap!=null and columnMap.componentType eq twoDimViewCtrl.selectOneRadio}"
+                        converter="#{columnMap.myconverter}"
+                        style="width: 180px"
+                        >
+                        <p:ajax 
+                            listener="#{twoDimViewCtrl.valueChangeListenerTableSearch}" 
+                            update="#{updateAjaxMB.action2DHistory}"
+                            />
+                        <f:selectItems value="#{columnMap.selectItemsHistory}"/>  
+                        <f:attribute name="myKey" value="#{columnMap.field}"/>  
+                    </h:selectOneMenu>
+                    <p:autoComplete 
+                        dropdown="true" 
+                        value="#{filterService.guiFilterHistory[columnMap.field]}"
+                        completeMethod="#{columnMap.completeMethod}" 
+                        rendered="#{twoDimViewCtrl.autoComplete eq  columnMap.componentType and columnMap.rendered}"
+                        converter="documentConverter"
+                        var="item" 
+                        itemLabel="#{item.name}"
+                        itemValue="#{item}"
+                        forceSelection="true"
+                        minQueryLength="3"    
+                        inputStyle="width:170px;"                            
+                        />
+                    <p:inputText 
+                        rendered="#{columnMap!=null 
+                                    and (columnMap.componentType eq twoDimViewCtrl.inputText 
+                                    or columnMap.componentType eq twoDimViewCtrl.inputMask 
+                                    or columnMap.componentType eq  twoDimViewCtrl.inputTextarea)}"
+                        value="#{filterService.guiFilterHistory[columnMap.field]}" 
+                        style="white-space: pre;font-family: monospace;width: 150px;"
+                        onkeypress="myClick(event);"
+                        >
+                    </p:inputText> 
+                </h:panelGroup>
+            </c:forEach>
+            <p:button
+                onclick="rcHistoryBaseFilter();return false;"
+                value="ara"
+                >
+            </p:button>
+            <p:button
+                onclick="rcHistoryBaseFilterReset();return false;"
+                value="sıfırla"
+                >
+            </p:button>
+        </p:panelGrid> 
+
+        <p:remoteCommand 
+            name="rcHistoryBaseFilter"
+            value="search" 
+            action="#{twoDimViewCtrl.actionSearchObject}"
+            update="#{updateAjaxMB.action2DHistory}"
+            >
+        </p:remoteCommand>
+
+    </h:form>
+
+    <h:form>
+        <p:remoteCommand 
+            name="rcHistoryBaseFilterReset"
+            value="reset" 
+            action="#{twoDimViewCtrl.resetFilter}"
+            update="#{updateAjaxMB.action2DHistory}"
+            >
+        </p:remoteCommand>
+    </h:form>
+
+
+
+
+
+</html>

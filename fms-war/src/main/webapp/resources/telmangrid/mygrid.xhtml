@@ -1,0 +1,49 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"   
+      xmlns:h="http://java.sun.com/jsf/html"
+      xmlns:composite="http://java.sun.com/jsf/composite"
+      >
+    <h:head>
+        <title></title>
+    </h:head>
+
+    <composite:interface>
+        <composite:attribute name="data" required="false"/>
+        <composite:attribute name="colWidths" required="true"/>
+        <composite:attribute name="rowHeaderWidh" required="false"/>
+        <composite:attribute name="rowHeaders" required="false"/>
+        <composite:attribute name="colHeaders" required="false"/>
+        <composite:attribute name="colRenderers" required="false"/>
+    </composite:interface>
+
+    <composite:implementation>
+        <div id="parentContainer">
+            <div id="#{cc.clientId}" class="hot"></div>
+        </div>
+
+        <h:inputHidden 
+            id="hiddenTextJsonData"
+            value="#{cc.attrs.data}"/> 
+        <h:inputHidden 
+            id="hiddenTextJsonColHeaders"
+            value="#{cc.attrs.colHeaders}"/>
+        <h:inputHidden 
+            id="hiddenTextJsonRowHeaders"
+            value="#{cc.attrs.rowHeaders}"/>           
+        <h:inputHidden 
+            id="hiddenTextJsonColRenderers"
+            value="#{cc.attrs.colRenderers}"/>
+
+        <script>
+            telmangrid.clarity.init('#{cc.clientId}',
+                    '#{cc.attrs.data}',
+                    '#{cc.attrs.colHeaders}',
+                    '#{cc.attrs.rowHeaders}',
+                    '#{cc.attrs.colRenderers}',
+                    '#{cc.attrs.colWidths}',
+                    '#{cc.attrs.rowHeaderWidh}'
+                    );
+        </script>
+    </composite:implementation>
+</html>

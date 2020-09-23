@@ -1,0 +1,85 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"   
+      xmlns:composite="http://java.sun.com/jsf/composite"
+      xmlns:f="http://java.sun.com/jsf/core"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:h="http://xmlns.jcp.org/jsf/html">
+    
+    <composite:interface>
+        <composite:attribute name="myconverter" required="true"/>
+        <composite:attribute name="label" required="true"/>
+        <composite:attribute name="myvalue" required="true"/>
+        <composite:attribute name="myrequired"/>
+        <composite:attribute name="myreadonly"/>
+        <composite:attribute name="mypattern" required="true"/>
+        <composite:attribute name="dateRangeControl"/>
+        <composite:attribute name="dateRangeValidate"/>
+        <composite:attribute name="dateRangeStartValue"/>
+        <composite:attribute name="dateRangeEndValue"/>
+        <composite:attribute name="eventChangeUpdate"/>
+        <composite:attribute name="eventDateSelectUpdate"/>
+        <composite:attribute name="dateChange" method-signature="void dateChange(org.primefaces.event.SelectEvent)"/>
+    </composite:interface>
+
+    <composite:implementation>
+        <script>
+            function cleanUysCalendar(id, clientId, widgetVar) {
+                PF(widgetVar).setDate(null);
+            }
+        </script>
+
+
+        <h:panelGroup
+            rendered="#{not cc.attrs.myreadonly}"
+            >
+            <p:calendar 
+                converter="#{cc.attrs.myconverter}" 
+                value="#{cc.attrs.myvalue}"
+                locale="tr"
+                showOn="button"
+                navigator="true"
+                yearRange="c-50:c+50"
+                widgetVar="mycalendar_#{cc.clientId}"  
+                required="#{cc.attrs.myrequired}"
+                pattern="#{cc.attrs.mypattern}"
+                mask="true"
+                requiredMessage="#{cc.attrs.label} zorunlu alandır."
+                >
+                <f:attribute name="label" value="#{cc.attrs.label}"/>
+                <f:validator validatorId="primeDateRangeValidator"/>
+                <f:attribute name="dateRangeValidate" value="#{cc.attrs.dateRangeValidate}"/>
+                <f:attribute name="dateRangeStartValue" value="#{cc.attrs.dateRangeStartValue}"/>
+                <f:attribute name="dateRangeEndValue" value="#{cc.attrs.dateRangeEndValue}"/>
+                <p:ajax event="change" 
+                        listener="#{cc.attrs.dateChange}" 
+                        update="#{cc.attrs.eventChangeUpdate}" 
+                        rendered="#{cc.attrs.dateRangeControl}"
+                        disabled="#{not cc.attrs.dateRangeControl}"
+                        />
+                <p:ajax event="dateSelect" 
+                        listener="#{cc.attrs.dateChange}"
+                        update="#{cc.attrs.eventDateSelectUpdate}" 
+                        rendered="#{cc.attrs.dateRangeControl}"
+                        disabled="#{not cc.attrs.dateRangeControl}"
+                        />
+            </p:calendar>
+            <p:commandButton
+                icon="fa fa-close"
+                title="temizle"
+                style="margin-right:20px;"
+                onclick="cleanUysCalendar('#{cc.attrs.id}', '#{cc.clientId}', 'mycalendar_#{cc.clientId}');return false;"/>
+        </h:panelGroup>
+
+        <h:inputText
+            style="width: 355px;" 
+            readonly="true"
+            value="#{cc.attrs.myvalue}"
+            rendered="#{cc.attrs.myreadonly}"
+            >
+            <f:convertDateTime pattern="dd.MM.yyyy - HH:mm:ss" timeZone="#{twoDimViewCtrl.timeZone}"/>
+        </h:inputText>
+
+
+    </composite:implementation>
+</html>

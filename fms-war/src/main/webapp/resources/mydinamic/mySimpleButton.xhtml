@@ -1,0 +1,49 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"   
+      xmlns:composite="http://java.sun.com/jsf/composite">
+
+
+    <composite:interface>
+        <composite:attribute name="myValue" required="true"/>
+        <composite:attribute name="myOnClickID" required="true"/>
+    </composite:interface>
+
+    <composite:implementation>
+        <script>
+            $("##{cc.clientId}").hover(
+                    function () {
+                        $(this).addClass("ui-state-hover");
+                    },
+                    function () {
+                        $(this).removeClass("ui-state-hover");
+                    }
+            );
+            $("##{cc.clientId}").mousedown(
+                    function () {
+                        $(this).addClass("ui-state-active");
+                        $(this).addClass("ui-state-focus");
+                    }
+            );
+            $("##{cc.clientId}").mouseup(
+                    function () {
+                        $(this).removeClass("ui-state-active");
+                        $(this).removeClass("ui-state-focus");
+                    }
+            );
+        </script>
+        <button 
+            id="#{cc.clientId}"
+            class="ui-button ui-widget ui-state-default ui-corner-all ui-button-text-icon-left"
+            type="button" 
+            role="button"
+            aria-disabled="false"
+            onclick="document.getElementById('#{cc.attrs.myOnClickID}').click();"
+            >
+            <span  class="ui-button-icon-left ui-icon ui-c ui-icon-disk"></span>
+            <span  class="ui-button-text ui-c">
+                #{cc.attrs.myValue}
+            </span>
+        </button>
+    </composite:implementation>
+</html>

@@ -1,0 +1,31 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"   
+      xmlns:composite="http://java.sun.com/jsf/composite"
+      xmlns:f="http://java.sun.com/jsf/core"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:h="http://java.sun.com/jsf/html"
+      >
+
+    <h:head>
+        <title></title>
+    </h:head>
+
+    <composite:interface>
+        <composite:attribute name="someaction" method-signature="void someaction(javax.faces.event.AjaxBehaviorEvent)" />
+    </composite:interface>
+
+    <composite:implementation>
+        <p:selectOneMenu 
+            >
+            <f:selectItem itemLabel="afasdfsd" itemValue="asdsdfasdfasdf"/>
+            <f:selectItem itemLabel="afasqweqwedfsd" itemValue="asdsdqweqwefasdfasdf"/>
+            <f:selectItem itemLabel="afasqweqwedfsd" itemValue="asdsdfasdfqweqweasdf"/>
+            <p:ajax 
+                listener="#{twoDimModifyCtrl.someaction}"
+                update="idTwoDlgTabView:crud2dForm:id-component-ilce"
+                >
+            </p:ajax>
+        </p:selectOneMenu>
+    </composite:implementation>
+</html>

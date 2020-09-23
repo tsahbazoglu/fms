@@ -1,0 +1,29 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://java.sun.com/jsf/html"
+      xmlns:p="http://primefaces.org/ui"          
+      >
+
+    <h:head>
+        <title></title>
+    </h:head>
+
+    <h:panelGrid 
+        columns="2"
+        columnClasses="VTopHLeftW70p,VTopHRightW30p"
+        width="100%"
+        >
+        <h:outputLabel value="#{formService.myForm.name}" style="width:100%;font-size: 28px;font-weight: bolder;color: #b3b3b3;"/>
+        <p:scrollPanel style="width:500px;height:90px;">
+            <p:dataList value="#{crudOneDim.selectedFormMessages}"
+                        var="mymessage"  
+                        type="ordered"
+                        itemStyleClass="itemStyleClass"
+                        itemType="none"
+                        >
+                <h:outputText value="#{mymessage}" escape="false"/>
+            </p:dataList>
+        </p:scrollPanel>
+    </h:panelGrid>
+</html>

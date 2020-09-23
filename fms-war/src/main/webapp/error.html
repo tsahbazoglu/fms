@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+        <title id="id_title">fms</title>
+        <link 
+            id="id_link_favicon"
+            type="image/x-icon" 
+            href="" 
+            rel="shortcut icon" 
+            />
+
+        <style type="text/css">
+            .myinnerdiv {
+                display: table;
+                margin:0 auto;  
+                /*                background-color: #4591A1;*/
+                background-color: #FFFFFF;              
+                top:150px;
+                width: 700px; 
+                height: 340px; 
+                border: solid;
+                border-color: #0074C8;
+                -moz-border-radius: 15px;
+                border-radius: 15px;
+                position: relative;
+            }
+            .outTable{
+                width: 95%;
+                height: 100%;
+                margin: auto;
+                border:0;
+            }
+            .w30p{
+                width: 30%;
+            }
+            .w70p-hR{
+                width: 70%;
+                text-align: right;
+            }
+            .title-style{
+                font-size: 14px;
+                color: grey;
+            }
+            .title{
+                font-size: 14px;
+                font-weight: bold;
+                color: grey;
+            }
+            .warn{
+                font-size: 14px;
+                font-weight: bold;
+                color: #f38273;
+            }
+            li{
+                margin: 10px 0;
+            }
+        </style>
+    </head>
+
+    <body>
+
+        <div id="loginDiv" class="myinnerdiv">
+            <table class='outTable'>
+                <tr>
+                    <td class='w30p'>
+                        <img id='img_logo' src="" alt=""/>
+                    </td>
+                    <td class='w70p-hR'>
+                        <span id='id_main_title' class='title-style'></span>
+                        <br/>
+                        <br/>
+                        <span  class='title'>Üye Yönetim Sistemi</span>
+                    </td>
+                </tr>
+                <tr>
+                    <td colspan="2">
+                        <hr style="color: #0074C8;height: 2px;background-color: #0074C8; ">
+                    </td>
+                </tr>
+                <tr>
+                    <td colspan="2">
+                        <ul>
+                            <li>
+                                <span  class='warn'>Kullanıcı adı veya şifre yalnış</span>
+                            </li>                          
+                        </ul>
+                        <ul>
+                            <li>
+                                <a href="/">
+                                    <span class='title-style'>Yeniden giriş için tıklayın</span>
+                                </a>
+                            </li>                                
+                            <li>
+                                <a href="/fphi/tspb">
+                                    <span  class='title-style'>Parolamı unuttum</span>
+                                </a>
+                            </li>  
+                        </ul>
+                    </td>
+                </tr>     
+            </table> 
+        </div> 
+
+        <script>
+            vendor_value = "TSPB";
+            //vendor_value = "TDUB";
+            switch (vendor_value) {
+                case "TSPB":
+                    document.getElementById('img_logo').src = '/public/logo_tspb.png';
+                    document.getElementById('id_main_title').innerHTML = '<a href="http://tspb.org.tr/" target="_ablank">TSPB : Türkiye Sermaye Pyasaları Birliği</a>';
+                    document.getElementById('id_title').innerHTML = 'TSPB : Türkiye Sermaye Pyasaları Birliği';
+                    document.getElementById('id_link_favicon').href = '/public/favicon_tspb.ico';
+                    break;
+                case "TDUB":
+                    document.getElementById('img_logo').src = '/public/favicon_tdub.png';
+                    document.getElementById('id_main_title').innerHTML = '<a href="http://tdub.org.tr/" target="_ablank">TDUB : Türkiye Değerleme Uzmanları Birliği</a>';
+                    document.getElementById('id_title').innerHTML = 'TDUB : Türkiye Değerleme Uzmanları Birliği';
+                    document.getElementById('id_link_favicon').href = '/public/favicon_tdub.png';
+                    break;
+            }
+        </script>
+
+    </body>
+
+</html> 
+
+
+
+
+
+

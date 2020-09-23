@@ -1,0 +1,71 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://java.sun.com/jsf/html"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:f="http://java.sun.com/jsf/core"
+      xmlns:c="http://java.sun.com/jsp/jstl/core"
+      >
+
+    <h:head>
+        <title></title>
+    </h:head>
+
+
+    <h:form id="ndActionPanelForm">
+        <p:toolbar>
+            <f:facet name="left">
+                <p:commandButton 
+                    value="Bu sayfa ile ilgili açıklamalar için tıklayınız" 
+                    action="#{pivotModifierCtrl.showAllNote}" 
+                    style="color: red;font-weight: bold;white-space: nowrap;"
+                    rendered="#{pivotModifierCtrl.selectedFormUserNote}"
+                    update=":idMessageDialog"
+                    />
+                <p:commandButton 
+                    value="Excele Aktar" 
+                    rendered="#{pivotModifierCtrl.dependOnSelectedFormRenderedMap['download']}"
+                    action="#{pivotModifierCtrl.downloadCsvFile}" 
+                    style="white-space: nowrap;"
+                    />
+                <p:commandButton 
+                    value="Kaydet"
+                    rendered="#{pivotModifierCtrl.dependOnSelectedFormRenderedMap['save']}"
+                    style="width: 150px;"
+                    action="#{pivotModifierCtrl.provideCrossCheck}"
+                    update=":idCurrentMyGrid,:idCenterTop,:idDialogControlAndSave,:idMessageDialog"
+                    />
+                <p:commandButton 
+                    value="E-İmza Süreci" 
+                    action="#{pivotModifierCtrl.showEimza22}" 
+                    rendered="#{pivotModifierCtrl.dependOnSelectedFormRenderedMap['eimza2D']}"
+                    update=":idMessageDialog,:id_nd_esign_dialog"
+                    />  
+                <p:commandButton 
+                    value="Import" 
+                    action="#{pivotModifierCtrl.importData}" 
+                    rendered="#{pivotModifierCtrl.dependOnSelectedFormRenderedMap['importData']}"
+                    update=":idMessageDialog,:idImportDataDialog"
+                    /> 
+                <h:inputHidden
+                    id="hiddenTextJsonDataToModel" 
+                    value="#{pivotModifierCtrl.jsonDataToModel}"
+                    />
+            </f:facet>
+            <f:facet name="right">
+                <h:outputText 
+                    value="#{pivotModifierCtrl.selectedForm.name}" 
+                    style="font-size: 14px;font-weight: bolder;white-space: nowrap;"
+                    />
+            </f:facet>
+        </p:toolbar>
+        <br/>
+        <ul>
+            <c:forEach items="#{pivotModifierCtrl.selectedFormMessages}" var="mymessage">
+                <li>
+                    <h:outputText value="#{mymessage}" escape="false"/>
+                </li>
+            </c:forEach>
+        </ul>
+    </h:form> 
+</html>

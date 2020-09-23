@@ -1,0 +1,100 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:f="http://java.sun.com/jsf/core"
+      xmlns:h="http://java.sun.com/jsf/html"
+      xmlns:p="http://primefaces.org/ui"  
+      xmlns:c="http://java.sun.com/jsp/jstl/core"  
+          
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"> 
+
+    <h:head>
+        <title></title>
+    </h:head>
+
+    <h:panelGroup
+        rendered="#{formService.myForm.historyRendered}"
+        >
+        <h:outputText value="Geçmiş Dönem Verisi" style="font-size: 22px;font-weight: bolder;color: #b3b3b3;"/>
+
+        <c:if test="#{not empty filterService.quickFilters}">
+            <br/>
+            <br/>
+            <ui:include src="ui-filter-base_history.xhtml"/>
+            <br/>
+        </c:if> 
+
+        <h:form
+            id="id2DHistoryObjectsList">
+            <h:panelGrid width="100%">
+                <p:dataTable 
+                    id="idHistoryObjectsDataTable" 
+                    var="rowData" 
+                    value="#{twoDimViewCtrl.data}" 
+                    paginator="true" 
+                    rows="10"
+                    paginatorTemplate="{RowsPerPageDropdown} {FirstPageLink} {PreviousPageLink} {CurrentPageReport} {NextPageLink} {LastPageLink}"
+                    rowsPerPageTemplate="10,20,30" 
+                    selectionMode="single" 
+                    lazy="true"
+                    resizableColumns="true"
+                    rendered="#{formService.myForm.historyRendered}"
+                    style="width: 95%;"
+
+                    > 
+
+                    <c:forEach items="#{twoDimViewCtrl.objectsColumnDataModel}" var="columnMap">
+                        <p:column
+                            headerText="#{columnMap.shortName}"
+                            >
+                            <h:outputText  
+                                style="#{columnMap.style}"
+                                value="#{rowData[columnMap.field]}"
+                                rendered="#{columnMap.componentType == twoDimViewCtrl.inputDate}"
+                                >
+                                <f:convertDateTime pattern="dd.MM.yyyy - HH:mm:ss" timeZone="#{twoDimViewCtrl.timeZone}"/>
+                            </h:outputText>
+                            <h:outputText 
+                                style="#{columnMap.style}"
+                                value="#{rowData[columnMap.field]}"
+                                rendered="#{false 
+                                            or columnMap.componentType == twoDimViewCtrl.selectOneRadio 
+                                            or columnMap.componentType == twoDimViewCtrl.selectOneMenu
+                                            or columnMap.componentType == twoDimViewCtrl.inputTextarea
+                                            or columnMap.componentType == twoDimModifyCtrl.inputText
+                                            or columnMap.componentType == twoDimModifyCtrl.inputMask
+                                            or columnMap.componentType == twoDimModifyCtrl.autoComplete}"                              
+                                converter ="#{columnMap.myconverter}"     
+                                >
+                                <f:attribute name="converterInstance" value="#{columnMap.converterInstance}"/>
+                                <f:attribute name="minFractationDigits" value="#{columnMap.minFractationDigits}"/>
+                                <f:attribute name="maxFractationDigits" value="#{columnMap.maxFractationDigits}"/>
+                                <f:attribute name="divider" value="#{columnMap.divider}"/>
+                                <f:attribute name="fieldKey" value="#{columnMap.fieldKey}"/>
+                                <f:attribute name="crudObject" value="#{rowData}"/>
+                                <f:attribute name="uysformat" value="#{columnMap.uysformat}"/>
+
+                                <f:attribute name="viewKey" value="#{columnMap.viewKey}"/>
+                                <f:attribute name="calculateOnView" value="#{columnMap.calculateOnView}"/>
+                                <f:attribute name="myField" value="#{columnMap}"/>
+                                <f:attribute name="converterFormat" value="#{columnMap.converterFormat}"/>
+                                <f:attribute name="sessionKey" value="#{columnMap.sessionKey}"/>
+                            </h:outputText>
+
+                            <h:selectBooleanCheckbox 
+                                style="#{columnMap.style}"
+                                readonly="true"
+                                value="#{rowData[columnMap.field]}"
+                                rendered="#{columnMap.componentType == 'selectBooleanCheckbox'}"
+                                converter ="#{columnMap.myconverter}"
+                                >
+                            </h:selectBooleanCheckbox>
+                        </p:column>
+                    </c:forEach>   
+                    <p:column>
+                    </p:column>
+                </p:dataTable>
+            </h:panelGrid>        
+        </h:form>
+    </h:panelGroup>
+</html>

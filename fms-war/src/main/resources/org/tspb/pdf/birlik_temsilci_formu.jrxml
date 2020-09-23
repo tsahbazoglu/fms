@@ -1,0 +1,270 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="birlik_temsilci_formu" pageWidth="595" pageHeight="842" whenNoDataType="AllSectionsNoDetail" columnWidth="555" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="9aa60bd9-8207-4a6b-bf45-21b6d88a8a47">
+	<property name="ireport.zoom" value="1.0"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="144"/>
+	<subDataset name="Table Dataset 1" uuid="00a45654-8f78-4eee-b069-9cd729e9ac46"/>
+	<subDataset name="Table Dataset 2" uuid="4d0ab96a-1b2e-4d54-8fcb-8e0feff2c00b"/>
+	<parameter name="DELEGATE_NAME_SURNAME" class="java.lang.String"/>
+	<parameter name="DELEGATE_NATIONAL_ID" class="java.lang.String"/>
+	<parameter name="DELEGATE_TITLE" class="java.lang.String"/>
+	<parameter name="DELEGATE_PHONE" class="java.lang.String"/>
+	<parameter name="DELEGATE_FAX" class="java.lang.String"/>
+	<parameter name="DELEGATE_E_MAIL" class="java.lang.String"/>
+	<parameter name="CREATE_DATE" class="java.lang.String"/>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band height="459" splitType="Stretch">
+			<staticText>
+				<reportElement x="0" y="204" width="555" height="20" uuid="0bbfe9ae-c350-486f-bd04-493757f7bda6"/>
+				<textElement>
+					<font fontName="DIN Next LT Pro" size="14" isBold="true" pdfEncoding="Cp1254" isPdfEmbedded="true"/>
+				</textElement>
+				<text><![CDATA[TÜRKİYE SERMAYE PİYASALARI BİRLİĞİ’NE,]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="0" y="231" width="555" height="29" uuid="8faf8c9d-033f-401d-bfad-b7f74aba2232"/>
+				<textElement>
+					<font fontName="DIN Next LT Pro" size="12" pdfEncoding="Cp1254" isPdfEmbedded="true"/>
+				</textElement>
+				<text><![CDATA[Türkiye Sermaye Piyasaları Birliği Statüsü’nün 9’uncu maddesi gereğince Birlik nezdinde kurumumuzu temsile yetkili kişi aşağıda belirtilmiştir. ]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="0" y="276" width="555" height="20" uuid="fc2d79f1-f9e3-4725-890c-a1563fd07413"/>
+				<box>
+					<pen lineWidth="1.0"/>
+					<topPen lineWidth="1.0"/>
+					<leftPen lineWidth="1.0"/>
+					<bottomPen lineWidth="1.0"/>
+					<rightPen lineWidth="1.0"/>
+				</box>
+				<textElement verticalAlignment="Bottom">
+					<font fontName="DIN Next LT Pro" size="12" isBold="true" pdfEncoding="Cp1254" isPdfEmbedded="true"/>
+					<paragraph leftIndent="5"/>
+				</textElement>
+				<text><![CDATA[TEMSİLCİ]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="0" y="296" width="164" height="20" uuid="8133e5f4-7b75-4e91-91c0-7557942e179c"/>
+				<box>
+					<pen lineWidth="1.0"/>
+					<topPen lineWidth="1.0"/>
+					<leftPen lineWidth="1.0"/>
+					<bottomPen lineWidth="1.0"/>
+					<rightPen lineWidth="1.0"/>
+				</box>
+				<textElement verticalAlignment="Bottom">
+					<font fontName="DIN Next LT Pro" size="12" isBold="true" pdfEncoding="Cp1254" isPdfEmbedded="true"/>
+					<paragraph leftIndent="5"/>
+				</textElement>
+				<text><![CDATA[Adı – Soyadı]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="0" y="316" width="164" height="20" uuid="422bb833-aace-439e-a795-5026ff3ec445"/>
+				<box>
+					<pen lineWidth="1.0"/>
+					<topPen lineWidth="1.0"/>
+					<leftPen lineWidth="1.0"/>
+					<bottomPen lineWidth="1.0"/>
+					<rightPen lineWidth="1.0"/>
+				</box>
+				<textElement verticalAlignment="Bottom">
+					<font fontName="DIN Next LT Pro" size="12" isBold="true" pdfEncoding="Cp1254" isPdfEmbedded="true"/>
+					<paragraph leftIndent="5"/>
+				</textElement>
+				<text><![CDATA[TC Kimlik No]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="0" y="336" width="164" height="20" uuid="8210aca5-b283-451c-9255-116d6e1e0045"/>
+				<box>
+					<pen lineWidth="1.0"/>
+					<topPen lineWidth="1.0"/>
+					<leftPen lineWidth="1.0"/>
+					<bottomPen lineWidth="1.0"/>
+					<rightPen lineWidth="1.0"/>
+				</box>
+				<textElement verticalAlignment="Bottom">
+					<font fontName="DIN Next LT Pro" size="12" isBold="true" pdfEncoding="Cp1254" isPdfEmbedded="true"/>
+					<paragraph leftIndent="5"/>
+				</textElement>
+				<text><![CDATA[Ünvanı]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="0" y="356" width="164" height="20" uuid="4ce8b0d2-a7e7-4705-8a16-670fc003e55c"/>
+				<box>
+					<pen lineWidth="1.0"/>
+					<topPen lineWidth="1.0"/>
+					<leftPen lineWidth="1.0"/>
+					<bottomPen lineWidth="1.0"/>
+					<rightPen lineWidth="1.0"/>
+				</box>
+				<textElement verticalAlignment="Bottom">
+					<font fontName="DIN Next LT Pro" size="12" isBold="true" pdfEncoding="Cp1254" isPdfEmbedded="true"/>
+					<paragraph leftIndent="5"/>
+				</textElement>
+				<text><![CDATA[Telefon No]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="0" y="376" width="164" height="20" uuid="829ca0a4-4df8-4435-9e02-995c85383fa8"/>
+				<box>
+					<pen lineWidth="1.0"/>
+					<topPen lineWidth="1.0"/>
+					<leftPen lineWidth="1.0"/>
+					<bottomPen lineWidth="1.0"/>
+					<rightPen lineWidth="1.0"/>
+				</box>
+				<textElement verticalAlignment="Bottom">
+					<font fontName="DIN Next LT Pro" size="12" isBold="true" pdfEncoding="Cp1254" isPdfEmbedded="true"/>
+					<paragraph leftIndent="5"/>
+				</textElement>
+				<text><![CDATA[Faks No]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="0" y="396" width="164" height="20" uuid="8952a2cb-34c8-4c54-a952-b1c7b25a0fd7"/>
+				<box>
+					<pen lineWidth="1.0"/>
+					<topPen lineWidth="1.0"/>
+					<leftPen lineWidth="1.0"/>
+					<bottomPen lineWidth="1.0"/>
+					<rightPen lineWidth="1.0"/>
+				</box>
+				<textElement verticalAlignment="Bottom">
+					<font fontName="DIN Next LT Pro" size="12" isBold="true" pdfEncoding="Cp1254" isPdfEmbedded="true"/>
+					<paragraph leftIndent="5"/>
+				</textElement>
+				<text><![CDATA[E-Posta Adresi]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="164" y="296" width="391" height="20" uuid="7ac69c28-71ed-4d0f-be6d-448d26bea8c3"/>
+				<box>
+					<pen lineWidth="1.0"/>
+					<topPen lineWidth="1.0"/>
+					<leftPen lineWidth="1.0"/>
+					<bottomPen lineWidth="1.0"/>
+					<rightPen lineWidth="1.0"/>
+				</box>
+				<textElement verticalAlignment="Bottom">
+					<font fontName="DIN Next LT Pro" size="12" isBold="true" pdfEncoding="Cp1254" isPdfEmbedded="true"/>
+					<paragraph leftIndent="5"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{DELEGATE_NAME_SURNAME}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="164" y="316" width="391" height="20" uuid="96aad440-eab0-432d-a6cc-ab298db1b178"/>
+				<box>
+					<pen lineWidth="1.0"/>
+					<topPen lineWidth="1.0"/>
+					<leftPen lineWidth="1.0"/>
+					<bottomPen lineWidth="1.0"/>
+					<rightPen lineWidth="1.0"/>
+				</box>
+				<textElement verticalAlignment="Bottom">
+					<font fontName="DIN Next LT Pro" size="12" isBold="true" pdfEncoding="Cp1254" isPdfEmbedded="true"/>
+					<paragraph leftIndent="5"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{DELEGATE_NATIONAL_ID}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="164" y="336" width="391" height="20" uuid="32fe7922-79c3-42db-9b01-08da2c5f7a68"/>
+				<box>
+					<pen lineWidth="1.0"/>
+					<topPen lineWidth="1.0"/>
+					<leftPen lineWidth="1.0"/>
+					<bottomPen lineWidth="1.0"/>
+					<rightPen lineWidth="1.0"/>
+				</box>
+				<textElement verticalAlignment="Bottom">
+					<font fontName="DIN Next LT Pro" size="12" isBold="true" pdfEncoding="Cp1254" isPdfEmbedded="true"/>
+					<paragraph leftIndent="5"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{DELEGATE_TITLE}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="164" y="356" width="391" height="20" uuid="f8599975-0a94-426c-b757-4068f4006a1a"/>
+				<box>
+					<pen lineWidth="1.0"/>
+					<topPen lineWidth="1.0"/>
+					<leftPen lineWidth="1.0"/>
+					<bottomPen lineWidth="1.0"/>
+					<rightPen lineWidth="1.0"/>
+				</box>
+				<textElement verticalAlignment="Bottom">
+					<font fontName="DIN Next LT Pro" size="12" isBold="true" pdfEncoding="Cp1254" isPdfEmbedded="true"/>
+					<paragraph leftIndent="5"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{DELEGATE_PHONE}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="164" y="376" width="391" height="20" uuid="748294c3-5f12-41bf-868f-bc70b3be95be"/>
+				<box>
+					<pen lineWidth="1.0"/>
+					<topPen lineWidth="1.0"/>
+					<leftPen lineWidth="1.0"/>
+					<bottomPen lineWidth="1.0"/>
+					<rightPen lineWidth="1.0"/>
+				</box>
+				<textElement verticalAlignment="Bottom">
+					<font fontName="DIN Next LT Pro" size="12" isBold="true" pdfEncoding="Cp1254" isPdfEmbedded="true"/>
+					<paragraph leftIndent="5"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{DELEGATE_FAX}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="164" y="396" width="391" height="20" uuid="50de84e9-68ba-4455-988a-1deed13912e9"/>
+				<box>
+					<pen lineWidth="1.0"/>
+					<topPen lineWidth="1.0"/>
+					<leftPen lineWidth="1.0"/>
+					<bottomPen lineWidth="1.0"/>
+					<rightPen lineWidth="1.0"/>
+				</box>
+				<textElement verticalAlignment="Bottom">
+					<font fontName="DIN Next LT Pro" size="12" isBold="true" pdfEncoding="Cp1254" isPdfEmbedded="true"/>
+					<paragraph leftIndent="5"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{DELEGATE_E_MAIL}]]></textFieldExpression>
+			</textField>
+		</band>
+	</title>
+	<summary>
+		<band height="279">
+			<staticText>
+				<reportElement x="0" y="151" width="555" height="121" uuid="2bd7f478-d718-4eeb-899f-a5b8fdd823ff"/>
+				<textElement>
+					<font fontName="DIN Next LT Pro" size="11" isItalic="true" pdfEncoding="Cp1254" isPdfEmbedded="true"/>
+				</textElement>
+				<text><![CDATA[Bu Bildirim Formunda, yönetim kurulu başkanı, yönetim kurulu üyesi veya genel müdürden en az birinin imzasının bulunması zorunludur.
+
+Birlik nezdinde üyelerin temsili
+MADDE 9- (1) Üyeler, Birlik organlarında yönetim kurulu başkanı, yönetim kurulu üyesi veya genel müdür ya da bunlar tarafından temsil yetkisi verilen en az genel müdür yardımcısı düzeyinde temsil edilirler. Birlik nezdinde Birlik ile ilgili işlemlerde üyeyi temsil edecek ve üye adına oy kullanacak söz konusu nitelikleri haiz bir temsilci Birliğe bildirilir. Üyeler söz konusu temsilciler ile ilgili değişiklikleri üç iş günü içerisinde Birliğe yazılı olarak bildirmek zorundadır.
+]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="0" y="40" width="332" height="58" uuid="154fc5a5-5e00-4987-9428-c74e630a0fb5"/>
+				<textElement>
+					<font fontName="DIN Next LT Pro" size="12" isBold="true" pdfEncoding="Cp1254" isPdfEmbedded="true"/>
+				</textElement>
+				<text><![CDATA[Kurum Kaşesi ve Yetkili İmzalar
+
+
+Yetkili İmza Sahiplerinin Ad – Soyadı ve Ünvanı]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="57" y="20" width="199" height="20" uuid="a09046af-5589-4318-89c4-f41e3ead8e6f"/>
+				<textElement>
+					<font fontName="DIN Next LT Pro" size="12" isBold="true" pdfEncoding="Cp1254" isPdfEmbedded="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{CREATE_DATE}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="0" y="20" width="57" height="20" uuid="40fb0809-0d57-4863-85cd-91678a7cd9f8"/>
+				<textElement>
+					<font fontName="DIN Next LT Pro" size="12" isBold="true" pdfEncoding="Cp1254" isPdfEmbedded="true"/>
+				</textElement>
+				<text><![CDATA[Tarih :]]></text>
+			</staticText>
+		</band>
+	</summary>
+</jasperReport>

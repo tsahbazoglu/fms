@@ -1,0 +1,248 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://java.sun.com/jsf/html"
+      xmlns:p="http://primefaces.org/ui"          
+      xmlns:f="http://java.sun.com/jsf/core"
+      xmlns:c="http://java.sun.com/jsp/jstl/core"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets">
+
+    <h:head>
+        <title></title>
+    </h:head>
+
+    <style>
+        .TopStyle{
+            vertical-align: top;
+        }
+        /*        
+                table, th, td {
+                    border: 1px solid gray;
+                    text-align: center;
+                    border-collapse: collapse;
+                }
+        */
+    </style>
+
+    <ui:include src="ui-free-form-toolbar.xhtml"/>
+    <br/>
+    <h:form id="id_freeform">
+        <p:remoteCommand 
+            name="rcHybridFormSave"
+            id="id_freeform_submit_button"
+            value="Kaydet"
+            action="#{freeDesigner.save}">
+        </p:remoteCommand>
+        <h:panelGrid 
+            columns="2" 
+            style="border: 0px solid #A6C9E2;border-collapse: collapse;width: 90%;vertical-align: top;"
+            columnClasses="TopStyle">
+            <c:forEach items="#{freeDesigner.selectedFormFieldKeySetAsList}" var="x">
+                <h:outputText 
+                    value="#{freeDesigner.myRecord.crudFieldMap[x].name}" 
+                    style="#{freeDesigner.myRecord.crudFieldMap[x].style};white-space: nowrap;"
+                    rendered="#{x!='ekler' and freeDesigner.myRecord.crudFieldMap[x].rendered}"
+                    escape="false"/>
+                <h:panelGroup rendered="#{x!='ekler'}">
+                    <p:inputText 
+                        value="#{freeDesigner.myRecord.crudMap[x]}" 
+                        readonly="#{freeDesigner.myRecord.crudFieldMap[x].readonly}"
+                        rendered="#{'inputText' eq freeDesigner.myRecord.crudFieldMap[x].componentType}"
+                        style="width: 100%;"
+                        />
+                    <p:inputTextarea 
+                        value="#{freeDesigner.myRecord.crudMap[x]}" 
+                        readonly="#{freeDesigner.myRecord.crudFieldMap[x].readonly}"
+                        rendered="#{'inputTextarea' eq freeDesigner.myRecord.crudFieldMap[x].componentType}"
+                        style="width: 100%;"
+                        />
+                    <p:calendar 
+                        value="#{freeDesigner.myRecord.crudMap[x]}" 
+                        readonly="#{freeDesigner.myRecord.crudFieldMap[x].readonly}"
+                        rendered="#{'inputDate' eq freeDesigner.myRecord.crudFieldMap[x].componentType}"
+                        style="width: 95%;"
+                        />
+                    <p:selectOneMenu
+                        value="#{freeDesigner.myRecord.crudMap[x]}" 
+                        rendered="#{'selectOneMenu' eq freeDesigner.myRecord.crudFieldMap[x].componentType and freeDesigner.myRecord.crudFieldMap[x].rendered}"
+                        disabled="#{freeDesigner.myRecord.crudFieldMap[x].readonly}"
+                        >
+                        <f:selectItems value="#{freeDesigner.myRecord.crudFieldMap[x].selectItemsCurrent}"/>
+                    </p:selectOneMenu>
+                </h:panelGroup> 
+            </c:forEach>
+
+            <h:panelGroup
+                rendered="false"
+                >
+                <h:outputText 
+                    value="#{freeDesigner.myRecord.crudFieldMap['ekler'].name}" 
+                    style="#{freeDesigner.myRecord.crudFieldMap['ekler'].style}"
+                    escape="false"/>
+                <br/>
+                <br/>
+                <h:outputText value="Belge yükleme işlemi üç eylem ile yapılmaktadır"/>
+                <br/>
+                <h:outputText value="Seç, Yükle, Kaydet"/>
+            </h:panelGroup>
+            <p:panel
+                rendered="false"
+                >
+                <!-- 1024*1024*1 = 1048576 = 1MB -->
+                <!-- 1024*1024*2 = 2097152 = 2MB -->
+                <!-- 1024*1024*3 = 3145728 = 3MB -->
+                <!-- 1024*1024*4 = 4194304 = 4MB -->
+                <!-- 1024*1024*5 = 5242880 = 5MB -->
+                <!-- 1024*1024*6 = 6291456 = 6MB -->
+                <!-- 1024*1024*7 = 7340032 = 7MB -->
+                <p:fileUpload 
+                    value="#{freeDesigner.myRecord.uploadedFile}"
+                    fileUploadListener="#{freeDesigner.upload}"
+                    cancelLabel="Vazgeç"
+                    uploadLabel="Yükle"
+                    label="Seç"
+                    invalidSizeMessage="Dosya Boyutu 2MB dan büyük olmamalı : "
+                    invalidFileMessage="Geçersiz Dosya Tipi (Sadece PDF dosyalar eklenebilir) : "
+                    fileLimitMessage="En fazla 3 dosya eklenebilir."
+                    fileLimit="3"
+                    allowTypes="/(\.|\/)(pdf)$/"
+                    sizeLimit="2097152" 
+                    style="width: 100%;"
+                    />
+                <h:panelGroup 
+                    id="id2dUploadedFiles" 
+                    >
+                    <h:outputText value="Ekli Dosyalar" style="font-size: 22px;font-weight: bolder;color: #b3b3b3;"/>
+                    <br/>
+                    <br/>
+                    <p:dataTable 
+                        var="x" 
+                        value="#{freeDesigner.fileData}" 
+                        resizableColumns="true"
+                        style="width: 100%;"
+                        >
+                        <p:column 
+                            width="#{columnMap.width}" 
+                            style="color:gray;font-size: 14px;font-family:Verdana,Arial,sans-serif;#{columnMap.style}">
+                            <f:facet name="header" >
+                                <h:outputText value="Dosya Adı"/> 
+                            </f:facet>
+                            <h:outputText value="#{x.fileName}"/> 
+                        </p:column>
+                        <p:column 
+                            width="100" 
+                            style="color:gray;font-size: 14px;font-family:Verdana,Arial,sans-serif;#{columnMap.style}">
+                            <f:facet name="header" >
+                                <h:outputText value="Dosya Boyutu"/> 
+                            </f:facet>
+                            <h:outputText value="#{x.fileSize}"/> 
+                        </p:column>
+                        <p:column 
+                            width="#{columnMap.width}" 
+                            style="white-space: nowrap;color:gray;font-size: 14px;font-family:Verdana,Arial,sans-serif;#{columnMap.style}">
+                            <f:facet name="header" >
+                                <h:outputText value="Durum"/> 
+                            </f:facet>
+                            <h:outputText value="#{x.fileState}" style="background: #{x.fileColor}"/> 
+                        </p:column>
+                        <p:column
+                            width="50" 
+                            >
+                            <f:facet name="header">
+                                <h:outputText value="Sil"/> 
+                            </f:facet>
+                            <p:commandButton 
+                                value="sil" action="#{freeDesigner.deleteFile}" 
+                                >
+                                <f:setPropertyActionListener  target="#{freeDesigner.toBeDeletedFileID}" value="#{x.fileID}"/>
+                            </p:commandButton>
+                        </p:column>
+                        <p:column 
+                            width="50" 
+                            style="color:gray;font-size: 14px;font-family:Verdana,Arial,sans-serif;#{columnMap.style}">
+                            <f:facet name="header" >
+                                <h:outputText value="İndir"/> 
+                            </f:facet>
+                            <h:outputLink 
+                                value="#{application.contextPath}/myDownloadServlet/#{x.fileID}"
+                                style="
+                                text-decoration:none;
+                                font-size: 14px;
+                                color:#112978;
+                                font-weight:bold;"
+                                >
+                                <h:outputText value="indir" />
+                            </h:outputLink>           
+                        </p:column>
+                    </p:dataTable>
+                </h:panelGroup>
+            </p:panel>
+
+            <h:outputText 
+                value="İzin Verilen Yatırım Hizmet ve Faaliyet" 
+                style="font-weight: bold;white-space: nowrap;"/>
+            <p:dataTable 
+                value="#{freeDesigner.myRecord.listOfLicense}"
+                tableStyle="width:auto"
+                var="license" >
+                <p:column style="#{license.style}">
+                    <f:facet name="header"></f:facet>
+                    <h:outputText value="#{license.licenseName}" style="white-space: nowrap;#{license.style}"/>
+                </p:column>
+                <p:column 
+                    rendered="#{not freeDesigner.myRecord.renderedInOut}"
+                    style="text-align: center;#{license.style}"
+                    >
+                    <f:facet name="header">Yurt İçinde</f:facet>
+                    <p:selectBooleanCheckbox 
+                        value="#{license.in}" 
+                        rendered="#{license.renderedIn}"
+                        disabled="#{license.readonlyIn}"
+                        />
+                </p:column>
+                <p:column 
+                    rendered="#{not freeDesigner.myRecord.renderedInOut}"
+                    style="text-align: center;#{license.style}"
+                    >
+                    <f:facet name="header">Yurt Dışında</f:facet>
+                    <p:selectBooleanCheckbox 
+                        value="#{license.out}" 
+                        rendered="#{license.renderedOut}"
+                        disabled="#{license.readonlyOut}"
+                        />
+                </p:column>
+                <p:column 
+                    style="text-align: center;#{license.style}"
+                    rendered="#{freeDesigner.myRecord.renderedInOut}"
+                    >
+                    <f:facet name="header">_</f:facet>
+                    <p:selectBooleanCheckbox 
+                        widgetVar="#{license.licenseCode}"
+                        value="#{license.inout}" 
+                        onchange="checkOthers('#{license.licenseCode}')"
+                        />
+                </p:column>
+            </p:dataTable>
+        </h:panelGrid> 
+    </h:form>
+    <br/>
+    <script>
+        function checkOthers(code) {
+            if ('F3000' === code) {
+                if (PF('F3000').isChecked()) {
+                    PF('F3020').check();
+                } else {
+                    PF('F3020').uncheck();
+                }
+            } else if ('F3020' === code) {
+                if (PF('F3020').isChecked()) {
+                    PF('F3000').check();
+                } else {
+                    PF('F3000').uncheck();
+                }
+            }
+        }
+    </script>
+
+</html>
+

@@ -1,0 +1,58 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"   
+      xmlns:composite="http://java.sun.com/jsf/composite"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:c="http://java.sun.com/jsp/jstl/core"
+      xmlns:f="http://java.sun.com/jsf/core"
+      xmlns:h="http://java.sun.com/jsf/html"
+      >
+
+    <h:head>
+        <title></title>
+        <style>
+            /*            ul.ui-menu-child {
+                            white-space: nowrap;
+                            width: auto !important;
+                        }*/
+        </style>
+    </h:head>
+
+    <composite:interface>
+        <composite:attribute name="rows" required="true"/>
+        <composite:attribute name="selectedFormInfo"/>
+        <composite:attribute name="myAction" method-signature="java.lang.String myAction()" />
+        <composite:attribute name="myActionListener" method-signature="void myActionListener(javax.faces.event.AjaxBehaviorEvent)" />
+        <composite:attribute name="myOnPaneChange" method-signature="void myOnPaneChange(org.primefaces.event.TabChangeEvent)" />
+    </composite:interface>
+
+    <composite:implementation>
+        <p:menu 
+            toggleable="true" 
+            style="width: 100%;" 
+            >    
+            <c:forEach items="#{cc.attrs.rows}" var="item">
+                <p:submenu label="#{item.name}" expanded="false">
+                    <p:menuitem
+                        value="Hakkında ..." 
+                        action="#{cc.attrs.myAction}" 
+                        update="#{updateAjaxMB.menuSelectForm}"
+                        icon="ui-icon-home"
+                        >
+                        <f:setPropertyActionListener target="#{cc.attrs.selectedFormInfo}" value="about,#{item.projectKey},#{item.moduleKey}"/>
+                    </p:menuitem>
+                    <c:forEach items="#{item.myLinks}" var="item">
+                        <p:menuitem 
+                            value="#{item.label}"
+                            action="#{cc.attrs.myAction}"
+                            update="#{updateAjaxMB.menuSelectForm}"
+                            icon="ui-icon-document"
+                            >
+                            <f:setPropertyActionListener target="#{cc.attrs.selectedFormInfo}" value="#{item.value}"/>
+                        </p:menuitem>
+                    </c:forEach>                   
+                </p:submenu>
+            </c:forEach>
+        </p:menu> 
+    </composite:implementation>
+</html>

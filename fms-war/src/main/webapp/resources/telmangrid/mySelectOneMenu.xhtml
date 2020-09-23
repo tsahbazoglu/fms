@@ -1,0 +1,29 @@
+<!--http://www.ibm.com/developerworks/java/library/j-jsf2fu0111/index.html-->
+
+<html xmlns="http://www.w3.org/1999/xhtml"   
+      xmlns:h="http://java.sun.com/jsf/html"
+      xmlns:ui="http://java.sun.com/jsf/facelets"
+      xmlns:composite="http://java.sun.com/jsf/composite"
+      >
+    <h:head>
+        <title></title>
+    </h:head>
+
+
+    <composite:interface>
+        <composite:attribute name="rows" required="true"/>
+    </composite:interface>
+
+
+    <composite:implementation>
+        <select style="white-space: pre;font-family: monospace;">
+            <ui:repeat value="#{cc.attrs.rows}" var="telman">
+                <option value="#{telman.value}">
+                    <h:outputText 
+                        value="#{telman.label}"
+                        escape="false"/>    
+                </option>
+            </ui:repeat>
+        </select>
+    </composite:implementation>
+</html>

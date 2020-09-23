@@ -1,0 +1,98 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://java.sun.com/jsf/html"
+      xmlns:p="http://primefaces.org/ui"          
+      xmlns:f="http://java.sun.com/jsf/core">
+
+    <h:head>
+        <title></title>
+    </h:head>
+
+    <style>
+        TopStyle{
+            vertical-align: top;
+        }
+        /*        
+                table, th, td {
+                    border: 1px solid gray;
+                    text-align: center;
+                    border-collapse: collapse;
+                }
+        */
+    </style>
+
+
+    <h:form>
+        <h:outputText value="Arama" style="font-size: 22px;font-weight: bolder;color: #b3b3b3;"/>
+        <br/>
+        <br/>
+        <p:autoComplete
+            dropdown="true" 
+            value="#{freeDesigner.searchLoginMemberID}"
+            completeMethod="#{freeDesigner.completeMethod}" 
+            converter="documentConverter"
+            var="item" 
+            itemLabel="#{item.name}"
+            itemValue="#{item}"
+            forceSelection="true"
+            minQueryLength="2"    
+            inputStyle="width:335px;"
+            placeholder="arama için en az 2 büyük harf (boşluk dahil)"
+            >
+        </p:autoComplete>
+        <p:commandButton
+            value="getir"
+            action="#{freeDesigner.search}"
+            update=":id-tab-view:id_form:id_table"
+            />
+    </h:form>
+
+    <h:form
+        id="id_form"
+        rendered="true"
+        >
+        <br/>
+        <br/>
+        <h:outputText value="Liste" style="font-size: 22px;font-weight: bolder;color: #b3b3b3;"/>
+        <br/>
+        <br/>
+        <p:dataTable
+            id="id_table"
+            var="x"
+            value="#{freeDesigner.myRecords}" 
+            selection="#{freeDesigner.selectedRow}"
+            paginator="true" 
+            rows="25"
+            paginatorTemplate="{RowsPerPageDropdown} {FirstPageLink} {PreviousPageLink} {CurrentPageReport} {NextPageLink} {LastPageLink}"
+            rowsPerPageTemplate="10,20,30" 
+            selectionMode="single" 
+            lazy="true"
+            resizableColumns="true"
+            paginatorPosition="bottom"
+            style="width: 100%"            
+            >
+            <p:ajax event="rowSelect" listener="#{freeDesigner.selectListener}"/>
+            <p:column
+                width="100" 
+                style="color:gray;font-size: 14px;font-family:Verdana,Arial,sans-serif;#{columnMap.style}">
+                <f:facet name="header">
+                    <h:outputText value="Kullanıcı Adı"/> 
+                </f:facet>
+                <h:outputText value="#{x.memberName}"/> 
+            </p:column>
+            <p:column
+                width="100" 
+                style="color:gray;font-size: 14px;font-family:Verdana,Arial,sans-serif;#{columnMap.style}">
+                <f:facet name="header">
+                    <h:outputText value="Bildirim Adı"/> 
+                </f:facet>
+                <h:outputText value="#{x.crudMap.formName}"/> 
+            </p:column>
+            <p:column
+                width="10" 
+                style="color:gray;font-size: 14px;font-family:Verdana,Arial,sans-serif;#{columnMap.style}">
+            </p:column>
+        </p:dataTable>
+    </h:form>
+</html>

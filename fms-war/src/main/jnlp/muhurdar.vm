@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<jnlp 
+    spec="1.0+"
+    codebase=""
+    href="">
+  <information>
+    <title>Muhurdar</title>
+    <vendor>Ozgur Yazilim A.S.</vendor>
+  </information>
+  <security>
+     <all-permissions/>
+  </security>
+  <resources>
+    <j2se version="1.7+" href="http://java.sun.com/products/autodl/j2se" />
+     $dependencies
+  </resources>
+  <applet-desc 
+         name="Muhurdar"
+         main-class="com.ozguryazilim.muhurdar.Muhurdar"
+         width="1"
+         height="1">
+   </applet-desc>
+   <update check="always" policy="always"/>
+</jnlp>

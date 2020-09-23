@@ -1,0 +1,561 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:f="http://java.sun.com/jsf/core"
+      xmlns:h="http://java.sun.com/jsf/html"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:c="http://java.sun.com/jsp/jstl/core"
+      xmlns:mydynamic="http://java.sun.com/jsf/composite/mydinamic"
+      xmlns:mygrid="http://java.sun.com/jsf/composite/telmangrid"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets">
+
+    <h:head>
+        <title></title>
+    </h:head>
+
+
+    <h:panelGroup id="id-panel-crud">
+
+        <p:messages 
+            showDetail="true"
+            closable="true">
+            <p:autoUpdate/>
+        </p:messages>
+
+        <p:toolbar
+            id="id-2d-toolbar"
+            style="width: 100%;"
+            >
+            <f:facet name="left">              
+                <p:button  
+                    icon="ui-icon-home" 
+                    disabled="true">
+                </p:button>
+                <p:commandButton 
+                    onclick="PF('specialConfirmationDialog').show(); return false;"
+                    value="Sil" 
+                    transient="true"
+                    rendered="#{guiService.selectedForm.myActions.delete}"
+                    />  
+                <p:button
+                    onclick="rcSave();return false;"
+                    value="Kaydet" 
+                    rendered="#{guiService.selectedForm.myActions.save}"
+                    />
+                <p:commandButton 
+                    id="id_2d_buttonSaveAsObjectId"
+                    value="Farklı Kaydet" 
+                    action="#{twoDimModifyCtrl.saveAsObject}" 
+                    rendered="#{guiService.selectedForm.myActions.saveAs}"
+                    update="#{updateAjaxMB.btn2dSaveAs}"
+                    />
+                <p:commandButton 
+                    id="id_2d_button_esign"
+                    value="2:1 - Eimza Süreci" 
+                    action="#{twoDimModifyCtrl.showEimza}" 
+                    rendered="#{guiService.selectedForm.myActions.eimza1D}"
+                    update="#{updateAjaxMB.btn2dDlgEsign}"
+                    />
+                <!--rendered="# {twoDimModifyCtrl.dependOnSelectedFormRenderedMap['save']and twoDimModifyCtrl.myObject['resultType']['code']=='001'}"-->
+                <p:commandButton 
+                    id="buttonCopyObject"
+                    value="Kopyala" 
+                    action="#{twoDimModifyCtrl.copyObject}" 
+                    rendered="false"/>
+
+                <p:commandButton 
+                    value="Ödeme İşlemi" 
+                    action="#{twoDimModifyCtrl.payment}" 
+                    style="white-space: nowrap;"
+                    update=":id-dlg-payment,:idMessageDialog"
+                    rendered="#{guiService.selectedForm.myActions.payment}"
+                    />
+
+                <p:commandButton 
+                    value="indirmek için tıklayınız." 
+                    ajax="false" 
+                    icon="ui-icon-arrowthick-1-s"
+                    rendered="#{guiService.selectedForm.myActions.pdf}"
+                    >
+                    <p:fileDownload value="#{twoDimModifyCtrl.file}"/>
+                </p:commandButton>
+
+                <p:commandButton 
+                    value="LDAP" 
+                    onclick="PF('wv_dlg_ldap').show(); return false;"
+                    style="white-space: nowrap;"
+                    update="id_dlg_ldap"
+                    rendered="#{guiService.selectedForm.myActions.ldap}"
+                    >
+                </p:commandButton>
+
+                <h:outputText 
+                    value="Tarihçe Etkin(siz)leştir" 
+                    style="white-space: nowrap;"
+                    rendered="#{roleMB[mainFrame.architectRole] and guiService.selectedForm.myActions.save}"/>
+
+                <h:selectBooleanCheckbox  
+                    value="#{twoDimModifyCtrl.enableHistoryOnSave}" 
+                    readonly="true"
+                    rendered="#{roleMB[mainFrame.architectRole] and guiService.selectedForm.myActions.save}"/>
+
+                <h:selectOneMenu 
+                    value="#{twoDimModifyCtrl.transparentProperties['emailType']}" 
+                    rendered="#{guiService.selectedForm.myActions.email}"
+                    >
+                    <f:selectItems value="#{guiService.emailTypes}"/>
+                </h:selectOneMenu> 
+
+                <p:commandButton 
+                    id="buttonSendEmailId"
+                    value="Email Önizleme"
+                    action="#{twoDimModifyCtrl.actionEmail}"
+                    rendered="#{guiService.selectedForm.myActions.email}"
+                    update=":idEmailPreview,:idMessageDialog"
+                    /> 
+
+                <c:forEach 
+                    items="#{guiService.selectedForm.myActions.list}" 
+                    var="dynamicBtn"
+                    rendered="#{guiService.selectedForm.hasWorkflowRelation}"
+                    >
+                    <p:commandButton  
+                        value="#{dynamicBtn.label}"
+                        action="#{dynamicBtn.execute}"
+                        immediate="true"
+                        /> 
+                </c:forEach>
+
+                <c:forEach 
+                    items="#{workFlowCtrl.triggers}" 
+                    var="trigger"
+                    >
+                    <p:commandButton 
+                        value="#{trigger}" 
+                        action="#{workFlowCtrl.fireProcess}" 
+                        update="#{updateAjaxMB.btnWfOnCrud}"                     
+                        >
+                        <f:setPropertyActionListener value="#{trigger}" target="#{workFlowCtrl.trigger}"/>
+                    </p:commandButton>
+                </c:forEach>
+
+            </f:facet>
+
+            <f:facet name="right">
+                <p:outputLabel value="adım : #{twoDimModifyCtrl.myObject['smState']}"/>
+            </f:facet>
+
+        </p:toolbar>
+
+        <br/>
+
+        <p:scrollPanel styleClass="td-8">
+
+            <h:form id="crud2dForm">
+                <p:remoteCommand 
+                    name="rcDelete"
+                    value="Sormadan Sil"
+                    action="#{twoDimModifyCtrl.deleteObject}" 
+                    rendered="#{guiService.selectedForm.myActions.delete}"
+                    update="#{updateAjaxMB.buttonDeleteDirectly}"
+                    immediate="true"
+                    /> 
+                <p:remoteCommand 
+                    name="rcSave"
+                    value="Kaydet" 
+                    action="#{twoDimModifyCtrl.saveObject}" 
+                    rendered="#{guiService.selectedForm.myActions.save}"
+                    update="#{updateAjaxMB.btn2dSave}"
+                    />
+                <br/>
+                <h:panelGrid 
+                    id="crud_2d_dlg_panel"
+                    columns="4" 
+                    columnClasses="td-3,td-2,td-2,td-1" 
+                    styleClass="tableWidth">
+
+                    <c:forEach items="#{guiService.twoDimDlgUi.componentList}" var="myField">
+
+                        <h:panelGroup id="id-label-#{myField.key}" class="#{myField.styleClass}">
+                            <h:outputText
+                                value="#{myField.label}" 
+                                escape="false"
+                                style="#{myField.style}"
+                                rendered="#{myField.rendered}"
+                                >
+                            </h:outputText>
+                            <p:commandButton 
+                                value="detay" 
+                                style="font-size:8px;"
+                                action="#{mainFrame.myActionListener1}" 
+                                update="#{updateAjaxMB.btnDetay}"
+                                rendered="#{myField.rendered and myField.hasHref}"
+                                immediate="true"
+                                >
+                                <f:setPropertyActionListener value="#{myField.href}" target="#{mainFrame.showDetailProjectFormKeys}"/>
+                                <f:setPropertyActionListener value="#{twoDimModifyCtrl.myObject[myField.key]}" target="#{mainFrame.showDetailObject}"/>
+                            </p:commandButton>
+                            <p:commandButton 
+                                value="güncelle" 
+                                style="font-size:8px;"
+                                action="#{mainFrame.myActionListener2}"
+                                update="#{updateAjaxMB.btnEditDetail}"
+                                rendered="#{myField.rendered and myField.hasHref}"
+                                immediate="true"
+                                >
+                                <f:setPropertyActionListener value="#{myField.href}" target="#{mainFrame.showDetailProjectFormKeys}"/>
+                                <f:setPropertyActionListener value="#{twoDimModifyCtrl.myObject[myField.key]}" target="#{mainFrame.showDetailObject}"/>
+                            </p:commandButton>
+                        </h:panelGroup>
+
+                        <h:panelGroup id="id-component-#{myField.key}" class="#{myField.styleClass}">
+                            <mydynamic:uysSelectMenuTable  
+                                myvalue="#{dataService.myMap[myField.key]}"
+                                myField="#{myField}"
+                                myFieldKey="#{myField.key}"
+                                myProjectKey="#{guiService.selectedForm.projectKey}"
+                                myUpperNode="#{guiService.selectedForm.upperNode}"
+                                myFormKey="#{guiService.selectedForm.key}"
+                                myreadonly="#{myField.readonly}" 
+                                label="#{myField.label}" 
+                                myitems="#{myField.selectItemsCurrent}" 
+                                myrequired="#{myField.required}"
+                                rendered="#{twoDimModifyCtrl.selectOneMenu eq  myField.componentType and myField.rendered}"
+                                myconverter="#{myField.myconverter}"
+                                isAjax="#{myField.ajax}"
+                                ajax_update="#{myField.ajaxUpdate}"
+                                />
+                            <p:autoComplete 
+                                dropdown="true" 
+                                value="#{dataService.myMap[myField.key]}"
+                                completeMethod="#{myField.completeMethod}" 
+                                rendered="#{twoDimModifyCtrl.autoComplete eq  myField.componentType and myField.rendered}"
+                                converter="documentConverter"
+                                var="item" 
+                                itemLabel="#{item.name}"
+                                itemValue="#{item}"
+                                forceSelection="true"
+                                minQueryLength="3"    
+                                inputStyle="width:335px;"
+                                />
+                            <mydynamic:uysSelectManyListbox 
+                                myvalue="#{twoDimModifyCtrl.myObject[myField.key]}"
+                                label="#{myField.label}" 
+                                myitems="#{myField.selectItemsCurrent}" 
+                                rendered="#{twoDimModifyCtrl.selectManyListbox eq  myField.componentType and myField.rendered}"
+                                myconverter="#{myField.myconverter}"
+                                />
+                            <mydynamic:uysInputText 
+                                myvalue="#{dataService.myMap[myField.key]}"
+                                myFieldKey="#{myField.key}"
+                                myreadonly="#{myField.readonly}" 
+                                myrequired="#{myField.required}"
+                                mystyle="#{myField.style}"
+                                myCalculateOnCrudView="#{myField.calculateOnCrudView}"
+                                myCalculateOnListView="#{myField.calculateOnListView}"
+                                myCalculateOnSave="#{myField.calculateOnSave}"
+                                label="#{myField.label}" 
+                                rendered="#{twoDimModifyCtrl.inputText eq  myField.componentType and myField.rendered}"
+                                myConverter="#{myField.myconverter}"
+                                myConverterInstance="#{myField.converterInstance}" 
+                                myConverterFormat="#{myField.converterFormat}" 
+                                crudObject="#{twoDimModifyCtrl.myObject}"
+                                myMaxValue="#{myField.maxValue}" 
+                                shouldCheckNegative="#{myField.shouldCheckNegative}"
+                                /> 
+                            <mydynamic:uysInputMask 
+                                myvalue="#{dataService.myMap[myField.key]}"
+                                myFieldKey="#{myField.key}"
+                                myrequired="#{myField.required}"
+                                myreadonly="#{myField.readonly}" 
+                                mystyle="#{myField.style}"
+                                myCalculateOnCrudView="#{myField.calculateOnCrudView}"
+                                myCalculateOnListView="#{myField.calculateOnListView}"
+                                myCalculateOnSave="#{myField.calculateOnSave}"
+                                label="#{myField.label}" 
+                                rendered="#{twoDimModifyCtrl.inputMask eq myField.componentType and myField.rendered}"
+                                myConverter="#{myField.myconverter}"
+                                myConverterInstance="#{myField.converterInstance}" 
+                                myConverterFormat="#{myField.converterFormat}" 
+                                crudObject="#{twoDimModifyCtrl.myObject}"
+                                myMaxValue="#{myField.maxValue}" 
+                                shouldCheckNegative="#{myField.shouldCheckNegative}"
+                                myMask="#{myField.mask}"
+                                />
+                            <mydynamic:uysInputTextArea 
+                                myvalue="#{dataService.myMap[myField.key]}"
+                                myreadonly="#{myField.readonly}" 
+                                myrequired="#{myField.required}"
+                                label="#{myField.label}" 
+                                rendered="#{twoDimModifyCtrl.inputTextarea eq myField.componentType and myField.rendered}"
+                                myconverter="#{myField.myconverter}"
+                                />
+                            <mydynamic:uysDateTimeEntry 
+                                myvalue="#{dataService.myMap[myField.key]}"
+                                label="#{myField.label}" 
+                                rendered="#{myField.componentType eq twoDimModifyCtrl.inputDate and myField.rendered}"
+                                myconverter="#{myField.myconverter}"
+                                myrequired="#{myField.required}"
+                                mypattern="#{myField.datePattern}"
+                                dateChange="#{twoDimModifyCtrl.dateChange}"
+                                />
+                            <mydynamic:uysSelectBooleanCheckbox 
+                                myvalue="#{dataService.myMap[myField.key]}"
+                                label="#{myField.label}" 
+                                rendered="#{twoDimModifyCtrl.selectBooleanCheckbox eq  myField.componentType and myField.rendered}"
+                                myconverter="#{myField.myconverter}"
+                                />
+                        </h:panelGroup>
+
+                        <h:panelGroup id="id-desc-#{myField.key}" class="#{myField.styleClass}">
+                            <p:outputLabel
+                                value="#{myField.description} &nbsp;&nbsp;"
+                                rendered="#{myField.renderDesc}"
+                                />
+                            <p:commandButton 
+                                icon="fa fa-info-circle" 
+                                action="#{twoDimModifyCtrl.showMyFieldDesc}"
+                                immediate="true"
+                                value="Bilgi" 
+                                update="id-desc-dlg-pnl"
+                                rendered="#{myField.renderPopupDesc}"
+                                style="font-size:10px"
+                                >
+                                <f:setPropertyActionListener value="#{myField}" target="#{twoDimModifyCtrl.selectedField}"/>
+                            </p:commandButton>
+                        </h:panelGroup>
+
+                        <h:outputText/>
+
+                    </c:forEach>
+
+                </h:panelGrid>
+                <br/>
+                <p:panel
+                    id="id-pnl-wf"
+                    header="Süreç İşlemleri"
+                    rendered="#{guiService.selectedForm.workFlowActive}"
+                    >
+                    <h:panelGrid 
+                        columns="3" 
+                        columnClasses="td1,td2" 
+                        styleClass="tableWidth">
+
+                        <c:forEach items="#{workFlowCtrl.fieldsAsList}" var="myField">
+
+                            <h:panelGroup id="id-label-#{myField.key}" class="#{myField.styleClass}">
+                                <h:outputText
+                                    value="#{myField.label}" 
+                                    escape="false"
+                                    style="#{myField.style}"
+                                    rendered="#{myField.rendered}"
+                                    >
+                                </h:outputText>
+                                <p:commandButton 
+                                    value="detay" 
+                                    style="font-size:8px;"
+                                    action="#{mainFrame.myActionListener1}" 
+                                    update="#{updateAjaxMB.btnDetay}"
+                                    rendered="#{myField.rendered and myField.hasHref}"
+                                    >
+                                    <f:setPropertyActionListener value="#{myField.href}" target="#{mainFrame.showDetailProjectFormKeys}"/>
+                                    <f:setPropertyActionListener value="#{twoDimModifyCtrl.myObject[myField.key]}" target="#{mainFrame.showDetailObject}"/>
+                                </p:commandButton>
+                                <p:commandButton 
+                                    value="güncelle" 
+                                    style="font-size:8px;"
+                                    action="#{mainFrame.myActionListener2}"
+                                    update="#{updateAjaxMB.btnEditDetail}"
+                                    rendered="#{myField.rendered and myField.hasHref}"
+                                    >
+                                    <f:setPropertyActionListener value="#{myField.href}" target="#{mainFrame.showDetailProjectFormKeys}"/>
+                                    <f:setPropertyActionListener value="#{twoDimModifyCtrl.myObject[myField.key]}" target="#{mainFrame.showDetailObject}"/>
+                                </p:commandButton>
+                            </h:panelGroup>
+                            <h:panelGroup id="id-component-#{myField.key}" class="#{myField.styleClass}">
+                                <mydynamic:uysSelectMenuTable
+                                    myvalue="#{twoDimModifyCtrl.myObject[myField.key]}"
+                                    myFieldKey="#{myField}"
+                                    myFieldKey="#{myField.key}"
+                                    myProjectKey="#{guiService.selectedForm.projectKey}"
+                                    myUpperNode="#{guiService.selectedForm.upperNode}"
+                                    myFormKey="#{guiService.selectedForm.key}"
+                                    myreadonly="#{myField.readonly}" 
+                                    label="#{myField.label}" 
+                                    myitems="#{myField.selectItemsCurrent}" 
+                                    myrequired="#{myField.required}"
+                                    rendered="#{twoDimModifyCtrl.selectOneMenu eq  myField.componentType and myField.rendered}"
+                                    myconverter="#{myField.myconverter}"
+                                    isAjax="#{myField.ajax}"
+                                    ajax_update="#{myField.ajaxUpdate}"
+                                    myStyle="width:50px;"
+                                    />
+                                <mydynamic:uysSelectManyListbox 
+                                    myvalue="#{twoDimModifyCtrl.myObject[myField.key]}"
+                                    label="#{myField.label}" 
+                                    myitems="#{myField.selectItemsCurrent}" 
+                                    rendered="#{twoDimModifyCtrl.selectManyListbox eq  myField.componentType and myField.rendered}"
+                                    myconverter="#{myField.myconverter}"
+                                    />
+                                <mydynamic:uysInputText 
+                                    myvalue="#{twoDimModifyCtrl.myObject[myField.key]}"
+                                    myFieldKey="#{myField.key}"
+                                    myreadonly="#{myField.readonly}" 
+                                    myrequired="#{myField.required}"
+                                    mystyle="#{myField.style}"
+                                    myCalculateOnCrudView="#{myField.calculateOnCrudView}"
+                                    myCalculateOnListView="#{myField.calculateOnListView}"
+                                    myCalculateOnSave="#{myField.calculateOnSave}"
+                                    label="#{myField.label}" 
+                                    rendered="#{twoDimModifyCtrl.inputText eq  myField.componentType and myField.rendered}"
+                                    myConverter="#{myField.myconverter}"
+                                    myConverterInstance="#{myField.converterInstance}" 
+                                    myConverterFormat="#{myField.converterFormat}" 
+                                    crudObject="#{twoDimModifyCtrl.myObject}"
+                                    myMaxValue="#{myField.maxValue}" 
+                                    shouldCheckNegative="#{myField.shouldCheckNegative}"
+                                    /> 
+                                <mydynamic:uysInputMask 
+                                    myvalue="#{twoDimModifyCtrl.myObject[myField.key]}"
+                                    myFieldKey="#{myField.key}"
+                                    myrequired="#{myField.required}"
+                                    myreadonly="#{myField.readonly}" 
+                                    mystyle="#{myField.style}"
+                                    myCalculateOnCrudView="#{myField.calculateOnCrudView}"
+                                    myCalculateOnListView="#{myField.calculateOnListView}"
+                                    myCalculateOnSave="#{myField.calculateOnSave}"
+                                    label="#{myField.label}" 
+                                    rendered="#{twoDimModifyCtrl.inputMask eq myField.componentType and myField.rendered}"
+                                    myConverter="#{myField.myconverter}"
+                                    myConverterInstance="#{myField.converterInstance}" 
+                                    myConverterFormat="#{myField.converterFormat}" 
+                                    crudObject="#{twoDimModifyCtrl.myObject}"
+                                    myMaxValue="#{myField.maxValue}" 
+                                    shouldCheckNegative="#{myField.shouldCheckNegative}"
+                                    myMask="#{myField.mask}"
+                                    />
+                                <mydynamic:uysInputTextArea 
+                                    myvalue="#{twoDimModifyCtrl.myObject[myField.key]}"
+                                    myreadonly="#{myField.readonly}" 
+                                    myrequired="#{myField.required}"
+                                    label="#{myField.label}" 
+                                    rendered="#{twoDimModifyCtrl.inputTextarea eq myField.componentType and myField.rendered}"
+                                    myconverter="#{myField.myconverter}"
+                                    />
+                                <mydynamic:uysDateTimeEntry 
+                                    myvalue="#{twoDimModifyCtrl.myObject[myField.key]}"
+                                    label="#{myField.label}" 
+                                    rendered="#{myField.componentType eq twoDimModifyCtrl.inputDate and myField.rendered}"
+                                    myconverter="#{myField.myconverter}"
+                                    myrequired="#{myField.required}"
+                                    myreadonly="#{myField.readonly}"
+                                    mypattern="#{myField.datePattern}"
+                                    dateChange="#{twoDimModifyCtrl.dateChange}"
+                                    />
+                                <mydynamic:uysSelectBooleanCheckbox 
+                                    myvalue="#{twoDimModifyCtrl.myObject[myField.key]}"
+                                    label="#{myField.label}" 
+                                    rendered="#{twoDimModifyCtrl.selectBooleanCheckbox eq  myField.componentType and myField.rendered}"
+                                    myconverter="#{myField.myconverter}"
+                                    />
+                            </h:panelGroup>
+                            <h:panelGroup id="id-desc-#{myField.key}" class="#{myField.styleClass}">
+                                <h:outputText 
+                                    value="#{myField.description}"
+                                    rendered="#{myField.rendered}"
+                                    >
+                                </h:outputText>
+                            </h:panelGroup>
+                        </c:forEach>
+                    </h:panelGrid>
+                </p:panel>
+                <br/>
+            </h:form>
+
+            <h:panelGroup id="idPanelUploadFile">
+                <h:form id="idInputFileForm"
+                        rendered="#{guiService.selectedForm.hasAttachedFiles}"
+                        enctype="multipart/form-data"
+                        >
+                    <p:fileUpload 
+                        value="#{twoDimModifyCtrl.uploadedFile}"
+                        fileUploadListener="#{twoDimModifyCtrl.upload}"
+                        cancelLabel="Vazgeç"
+                        uploadLabel="Yükle"
+                        label="Seç"
+                        invalidSizeMessage="Dosya Boyutu 4MB dan büyük olmamalı : "
+                        invalidFileMessage="#{twoDimModifyCtrl.invalidFileMessage}"
+                        fileLimitMessage="En fazla #{twoDimModifyCtrl.fileLimit} dosya eklenebilir."
+                        fileLimit="#{twoDimModifyCtrl.fileLimit}"
+                        allowTypes="#{twoDimModifyCtrl.mongoUploadFileType}"
+                        sizeLimit="4194304"
+                        />  
+                </h:form>
+
+                <br/>
+
+                <h:panelGroup id="id2dUploadedFiles">
+                    <h:outputText value="Ekli Dosyalar" style="font-size: 22px;font-weight: bolder;color: #b3b3b3;"/>
+                    <br/>
+                    <br/>
+                    <p:dataTable 
+                        var="x" 
+                        value="#{twoDimModifyCtrl.fileData}" 
+                        rendered="#{guiService.selectedForm.hasAttachedFiles}"
+                        >
+                        <p:column width="#{columnMap.width}" style="color:gray;font-size: 14px;font-family:Verdana,Arial,sans-serif;#{columnMap.style}">
+                            <f:facet name="header" >
+                                <h:outputText value="Dosya Adı"/> 
+                            </f:facet>
+                            <h:outputText value="#{x.fileName}"/> 
+                        </p:column>
+                        <p:column width="#{columnMap.width}" style="color:gray;font-size: 14px;font-family:Verdana,Arial,sans-serif;#{columnMap.style}">
+                            <f:facet name="header" >
+                                <h:outputText value="Dosya Boyutu"/> 
+                            </f:facet>
+                            <h:outputText value="#{x.fileSize}"/> 
+                        </p:column>
+                        <p:column width="#{columnMap.width}" style="color:gray;font-size: 14px;font-family:Verdana,Arial,sans-serif;#{columnMap.style}">
+                            <f:facet name="header" >
+                                <h:outputText value="Durum"/> 
+                            </f:facet>
+                            <h:outputText value="#{x.fileState}" style="background: #{x.fileColor}"/> 
+                        </p:column>
+                        <p:column>
+                            <f:facet name="header">
+                                <h:outputText value="Sil"/> 
+                            </f:facet>
+                            <p:commandButton 
+                                value="sil" action="#{twoDimModifyCtrl.deleteFile}"
+                                >
+                                <f:setPropertyActionListener  target="#{twoDimModifyCtrl.toBeDeletedFileID}" value="#{x.fileID}"/>
+                            </p:commandButton>
+                        </p:column>
+                        <p:column width="#{columnMap.width}" style="color:gray;font-size: 14px;font-family:Verdana,Arial,sans-serif;#{columnMap.style}">
+                            <f:facet name="header" >
+                                <h:outputText value="İndir"/> 
+                            </f:facet>
+                            <h:outputLink 
+                                value="#{application.contextPath}/myDownloadServlet/#{x.fileID}"
+                                style="
+                                text-decoration:none;
+                                font-size: 14px;
+                                color:#112978;
+                                font-weight:bold;"
+                                >
+                                <h:outputText value="indir" />
+                            </h:outputLink>           
+                        </p:column>
+                    </p:dataTable>
+                </h:panelGroup>
+            </h:panelGroup>   
+
+
+            <br/>
+            <br/>
+        </p:scrollPanel>
+
+    </h:panelGroup>
+
+
+</html>

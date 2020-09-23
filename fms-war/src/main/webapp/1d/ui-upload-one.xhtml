@@ -1,0 +1,104 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:f="http://java.sun.com/jsf/core"
+      xmlns:h="http://java.sun.com/jsf/html"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:mydynamic="http://java.sun.com/jsf/composite/mydinamic"
+      xmlns:mygrid="http://java.sun.com/jsf/composite/telmangrid">
+
+    <h:head>
+        <title></title>
+    </h:head>
+
+    <h:panelGroup id="idPanelUploadFile1D">
+        <h:panelGroup rendered="#{formService.myForm.hasAttachedFiles}">
+            <h:outputText value="Dosya Yükleme Aracı" style="font-size: 22px;font-weight: bolder;color: #b3b3b3;"/>
+            <br/>
+            <br/> 
+            <h:form 
+                id="idInputFileForm1D"
+                enctype="multipart/form-data"
+                rendered="#{not roleMB[formService.myForm.myProject.adminAndViewerRole]}"
+                >              
+                <p:fileUpload 
+                    value="#{crudOneDim.uploadedFile}"
+                    fileUploadListener="#{crudOneDim.upload}"
+                    allowTypes="#{crudOneDim.mongoUploadFileType}"
+                    invalidSizeMessage="Dosya Boyutu 4MB dan büyük olmamalı : "
+                    invalidFileMessage="#{crudOneDim.invalidFileMessage}"
+                    fileLimitMessage="En fazla #{crudOneDim.fileLimit} dosya eklenebilir."
+                    fileLimit="#{crudOneDim.fileLimit}"
+                    sizeLimit="15728640"
+                    update="#{updateAjaxMB.action1dUploadFile}"
+                    cancelLabel="Vazgeç"
+                    uploadLabel="Yükle"
+                    label="Seç"
+                    />  
+            </h:form>
+
+            <br/> 
+            <br/> 
+            <h:panelGroup id="idUploadedFiles">
+                <h:outputText value="Ekli Dosyalar" style="font-size: 22px;font-weight: bolder;color: #b3b3b3;"/>
+                <br/>
+                <br/> 
+                <p:dataTable 
+                    value="#{crudOneDim.listFileData}" 
+                    var="x"
+                    >
+                    <p:column>
+                        <f:facet name="header">
+                            <h:outputText value="Dosya Adı"/> 
+                        </f:facet>
+                        <h:outputText value="#{x.fileName}"/> 
+                    </p:column>
+                    <p:column>
+                        <f:facet name="header">
+                            <h:outputText value="Dosya Boyutu"/>
+                        </f:facet>
+                        <h:outputText value="#{x.fileSize}"/> 
+
+                    </p:column>
+                    <p:column>
+                        <f:facet name="header">
+                            <h:outputText value="Durum"/>
+                        </f:facet>
+                        <h:outputText value="#{x.fileState}" style="background: #{x.fileColor}"/> 
+                    </p:column>
+
+                    <p:column>
+                        <f:facet name="header">
+                            <h:outputText value="Sil"/> 
+                        </f:facet>
+                        <p:commandButton 
+                            value="sil" 
+                            action="#{crudOneDim.deleteFile}" 
+                            rendered="#{formService.myForm.myActions.delete}"
+                            update="#{updateAjaxMB.btn1dRemoveFile}"
+                            >
+                            <f:setPropertyActionListener  target="#{crudOneDim.toBeDeletedFileID}" value="#{x.fileID}"/>
+                        </p:commandButton>
+                    </p:column>
+                    <p:column>
+                        <f:facet name="header">
+                            <h:outputText value="İndir"/>  
+                        </f:facet>
+                        <h:outputLink 
+                            value="#{application.contextPath}/myDownloadServlet/#{x.fileID}"
+                            style="
+                            text-decoration:none;
+                            font-size: 14px;
+                            color:#112978;
+                            font-weight:bold;"
+                            >
+                            <h:outputText value="indir" />
+                        </h:outputLink>  
+                    </p:column>
+                </p:dataTable>
+            </h:panelGroup>
+        </h:panelGroup>
+    </h:panelGroup>
+
+
+</html>

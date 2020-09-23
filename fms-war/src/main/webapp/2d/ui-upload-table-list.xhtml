@@ -1,0 +1,60 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:f="http://java.sun.com/jsf/core"
+      xmlns:h="http://java.sun.com/jsf/html"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:mydynamic="http://java.sun.com/jsf/composite/mydinamic"
+      xmlns:mygrid="http://java.sun.com/jsf/composite/telmangrid">
+
+    <h:head>
+        <title></title>
+    </h:head>
+
+    <h:panelGroup id="id-table-file-list">
+        <h:outputText value="Ekli Dosyalar" style="font-size: 22px;font-weight: bolder;color: #b3b3b3;"/>
+        <br/>
+        <br/>
+        <p:dataTable 
+            var="x" 
+            value="#{twoDimModifyCtrl.fileListAll}" 
+            rendered="#{formService.myForm.hasAttachedFiles}"
+            >
+            <p:column width="#{columnMap.width}" style="color:gray;font-size: 14px;font-family:Verdana,Arial,sans-serif;#{columnMap.style}">
+                <f:facet name="header" >
+                    <h:outputText value="Dosya Adı"/> 
+                </f:facet>
+                <h:outputText value="#{x.fileName}"/> 
+            </p:column>
+            <p:column width="#{columnMap.width}" style="color:gray;font-size: 14px;font-family:Verdana,Arial,sans-serif;#{columnMap.style}">
+                <f:facet name="header" >
+                    <h:outputText value="Dosya Boyutu"/> 
+                </f:facet>
+                <h:outputText value="#{x.fileSize}"/> 
+            </p:column>
+            <p:column width="#{columnMap.width}" style="color:gray;font-size: 14px;font-family:Verdana,Arial,sans-serif;#{columnMap.style}">
+                <f:facet name="header" >
+                    <h:outputText value="Durum"/> 
+                </f:facet>
+                <h:outputText value="#{x.fileState}" style="background: #{x.fileColor}"/> 
+            </p:column>
+            <p:column width="#{columnMap.width}" style="color:gray;font-size: 14px;font-family:Verdana,Arial,sans-serif;#{columnMap.style}">
+                <f:facet name="header" >
+                    <h:outputText value="İndir"/> 
+                </f:facet>
+                <h:outputLink 
+                    value="#{application.contextPath}/myDownloadServlet/#{x.fileID}"
+                    style="
+                    text-decoration:none;
+                    font-size: 14px;
+                    color:#112978;
+                    font-weight:bold;"
+                    >
+                    <h:outputText value="indir" />
+                </h:outputLink>           
+            </p:column>
+        </p:dataTable>
+    </h:panelGroup>
+
+
+</html>

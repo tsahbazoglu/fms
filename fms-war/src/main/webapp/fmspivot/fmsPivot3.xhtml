@@ -1,0 +1,80 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://java.sun.com/jsf/html"
+      xmlns:p="http://primefaces.org/ui"          
+      xmlns:f="http://java.sun.com/jsf/core"
+      xmlns:c="http://java.sun.com/jsp/jstl/core">
+
+    <h:head>
+        <title></title>
+    </h:head>
+
+    <style>
+        .TopStyle{
+            vertical-align: top;
+        }
+        /*        
+                table, th, td {
+                    border: 1px solid gray;
+                    text-align: center;
+                    border-collapse: collapse;
+                }
+        */
+    </style>
+
+    <h:form id="id_freeform">
+        <p:remoteCommand                
+            name="rcSave"
+            value="Kaydet"
+            action="#{simplePivotCtrl.save}" 
+            /> 
+        <h:panelGrid 
+            columns="2" 
+            style="border: 0px solid #A6C9E2;border-collapse: collapse;width: 90%;vertical-align: top;"
+            columnClasses="TopStyle">
+
+
+            <c:forEach 
+                items="#{simplePivotCtrl.itemProvider.fields}"
+                var="field"
+                >
+                <p:dataTable 
+                    value="#{simplePivotCtrl.pivotRecord.rowRecordMap[field.code]}"
+                    tableStyle="width:auto"
+                    var="rowRecord" 
+                    >
+                    <f:facet name="header">
+                        #{field.name}
+                    </f:facet>
+                    <p:column style="#{tedbirTuru.style}">
+                        <h:outputText value="#{simplePivotCtrl.itemProvider.tedbirTuleriMap[rowRecord.tedbirTuru].name}"/>
+                    </p:column>
+                    <p:column headerText="Tedbir Türü">
+                        <h:selectBooleanCheckbox value="#{rowRecord.check}"/>                                
+                    </p:column>
+                    <p:column style="width: 50px;" headerText="Kontrol Tipi">
+                        <h:selectOneMenu value="#{rowRecord.kontrolTipi}">
+                            <f:selectItem itemValue="null" itemLabel="Lütfen Seçiniz"/>
+                            <f:selectItem itemValue="kt000" itemLabel="Tespit Edici"/>
+                            <f:selectItem itemValue="kt001" itemLabel="Risk Azaltıcı"/>
+                            <f:selectItem itemValue="kt002" itemLabel="Önleyici"/>
+                        </h:selectOneMenu>
+                    </p:column>
+                    <p:column style="width: 50px;" headerText="Uygulama Yönetimi">
+                        <h:selectOneMenu value="#{rowRecord.uygulamaYonetimi}">
+                            <f:selectItem itemValue="null" itemLabel="Lütfen Seçiniz"/>
+                            <f:selectItem itemValue="uy000" itemLabel="Manüel"/>
+                            <f:selectItem itemValue="uy001" itemLabel="Yarı sistematik"/>
+                            <f:selectItem itemValue="uy002" itemLabel="Sistematik"/>
+                        </h:selectOneMenu> 
+                    </p:column>
+                </p:dataTable>
+            </c:forEach>
+
+        </h:panelGrid> 
+    </h:form>
+
+
+</html>
+

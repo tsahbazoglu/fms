@@ -1,0 +1,40 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:f="http://java.sun.com/jsf/core"
+      xmlns:h="http://java.sun.com/jsf/html"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:c="http://java.sun.com/jsp/jstl/core"
+      xmlns:mydynamic="http://java.sun.com/jsf/composite/mydinamic"
+      xmlns:mygrid="http://java.sun.com/jsf/composite/telmangrid"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets">
+
+    <h:head>
+        <title></title>
+        <script>
+            function myClick(e) {
+                var evt = e || window.event
+                if (evt.keyCode == 13) {
+                    rcFilter();
+                }
+            }
+        </script>
+    </h:head>
+
+    <p:panel>
+        <h:panelGrid
+            columns="2"
+            columnClasses="VTopHLeftW50pNowrap,VTopHLeftW50pNowrap"
+            >
+            <h:panelGroup>
+                <ui:include src="ui-filter-current.xhtml"/>
+            </h:panelGroup>
+            <h:panelGroup>
+                <c:if test="#{formService.myForm.historyRendered}">
+                    <ui:include src="ui-filter-history.xhtml"/>
+                </c:if>
+            </h:panelGroup>
+        </h:panelGrid>
+    </p:panel>
+
+</html>

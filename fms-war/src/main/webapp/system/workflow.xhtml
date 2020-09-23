@@ -1,0 +1,197 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://java.sun.com/jsf/html"    
+      >
+    <h:head>
+        <title></title>
+    </h:head>
+
+    <!-- content -->
+    <div id="myholder"></div>
+
+    <!-- dependencies -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/lodash.js/3.10.1/lodash.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/backbone.js/1.3.3/backbone.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jointjs/2.1.0/joint.js"></script>
+
+    <!-- code -->
+    <script>
+
+        array = [
+            {jobKey: "exper-analiz-onay", current: "START", action: "approve", next: "s1", assignee: "uysuser"},
+            {jobKey: "exper-analiz-onay", current: "s1", action: "_reject", next: "s2", assignee: "uysuser"},
+            {jobKey: "exper-analiz-onay", current: "s1", action: "approve", next: "s4", assignee: "uysuser"},
+            {jobKey: "exper-analiz-onay", current: "s3", action: "approve", next: "s6", assignee: "uysuser"},
+            {jobKey: "exper-analiz-onay", current: "s4", action: "system", next: "s5", assignee: "uysuser"},
+            {jobKey: "exper-analiz-onay", current: "s5", action: "system", next: "s6", assignee: "uysuser"},
+            {jobKey: "exper-analiz-onay", current: "s6", action: "system", next: "STOP", assignee: "uysuser"}
+        ];
+
+        var graph;
+
+        function  viewJson() {
+            graph.set('graphCustomProperty', true);
+            graph.set('graphExportTime', Date.now());
+            var jsonObject = graph.toJSON();
+            var jsonString = JSON.stringify(jsonObject);
+            console.log(jsonString);
+            //document.getElementById("id-wf-json").value = jsonString;
+        }
+
+        function  writeGraph() {
+            graph = new joint.dia.Graph();
+            var paper = new joint.dia.Paper({
+                el: document.getElementById('myholder'),
+                model: graph,
+                width: 1200,
+                height: 300,
+                //            gridSize: 1
+
+                gridSize: 10,
+                drawGrid: true,
+                background: {
+                    color: 'rgba(0, 255, 0, 0.3)'
+                }
+
+            });
+
+            graphJsonArray = [];
+
+
+            //distinct state nodes
+            uniquemap = {};
+            array.forEach(function (v) {
+                uniquemap[v.current] = 1;
+                uniquemap[v.next] = 1;
+            });
+
+            //write state nodes
+            x = 10;
+            for (i in uniquemap) {
+                graphJsonArray.push(createRect(i, x, 100, i));
+                x += (100 + 50);
+            }
+
+            //write links
+            j = 100;
+            array.forEach(function (v) {
+                linkLabel = "Ok";
+                if (v.action == "approve") {
+                    linkLabel = "Ok"
+                } else if (v.action == "_reject") {
+                    linkLabel = "NoK";
+                } else if (v.action == "system") {
+                    linkLabel = "S";
+                }
+                graphJsonArray.push(createLink(j, v.current, v.next, linkLabel));
+                j++;
+            });
+
+            graph.fromJSON({
+                cells: graphJsonArray
+            });
+        }
+
+        function createRect(id, x, y, mylabel) {
+            return {
+                id: id,
+                type: 'standard.Rectangle',
+                position: {
+                    x: x,
+                    y: y
+                },
+                size: {
+                    width: 100,
+                    height: 30
+                },
+                attrs: {
+                    body: {
+                        fill: 'blue'
+                    },
+                    label: {
+                        text: mylabel,
+                        fill: 'white'
+                    }
+                }
+            }
+        }
+
+        function createLink(id, sourceId, targetId, label) {
+            return  {
+                "id": id,
+                "type": "standard.Link",
+                "source": {
+                    "id": sourceId
+                },
+                "target": {
+                    "id": targetId
+                },
+                "labels": [
+                    {
+                        "markup": [
+                            {
+                                "tagName": "circle",
+                                "selector": "body"
+                            },
+                            {
+                                "tagName": "text",
+                                "selector": "label"
+                            },
+                            {
+                                "tagName": "circle",
+                                "selector": "asteriskBody"
+                            },
+                            {
+                                "tagName": "text",
+                                "selector": "asterisk"
+                            }
+                        ],
+                        "attrs": {
+                            "label": {
+                                "text": label,
+                                "fill": "#000000",
+                                "fontSize": 8,
+                                "textAnchor": "middle",
+                                "yAlignment": "middle",
+                                "pointerEvents": "none"
+                            },
+                            "body": {
+                                "ref": "label",
+                                "fill": "#ffffff",
+                                "stroke": "#000000",
+                                "strokeWidth": 1,
+                                "refR": 2,
+                                "refCx": 0,
+                                "refCy": 0
+                            }
+                        }
+                    }
+                ],
+                "z": 3,
+                "attrs": {
+                }
+            };
+        }
+        writeGraph();
+        documnt
+
+    </script>
+
+    <input type="button" onclick="viewJson();" value="Show Json"/> 
+    <input type="button" onclick="writeGraph();" value="Draw Graph"/> 
+
+    <h:form>
+
+        <h:inputHidden 
+            id="id-wf-json"
+            value=""/>
+
+
+        <!--        <p:commandButton>
+        
+                </p:commandButton>-->
+
+    </h:form>
+
+</html>

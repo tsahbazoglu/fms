@@ -1,0 +1,49 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"   
+      xmlns:composite="http://java.sun.com/jsf/composite"
+      xmlns:f="http://java.sun.com/jsf/core"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:h="http://java.sun.com/jsf/html"
+      >
+
+    <h:head>
+        <title></title>
+    </h:head>
+
+    <composite:interface>
+        <composite:attribute name="myitems" required="true"/>
+        <composite:attribute name="myconverter" required="true"/>
+        <composite:attribute name="label" required="true"/>
+        <composite:attribute name="myvalue" required="true"/>
+        <composite:attribute name="myreadonly"/>
+        <composite:attribute name="myrequired"/>
+        <composite:attribute name="myFieldKey"/>
+        <composite:attribute name="myStyle"/>
+        <composite:attribute name="isAjax"/>
+        <composite:attribute name="ajax_update"/>
+        <composite:attribute name="someaction" method-signature="void someaction(javax.faces.event.AjaxBehaviorEvent)" />
+    </composite:interface>
+
+    <composite:implementation>
+        <p:selectOneMenu 
+            style="#{cc.attrs.myStyle}" 
+            converter="#{cc.attrs.myconverter}" 
+            value="#{cc.attrs.myvalue}"
+            disabled="#{cc.attrs.myreadonly}"
+            filter="true" 
+            filterMatchMode="contains"   
+            caseSensitive="true"
+            >
+            <f:selectItems value="#{cc.attrs.myitems}"/>  
+            <f:attribute name="label" value="#{cc.attrs.label}"/>
+            <f:attribute name="trequired" value="#{cc.attrs.myrequired}"/>
+            <f:attribute name="fieldKey" value="#{cc.attrs.myFieldKey}"/>
+            <p:ajax 
+                listener="#{crudOneDim.someaction}"  
+                disabled="#{not cc.attrs.isAjax}" 
+                update="#{cc.attrs.ajax_update}"
+                />
+        </p:selectOneMenu>
+    </composite:implementation>
+</html>

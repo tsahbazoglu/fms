@@ -1,0 +1,82 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://java.sun.com/jsf/html"
+      xmlns:p="http://primefaces.org/ui"          
+      xmlns:f="http://java.sun.com/jsf/core"
+      xmlns:c="http://java.sun.com/jsp/jstl/core">
+
+    <h:head>
+        <title></title>
+    </h:head>
+
+    <style>
+        .TopStyle{
+            vertical-align: top;
+        }
+        /*        
+                table, th, td {
+                    border: 1px solid gray;
+                    text-align: center;
+                    border-collapse: collapse;
+                }
+        */
+    </style>
+
+    <h:form id="id_freeform">
+        <p:commandButton 
+            id="id_freeform_submit_button"
+            style="display: none;"            
+            value="Kaydet"
+            action="#{simplePivotCtrl.save}">
+        </p:commandButton>
+        <h:panelGrid 
+            columns="2" 
+            style="border: 0px solid #A6C9E2;border-collapse: collapse;width: 90%;vertical-align: top;"
+            columnClasses="TopStyle">
+
+
+
+            <p:dataTable 
+                value="#{simplePivotCtrl.itemProvider.tedbirTuleri}"
+                tableStyle="width:auto"
+                var="tedbirTuru" 
+                >
+
+                <p:column headerText="Faaliyet Alanı">
+                    <p:selectManyCheckbox columns="1" layout="grid">
+                        <f:selectItems  
+                            value="#{simplePivotCtrl.itemProvider.fieldsAsItems}" 
+                            >
+                        </f:selectItems>
+                    </p:selectManyCheckbox>
+                </p:column>
+
+                <p:column style="width: 150px;" headerText="Tedbir Türü">
+                    <h:outputText value="#{tedbirTuru.name}" style="#{tedbirTuru.style}"/>
+                </p:column>
+
+                <p:column style="width: 50px;" headerText="Kontrol Tipi">
+                    <p:selectOneMenu>
+                        <f:selectItem itemValue="null" itemLabel="Lütfen Seçiniz"/>
+                        <f:selectItem itemValue="Tespit Edici" itemLabel="Tespit Edici"/>
+                        <f:selectItem itemValue="Risk Azaltıcı" itemLabel="Risk Azaltıcı"/>
+                        <f:selectItem itemValue="Önleyici" itemLabel="Önleyici"/>
+                    </p:selectOneMenu>
+                </p:column>
+                <p:column style="width: 50px;" headerText="Uygulama Yönetimi">
+                    <p:selectOneMenu>
+                        <f:selectItem itemValue="null" itemLabel="Lütfen Seçiniz"/>
+                        <f:selectItem itemValue="Manüel" itemLabel="Manüel"/>
+                        <f:selectItem itemValue="Yarı sistematik" itemLabel="Yarı sistematik"/>
+                        <f:selectItem itemValue="Sistematik" itemLabel="Sistematik"/>
+                    </p:selectOneMenu> 
+                </p:column>
+
+            </p:dataTable>
+        </h:panelGrid> 
+    </h:form>
+
+
+</html>
+

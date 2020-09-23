@@ -1,0 +1,84 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://java.sun.com/jsf/html"
+      xmlns:f="http://java.sun.com/jsf/core"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets">
+
+    <h:head>
+        <title></title>
+    </h:head>
+
+
+    <style type="text/css">
+        .ui-treetable table {
+            table-layout: fixed
+        }
+
+        .value {
+            font-weight: bold
+        }
+
+        .ui-dialog table {
+            margin-left:auto; 
+            margin-right:auto;
+        }
+    </style>
+
+    <p:treeTable value="#{basicView.root}" var="document">
+        <f:facet name="header">
+            Document Viewer
+        </f:facet>
+        <p:column headerText="Name">
+            <h:outputText value="#{document.name}" />
+        </p:column>
+        <p:column headerText="İlerleme Durumu">
+            <p:progressBar 
+                value="#{document.progress}" 
+                labelTemplate="{value}%" 
+                displayOnly="true"
+                >
+
+            </p:progressBar>
+        </p:column>
+        <p:column headerText="">
+            <h:form>
+                <p:commandButton 
+                    icon="fa fa-plus"
+                    action="#{guiService.createAndView}"
+                    oncomplete="PF('wvDlgRestCrud').show();"
+                    update="id-tab-view:idDlgRestCrud"
+                    rendered="#{'plus' eq document.action}"
+                    >
+                    <f:setPropertyActionListener value="#{document.dbKey}" target="#{guiService.projectAndFormKey}" />
+                </p:commandButton>
+
+                <p:commandButton 
+                    icon="fa fa-edit"
+                    action="#{guiService.createAndView}"
+                    oncomplete="PF('wvDlgRestCrud').show();"
+                    update="id-tab-view:idDlgRestCrud"
+                    rendered="#{'edit' eq document.action}"
+                    >
+                    <f:setPropertyActionListener value="#{document.dbKey}" target="#{guiService.projectAndFormKey}" />
+                </p:commandButton>
+            </h:form>
+        </p:column>
+    </p:treeTable>
+
+
+    <p:dialog 
+        id="idDlgRestCrud"
+        header="#{guiService.twoDimDlgUi.header}"
+        widgetVar="wvDlgRestCrud"
+        closable="true"
+        closeOnEscape="true"
+        >
+        <p:panel>
+            <ui:include src="ui-crud-rest.xhtml"/>
+        </p:panel>
+    </p:dialog>
+
+
+</html>

@@ -1,0 +1,319 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://java.sun.com/jsf/html"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:mydynamic="http://java.sun.com/jsf/composite/mydinamic"
+      xmlns:mygrid="http://java.sun.com/jsf/composite/telmangrid"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:f="http://xmlns.jcp.org/jsf/core">
+
+    <h:head>
+        <title></title>
+    </h:head>
+
+    <p:dialog 
+        id="id-dlg-filter"
+        widgetVar="wv-dlg-filter"
+        width="900"
+        height="650"
+        resizable="true"
+        header="Arama Filtreleri"
+        closable="true"
+        closeOnEscape="true" 
+        modal="false"
+        draggable="true"
+        position="center"
+        visible="false"
+        >
+        <ui:include src="ui-filter.xhtml"/>
+    </p:dialog>
+
+    <p:dialog 
+        id="idCrudOperation"
+        widgetVar="crudOperationDialog2"
+        width="1200"
+        height="700"
+        header="#{formService.myForm.name}"
+        closable="true"
+        closeOnEscape="true"                     
+        modal="false"
+        draggable="true"
+        position="center"
+        resizable="false"
+        maximizable="false"
+        minimizable="false"
+        >
+        <p:tabView id="idTwoDlgTabView">
+            <p:tab 
+                title="Güncel Veri Girişi"
+                >
+                <ui:include src="ui-crud.xhtml"/>
+            </p:tab>
+            <p:tab 
+                title="Ekli Dosyalar"
+                rendered="#{formService.myForm.hasAttachedFiles}"
+                >
+                <ui:include src="ui-upload.xhtml"/>
+            </p:tab>
+            <p:tab 
+                title="Veri Tarihçesi"
+                rendered="#{formService.myForm.versionEnable}"
+                >
+                <ui:include src="ui-history.xhtml"/>
+            </p:tab>
+            <p:tab 
+                title="İş Süreci"
+                rendered="#{formService.myForm.workFlowActive}"
+                >
+                <ui:include src="ui-workflow.xhtml"/>
+            </p:tab>
+
+        </p:tabView>
+    </p:dialog>
+
+
+    <p:dialog 
+        id="id-dlg-crud-json"
+        widgetVar="wv-dlg-crud-json"
+        width="1200"
+        height="700"
+        header="#{formService.myForm.name}"
+        closable="true"
+        closeOnEscape="true"                     
+        modal="false"
+        draggable="true"
+        position="center"
+        resizable="true"
+        maximizable="true"
+        minimizable="true"
+        > 
+
+        <p:tree value="#{twoDimModifyCtrl.root}" var="node" style="width: 500px;">
+            <p:treeNode>
+                <p:panel>
+                    <h:outputText value="#{node.key}"/>
+                    <h:inputText value="#{node.value}" rendered="#{node.renderValue}"/>
+                </p:panel>
+            </p:treeNode>
+        </p:tree>
+
+        <h:outputText value="#{twoDimModifyCtrl.asciidoctorContent}" escape="false"/>
+
+    </p:dialog>
+
+
+
+    <p:dialog 
+        id="id-work-flow"
+        widgetVar="wv-work-flow"
+        width="1200"
+        height="700"
+        header="#{formService.myForm.name}"
+        closable="true"
+        closeOnEscape="true"                     
+        modal="false"
+        draggable="true"
+        position="center"
+        resizable="false"
+        maximizable="false"
+        minimizable="false"
+        >
+        <p:scrollPanel styleClass="td-8">
+            <h:panelGroup 
+                id="id-diagram-panel"
+                style="height: 100%;"
+                >
+                <p:diagram 
+                    id="id-diagram"
+                    value="#{workFlowCtrl.model}" 
+                    style="height:700px;"
+                    styleClass="ui-widget-content" 
+                    var="data"
+                    >
+                    <f:facet name="element">
+                        <h:outputText value="#{data.code} : #{data.name}"/>
+                    </f:facet>
+                </p:diagram>
+            </h:panelGroup>
+        </p:scrollPanel>
+    </p:dialog>
+
+    <p:dialog 
+        id="idEmailPreview"
+        widgetVar="emailPreview"
+        width="500"
+        resizable="false"
+        header="E-Posta Önizleme"
+        closable="true"
+        closeOnEscape="true" 
+        modal="false"
+        draggable="true"
+        position="center"
+        visible="false"
+        >
+        <h:panelGroup>
+            <h:form>
+                <h:outputText value="Birden fazla email gönderimi için yalnız (,) VİRGÜL ayracı kullanılmalı."
+                              style="font-weight: bold;color:red;"/>
+                <h:panelGrid columns="3" 
+                             columnClasses="
+                             VTopHLeftW00px,
+                             VTopHLeftW00px,
+                             VTopHLeftW100pNowrap"
+                             width="100%;" 
+                             border="0">
+                    <h:outputText value="Kime" style="font-weight: bold;"/>
+                    <h:outputText value=":" style="font-weight: bold;"/>
+                    <h:inputTextarea value="#{twoDimModifyCtrl.emailData['email']}"/>
+                    <h:outputText value="Konu" style="font-weight: bold;"/>
+                    <h:outputText value=":" style="font-weight: bold;"/>
+                    <h:outputText style="width: 100%;" value="#{twoDimModifyCtrl.emailData['subject']}"/>
+                    <h:outputText value="Ek Not" style="font-weight: bold;"/>
+                    <h:outputText value=":" style="font-weight: bold;"/>
+                    <h:inputTextarea
+                        value="#{twoDimModifyCtrl.emailData['adminComment']}"/>
+                    <h:outputText value="İçerik" style="font-weight: bold;"/>
+                    <h:outputText value=":" style="font-weight: bold;"/>
+                    <h:outputText style="font-size: 10px;"
+                                  value="#{twoDimModifyCtrl.emailData['content']}"
+                                  escape="false"/>
+
+                </h:panelGrid>
+                <p:commandButton value="Gönder" action="#{twoDimModifyCtrl.gonder}"/>
+            </h:form>
+        </h:panelGroup>
+    </p:dialog>
+
+    <p:dialog 
+        id="id-dlg-payment"
+        widgetVar="wv-dlg-payment"
+        width="475"
+        height="530"
+        resizable="true"
+        header="Ödeme Sayfası"
+        closable="true"
+        closeOnEscape="true" 
+        modal="false"
+        draggable="true"
+        position="center"
+        visible="false"
+        >
+        <h:panelGroup>
+            <ui:include src="ccbank.html"/>
+        </h:panelGroup>
+
+    </p:dialog>
+
+    <p:dialog 
+        id="id-desc-dlg"
+        header="açıklama"
+        widgetVar="wvDescDlg"
+        width="600"
+        height="400"
+        closable="true"
+        closeOnEscape="true"                     
+        position="center"
+        resizable="true"
+        >
+        <p:panel
+            id="id-desc-dlg-pnl"
+            >
+            <b>form: </b> <p:outputLabel value="#{formService.myForm.name}"/> 
+            <hr/>
+            <b>alan: </b> <p:outputLabel value="#{twoDimModifyCtrl.selectedField.name}"/> 
+            <hr/>
+            <b>açıklama: </b> <p:outputLabel value="#{twoDimModifyCtrl.selectedField.popupDescription}" escape="false"/>
+        </p:panel>
+    </p:dialog>
+
+    <p:dialog 
+        id="id-rest-curl-dlg"
+        header="Rest Curl"
+        widgetVar="wvRestCurlDlg"
+        width="800"
+        height="600"
+        closable="true"
+        closeOnEscape="true"                     
+        position="center"
+        resizable="true"
+        >
+        <p:panel
+            id="id-rest-curl-dlg-pnl"
+            >
+            <br/>
+            <b>Create</b>
+            <p>
+                <b>curl --header "Content-Type: application/json" \</b>
+                <br/>
+                <b>--request POST \</b>
+                <br/>
+                <b>--data</b> '{ "_id" : null, "olusturmaTarihi" : 201901011200, "isSahibiSoyad" : "coşgun", "isSahibiTCK" : "213123123", "durumId" : "0", "ilgiliTalepNo" : null, "ilceId" :"5bf3ff67838fc9164d9dd980", "tdubTalepNo" : null, "tapuId" : null, "talepNo" : "21312312", "isTipi" : "Yeni Talep", "atananKurulus" : null, "aciklama" : null, "atanmaTarihi" : null, "isSahibiEmail" : "sadasdad@sadad.com", "durum" : "Açık", "ilgiliTalepId" : null, "il" : "Ankara", "isTipiId" : "0", "isSahibiAd" : "cihan", "kaynakTipi" : "Tapu", "ilId" : "5bf3c10f838fc9164d9dd967", "isSahibiTelNo" : "213123 2131231", "ilce" : "Altındağ", "atananKurulusId" : null, "tdubTalepId" : null, "kaynakTipiId" : "0", "forms" : "f038", "talepId" : "5c497566cf21b834569abc8b", "project-key" : "tdub_iys", "form-key" : "f038" }' \
+                <br/>
+                <b>http://localhost:9898/api/crud/create</b>
+            </p>
+
+            <br/>
+            <b>Update</b>
+            <p>
+                <b>curl --header "Content-Type: application/json" \</b>
+                <br/>
+                <b>--request POST \</b>
+                <br/>
+                <b>--data</b> '{ "_id" : null, "olusturmaTarihi" : 201901011200, "isSahibiSoyad" : "coşgun", "isSahibiTCK" : "213123123", "durumId" : "0", "ilgiliTalepNo" : null, "ilceId" :"5bf3ff67838fc9164d9dd980", "tdubTalepNo" : null, "tapuId" : null, "talepNo" : "21312312", "isTipi" : "Yeni Talep", "atananKurulus" : null, "aciklama" : null, "atanmaTarihi" : null, "isSahibiEmail" : "sadasdad@sadad.com", "durum" : "Açık", "ilgiliTalepId" : null, "il" : "Ankara", "isTipiId" : "0", "isSahibiAd" : "cihan", "kaynakTipi" : "Tapu", "ilId" : "5bf3c10f838fc9164d9dd967", "isSahibiTelNo" : "213123 2131231", "ilce" : "Altındağ", "atananKurulusId" : null, "tdubTalepId" : null, "kaynakTipiId" : "0", "forms" : "f038", "talepId" : "5c497566cf21b834569abc8b", "project-key" : "tdub_iys", "form-key" : "f038" }' \
+                <br/>
+                <b>http://localhost:9898/api/crud/update</b>
+            </p>
+
+            <br/>
+            <b>Delete</b>
+            <p>
+                <b>curl --header "Content-Type: application/json" \</b>
+                <br/>
+                <b>--request POST \</b>
+                <br/>
+                <b>--data</b> '{"project-key":"tdub_ent","form-key":"f051", "isSahibiAd" : "cihan"}' \
+                <br/>
+                <b>http://localhost:9898/api/crud/delete</b>
+            </p>
+
+            <br/>
+            <b>Find One</b>
+            <p>
+                <b>curl --header "Content-Type: application/json" \</b>
+                <br/>
+                <b>--request POST \</b>
+                <br/>
+                <b>--data</b> '{"project-key":"tdub_ent","form-key":"f051", "isSahibiAd" : "cihan"}' \
+                <br/>
+                <b>http://localhost:9898/api/crud/one</b>
+            </p>
+
+            <br/>
+            <b>Count</b>
+            <p>
+                <b>curl --header "Content-Type: application/json" \</b>
+                <br/>
+                <b>--request POST \</b>
+                <br/>
+                <b>--data</b> '{"project-key":"tdub_ent","form-key":"f051", "isSahibiAd" : "cihan"}' \
+                <br/>
+                <b>http://localhost:9898/api/crud/count</b>
+            </p>
+
+            <br/>
+            <b>Find Multi (Max = 50)</b>
+            <p>
+                <b>curl --header "Content-Type: application/json" \</b>
+                <br/>
+                <b>--request POST \</b>
+                <br/>
+                <b>--data</b> '{"project-key":"tdub_ent","form-key":"f051", "isSahibiAd" : "cihan"}' \
+                <br/>
+                <b>http://localhost:9898/api/crud/fifty</b>
+            </p>
+
+        </p:panel>
+    </p:dialog>
+
+</html>

@@ -1,0 +1,169 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"   
+      xmlns:composite="http://java.sun.com/jsf/composite"
+      xmlns:h="http://java.sun.com/jsf/html"
+      xmlns:ui="http://java.sun.com/jsf/facelets"
+      xmlns:f="http://java.sun.com/jsf/core">
+
+    <h:head>
+        <title></title>
+    </h:head>
+
+    <composite:interface>
+        <composite:attribute name="columns" required="true"/>
+        <composite:attribute name="rows" required="true"/>
+        <composite:attribute name="cell" required="true"/>
+        <composite:attribute name="readonly" default="false"/>
+        <composite:attribute name="rowHeaderWidh" required="true"/>
+        <composite:attribute name="colWidths" required="true"/>
+        <composite:attribute name="renderedRowHeader" default="true"/>
+    </composite:interface>
+
+    <composite:implementation>
+
+        <script>
+            function ShowControlFormula(controlDesc) {
+                if (controlDesc == null || controlDesc.length == 0) {
+                    PF('myFormulaDialog').hide();
+                } else {
+                    var span = document.getElementById("clientSideControlDialogText");
+                    span.innerHTML = controlDesc;
+                    PF('myFormulaDialog').show();
+                }
+            }
+        </script>
+
+
+        <style>
+            .myGridHistoryLive {
+                background-color: rgb(255, 255, 255);
+                overflow: hidden;
+            }
+            .myGridHistoryTest {
+                background-color: rgb(0, 0, 255);
+                overflow: hidden;
+            }
+        </style>
+
+
+        <div id="#{cc.clientId}" class="hot handsontable htRowHeaders htColumnHeaders uyshandson myGridHistoryLive #{cc.clientId}">
+            <div class="wtHolder uyshandson #{cc.clientId}" style="position: relative;" >
+                <div class="wtHider" style="position: relative;">
+                    <div class="wtSpreader" style="position: relative; width: auto; height: auto;">
+                        <table class="htCore">
+                            <colgroup>
+                                <col class="rowHeader uyshandson"/>
+                                <ui:repeat value="#{cc.attrs.columns}" var="y"> 
+                                    <col class="uysdatacolumn"/>
+                                </ui:repeat>
+                            </colgroup>
+                            <thead>
+                                <tr>
+                                    <th class="" style="height: 25px;">
+                                        <div class="relative">
+                                            <span class="colHeader cornerHeader"></span>
+                                        </div>
+                                    </th>
+                                    <ui:repeat value="#{cc.attrs.columns}" var="y">
+                                        <th class="">
+                                            <div class="relative">
+                                                <span class="colHeader">
+                                                    #{y.name}
+                                                </span>
+                                            </div>
+                                        </th>
+                                    </ui:repeat>
+                                </tr>                        
+                            </thead>
+                            <tbody>
+                                <ui:repeat value="#{cc.attrs.rows}" var="x" id="rows">
+                                    <tr>
+                                        <th class="handsontable-uysdatarow">
+                                            <div class="relative">
+                                                <span class="rowHeader">
+                                                    #{x.name}
+                                                </span>
+                                            </div>
+                                        </th>
+                                        <ui:repeat value="#{cc.attrs.columns}" var="y" id="columns">
+                                            <td class="handsontable-uysdatacell"
+                                                style="#{cc.attrs.cell.style}"  
+                                                >
+                                                <div style="
+                                                     height: 20px;"
+                                                     onclick="ShowControlFormula('#{cc.attrs.cell.controlDesc}');
+                                                             return false;"
+                                                     ><h:outputText 
+                                                        value="#{cc.attrs.cell.value}" 
+                                                        style="border: 0px;#{cc.attrs.cell.style}"
+                                                        converter="#{cc.attrs.cell.converter}"
+                                                        >
+                                                        <f:attribute name="uysformat" value="#{cc.attrs.cell.uysformat}"/>
+                                                    </h:outputText>
+                                                </div>
+                                            </td>
+                                        </ui:repeat>
+                                    </tr>
+                                </ui:repeat>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <script>
+            telmanHistoryGrid = {};
+            if (!telmanHistoryGrid.clarity) {
+                telmanHistoryGrid.clarity = {
+                    init: function () {
+                        var colCount = "#{cc.attrs.columns.rowCount}";
+                        var rowCount = "#{cc.attrs.rows.rowCount}";
+                        var rowHeaderWidh = "#{cc.attrs.rowHeaderWidh}";
+                        var colWidths = "#{cc.attrs.colWidths}";
+
+                        if (typeof colCount === "string") {
+                            colCount = eval("(" + colCount + ')');
+                        }
+                        if (typeof rowCount === "string") {
+                            rowCount = eval("(" + rowCount + ')');
+                        }
+                        if (typeof rowHeaderWidh === "string") {
+                            rowHeaderWidh = eval("(" + rowHeaderWidh + ')') + 80;
+                        }
+                        if (typeof colWidths === "string") {
+                            colWidths = eval("(" + colWidths + ')') + 20;
+                        }
+                        var offset = 20;
+                        var rowHeigth = 24;
+                        divWidth = offset + rowHeaderWidh + colCount * colWidths + "px";
+                        divHeigth = offset + rowHeigth + rowCount * rowHeigth + "px";
+                        $('.hot.handsontable.htRowHeaders.htColumnHeaders.uyshandson.#{cc.clientId}').css({
+                            //"background-color": "red",
+                            "width": divWidth,
+                            "height": divHeigth
+                        });
+                        $('.wtHolder.uyshandson.#{cc.clientId}').css({
+                            "width": divWidth,
+                            "height": divHeigth
+                        });
+                        $('.rowHeader.uyshandson').css({
+                            "width": rowHeaderWidh + "px"
+                        });
+                        $('.handsontable-uysdatarow').css({
+                            "text-align": "left"
+                        });
+                        $('.handsontable-uysdatacell').css({
+                            "white-space": "nowrap",
+                            "text-align": "right"
+                        });
+                        $('.uysdatacolumn').css({
+                            "width": colWidths + "px"
+                        });
+                    }
+                }
+            }
+            telmanHistoryGrid.clarity.init();
+        </script>
+    </composite:implementation>
+</html>

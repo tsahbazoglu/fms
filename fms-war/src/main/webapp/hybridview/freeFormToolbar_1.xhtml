@@ -1,0 +1,38 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://java.sun.com/jsf/html"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:f="http://java.sun.com/jsf/core"
+      xmlns:mydynamic="http://java.sun.com/jsf/composite/mydinamic"
+      >
+
+    <h:head>
+        <title></title>
+    </h:head>
+
+    <p:toolbar>
+        <f:facet name="left">
+            <mydynamic:mySimpleButton 
+                id="id_mySaveButton"
+                myValue="Kaydet"
+                myOnClickID="id_freeform:id_freeform_submit_button"
+                />  
+            <p:commandButton
+                id ="buttonEimza"
+                value="E-İmza Süreci" 
+                action="#{freeDesigner.showEimza}"
+                rendered="#{freeDesigner.actionsMap['esign']}" 
+                update=":idToBeSignedDialog,:idMessageDialog"
+                /> 
+        </f:facet>
+
+        <f:facet name="right">
+            <h:outputText 
+                value="#{freeDesigner.selectedForm.name}" 
+                style="font-size: 14px;font-weight: bolder;white-space: nowrap;"/>
+        </f:facet>
+    </p:toolbar>
+
+
+</html>

@@ -1,0 +1,566 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:f="http://java.sun.com/jsf/core"
+      xmlns:h="http://java.sun.com/jsf/html"
+      xmlns:p="http://primefaces.org/ui"
+      >
+    <h:head>
+        <title></title>
+    </h:head>
+
+    <p:tabView>
+        <p:tab title="POS Test"> 
+            <h:form id="id-post-tst">
+                <p:panel header="POS Test" style="width: 100%;">
+                    <h:form>
+                        <p:commandButton value="credit card 1" action="#{garantiPayMB.creditCard1}" update="#{updateAjaxMB.btnPostCreditCard}"/>
+                        <p:commandButton value="credit card 2" action="#{garantiPayMB.creditCard2}" update="#{updateAjaxMB.btnPostCreditCard}"/>
+                        <p:commandButton value="new order" action="#{garantiPayMB.neworder}" update="#{updateAjaxMB.btnPostCreditCard}"/>
+                    </h:form>
+                    <table>
+                        <tr>
+                            <td>
+                                <span>XML Pay</span>
+                                <form  action="https://sanalposprovtest.garanti.com.tr/VPServlet" method="POST">
+                                    <textarea cols="80" rows="40" name="data">
+&lt;?xml version="1.0" encoding="ISO-8859-1"?&gt;
+&lt;GVPSRequest&gt;
+&lt;Mode&gt;TEST&lt;/Mode&gt;
+&lt;Version&gt;v0.00&lt;/Version&gt;
+&lt;Terminal&gt;
+	&lt;ProvUserID&gt;PROVAUT&lt;/ProvUserID&gt;
+	&lt;HashData&gt;/HashData&gt;
+	&lt;UserID&gt;PROVAUT&lt;/UserID&gt;
+	&lt;ID&gt;111995&lt;/ID&gt;
+	&lt;MerchantID&gt;600218&lt;/MerchantID&gt;
+&lt;/Terminal&gt;
+&lt;Customer&gt;
+	&lt;IPAddress&gt;1.1.111.111&lt;/IPAddress&gt;
+	&lt;EmailAddress&gt;Cem@cem.com&lt;/EmailAddress&gt;
+&lt;/Customer&gt;
+&lt;Card&gt;
+	&lt;Number&gt;&lt;/Number&gt;
+	&lt;ExpireDate&gt;&lt;/ExpireDate&gt;
+	&lt;CVV2&gt;&lt;/CVV2&gt;
+&lt;/Card&gt;
+&lt;Order&gt;
+	&lt;OrderID&gt;&lt;/OrderID&gt;
+	&lt;GroupID&gt;&lt;/GroupID&gt;
+&lt;/Order&gt;
+&lt;Transaction&gt;
+	&lt;Type&gt;sales&lt;/Type&gt;
+	&lt;InstallmentCnt&gt;&lt;/InstallmentCnt&gt;
+	&lt;Amount&gt;1110&lt;/Amount&gt;
+	&lt;CurrencyCode&gt;949&lt;/CurrencyCode&gt;
+	&lt;CardholderPresentCode&gt;13&lt;/CardholderPresentCode&gt;	///For 3D it should be 13 	
+	&lt;MotoInd&gt;H&lt;/MotoInd&gt;
+	&lt;Description&gt;&lt;/Description&gt;
+	&lt;Secure3D&gt;
+    		&lt;AuthenticationCode&gt;CAVV&lt;/AuthenticationCode&gt;   
+    		&lt;SecurityLevel&gt;ECI&lt;/SecurityLevel&gt;
+    		&lt;TxnID&gt;XID&lt;/TxnID&gt;
+    		&lt;Md&gt;MD &lt;/Md&gt; //// Instead of Card data this field is used 
+	&lt;/Secure3D&gt;
+&lt;/Transaction&gt;
+&lt;/GVPSRequest&gt;
+
+                                    </textarea>
+                                    <center>
+                                        <input value="Submit" type="submit"/> 
+                                        <input value="Reset" type="reset"/>
+                                    </center>
+                                </form>
+                            </td>
+
+                            <td>
+                                <span><h3>3D Pay Test Ödeme</h3></span>
+                                <span>#{garantiPayMB.formTest3D}</span>
+                                <form action="#{garantiPayMB.formTest3D}" method="post">
+
+
+                                    <table>
+                                        <tr>
+                                            <td>secure3dsecuritylevel</td>
+                                            <td>
+                                                <select name="secure3dsecuritylevel">
+                                                    <option value="3D_PAY">3D_PAY</option>
+                                                    <option value="3D_FULL">3D_FULL</option>
+                                                    <option value="3D_HALF">3D_HALF</option>
+                                                </select>
+                                            </td>
+                                        </tr>
+
+                                        <tr>
+                                            <td>Card Number</td>
+                                            <td><input name="cardnumber" type="text" value="#{garantiPayMB.cardnumber}"/></td>
+                                        </tr>
+
+                                        <tr>
+                                            <td>Expire Date (mm)</td>
+                                            <td> <input name="cardexpiredatemonth" type="text" value="#{garantiPayMB.cardexpiredatemonth}"/></td>
+                                        </tr>
+
+                                        <tr>
+                                            <td>Expire Date (yy)</td>
+                                            <td><input name="cardexpiredateyear" type="text" value="#{garantiPayMB.cardexpiredateyear}"/></td>
+                                        </tr>
+
+                                        <tr>
+                                            <td>CVV2</td> 
+                                            <td><input name="cardcvv2" type="text" value="#{garantiPayMB.cardcvv2}"/></td>
+                                        </tr>
+
+                                        <tr>
+                                            <td>
+                                                <input id="submit" type="submit" value="İşlemi Gönder" />
+                                            </td>
+
+
+                                            <td></td>
+                                        </tr>
+                                    </table>
+
+
+                                    <h3>Hidden Fields</h3>
+                                    <table>
+                                        <tr>
+                                            <td>strMode</td>
+                                            <td><input type="text" name="mode" value="#{garantiPayMB.strMode}"/></td>
+                                        </tr>
+                                        <tr>
+                                            <td>strApiVersion</td>
+                                            <td><input type="text" name="apiversion" value="#{garantiPayMB.strApiVersion}"/></td>
+                                        </tr>
+                                        <tr>
+                                            <td>strTerminalProvUserID</td>
+                                            <td><input type="text" name="terminalprovuserid" value="#{garantiPayMB.strTerminalProvUserID}"/></td>
+                                        </tr>
+                                        <tr>
+                                            <td>strTerminalUserID</td>
+                                            <td><input type="text" name="terminaluserid" value="#{garantiPayMB.strTerminalProvUserID}"/></td>
+                                        </tr>
+                                        <tr>
+                                            <td>strTerminalMerchantID</td>
+                                            <td><input type="text" name="terminalmerchantid" value="#{garantiPayMB.strTerminalMerchantID}"/></td>
+                                        </tr>
+                                        <tr>
+                                            <td>strType</td>
+                                            <td><input type="text" name="txntype" value="#{garantiPayMB.strType}"/></td>
+                                        </tr>
+                                        <tr>
+                                            <td>strAmount</td>
+                                            <td><input type="text" name="txnamount" value="#{garantiPayMB.strAmount}"/></td>
+                                        </tr>
+                                        <tr>
+                                            <td>strCurrencyCode</td>
+                                            <td><input type="text" name="txncurrencycode" value="#{garantiPayMB.strCurrencyCode}"/></td>
+                                        </tr>
+                                        <tr>
+                                            <td>strInstallmentCount</td>
+                                            <td><input type="text" name="txninstallmentcount" value="#{garantiPayMB.strInstallmentCount}"/></td>
+                                        </tr>
+                                        <tr>
+                                            <td>strOrderID</td>
+                                            <td><input type="text" name="orderid" value="#{garantiPayMB.strOrderID}"/></td>
+                                        </tr>
+                                        <tr>
+                                            <td>strTerminalID</td>
+                                            <td><input type="text" name="terminalid" value="#{garantiPayMB.strTerminalID}"/></td>
+                                        </tr>
+                                        <tr>
+                                            <td>strSuccessURL</td>
+                                            <td><input type="text" name="successurl" value="#{garantiPayMB.strSuccessURL}"/></td>
+                                        </tr>
+                                        <tr>
+                                            <td>strErrorURL</td>
+                                            <td><input type="text" name="errorurl" value="#{garantiPayMB.strErrorURL}"/></td>
+                                        </tr>
+                                        <tr>
+                                            <td>strCustomeripaddress</td>
+                                            <td><input type="text" name="customeripaddress" value="#{garantiPayMB.strCustomeripaddress}"/></td>
+                                        </tr>
+                                        <tr>
+                                            <td>strcustomeremailaddress</td>
+                                            <td><input type="text" name="customeremailaddress" value="#{garantiPayMB.strcustomeremailaddress}"/></td>
+                                        </tr>
+                                        <tr>
+                                            <td>HashData</td>
+                                            <td><input type="text" name="secure3dhash" value="#{garantiPayMB.hashData}"/></td>
+                                        </tr>
+                                    </table>
+
+                                </form>
+                            </td>
+
+                            <td>
+                                <span><h3>Form Reader</h3></span>
+                                <span>#{garantiPayMB.form3DReader}</span>
+                                <form action="#{garantiPayMB.form3DReader}" method="post">
+                                    <table>
+                                        <tr>
+                                            <td>secure3dsecuritylevel</td>
+                                            <td>
+                                                <select name="secure3dsecuritylevel">
+                                                    <option value="3D_PAY">3D_PAY</option>
+                                                    <option value="3D_FULL">3D_FULL</option>
+                                                    <option value="3D_HALF">3D_HALF</option>
+                                                </select>
+                                            </td>
+                                        </tr>
+
+                                        <tr>
+                                            <td>Card Number</td>
+                                            <td><input name="cardnumber" type="text" value="#{garantiPayMB.cardnumber}"/></td>
+                                        </tr>
+
+                                        <tr>
+                                            <td>Expire Date (mm)</td>
+                                            <td> <input name="cardexpiredatemonth" type="text" value="#{garantiPayMB.cardexpiredatemonth}"/></td>
+                                        </tr>
+
+                                        <tr>
+                                            <td>Expire Date (yy)</td>
+                                            <td><input name="cardexpiredateyear" type="text" value="#{garantiPayMB.cardexpiredateyear}"/></td>
+                                        </tr>
+
+                                        <tr>
+                                            <td>CVV2</td> 
+                                            <td><input name="cardcvv2" type="text" value="#{garantiPayMB.cardcvv2}"/></td>
+                                        </tr>
+
+
+                                        <tr>
+                                            <td>
+                                                <input id="submit" type="submit" value="İşlemi Gönder" />
+                                            </td>
+
+
+                                            <td></td>
+                                        </tr>
+                                    </table>
+
+
+                                    <h3>Hidden Fields</h3>
+                                    <table>
+                                        <tr>
+                                            <td>strMode</td>
+                                            <td><input type="text" name="mode" value="#{garantiPayMB.strMode}"/></td>
+                                        </tr>
+                                        <tr>
+                                            <td>strApiVersion</td>
+                                            <td><input type="text" name="apiversion" value="#{garantiPayMB.strApiVersion}"/></td>
+                                        </tr>
+                                        <tr>
+                                            <td>strTerminalProvUserID</td>
+                                            <td><input type="text" name="terminalprovuserid" value="#{garantiPayMB.strTerminalProvUserID}"/></td>
+                                        </tr>
+                                        <tr>
+                                            <td>strTerminalUserID</td>
+                                            <td><input type="text" name="terminaluserid" value="#{garantiPayMB.strTerminalProvUserID}"/></td>
+                                        </tr>
+                                        <tr>
+                                            <td>strTerminalMerchantID</td>
+                                            <td><input type="text" name="terminalmerchantid" value="#{garantiPayMB.strTerminalMerchantID}"/></td>
+                                        </tr>
+                                        <tr>
+                                            <td>strType</td>
+                                            <td><input type="text" name="txntype" value="#{garantiPayMB.strType}"/></td>
+                                        </tr>
+                                        <tr>
+                                            <td>strAmount</td>
+                                            <td><input type="text" name="txnamount" value="#{garantiPayMB.strAmount}"/></td>
+                                        </tr>
+                                        <tr>
+                                            <td>strCurrencyCode</td>
+                                            <td><input type="text" name="txncurrencycode" value="#{garantiPayMB.strCurrencyCode}"/></td>
+                                        </tr>
+                                        <tr>
+                                            <td>strInstallmentCount</td>
+                                            <td><input type="text" name="txninstallmentcount" value="#{garantiPayMB.strInstallmentCount}"/></td>
+                                        </tr>
+                                        <tr>
+                                            <td>strOrderID</td>
+                                            <td><input type="text" name="orderid" value="#{garantiPayMB.strOrderID}"/></td>
+                                        </tr>
+                                        <tr>
+                                            <td>strTerminalID</td>
+                                            <td><input type="text" name="terminalid" value="#{garantiPayMB.strTerminalID}"/></td>
+                                        </tr>
+                                        <tr>
+                                            <td>strSuccessURL</td>
+                                            <td><input type="text" name="successurl" value="#{garantiPayMB.strSuccessURL}"/></td>
+                                        </tr>
+                                        <tr>
+                                            <td>strErrorURL</td>
+                                            <td><input type="text" name="errorurl" value="#{garantiPayMB.strErrorURL}"/></td>
+                                        </tr>
+                                        <tr>
+                                            <td>strCustomeripaddress</td>
+                                            <td><input type="text" name="customeripaddress" value="#{garantiPayMB.strCustomeripaddress}"/></td>
+                                        </tr>
+                                        <tr>
+                                            <td>strcustomeremailaddress</td>
+                                            <td><input type="text" name="customeremailaddress" value="#{garantiPayMB.strcustomeremailaddress}"/></td>
+                                        </tr>
+                                        <tr>
+                                            <td>HashData</td>
+                                            <td><input type="text" name="secure3dhash" value="#{garantiPayMB.hashData}"/></td>
+                                        </tr>
+                                    </table>
+
+                                </form>
+                            </td>
+                        </tr>
+                    </table>
+                </p:panel>
+            </h:form>
+        </p:tab>
+
+        <p:tab title="E-Posta Test">
+            <h:form id="uys_email_test_form">
+                <p:panel header="E-Posta Test" style="width: 100%;">
+                    <p:panelGrid columns="1">
+                        <h:outputText value="Enter comma seperated RCPT List"/>
+                        <p:inputTextarea value="#{mainFrame.emailTestRcpts}" autoResize="true"/>
+                        <p:commandButton 
+                            value="Send Test Email" 
+                            action="#{mainFrame.sendTestEmail}" 
+                            style="white-space: nowrap;"
+                            />
+                    </p:panelGrid>
+                </p:panel>
+            </h:form>
+        </p:tab>
+
+        <p:tab title="Parola Hatırlat Ayarları">
+            <h:form>
+                <p:panel header="Parola Hatırlat Ayarları" style="width: 100%;">
+                    <p:panelGrid columns="2">
+                        <p:outputLabel value="Ortam anahtarlaması"/>
+                        <p:selectOneRadio value="#{mainFrame.forgetPswdEnv}">
+                            <f:selectItem itemLabel="TEST" itemValue="TEST"/>
+                            <f:selectItem itemLabel="CANLI" itemValue="LIVE"/>
+                        </p:selectOneRadio>
+                        <p:outputLabel value="Test amaçlı tüm parola hatırlatma postalarının gideceği e-posta adresi"/>
+                        <p:inputTextarea value="#{mainFrame.testForgetPswdEmail}" style="width: 95%;" autoResize="true"/>
+                    </p:panelGrid>
+                    <p:commandButton 
+                        value="Kaydet" 
+                        action="#{mainFrame.saveTestForgetPswdEmail}" 
+                        style="white-space: nowrap;"
+                        />
+                </p:panel>
+            </h:form>
+        </p:tab>
+
+
+        <p:tab title="Cache Yönetimi">
+            <p:panel header="Formüller" style="width: 100%;">
+                <p:commandButton 
+                    value="KPB Projesi için oluşturulan üye cachelerini temizle" 
+                    action="#{uysApplicationMB.clearKpbMemberCache}" 
+                    style="white-space: nowrap;"
+                    rendered="true"
+                    />
+                <p:commandButton 
+                    value="#{uysApplicationMB.kunyeReportTitle}" 
+                    action="#{tbbService.runKunyeReport}" 
+                    style="white-space: nowrap;"
+                    rendered="#{uysApplicationMB.kunyeReport}"                
+                    /> 
+            </p:panel>
+        </p:tab>
+
+
+        <p:tab title="Formüller">
+            <p:panel header="Formüller" style="width: 100%;">
+                <h:form>
+                    <p:panel>
+                        <p:panel>
+                            <h:panelGrid columns="2">
+                                <p:outputLabel value="Kontrol Esnasında Hesaplanan Alanları Tekrar : "/>
+                                <p:selectOneRadio value="#{uysApplicationMB.databankRecalculateOnControl}">
+                                    <f:selectItem itemValue="true" itemLabel="Hesapla"></f:selectItem>
+                                    <f:selectItem itemValue="false" itemLabel="Hesaplama"></f:selectItem>
+                                </p:selectOneRadio>
+                            </h:panelGrid>
+                        </p:panel>
+                        <p:panel>
+                            <h:panelGrid columns="3">
+                                <p:outputLabel value="Sadece Belirtilen Kontrol Formülunü Test Et"/>
+                                <p:inputText value="#{uysApplicationMB.testControlFormulaTransferOrders}"/>
+                            </h:panelGrid>
+                        </p:panel>
+                        <p:commandButton 
+                            value="Uygula" 
+                            action="#{uysApplicationMB.justSubmit}" 
+                            />  
+                    </p:panel>
+                </h:form>
+            </p:panel>
+        </p:tab>
+
+        <p:tab title="Re-Save">
+            <p:panel header="Re-Save" style="width: 100%;">
+                <h:form acceptcharset="UTF-8">
+                    <p:panelGrid columns="12" rendered="#{mainFrame.access}">
+                        <h:panelGrid columns="2" border="0">
+                            <h:outputText value="Dönem Seçimi:" style="white-space: nowrap;"/>
+                            <h:panelGroup>
+                                <p:selectOneMenu  value="#{pivotResave.resavePeriodStr}">
+                                    <f:selectItems value="#{pivotResave.resaveAllPeriods}"/>
+                                </p:selectOneMenu>
+                                <p:selectOneMenu value="#{pivotResave.resavePeriodEndStr}">
+                                    <f:selectItems value="#{pivotResave.resaveAllPeriods}"/>
+                                </p:selectOneMenu>
+                            </h:panelGroup>
+                            <h:outputText value="Şablon:" style="white-space: nowrap;"/>
+                            <p:selectOneMenu value="#{pivotResave.resaveTemplateStr}">
+                                <f:selectItems value="#{pivotResave.resaveAllTemplates}"/>
+                            </p:selectOneMenu>
+                            <h:outputText value="Kurum:" style="white-space: nowrap;"/>
+                            <p:selectOneMenu value="#{pivotResave.resaveMemberStr}" style="width: 150px;" >
+                                <f:selectItems value="#{pivotResave.resaveMembers}"/>
+                            </p:selectOneMenu>  
+                        </h:panelGrid>
+                        <h:panelGrid columns="1" border="0">
+                            <p:selectManyCheckbox   value="#{pivotResave.resaveForm}" layout="grid" columns="3" >
+                                <f:selectItems value="#{pivotResave.resaveForms}"/>
+                            </p:selectManyCheckbox>
+                        </h:panelGrid>
+                        <h:panelGrid columns="1" border="0">
+                            <p:commandButton 
+                                value="ASADMIN RESAVE ALL" 
+                                action="#{pivotModifierCtrl.saveAgainAll}" 
+                                style="white-space: nowrap;"
+                                rendered="true"
+                                />
+                            <p:commandButton value="CLEAR CACHE : Hesaplama Formülleri" action="#{twoDimModifyCtrl.clearCache}"/>
+                        </h:panelGrid>
+                    </p:panelGrid>
+
+                </h:form>
+            </p:panel>
+        </p:tab>
+
+        <p:tab title="TBB Web Service">
+            <p:outputPanel id="id-tbb-web-service">
+                <h:panelGrid columns="1" border="0" style="width: 100%;">
+                    <p:panel header="Türkiye Bankalar Birliği (TBB) Web Service" style="width: 100%;">
+                        <h:panelGrid columns="2" border="1" style="width: 100%;">
+                            <p:outputLabel value="Web Service URL"/>
+                            <p:outputLabel value="#{tbbService.tbbWebServiceUrl}"/>
+                            <p:outputLabel value="Web Client (store location is : /home/telman/Desktop/bankalar_YYYYMMDD_HHmm.txt)"/>
+                            <h:form id="uys_system_form">
+                                <p:commandButton 
+                                    value="Çalıştır" 
+                                    action="#{tbbService.runKunyeReport}" 
+                                    style="white-space:nowrap;"
+                                    rendered="true"
+                                    update="#{updateAjaxMB.btnRunTbb}"
+                                    />
+                            </h:form>
+                            <p:outputLabel value="Alınan Banka Verilerinin UYS Sistemi ile Eşleştirilmesi"/>
+                            <h:form enctype="multipart/form-data">
+                                <p:fileUpload 
+                                    id="idBankalarPath" 
+                                    value="#{tbbService.tbbBankInfoXmFilePath}" 
+                                    style="width: 95%;"  
+                                    mode="simple" 
+                                    skinSimple="true"/>
+                                <p:commandButton 
+                                    value="Yükle ve Eşleştir" 
+                                    ajax="false"
+                                    action="#{tbbService.mergeWithTBB}" 
+                                    style="white-space: nowrap;"
+                                    update="#{updateAjaxMB.btnMergeTbb}"
+                                    />
+                            </h:form>
+                        </h:panelGrid>
+                        <p:commandButton 
+                            value="Temizle" 
+                            action="#{tbbService.clearWarnings}" 
+                            style="white-space: nowrap;"
+                            rendered="true"
+                            update="#{updateAjaxMB.btnMergeTbb}"
+                            />
+                        <p:dataList value="#{tbbService.warnings}" var="x" id="idWarningList">
+                            <h:outputText value="#{x}"/>
+                        </p:dataList>
+                    </p:panel>
+
+
+                </h:panelGrid>
+            </p:outputPanel>
+        </p:tab>
+
+        <p:tab title="Yıllık Web Özet Raporu">
+            <p:panel header="Yıllık Web Özet Raporu" style="width: 100%;">
+                <h:form acceptcharset="UTF-8">
+                    <h:panelGrid columns="1" border="0">
+                        <h:panelGroup>
+                            <h:outputText value="Web Özet İlk Sayfa No :" style="white-space: nowrap"/>
+                            <h:inputText value="#{pivotResave.jasperParameterPageNumber}" style="width: 50px;"></h:inputText>
+                        </h:panelGroup>
+                        <h:panelGrid columns="1" border="0">
+                            <p:selectBooleanCheckbox value="#{pivotResave.reportWebOzetSelectAll}" itemLabel="Tümünü Seç">
+                                <f:ajax listener="#{pivotResave.onSelectAll}" render="items"/>
+                            </p:selectBooleanCheckbox>
+                            <hr/>
+                            <p:selectManyCheckbox 
+                                id="items"
+                                value="#{pivotResave.reportWebOzetMemberType}" 
+                                layout="grid" 
+                                columns="1" >
+                                <f:selectItems value="#{pivotResave.reportWebOzetMemberTypes}"/>
+                            </p:selectManyCheckbox>
+                        </h:panelGrid>
+                        <p:commandButton 
+                            value="WEB ÖZET : Tüm Kurumlar Tek PDF Dosyada" 
+                            action="#{pivotResave.webOzet}"
+                            update="#{updateAjaxMB.btnReportWebOzet},:idMessageDialog"
+                            />
+                        <p:commandButton 
+                            value="WEB ÖZET : Tümü Kurumlar Ayrı Ayrı PDF Dosyalarda" 
+                            action="#{pivotResave.webOzetSeparatedly}"
+                            update="#{updateAjaxMB.btnReportWebOzet},:idMessageDialog"
+                            />
+                    </h:panelGrid>
+                </h:form>
+            </p:panel>
+
+            <p:outputLabel value="Web Ozet Raporlarının konumu : cd #{pivotModifierCtrl.reportWebOzetPath}" style="font-size:24px; "/>
+
+            <h:form>
+                <p:dataTable value="#{mainFrame.mongoDbExportedFiles}"      
+                             var="x"
+                             style="width: 100%;">
+                    <p:column  headerText="dosya adı" 
+                               style="width: 0px;white-space:nowrap;text-align: left;"
+                               sortBy="#{x.name}">
+                        <h:outputText value="#{x.name}"  />
+                    </p:column> 
+                    <p:column  style="width: 0px;white-space:nowrap;text-align: left;">
+                        <h:outputLink 
+                            value="#{x.path}"
+                            style="
+                            text-decoration:none;
+                            font-size: 14px;
+                            color:#112978;
+                            font-weight:bold;"
+                            >
+                            <h:outputText value="indir" />
+                        </h:outputLink>     
+                    </p:column>
+                    <p:column  style="width: 0px;white-space:nowrap;text-align: left;">
+                        <h:commandLink 
+                            value="sil"
+                            action="#{mainFrame.deleteExportFile}"
+                            />
+                    </p:column>           
+                </p:dataTable>
+            </h:form>
+        </p:tab>
+    </p:tabView>
+</html>

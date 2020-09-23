@@ -1,0 +1,28 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://java.sun.com/jsf/html"
+      xmlns:mydynamic="http://java.sun.com/jsf/composite/mydinamic"
+      xmlns:mygrid="http://java.sun.com/jsf/composite/telmangrid"
+
+      xmlns:p="http://primefaces.org/ui">
+
+    <h:head>
+        <title></title>
+    </h:head>
+
+    <p:outputLabel
+        value="bu veri yapısında tarihçe aktiv değil."
+        rendered="#{not formService.myForm.versionEnable}"
+        >
+    </p:outputLabel>
+
+    <mygrid:mySimpleGrid
+        id="id-2d-version-history"
+        rendered="#{formService.myForm.versionEnable}"
+        columns="#{twoDimModifyCtrl.historyColumnModel}"
+        rows="#{twoDimModifyCtrl.versionHistory}"
+        />
+
+
+</html>

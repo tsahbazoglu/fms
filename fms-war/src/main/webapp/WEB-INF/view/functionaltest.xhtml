@@ -1,0 +1,50 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:f="http://java.sun.com/jsf/core"
+      xmlns:h="http://java.sun.com/jsf/html"
+      xmlns:ace="http://primefaces.org/ui"
+      >
+
+    <h:head>
+        <title></title>
+    </h:head>
+
+    <h:messages
+        errorClass="applicationMessageError"
+        infoClass="applicationMessageSuccess"
+        style="white-space: pre; font-size: 10px; font-family:Arial;"
+        />
+
+    <h:panelGrid columns="6"   border="0"  >
+        <h:outputText value="RCPT TO"/>
+        <h:message for="idAppUserPassword" errorClass="applicationMessageError"/>
+        <h:outputLabel value="#{msg.splitter}"/>
+        <h:inputText value="#{functionalTest.rcptemail}"/>
+        <h:commandButton value="Send Internal Email" action="#{functionalTest.sendMail}"/>
+        <h:outputText value="note : regrading to the related mx this action will sent an email only to inside users"/>
+        <f:verbatim/>
+        <f:verbatim/>
+        <f:verbatim/>
+        <f:verbatim/>
+        <h:commandButton value="Send Outside Email" action="#{functionalTest.sendMail}"/>
+        <h:outputText value="note : regrading to the related mx this action can sent an email to outside users too"/>
+
+    </h:panelGrid>
+
+
+    <ace:selectOneMenu value="#{functionalTest.testMap['test']}"
+                       valueChangeListener="#{functionalTest.valueChangeListener}"
+                       immediate="true"
+                       <!--partialSubmit="true"-->
+                       >
+                       <f:selectItem itemValue="Yes" itemLabel="Yes"/>
+        <f:selectItem itemValue="No" itemLabel="No"/>
+    </ace:selectOneMenu>
+
+    <h:inputText value="telman" disabled="#{functionalTest.testMap['test']=='No'}" 
+                 converter="#{functionalTest.moneyConverter}">
+        <f:attribute name="trequired" value="true"/>
+    </h:inputText>
+
+</html>

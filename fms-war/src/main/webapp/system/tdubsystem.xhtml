@@ -1,0 +1,142 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:f="http://java.sun.com/jsf/core"
+      xmlns:h="http://java.sun.com/jsf/html"
+      xmlns:p="http://primefaces.org/ui"
+      >
+    <h:head>
+        <title></title>
+    </h:head>
+
+    <h:form id="uys_system_form">
+        <h:panelGrid columns="1" border="0" style="width: 100%;">
+            <p:panel header="TAKBIS Web Service" style="width: 100%;">
+                <h:panelGrid columns="2" border="1" style="width: 100%;">
+
+
+                    <p:outputLabel value="Web Service URL"/>
+                    <p:outputLabel value="#{uysApplicationMB.tbbWebServiceUrl}"/>
+
+
+                    <p:outputLabel value="İl"/>
+                    <p:selectOneMenu>
+                        <f:selectItem itemLabel="il" itemValue="il"></f:selectItem>
+                    </p:selectOneMenu>
+
+                    <p:outputLabel value="İlçe"/>
+                    <p:selectOneMenu>
+                        <f:selectItem itemLabel="ilçe" itemValue="ilçe"></f:selectItem>
+                    </p:selectOneMenu>
+
+                    <p:outputLabel value="Ada"/>
+                    <p:selectOneMenu>
+                        <f:selectItem itemLabel="ada" itemValue="ada"></f:selectItem>
+                    </p:selectOneMenu>
+
+                    <p:outputLabel value="Parsel"/>
+                    <p:selectOneMenu>
+                        <f:selectItem itemLabel="parsel" itemValue="parsel"></f:selectItem>
+                    </p:selectOneMenu>
+
+                    <p:outputLabel value="Pafta"/>
+                    <p:selectOneMenu>
+                        <f:selectItem itemLabel="pafta" itemValue="pafta"></f:selectItem>
+                    </p:selectOneMenu>
+
+                    <p:outputLabel value="Web Client (store location is : /home/telman/Desktop/bankalar_YYYYMMDD_HHmm.txt)"/>
+                    <p:commandButton 
+                        action="#{mainFrame.webClientCallTakbis}"
+                        value="Çalıştır" 
+                        style="white-space:nowrap;"
+                        rendered="true"
+                        />  
+
+                    <p:commandButton 
+                        action="#{mainFrame.readJackrabbitData}"
+                        value="Refresh" 
+                        style="white-space:nowrap;"
+                        update="id_dt_jackrabbit"
+                        />
+
+                </h:panelGrid>
+            </p:panel>
+        </h:panelGrid>
+    </h:form>
+
+
+
+    <p:dataTable 
+        id="id_dt_jackrabbit" 
+        widgetVar="wv_dt_jackrabbit"
+        var="rowData" 
+        value="#{mainFrame.carsData}" 
+        paginator="true" 
+        rows="25"
+        paginatorTemplate="{RowsPerPageDropdown} {FirstPageLink} {PreviousPageLink} {CurrentPageReport} {NextPageLink} {LastPageLink}"
+        rowsPerPageTemplate="10,20,30" 
+        lazy="true"
+        resizableColumns="true"
+        paginatorPosition="bottom"
+        style="width: 100%"
+        >
+        <p:column headerText="index">
+            <h:outputText value="#{rowData.index}"  />
+        </p:column> 
+    </p:dataTable>
+
+    <h:form>
+        <p:dataTable value="#{mainFrame.mongoDbExportedFiles}"      
+                     var="x"
+                     style="width: 100%;">
+            <p:column  headerText="sorgu talep eden" 
+                       style="width: 0px;white-space: nowrap;text-align: left;"
+                       sortBy="#{x.name}">
+                <h:outputText value="banka"  />
+            </p:column> 
+            <p:column  headerText="sorgu talep tarihi" 
+                       style="width: 0px;white-space: nowrap;text-align: left;"
+                       sortBy="#{x.name}">
+                <h:outputText value="2028.12.12"  />
+            </p:column> 
+            <p:column  headerText="sorgu yanıt tarihi" 
+                       style="width: 0px;white-space: nowrap;text-align: left;"
+                       sortBy="#{x.name}">
+                <h:outputText value="2028.12.12"  />
+            </p:column> 
+            <p:column  headerText="sorgu hash 256" 
+                       style="width: 0px;white-space: nowrap;text-align: left;"
+                       sortBy="#{x.name}">
+                <h:outputText value="312411239875912834"  />
+            </p:column> 
+            <p:column  headerText="sorgu filtresi" 
+                       style="width: 0px;white-space: nowrap;text-align: left;"
+                       sortBy="#{x.name}">
+                <h:outputText value="il ilçe ada parsel pafta"  />
+            </p:column> 
+            <p:column  headerText="dosya adı" 
+                       style="width: 0px;white-space: nowrap;text-align: left;"
+                       sortBy="#{x.name}">
+                <h:outputText value="#{x.name}"  />
+            </p:column> 
+            <p:column  style="width: 0px;white-space: nowrap;text-align: left;">
+                <h:outputLink 
+                    value="#{x.path}"
+                    style="
+                    text-decoration:none;
+                    font-size: 14px;
+                    color:#112978;
+                    font-weight:bold;"
+                    >
+                    <h:outputText value="indir" />
+                </h:outputLink>     
+            </p:column>
+            <p:column  style="width: 0px;white-space: nowrap;text-align: left;">
+                <h:commandLink 
+                    value="sil"
+                    action="#{mainFrame.deleteExportFile}"
+                    />
+            </p:column>           
+        </p:dataTable>
+    </h:form>
+</html>

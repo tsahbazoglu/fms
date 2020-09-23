@@ -1,0 +1,72 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://java.sun.com/jsf/html"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:f="http://java.sun.com/jsf/core"
+      >
+    <h:head>
+        <title></title>
+    </h:head>
+
+    <h:form id="ndActionPanelForm">
+        <h:panelGrid 
+            columns="3"
+            columnClasses="VTopHLeftW50pNowrap,VTopHLeftW50pNowrap"
+            width="100%"
+            >
+
+            <h:panelGrid width="100%">
+
+
+                <p:toolbar rendered="#{not esignViewCtrl.preventedMultiTab}">
+                    <f:facet name="left">
+                        <p:commandButton 
+                            value="Bu sayfa ile ilgili açıklamalar için tıklayınız" 
+                            action="#{pivotModifierCtrl.showAllNote}" 
+                            style="color: red;font-weight: bold;white-space: nowrap;"
+                            rendered="#{pivotModifierCtrl.selectedFormUserNote}"
+                            update=":idMessageDialog"
+                            />
+                        <p:commandButton 
+                            value="Excele Aktar" 
+                            rendered="#{formSevice.myform.myActions.download}"
+                            action="#{pivotModifierCtrl.downloadCsvFile}" 
+                            style="white-space: nowrap;"
+                            />
+                        <p:commandButton 
+                            value="Kaydet"
+                            rendered="#{formService.myForm.myActions.save}"
+                            style="width: 150px;"
+                            action="#{pivotModifierCtrl.provideCrossCheck}"
+                            update="#{updateAjaxMB.btnNdSave}"
+                            />
+                        <p:commandButton 
+                            value="E-İmza Süreci" 
+                            action="#{pivotModifierCtrl.showEimza22}" 
+                            rendered="#{formService.myForm.myActions.eimza2D}"
+                            update=":idMessageDialog,:id_nd_esign_dialog"
+                            />  
+                        <h:inputHidden
+                            id="hiddenTextJsonDataToModel" 
+                            value="#{pivotModifierCtrl.pivotDataModelEdit.jsonDataToModel}"
+                            />
+                    </f:facet>
+                </p:toolbar>
+                <p:panel style="text-align: center;">
+                    <h:outputLabel value="#{formService.myForm.name}" style="font-size: 28px;font-weight: bolder;color: #b3b3b3;"/>
+                </p:panel>
+            </h:panelGrid>
+
+            <p:dataList value="#{pivotModifierCtrl.selectedFormMessages}" var="mymessage"  type="ordered"
+                        itemStyleClass="itemStyleClass"
+                        itemType="none"
+                        >
+                <f:facet name="header">
+                    açıklamalar
+                </f:facet>
+                <h:outputText value="#{mymessage}" escape="false"/>
+            </p:dataList>
+        </h:panelGrid>
+    </h:form> 
+</html>

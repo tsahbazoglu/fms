@@ -1,0 +1,108 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://java.sun.com/jsf/html"
+      xmlns:f="http://java.sun.com/jsf/core"
+      xmlns:p="http://primefaces.org/ui">
+
+    <h:head>
+        <title></title>
+    </h:head>
+
+    <p:toolbar 
+        id="id-2d-action-toolbar"
+        rendered="#{not esignViewCtrl.preventedMultiTab}"
+        >
+        <f:facet name="left">
+            <p:button  
+                icon="ui-icon-home" 
+                disabled="true">
+            </p:button>
+
+            <p:commandButton  
+                value="Geniş Filtre" 
+                action="#{filterService.bringFilters}"
+                immediate="true"
+                update="id-dlg-filter"
+                /> 
+
+            <p:commandButton 
+                value="Bu sayfa ile ilgili açıklamalar için tıklayınız" 
+                action="#{twoDimModifyCtrl.showAllNote}" 
+                style="white-space: nowrap;"
+                rendered="#{twoDimModifyCtrl.selectedFormUserNote}"
+                update=":idMessageDialog"
+                />
+            <p:commandButton  
+                value="Yeni Ekle" 
+                action="#{twoDimModifyCtrl.newObject}"
+                immediate="true"
+                rendered="#{formService.myForm.myActions.create}"
+                update="#{updateAjaxMB.btnNewRecord}"
+                /> 
+            <p:commandButton 
+                value="Tüm Sayfaları Kontrol Et" 
+                action="#{twoDimModifyCtrl.provideOverAllCrossCheck}" 
+                rendered="#{formService.myForm.myActions.checkAll}"
+                style="white-space: nowrap;"
+                update="#{updateAjaxMB.btnCheckAll}"
+                />
+            <p:commandButton 
+                value="Tüm Sayfaları Kontrol Et (Admin)" 
+                action="#{twoDimModifyCtrl.provideOverAllCrossCheckForAll}" 
+                rendered="#{formService.myForm.myActions.checkAll and roleMB[mainFrame.architectRole]}"
+                style="white-space: nowrap;"
+                update="#{updateAjaxMB.btnCheckAllAsAdmin}"
+                />
+            <p:commandButton 
+                value="#{twoDimModifyCtrl.dynamicButtonName}" 
+                actionListener="#{twoDimModifyCtrl.processActionExternal}" 
+                rendered="#{twoDimModifyCtrl.shouldSendForm}"
+                style="white-space: nowrap;"
+                update=":idMessageDialog,:idCenterTop"
+                />
+            <p:commandButton 
+                value="Excele Aktar" 
+                ajax="false" 
+                rendered="#{formService.myForm.myActions.download}"
+                actionListener="#{downloadService.downloadExcell}"
+                style="white-space: nowrap;"
+                >
+            </p:commandButton>
+
+            <p:commandButton 
+                value="API" 
+                actionListener="#{twoDimModifyCtrl.showApi}"
+                update=":id-rest-curl-dlg"
+                style="white-space: nowrap;"
+                rendered="false"
+                >
+            </p:commandButton>
+
+            <p:commandButton 
+                id ="idButtonEimza"
+                value="E-İmza Süreci" 
+                action="#{twoDimModifyCtrl.showEimza22}" 
+                rendered="#{formService.myForm.myActions.eimza2D}"
+                update=":idToBeSignedDialog,:idMessageDialog,:id_2d_DialogControlAndSave,:id_dlg_error_warning"
+                /> 
+            <h:selectOneMenu 
+                value="#{twoDimModifyCtrl.transparentProperties['emailType']}" 
+                rendered="#{formService.myForm.myActions.email}"
+                style="white-space: nowrap;"
+                >
+                <f:selectItem itemValue="PLEASE_SELECT" itemLabel="Lütfen Seçiniz..."/>
+                <f:selectItem itemValue="HATIRLATMA" itemLabel="Veri Girişini Hatırlat"/>
+                <f:selectItem itemValue="HATIRLATMA_2" itemLabel="Veri Girişini Hatırlat 2"/>
+            </h:selectOneMenu> 
+
+            <p:commandButton 
+                value="Toplu E-Posta Gönder" 
+                action="#{twoDimModifyCtrl.sendEmailToAll}" 
+                rendered="#{formService.myForm.myActions.emailToAll}"
+                style="white-space: nowrap;"
+                />
+        </f:facet>
+    </p:toolbar>
+
+</html>

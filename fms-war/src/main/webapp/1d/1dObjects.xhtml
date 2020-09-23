@@ -1,0 +1,301 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://java.sun.com/jsf/html"
+      xmlns:p="http://primefaces.org/ui"          
+      xmlns:mygrid="http://java.sun.com/jsf/composite/telmangrid"
+      xmlns:mydynamic="http://java.sun.com/jsf/composite/mydinamic"
+      xmlns:c="http://java.sun.com/jsp/jstl/core"
+      xmlns:f="http://xmlns.jcp.org/jsf/core">
+
+    <h:head>
+        <title></title>
+    </h:head>
+
+
+    <script>
+        function yes1dDoDelete() {
+            PF('widget_1d_delete_confirmation').hide();
+            document.getElementById('buttonDelete1dObjectId').click();
+        }
+
+        function no1dDoNotDelete() {
+            PF('widget_1d_delete_confirmation').hide();
+            return false;
+        }
+    </script>
+
+    <p:toolbar rendered="#{not esignViewCtrl.preventedMultiTab}">
+        <f:facet name="left">
+            <p:commandButton 
+                icon="ui-icon-home" 
+                disabled="true">
+            </p:commandButton>
+            <p:commandButton 
+                onclick="PF('widget_1d_delete_confirmation').show();
+                        return false;"
+                value="Sil" 
+                transient="true"
+                rendered="#{formService.myForm.myActions.delete}"
+                icon="ui-icon-trash"
+                /> 
+            <p:commandButton 
+                id ="buttonDelete1dObjectId"
+                style="display: none;"
+                value="Direk Sil" 
+                action="#{crudOneDim.deleteObject}" 
+                rendered="#{formService.myForm.myActions.delete}"
+                icon="ui-icon-trash"
+                update="idMessageDialog"
+                /> 
+
+            <p:button 
+                id="mySaveButton"
+                onclick="rcOneDimSave();return false;"
+                value="Kaydet"
+                rendered="#{formService.myForm.myActions.save}"
+                />  
+
+            <p:commandButton 
+                id ="buttonCopyObject"
+                value="Kopyala" 
+                action="#{crudOneDim.copyObject}" 
+                rendered="false"/>
+            <p:commandButton 
+                value="Bu sayfa ile ilgili açıklamalar için tıklayınız" 
+                action="#{crudOneDim.showAllNote}" 
+                style="white-space: nowrap;"
+                rendered="#{crudOneDim.selectedFormUserNote}"
+                update=":idMessageDialog"
+                />
+            <h:outputText 
+                value="Tarihçe Etkin(siz)leştir" 
+                style="white-space: nowrap;" 
+                rendered="#{mainFrame.adminRole}"/>
+            <h:selectBooleanCheckbox  
+                value="#{crudOneDim.enableHistoryOnSave}" 
+                rendered="#{mainFrame.adminRole}"
+                readonly="true"/>
+            <!--            <span class="ui-separator">
+                            <span class="ui-icon ui-icon-grip-dotted-vertical" />
+                        </span>-->
+            <p:commandButton
+                id="buttonEimza"
+                value="E-İmza Süreci" 
+                action="#{crudOneDim.showEimza}" 
+                rendered="#{formService.myForm.myActions.esign}"
+                update=":idToBeSignedDialog,:idMessageDialog,:id_dlg_error_warning"/> 
+
+            <h:selectOneMenu 
+                value="#{crudOneDim.transparentProperties['emailType']}" 
+                rendered="#{formService.myForm.myActions.email}">
+                <f:selectItems value="#{crudOneDim.emailTypes}"/>
+            </h:selectOneMenu> 
+            <p:commandButton 
+                id="buttonSendEmailId"
+                value="Email Önizleme"
+                action="#{crudOneDim.actionEmail}"
+                rendered="#{formService.myForm.myActions.email}"/> 
+            <h:form>
+                <p:commandButton 
+                    id="id_downlod_button"
+                    value="Islak imza formatında indirmek için tıklayınız."
+                    ajax="false"
+                    icon="ui-icon-arrowthick-1-s"
+                    rendered="#{formService.myForm.myActions.customDownload}">
+                    <p:fileDownload value="#{crudOneDim.file}"/>
+                </p:commandButton> 
+            </h:form>
+        </f:facet>
+    </p:toolbar>
+
+
+    <h:form id="crud1dForm">
+        <p:messages
+            showDetail="true" 
+            showSummary="true" 
+            closable="true" 
+            />
+        
+        <p:remoteCommand 
+            name="rcOneDimSave"
+            value="Kaydet" 
+            action="#{crudOneDim.saveObject}" 
+            rendered="#{formService.myForm.myActions.save}"
+            update="#{updateAjaxMB.btn1dSave}"
+            />
+
+        <br/>
+        <h:outputText value="Döküman Bilgisi" style="font-size: 22px;font-weight: bolder;color: #b3b3b3;"/>
+        <br/>
+        <br/>
+        <p:panel>
+            <h:panelGrid 
+                id="ajax_fields_place"
+                columns="4"
+                columnClasses="td-3,td-2,td-2,td-1" 
+                styleClass="tableWidth" 
+                >
+                <c:forEach items="#{formService.myForm.fieldsAsList}" var="myField">
+                    <h:panelGroup id="id-label-#{myField.key}" class="#{myField.styleClass}">
+                        <p:outputLabel
+                            value="#{myField.label}" 
+                            escape="false"
+                            style="#{myField.labelStyle}"
+                            rendered="#{myField.rendered}"
+                            >
+                        </p:outputLabel>
+                    </h:panelGroup>
+                    <h:panelGroup id="id-component-#{myField.key}" class="#{myField.styleClass}">
+                        <mydynamic:uysSelectMenuFor1D
+                            myvalue="#{crudOneDim.myObject[myField.key]}"
+                            myFieldKey="#{myField.key}"
+                            label="#{myField.label}" 
+                            myitems="#{myField.selectItemsCurrent}" 
+                            myreadonly="#{myField.readonly}" 
+                            myrequired="#{myField.required}"
+                            rendered="#{crudOneDim.selectOneMenu eq  myField.componentType and myField.rendered}"
+                            myconverter="#{myField.myconverter}"
+                            isAjax="#{myField.ajax}"
+                            ajax_update="#{updateAjaxMB.selectMenu1dChange},#{myField.ajaxUpdate}"
+                            someaction="#{crudOneDim.someaction}"
+                            />
+                        <mydynamic:uysSelectManyListbox
+                            myvalue="#{crudOneDim.myObject[myField.key]}"
+                            label="#{myField.label}" 
+                            myitems="#{myField.selectItemsCurrent}" 
+                            rendered="#{crudOneDim.selectManyListbox eq  myField.componentType and myField.rendered}"
+                            myconverter="#{myField.myconverter}"
+                            />
+                        <mydynamic:uysInputText 
+                            myvalue="#{crudOneDim.myObject[myField.key]}"
+                            myFieldKey= "#{myField.key}"
+                            myrequired="#{myField.required}"
+                            myreadonly="#{myField.readonly}" 
+                            mystyle="#{myField.style}"
+                            label="#{myField.label}" 
+                            rendered="#{crudOneDim.inputText eq  myField.componentType and myField.rendered}"
+                            myCalculateOnCrudView="#{myField.calculateOnCrudView}"
+                            myCalculateOnListView="#{myField.calculateOnListView}"
+                            myCalculateOnSave="#{myField.calculateOnSave}"
+                            myConverter="#{myField.myconverter}"
+                            myConverterInstance="#{myField.converterInstance}" 
+                            myConverterFormat ="#{myField.converterFormat}" 
+                            myConverterParam="#{myField.converterParam}"
+                            myMaxValue="#{myField.maxValue}" 
+                            crudObject= "#{crudOneDim.myObject}"
+                            shouldCheckNegative="#{myField.shouldCheckNegative}"
+                            >
+                            <!--stayed here for calculate converter   JsFunctionConverter-->
+                        </mydynamic:uysInputText>
+                        <mydynamic:uysInputMask 
+                            myvalue="#{crudOneDim.myObject[myField.key]}"
+                            myFieldKey= "#{myField.key}"
+                            myrequired="#{myField.required}"
+                            myreadonly="#{myField.readonly}" 
+                            mystyle="#{myField.style}"
+                            myCalculateOnCrudView="#{myField.calculateOnCrudView}"
+                            myCalculateOnListView="#{myField.calculateOnListView}"
+                            myCalculateOnSave="#{myField.calculateOnSave}"
+                            label="#{myField.label}" 
+                            rendered="#{crudOneDim.inputMask eq  myField.componentType and myField.rendered}"
+                            myConverter="#{myField.myconverter}"
+                            myConverterInstance="#{myField.converterInstance}" 
+                            myConverterFormat ="#{myField.converterFormat}" 
+                            crudObject= "#{crudOneDim.myObject}"
+                            myMaxValue="#{myField.maxValue}" 
+                            shouldCheckNegative="#{myField.shouldCheckNegative}"
+                            myMask="#{myField.mask}"
+                            >
+                            <!--stayed here for calculate converter   JsFunctionConverter-->
+                        </mydynamic:uysInputMask>
+                        <mydynamic:uysInputTextArea                            
+                            myvalue="#{crudOneDim.myObject[myField.key]}"
+                            label="#{myField.label}" 
+                            rendered="#{crudOneDim.inputTextarea eq  myField.componentType and myField.rendered}"
+                            myconverter="#{myField.myconverter}"
+                            myrequired="#{myField.required}"
+                            myreadonly="#{myField.readonly}" 
+                            />
+                        <mydynamic:uysDateTimeEntry
+                            myvalue="#{crudOneDim.myObject[myField.key]}"
+                            myreadonly="#{myField.readonly}"
+                            label="#{myField.label}" 
+                            rendered="#{crudOneDim.inputDate eq  myField.componentType and myField.rendered}"
+                            myconverter="#{myField.myconverter}"
+                            mypattern="#{myField.datePattern}"
+                            myrequired="#{myField.required}"
+                            dateRangeControl="#{myField.dateRangeControl}"
+                            dateRangeValidate="#{myField.dateRangeValidate}"
+                            dateRangeStartValue="#{crudOneDim.myObject.start_date}"
+                            dateRangeEndValue="#{crudOneDim.myObject.end_date}"
+                            eventChangeUpdate="#{updateAjaxMB.dateTimeEntry1dEventChangeUpdate}"
+                            eventDateSelectUpdate="#{updateAjaxMB.dateTimeEntry1dEventDateSelectUpdate}"
+                            dateChange="#{crudOneDim.dateChange}"
+                            />
+                        <mydynamic:uysSelectBooleanCheckbox 
+                            myvalue="#{crudOneDim.myObject[myField.key]}"
+                            label="#{myField.label}" 
+                            rendered="#{crudOneDim.selectBooleanCheckbox eq  myField.componentType and myField.rendered}"
+                            myconverter="#{myField.myconverter}"
+                            />
+                    </h:panelGroup>
+
+                    <h:panelGroup id="id-desc-#{myField.key}" class="#{myField.styleClass}">
+                        <p:outputLabel
+                            value="#{myField.description}"
+                            rendered="#{myField.rendered}"
+                            />
+                        <p:commandButton 
+                            icon="fa fa-info-circle" 
+                            action="#{crudOneDim.showMyFieldDesc}"
+                            immediate="true"
+                            value="Bilgi" 
+                            update="#{updateAjaxMB.btnPageShowDesc}"
+                            rendered="#{myField.renderPopupDesc}"
+                            style="font-size:10px"
+                            >
+                            <f:setPropertyActionListener value="#{fieldKey}" target="#{crudOneDim.selectedField}"/>
+                        </p:commandButton>
+                    </h:panelGroup>
+
+                    <h:outputText/>
+
+                </c:forEach>   
+            </h:panelGrid>
+        </p:panel>
+    </h:form>
+
+    <p:dialog 
+        id="id-desc-dlg"
+        header="açıklama"
+        widgetVar="wvDescDlg"
+        width="600"
+        height="400"
+        closable="true"
+        closeOnEscape="true"                     
+        position="center"
+        resizable="true"
+        >
+        <p:panel
+            id="id-desc-dlg-pnl"
+            >
+            <b>form: </b> <p:outputLabel value="#{formService.myForm.name}"/> 
+            <hr/>
+            <b>alan: </b> <p:outputLabel value="#{crudOneDim.selectedField.name}"/> 
+            <hr/>
+            <b>açıklama: </b> <p:outputLabel value="#{crudOneDim.selectedField.popupDescription}" escape="false"/>
+        </p:panel>
+    </p:dialog>
+
+    <br/>
+
+    <mygrid:mySimpleGrid
+        id="idVersionTable"
+        rendered="#{formService.myForm.showHistory}"
+        columns="#{crudOneDim.historyColumnModel}"
+        rows="#{crudOneDim.versionHistory}"
+        />
+    <br/>
+
+</html>

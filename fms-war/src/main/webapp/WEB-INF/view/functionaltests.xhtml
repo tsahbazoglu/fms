@@ -1,0 +1,31 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:f="http://java.sun.com/jsf/core"
+      xmlns:h="http://java.sun.com/jsf/html"
+      xmlns:ace="http://primefaces.org/ui"
+      > 
+
+    <h:head>
+        <title></title>
+    </h:head>
+
+    <ace:dataTable id="usersDataTable"
+                   var="item"
+                   value="#{functionalTest.lists}"
+                   style="width:100%"
+                   rows="10"
+                   scrollable="false"
+                   binding="#{functionalTest.htmlDataTable}"
+                   <!--rowSelectListener="# {functionalTest.rowSelectionListenerTest}"-->
+                   >
+                   <ace:column>
+            <f:facet name="header">
+                <h:outputText value="sira_no"/>
+            </f:facet>
+            <h:outputText value="#{item.name}"/>          
+        </ace:column>
+    </ace:dataTable> 
+
+
+</html>

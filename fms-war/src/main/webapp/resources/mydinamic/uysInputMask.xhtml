@@ -1,0 +1,72 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"   
+      xmlns:composite="http://java.sun.com/jsf/composite"
+      xmlns:f="http://java.sun.com/jsf/core"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:h="http://java.sun.com/jsf/html"
+      >
+    <h:head>
+        <title></title>
+    </h:head>
+
+    <composite:interface>
+        <composite:attribute name="myConverter" required="true"/>
+        <composite:attribute name="myConverterInstance"/>
+        <composite:attribute name="myConverterFormat"/>
+        <composite:attribute name="label" required="true"/>
+        <composite:attribute name="myFieldKey"/>
+        <composite:attribute name="myvalue" required="true"/>
+        <composite:attribute name="mystyle"/>
+        <composite:attribute name="myreadonly"/>
+        <composite:attribute name="crudObject"/>
+        <composite:attribute name="myCalculateOnCrudView"/>
+        <composite:attribute name="myCalculateOnListView"/>
+        <composite:attribute name="myCalculateOnSave"/>
+        <composite:attribute name="myrequired"/>
+        <composite:attribute name="myMaxValue"/>
+        <composite:attribute name="myMask"/>
+        <composite:attribute name="shouldCheckNegative"/>
+    </composite:interface>
+
+    <composite:implementation>
+
+        <h:panelGroup
+            rendered="#{not cc.attrs.myreadonly}"
+            >
+            <p:inputMask
+                style="width: 355px;;#{cc.attrs.mystyle}" 
+                converter="#{cc.attrs.myConverter}" 
+                value="#{cc.attrs.myvalue}"
+                mask="#{cc.attrs.myMask}"
+                >
+                <f:attribute name="label" value="#{cc.attrs.label}"/>
+                <f:attribute name="viewKey" value="name"/>
+                <f:attribute name="crudObject" value="#{cc.attrs.crudObject}"/>
+                <f:attribute name="fieldKey" value="#{cc.attrs.myFieldKey}"/>
+                <f:attribute name="converterInstance" value="#{cc.attrs.myConverterInstance}"/>
+                <f:attribute name="converterFormat" value="#{cc.attrs.myConverterFormat}"/>
+                <f:attribute name="calculateOnCrudView" value="#{cc.attrs.myCalculateOnCrudView}"/>
+                <f:attribute name="calculateOnListView" value="#{cc.attrs.myCalculateOnListView}"/>
+                <f:attribute name="calculateOnSave" value="#{cc.attrs.myCalculateOnSave}"/>
+                <f:attribute name="shouldCheckNegative" value="#{cc.attrs.shouldCheckNegative}"/>
+                <f:attribute name="trequired" value="#{cc.attrs.myrequired}"/>
+                <f:attribute name="maxValue" value="#{cc.attrs.myMaxValue}"/>
+            </p:inputMask>
+        </h:panelGroup>
+
+        <h:inputText
+            style="width: 355px;" 
+            readonly="true"
+            value="#{cc.attrs.myvalue}"
+            rendered="#{cc.attrs.myreadonly}"
+            converter="#{cc.attrs.myConverter}" 
+            >
+        </h:inputText>
+
+
+
+
+
+    </composite:implementation>
+</html>

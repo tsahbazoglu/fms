@@ -1,0 +1,31 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://java.sun.com/jsf/html"
+      xmlns:p="http://primefaces.org/ui">
+
+    <h:head>
+        <title></title>
+    </h:head>
+
+    <h:panelGroup id="id-pnl-crud-list">
+        <p:panel header="Gömülü Liste">
+
+            <h:panelGroup>
+                <p:commandButton value="ekle"/>
+                <p:commandButton value="çıkar"/>
+            </h:panelGroup>
+            <p:dataTable>
+                <p:column headerText="Seç">
+                    <p:selectBooleanCheckbox/>
+                </p:column>
+                <p:column headerText="Id">
+                    ilgili ID
+                </p:column>
+                <p:column headerText="Etiket">
+                    ilgili NAME
+                </p:column>
+            </p:dataTable>
+        </p:panel>      
+    </h:panelGroup>
+</html>

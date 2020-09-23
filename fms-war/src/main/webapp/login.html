@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<!--<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">-->
+<!--To further explain, IE reverts to IE5.5 in quirks mode when no doctype is declared, 
+and IE5.5 doesn't support auto margins (aka centering block elements via that).--> 
+<html>
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/></meta>
+        <title id="id_title"></title>
+        <link 
+            id="id_link_favicon" 
+            type="image/x-icon" 
+            href="" 
+            rel="shortcut icon"
+            >
+        <link rel='stylesheet' href='https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css'> 
+        <script src='https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js'></script> 
+        <script src='https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js'></script>
+
+        <script type="text/javascript">
+            function uysUpperCase(html_input_element) {
+                html_input_element.value = html_input_element.value.toLocaleUpperCase();
+            }
+            function loginDialog() {
+                varLoginDiv = document.getElementById("loginDiv");
+                varForgetDiv = document.getElementById("forgetDiv");
+                varLoginDiv.style.display = "block";
+                varForgetDiv.style.display = "none";
+            }
+        </script>
+
+        <style type="text/css">
+            .myinnerdiv{
+                margin:0 auto;
+                border: solid;
+                border-color: #0074C8;
+                -moz-border-radius: 15px;
+                border-radius: 15px;
+            }
+
+            .container{
+                padding-top:10%;
+                margin:0 auto;
+            }
+
+            .field-icon {
+                float: right;
+                margin-left: -25px;
+                margin-top: -25px;
+                position: relative;
+                z-index: 2;
+            }
+
+            .mytextstyle{
+                width:100%;
+                text-align:center;
+            }
+        </style>
+        <script src="https://www.google.com/recaptcha/api.js?hl=tr"></script>
+        <script type="text/javascript">
+            var RecaptchaOptions = {
+                lang: 'tr',
+                hl: 'tr'
+            };
+            grecaptcha.render('html_element', RecaptchaOptions);
+        </script>
+    </head>
+
+
+    <body>
+        <div class='container'>
+            <div class='row'>
+                <div class='col-md-2'></div>
+                <div class='col-md-8'>
+                    <div class='panel panel-default myinnerdiv'>
+                        <div class='panel-body'>
+
+                            <div class='row'>
+                                <div class='col-md-1'>
+                                    <img id='img_logo' src=""/>
+                                    <h5><span id='id_main_title' class='title-style'></span></h5>
+                                </div>
+                                <div class='col-md-7'></div>
+                                <div class='col-md-4 text-right'>
+                                    <h5><span  class='title'>Üye Yönetim Sistemi</span></h5>
+                                    <h5><a href="/login/anonym"><span class='title-style'>Misafir işlemleri</span></a></h5>
+                                </div> 
+                            </div> 
+
+                            <div class='row'> 
+                                <div class='col-md-12'> 
+                                    <hr style='color: #0074C8;height: 2px;background-color: #0074C8;'> 
+                                </div> 
+                            </div> 
+
+                            <form method="POST" name="login" action="/loginJaas">
+
+                                <div class='row'> 
+                                    <div class='col-md-12'> 
+                                        <span style="color: #0074C8;font-weight: bold;font-size: 10px;">Kullanıcı adı</span> 
+                                    </div> 
+                                </div> 
+
+                                <div class='row'> 
+                                    <div class='col-md-12'> 
+                                        <input id="username" name="j_username" type="text" tabindex="1001" class="mytextstyle"/>
+                                    </div> 
+                                </div> 
+
+                                <div class='row'> 
+                                    <div class='col-md-12'> 
+                                        <span style="color: #0074C8;font-weight: bold;font-size: 10px;">Parola</span> 
+                                    </div> 
+                                </div> 
+
+                                <div class='row'> 
+                                    <div class='col-md-12'> 
+                                        <input id="password" name="j_password" type="password" tabindex="1002" class="mytextstyle" />
+                                    </div> 
+                                </div> 
+
+                                <div class='row'> 
+                                    <div class='col-md-12'> 
+                                        <br/>
+                                    </div> 
+                                </div> 
+
+                                <div class='form-group'>
+                                    <div class='col-md-6'>
+                                        <div class='g-recaptcha' data-sitekey='6LcQzG4UAAAAACk87rF4aMb07mwTiZnldOiqWh8s'></div>
+                                    </div>
+                                    <div class='col-md-6'>
+                                        <button style='background:#0074C8;color: #FFF;font-size: 15px;width: 100%;height: 75px;' type='submit'> 
+                                            <span>
+                                                gönder
+                                            </span>
+                                        </button> 
+                                    </div>
+                                </div>
+
+                            </form>
+
+                            <div class='row'> 
+                                <div class="col-md-12 text-center"> 
+                                    <br/>
+                                    <a id="id_href_fgtpswd" href=""><span>Parolamı unuttum</span></a>
+                                </div> 
+                            </div> 
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+
+        <script>
+            vendor_value = "TSPB";
+            //vendor_value = "TDUB";
+            switch (vendor_value) {
+                case "TSPB":
+                    document.getElementById('id_href_fgtpswd').href = '/fphi/tspb';
+                    document.getElementById('img_logo').src = '/public/logo_tspb.png';
+                    document.getElementById('id_main_title').innerHTML = '<a href="http://www.tspb.org.tr/" target="_ablank">www.tspb.org.tr</a>';
+                    document.getElementById('id_title').innerHTML = 'Türkiye Sermaye Pyasaları Birliği';
+                    document.getElementById('id_link_favicon').href = '/public/favicon_tspb.ico';
+                    break;
+                case "TDUB":
+                    document.getElementById('id_href_fgtpswd').href = '/fphi/tdub';
+                    document.getElementById('img_logo').src = '/public/favicon_tdub.png';
+                    document.getElementById('id_main_title').innerHTML = '<a href="http://www.tdub.org.tr/" target="_ablank">www.tdub.org.tr</a>';
+                    document.getElementById('id_title').innerHTML = 'Türkiye Değerleme Uzmanları Birliği';
+                    document.getElementById('id_link_favicon').href = '/public/favicon_tdub.png';
+                    break;
+            }
+        </script>
+
+    </body>
+
+</html> 
+
+
+
+
+
+

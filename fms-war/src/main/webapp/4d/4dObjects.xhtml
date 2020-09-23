@@ -1,0 +1,54 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://java.sun.com/jsf/html"          
+      xmlns:c="http://java.sun.com/jsp/jstl/core"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:f="http://java.sun.com/jsf/core">
+
+    <h:head>
+        <title></title>
+    </h:head>
+
+
+    <h:form id="crud4dForm">
+
+        <p:commandButton 
+            value="Kaydet"
+            action="#{crudFourDim.save}"
+            />
+        <h:panelGrid columns="3">
+            <c:forEach items="#{crudFourDim.selectedFormFieldKeySetAsList}" var="fieldKey">
+                <h:panelGroup>
+                    <h:outputText
+                        value="#{crudFourDim.componentMap[fieldKey]['label']}" 
+                        escape="false"
+                        style="#{crudFourDim.componentMap[fieldKey]['style']}"
+                        rendered="#{crudFourDim.componentMap[fieldKey]['rendered']}"
+                        >
+                    </h:outputText>
+                </h:panelGroup>
+                <h:panelGroup>
+                    <p:inputText 
+                        value="#{crudFourDim.record[fieldKey]}"
+                        rendered="#{'inputText' eq  crudFourDim.componentMap[fieldKey]['componentType']}"
+                        >
+                    </p:inputText>
+                    <p:selectOneMenu 
+                        value="#{crudFourDim.record[fieldKey]}"
+                        rendered="#{'selectOneMenu' eq  crudFourDim.componentMap[fieldKey]['componentType']}"
+                        >
+                        <f:selectItems value="#{crudFourDim.componentMap[fieldKey]['items']}"/>
+                    </p:selectOneMenu>
+                </h:panelGroup>
+                <h:panelGroup>
+                    <h:outputText 
+                        value="#{crudFourDim.componentMap[fieldKey]['description']}"
+                        rendered="#{crudFourDim.componentMap[fieldKey]['rendered']}"
+                        >
+                    </h:outputText>
+                </h:panelGroup>
+            </c:forEach>
+        </h:panelGrid>
+    </h:form>
+</html>

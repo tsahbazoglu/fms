@@ -1,0 +1,54 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"   
+      xmlns:composite="http://java.sun.com/jsf/composite"
+      xmlns:h="http://java.sun.com/jsf/html"
+      >
+
+    <h:head>
+        <title></title>
+    </h:head>
+
+    <composite:interface>
+        <composite:attribute name="title" required="true"/>
+    </composite:interface>
+
+    <composite:implementation>
+
+        <div style="
+             bottom: 5px;
+             top: 5px;
+             border: 1px solid black;
+             width: 100px;
+             position: relative;
+             ">
+            <div style="
+                 border: 1px solid white;
+                 top:0px;
+                 left:20px;
+                 width: 55px;
+                 height: 20px;
+                 position: absolute;
+                 text-align: center;
+                 background: white;
+                 z-index: 2;
+                 ">
+                <span>#{cc.attrs.title}</span>
+            </div> 
+
+            <div style="
+                 border: 1px solid gray;
+                 top:8px;
+                 left:0px;
+                 width: 150px;
+                 height: 33px;
+                 position: absolute;  
+                 -moz-border-radius: 15px;
+                 border-radius: 8px;
+                 ">
+                <composite:insertChildren/>
+            </div>
+        </div>
+
+    </composite:implementation>
+</html>

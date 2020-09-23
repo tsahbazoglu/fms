@@ -1,0 +1,33 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:f="http://java.sun.com/jsf/core"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:c="http://java.sun.com/jsp/jstl/core"
+      xmlns:mydynamic="http://java.sun.com/jsf/composite/mydinamic"
+      xmlns:mygrid="http://java.sun.com/jsf/composite/telmangrid">
+
+    <p:commandButton  
+        value="süreç akış diagramı"
+        action="#{workFlowCtrl.show}"
+        rendered="#{formService.myForm.workFlowActive}"
+        update="#{updateAjaxMB.btnShowWf}"
+        immediate="true"
+        />
+    <p:commandButton 
+        value="başlat" 
+        rendered="#{workFlowCtrl.canStartProcess}"
+        action="#{workFlowCtrl.startProcess}"
+        update="#{updateAjaxMB.btnWfStart}" 
+        />
+    <c:forEach items="#{workFlowCtrl.triggers}" var="trigger">
+        <p:commandButton 
+            value="#{trigger}" 
+            action="#{workFlowCtrl.fireProcess}" 
+            update="#{updateAjaxMB.btnWfStart}"                     
+            >
+            <f:setPropertyActionListener value="#{trigger}" target="#{workFlowCtrl.trigger}"/>
+        </p:commandButton>
+    </c:forEach>
+
+</html>

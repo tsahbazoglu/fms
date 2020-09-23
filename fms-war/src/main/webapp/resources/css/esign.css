@@ -1,0 +1,63 @@
+/********************************************************************** EIMZA */
+
+
+records{
+    display: block;    
+}
+
+record{
+    display: block;
+}
+
+item{
+    display: block;
+}
+
+key{
+    display: inline;
+    font-weight: bold;
+}
+
+key:after{
+    content: " : ";
+} 
+
+value{
+    display: inline;
+}
+
+attachments{
+    display: block;
+}
+
+
+
+attachment{
+    display: block;
+}
+
+name{
+    display: inline;
+}
+
+content{
+    display: none;
+}
+
+records:before{
+    content: "[";
+}
+
+records:after{
+    content: "]";
+}
+
+record:before{
+    content: "{";
+}
+record:after{
+    content: "}";
+}
+attachments:before{
+    content: " Ekler ";
+}

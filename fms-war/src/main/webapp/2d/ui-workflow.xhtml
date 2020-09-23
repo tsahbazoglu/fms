@@ -1,0 +1,92 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:f="http://java.sun.com/jsf/core"
+      xmlns:h="http://java.sun.com/jsf/html"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:c="http://java.sun.com/jsp/jstl/core"
+      xmlns:mydynamic="http://java.sun.com/jsf/composite/mydinamic"
+      xmlns:mygrid="http://java.sun.com/jsf/composite/telmangrid"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets">
+
+    <h:head>
+        <title></title>
+    </h:head>
+
+    <style type="text/css">
+        .ui-diagram-element {
+            font-size: 12px;
+            border:0.25em dotted #3d56b9;    
+            width:20em; 
+            height:2em;     
+            line-height:2em;
+            text-align: center;
+        }
+        .ui-diagram-element-entry {
+            font-size: 12px;
+            border:0.25em dotted #3d56b9;    
+            width:20em; 
+            height:2em;     
+            line-height:2em;
+            text-align: center;
+            background-color: yellow;
+        }
+        .ui-diagram-element-exit {
+            font-size: 12px;
+            border:0.25em dotted #3d56b9;    
+            width:20em; 
+            height:2em;     
+            line-height:2em;
+            text-align: center;
+            background-color: #85df85;
+        }
+        .ui-diagram-label {
+            border:0.25em solid #3d56b9;  
+            font-size: 10px;
+            height:2em;     
+            line-height:2em;
+            text-align: center;
+            background-color: #85df85;
+        }
+    </style>
+
+    <p:messages 
+        showDetail="true"
+        closable="true">
+        <p:autoUpdate/>
+    </p:messages>
+
+    <br/>
+
+    <p:toolbar
+        id="id-2d-wf-toolbar"
+        style="width: 100%;"
+        >
+        <f:facet name="left">
+            <ui:include src="ui-workflow-btn.xhtml"/>
+        </f:facet>   
+        <f:facet name="right">
+            <p:outputLabel value="adım : #{twoDimModifyCtrl.myObject['smState']}"/>
+        </f:facet>
+    </p:toolbar>
+
+    <br/>
+
+    <p:dataTable
+        id="id-dt-wf"
+        value="#{workFlowCtrl.history}" 
+        var="history"
+        >
+        <f:facet name="header">
+            <h:outputText value="İş Akış Tarihçesi"/>
+        </f:facet>
+        <c:forEach items="#{workFlowCtrl.fieldsAsList}" var="myField">
+            <p:column headerText="#{myField.label}">
+                <h:outputText value="#{history[myField.key]}"/>
+            </p:column>
+        </c:forEach>
+    </p:dataTable>
+
+    <br/>
+
+</html>

@@ -1,0 +1,54 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://java.sun.com/jsf/html"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:f="http://java.sun.com/jsf/core"
+      xmlns:mydynamic="http://java.sun.com/jsf/composite/mydinamic"
+      >
+
+    <h:head>
+        <title></title>
+    </h:head>
+
+    <h:panelGrid 
+        columns="3"
+        columnClasses="VTopHLeftW50pNowrap,VTopHLeftW50pNowrap"
+        width="100%"
+        >
+
+        <h:panelGrid width="100%">
+            <p:toolbar>
+                <f:facet name="left">
+                    <p:button 
+                        value="Kaydet"
+                        onclick="rcSave();return false;"
+                        />
+                </f:facet>                
+            </p:toolbar>
+            <p:panel style="text-align: center;">
+                <h:outputLabel value="#{simplePivotCtrl.selectedForm.pageName}" style="font-size: 28px;font-weight: bolder;color: #b3b3b3;"/>
+            </p:panel>
+        </h:panelGrid>
+
+        <p:dataList
+            value="#{simplePivotCtrl.selectedFormMessages}" 
+            var="mymessage"  
+            type="ordered"
+            itemStyleClass="itemStyleClass"
+            itemType="none"
+            >
+            <f:facet name="header">
+                açıklamalar
+            </f:facet>
+            <h:outputText value="#{mymessage}" escape="false"/>
+        </p:dataList>
+
+    </h:panelGrid>
+
+
+
+
+
+
+</html>
