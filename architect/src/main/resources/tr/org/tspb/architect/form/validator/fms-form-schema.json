@@ -1,0 +1,301 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "definitions": {
+        "FmsEvent": {
+            "type": "object",
+            "properties": {
+                "db": {
+                    "type": "string"
+                },
+                "op": {
+                    "type": "string"
+                }
+            }
+        },
+        "FmsFunction": {
+            "type": "object",
+            "properties": {
+                "$code": {
+                    "type": "string"
+                }
+            }
+        },
+        "FmsUpperNode": {
+            "type": "object",
+            "properties": {
+                "key": {
+                    "type": "string"
+                }
+            }
+        },
+        "Map": {
+            "type": "object"
+        }
+    },
+    "type": "object",
+    "properties": {
+        "_id": {
+            "$ref": "#/definitions/Map"
+        },
+        "accessControlLevelTwo": {
+            "type": "string"
+        },
+        "accesscontrol": {
+            "type": "array",
+            "items": {
+                "type": "string"
+            }
+        },
+        "actions": {
+            "type": "object",
+            "properties": {
+                "create": {
+                    "type": "string"
+                },
+                "delete": {
+                    "type": "string"
+                },
+                "download": {
+                    "type": "string"
+                },
+                "read": {
+                    "type": "string"
+                },
+                "save": {
+                    "type": "string"
+                },
+                "upload": {
+                    "type": "string"
+                }
+            }
+        },
+        "anotherEimzaColletionKey": {
+            "type": "string"
+        },
+        "autosetFields": {
+            "$ref": "#/definitions/Map"
+        },
+        "cacheKey": {
+            "type": "string"
+        },
+        "calculateCollection": {
+            "type": "string"
+        },
+        "calculateQuery": {
+            "$ref": "#/definitions/FmsFunction"
+        },
+        "collection": {
+            "type": "string"
+        },
+        "constraintItems": {
+            "type": "object",
+            "properties": {
+                "collection": {
+                    "type": "string"
+                },
+                "db": {
+                    "type": "string"
+                },
+                "query": {
+                    "type": "object",
+                    "properties": {
+                        "$code": {
+                            "$ref": "#/definitions/FmsFunction"
+                        },
+                        "$where": {
+                            "type": "string"
+                        },
+                        "forms": {
+                            "type": "string"
+                        },
+                        "relations": {
+                            "type": "object",
+                            "properties": {
+                                "$regex": {
+                                    "type": "string"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "controlCollection": {
+            "type": "string"
+        },
+        "currentRendered": {
+            "type": "string"
+        },
+        "db": {
+            "type": "string"
+        },
+        "defaultCurrentQuery": {
+            "type": "string"
+        },
+        "defaultHistoryQuery": {
+            "type": "string"
+        },
+        "defaultSortField": {
+            "type": "string"
+        },
+        "dimension": {
+            "type": "number"
+        },
+        "disabled": {
+            "type": "boolean"
+        },
+        "enabled": {
+            "type": "boolean"
+        },
+        "esignEmailBccRecipients": {
+            "type": "string"
+        },
+        "esignEmailToRecipients": {
+            "$ref": "#/definitions/FmsFunction"
+        },
+        "eventFormSelection": {
+            "$ref": "#/definitions/FmsEvent"
+        },
+        "eventPostDelete": {
+            "$ref": "#/definitions/FmsEvent"
+        },
+        "eventPostSave": {
+            "$ref": "#/definitions/FmsEvent"
+        },
+        "eventPreSave": {
+            "$ref": "#/definitions/FmsEvent"
+        },
+        "events": {
+            "type": "array",
+            "items": {
+                "$ref": "#/definitions/FmsEvent"
+            }
+        },
+        "fields": {
+            "$ref": "#/definitions/Map"
+        },
+        "fieldsRow": {
+            "type": "string"
+        },
+        "form": {
+            "type": "string"
+        },
+        "formType": {
+            "type": "string",
+            "enum": ["YetkiBelgeleri_java", "DayanakVarliklari_java"]
+        },
+        "forms": {
+            "type": "string"
+        },
+        "funcNote": {
+            "type": "string"
+        },
+        "group": {
+            "type": "string"
+        },
+        "handsonColWidths": {
+            "type": "number"
+        },
+        "handsonRowHeaderWidth": {
+            "type": "number"
+        },
+        "historyPosition": {
+            "type": "string",
+            "enum": ["ONE", "TWO"]
+        },
+        "historyRendered": {
+            "type": "boolean"
+        },
+        "key": {
+            "type": "string",
+            "maxLength": 100
+        },
+        "member": {
+            "type": "string"
+        },
+        "menuOrder": {
+            "type": "number"
+        },
+        "myNamedQueries": {
+            "type": "string"
+        },
+        "name": {
+            "type": "string"
+        },
+        "oneToMany": {
+            "type": "string"
+        },
+        "postSave": {
+            "type": "object",
+            "properties": {
+                "action": {
+                    "type": "string"
+                },
+                "cacheQuery": {
+                    "type": "object",
+                    "properties": {
+                        "collection": {
+                            "type": "string"
+                        },
+                        "db": {
+                            "type": "string"
+                        },
+                        "relations": {
+                            "type": "boolean"
+                        }
+                    }
+                },
+                "type": {
+                    "type": "string"
+                }
+            }
+        },
+        "projectKey": {
+            "type": "string"
+        },
+        "readOnlyNote": {
+            "type": "string"
+        },
+        "searchForm": {
+            "type": "string"
+        },
+        "shortName": {
+            "type": "string"
+        },
+        "shouldAskForVersion": {
+            "type": "boolean"
+        },
+        "showHistory": {
+            "type": "boolean"
+        },
+        "snapshotCollection": {
+            "type": "string"
+        },
+        "type": {
+            "type": "string",
+            "enum": ["node", "website"]
+        },
+        "upperNode": {
+            "$ref": "#/definitions/FmsUpperNode"
+        },
+        "upperNodes": {
+            "$ref": "#/definitions/FmsUpperNode"
+        },
+        "userConstantNote": {
+            "type": "string"
+        },
+        "userConstantNoteList": {
+            "type": "array",
+            "items": {
+                "type": "string"
+            }
+        },
+        "userNote": {
+            "type": "string"
+        },
+        "versionCollection": {
+            "type": "string"
+        }
+    },
+    "required": ["accesscontrol", "collection", "upperNode", "upperNodes", "menuOrder", "projectKey", "name", "fields", "shortName", "actions", "dimension", "db", "forms"]
+}

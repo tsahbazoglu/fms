@@ -1,0 +1,29 @@
+{
+    "key": "sdfsf",
+    "projectKey": "sdfsf",
+    "name": "ssdvsdfv",
+    "shortName": "ssdvsdfv",
+    "formType": "website",
+    "accesscontrol": ["ionadmin", "ionuser"],
+    "upperNode": {},
+    "db": "uysdb",
+    "table": "common",
+    "loginFkField": "ldapUID",
+    "form": "H1",
+    "requiredFields": [],
+    "actions": {
+        "new": "",
+        "save": "",
+        "delete": "",
+        "download": "",
+        "eimzaPage": "",
+        "eimzaTable": "",
+        "eimza": ""
+    },
+    "fields": [
+        {
+            "name": "dsdv",
+            "componentType": "2"
+        }
+    ]
+}

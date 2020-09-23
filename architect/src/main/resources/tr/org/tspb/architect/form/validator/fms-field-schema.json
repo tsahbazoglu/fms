@@ -1,0 +1,312 @@
+{
+    "$schema": "https://json-schema.org/draft/2019-09/schema",
+    "$id": "file:///home/telman/git/fms/architect/src/main/resources/tr/org/tspb/architect/form/validator/fms-field-schema.json",
+    "type": "object",
+    "$def": {
+        "field": {
+            "type": "object",
+            "properties": {
+                "accesscontrol": {
+                    "title": "accesscontrol",
+                    "type": "string",
+                    "description": "identify the required filds"
+                },
+                "ajaxAction": {
+                    "title": "ajaxAction",
+                    "type": "string",
+                    "description": "identify the required filds"
+                }, 
+                "ajaxUpdate": {
+                    "title": "ajaxUpdate",
+                    "type": "string",
+                    "description": "identify the required filds"
+                }, 
+                "code": {
+                    "title": "code",
+                    "type": "string",
+                    "description": "identify the required filds"
+                }, 
+                "calculateEngine": {
+                    "title": "calculateEngine",
+                    "type": "string",
+                    "description": "identify the required filds"
+                }, 
+                "componentType": {
+                    "title": "componentType",
+                    "type": "string",
+                    "description": "identify the required filds"
+                }, 
+                "converterInstance": {
+                    "title": "converterInstance",
+                    "type": "string",
+                    "description": "identify the required filds"
+                }, 
+                "converterFormat": {
+                    "title": "converterFormat",
+                    "type": "string",
+                    "description": "identify the required filds"
+                }, 
+                "converterParam": {
+                    "title": "converterParam",
+                    "type": "string",
+                    "description": "identify the required filds"
+                }, 
+                "description": {
+                    "title": "description",
+                    "type": "string",
+                    "description": "identify the required filds"
+                }, 
+                "dateRangeBeginKey": {
+                    "title": "dateRangeBeginKey",
+                    "type": "string",
+                    "description": "identify the required filds"
+                },
+                "dateRangeEndKey": {
+                    "title": "dateRangeEndKey",
+                    "type": "string",
+                    "description": "identify the required filds"
+                }, 
+                "fieldNote": {
+                    "title": "fieldNote",
+                    "type": "string",
+                    "description": "identify the required filds"
+                }, 
+                "field": {
+                    "title": "field",
+                    "type": "string",
+                    "description": "identify the required filds"
+                }, 
+                "fileType": {
+                    "title": "fileType",
+                    "type": "string",
+                    "description": "identify the required filds"
+                }, 
+                "href": {
+                    "title": "href",
+                    "type": "string",
+                    "description": "identify the required filds"
+                }, 
+                "key": {
+                    "title": "key",
+                    "type": "string",
+                    "description": "identify the required filds"
+                }, 
+                "myDatePattern": {
+                    "title": "myDatePattern",
+                    "type": "string",
+                    "description": "identify the required filds"
+                }, 
+                "mask": {
+                    "title": "mask",
+                    "type": "string",
+                    "description": "identify the required filds"
+                }, 
+                "myFormKey": {
+                    "title": "myFormKey",
+                    "type": "string",
+                    "description": "identify the required filds"
+                }, 
+                "name": {
+                    "title": "name",
+                    "type": "string",
+                    "description": "identify the required filds"
+                }, 
+                "ndType": {
+                    "title": "ndType",
+                    "type": "string",
+                    "description": "identify the required filds"
+                }, 
+                "ndAxis": {
+                    "title": "ndAxis",
+                    "type": "string",
+                    "description": "identify the required filds"
+                }, 
+                "refCollection": {
+                    "title": "refCollection",
+                    "type": "string",
+                    "description": "identify the required filds"
+                }, 
+                "sessionKey": {
+                    "title": "sessionKey",
+                    "type": "string",
+                    "description": "identify the required filds"
+                }, 
+                "subGroup": {
+                    "title": "subGroup",
+                    "type": "string",
+                    "description": "identify the required filds"
+                }, 
+                "shortName": {
+                    "title": "shortName",
+                    "type": "string",
+                    "description": "identify the required filds"
+                }, 
+                "style": {
+                    "title": "style",
+                    "type": "string",
+                    "description": "identify the required filds"
+                }, 
+                "styleClass": {
+                    "title": "styleClass",
+                    "type": "string",
+                    "description": "identify the required filds"
+                }, 
+                "valueType": {
+                    "title": "valueType",
+                    "type": "string",
+                    "description": "identify the required filds"
+                }, 
+                "visible": {
+                    "title": "visible",
+                    "type": "string",
+                    "description": "identify the required filds"
+                },     
+                "maxMoney": {
+                    "title": "maxMoney",
+                    "type": "string",
+                    "description": "identify the required filds"
+                }, 
+                "uysformat": {
+                    "title": "uysformat",
+                    "type": "string",
+                    "description": "identify the required filds"
+                }, 
+                "popupDesc": {
+                    "title": "popupDesc",
+                    "type": "string",
+                    "description": "identify the required filds"
+                }
+
+                ,
+
+                "embeddedAsList": {
+                    "title": "popupDesc",
+                    "type": "boolean",
+                    "description": ""
+                },
+                "immediate": {
+                    "title": "popupDesc",
+                    "type": "boolean",
+                    "description": ""
+                },
+                "money": {
+                    "title": "popupDesc",
+                    "type": "boolean",
+                    "description": ""
+                },
+                "rendered": {
+                    "title": "popupDesc",
+                    "type": "boolean",
+                    "description": ""
+                },
+                "required": {
+                    "title": "popupDesc",
+                    "type": "boolean",
+                    "description": ""
+                },
+                "reportRendered": {
+                    "title": "popupDesc",
+                    "type": "boolean",
+                    "description": ""
+                },
+                "roleCheck": {
+                    "title": "popupDesc",
+                    "type": "boolean",
+                    "description": ""
+                },
+                "readonly": {
+                    "title": "popupDesc",
+                    "type": "boolean",
+                    "description": ""
+                },
+                "isAutoComplete": {
+                    "title": "popupDesc",
+                    "type": "boolean",
+                    "description": ""
+                },
+                "workflow": {
+                    "title": "popupDesc",
+                    "type": "boolean",
+                    "description": ""
+                },
+                "renderDesc": {
+                    "title": "popupDesc",
+                    "type": "boolean",
+                    "description": ""
+                },
+                "renderPopupDesc": {
+                    "title": "popupDesc",
+                    "type": "boolean",
+                    "description": ""
+                },
+                "disabled": {
+                    "title": "popupDesc",
+                    "type": "boolean",
+                    "description": ""
+                },
+                "ajax": {
+                    "title": "popupDesc",
+                    "type": "boolean",
+                    "description": ""
+                },
+                "version": {
+                    "title": "popupDesc",
+                    "type": "boolean",
+                    "description": ""
+                },
+                "searchAccess": {
+                    "title": "popupDesc",
+                    "type": "boolean",
+                    "description": ""
+                },
+                "calculateOnListView": {
+                    "title": "popupDesc",
+                    "type": "boolean",
+                    "description": ""
+                },
+                "calculateOnCrudView": {
+                    "title": "popupDesc",
+                    "type": "boolean",
+                    "description": ""
+                },
+                "calculateAfterSave": {
+                    "title": "popupDesc",
+                    "type": "boolean",
+                    "description": ""
+                },
+                "calculateAfterDelete": {
+                    "title": "popupDesc",
+                    "type": "boolean",
+                    "description": ""
+                },
+                "calculateOnSave": {
+                    "title": "popupDesc",
+                    "type": "boolean",
+                    "description": ""
+                },
+                "dateRangeControl": {
+                    "title": "popupDesc",
+                    "type": "boolean",
+                    "description": ""
+                },
+                "dateRangeValidate": {
+                    "title": "popupDesc",
+                    "type": "boolean",
+                    "description": ""
+                },
+                "shouldCheckNegative": {
+                    "title": "popupDesc",
+                    "type": "boolean",
+                    "description": ""
+                },
+                "loginFK": {
+                    "title": "popupDesc",
+                    "type": "boolean",
+                    "description": ""
+                }
+            }
+        }
+    }
+}
+
+
