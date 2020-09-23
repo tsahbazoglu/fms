@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<configuration scan="true" debug="true">
+    <contextListener class="ch.qos.logback.classic.jul.LevelChangePropagator">
+        <resetJUL>true</resetJUL>
+    </contextListener>
+    <property name="pattern" value="%d{yyyy-MM-dd HH:mm:ss.SSS} [%-5level][%thread][%logger{36}]%msg%n"/>
+    <property name="dir" value="/tmp/fms"/>
+    <appender name="DEF" class="ch.qos.logback.core.FileAppender">
+        <file>${com.sun.aas.instanceRoot}/logs/my_def.log</file>
+        <append>true</append>
+        <encoder>
+            <Pattern>${pattern}</Pattern>
+        </encoder>
+    </appender>
+    <appender name="WSDLR" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>${dir}/dt_wsdlr.log</file>
+        <append>true</append>
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <fileNamePattern>${dir}/dt_wsdlr-%d{yyyy.MM.dd}.log</fileNamePattern>
+            <maxHistory>90</maxHistory>
+            <totalSizeCap>3GB</totalSizeCap>
+        </rollingPolicy>
+
+        <encoder>
+            <Pattern>${pattern}</Pattern>
+        </encoder>
+    </appender>
+    
+    <!-- appender that replace payara default server.log, defualt was redirected to ${com.sun.aas.instanceRoot}/tmp/server.log -->
+    <appender name="GF" class="ch.qos.logback.core.FileAppender">
+        <file>${com.sun.aas.instanceRoot}/logs/server.log</file>
+        <append>true</append>
+        <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
+            <level>INFO</level>
+        </filter>
+
+        <encoder>
+            <Pattern>${pattern}</Pattern>
+        </encoder>
+    </appender>
+    <root level="INFO">
+        <appender-ref ref="GF"/>
+    </root>
+
+    <logger level="INFO" name="DEF" additivity="false">
+    <!--<logger level="TRACE" name="DEF" additivity="false">-->
+        <appender-ref ref="STDOUT"/>
+    </logger>
+    <logger level="INFO" name="wsdlr" additivity="false">
+    <!--<logger level="DEBUG" name="wsdlr" additivity="false">-->
+        <appender-ref ref="WSDLR"/>
+    </logger>
+</configuration>
+
+

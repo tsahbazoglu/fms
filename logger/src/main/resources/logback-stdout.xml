@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration debug="true">
+    <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <pattern>
+                %d{HH:mm:ss.SSS} [%thread] %-5level %logger{35} - %msg %n
+            </pattern>
+        </encoder>
+    </appender>
+
+    <!--
+    
+    <logger name="tr.org.tspb.dim.two.TwoDimModifyCtrl" level="debug"/>
+    <logger name="com.mkyong" level="debug" additivity="false">
+        <appender-ref ref="FILE-ROLLING"/>
+    </logger>    
+    
+    -->
+
+    <root level="INFO">
+        <appender-ref ref="STDOUT"/>
+    </root>
+    
+</configuration>
