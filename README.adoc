@@ -1,4 +1,31 @@
-== FMS
+:toc: left
+:toc-title: Content
+:toclevels: 3
+:sectnums:
+:sectnumlevels: 3
+:docinfo: shared
+
+
+= FMS : Form Management System
+telman şahbazoğlu <tsahbazoglu@tspb.org.tr>
+v1.0.0, 2018-03-06
+:title-logo-image: image::tspb_logo.png[]
+
+
+== About
+
+FMS (Form Management System) project is aimed to accelarate development and deployment process of widely used form types like registration forms, tables and pivot input.
+
+Just download *link:https://git.tspb.org.tr/fms/fms/blob/master/quick-start-demo-config.js[quick-start-demo-config.js^]* and customize it to your requirements.
+
+All you need to do is accustom the configuration script file to your needs and import it to mongodb.
+
+You will get both the data structure and Web GUI in one shot.
+
+Check out our demo project and its config.js to discover all the features.
+
+
+
 
 == License
 
