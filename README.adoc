@@ -14,7 +14,7 @@ v1.0.0, 2018-03-06
 
 == About
 
-FMS (Form Management System) project is aimed to accelarate development and deployment process of widely used form types like registration forms, tables and pivot input.
+FMS (Form Management System) project is aimed to accelerate development and deployment process of widely used form types like registration forms, tables and pivot input.
 
 Just download *link:https://git.tspb.org.tr/fms/fms/blob/master/quick-start-demo-config.js[quick-start-demo-config.js^]* and customize it to your requirements.
 
