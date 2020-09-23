@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <artifactId>uys</artifactId>
+        <groupId>tr.org.tspb</groupId>
+        <version>3.2-SNAPSHOT</version>
+        <relativePath>../pom.xml</relativePath>
+    </parent>
+    
+    <artifactId>fms-ear</artifactId>
+    <packaging>ear</packaging>
+    <name>${project.groupId} : ${project.artifactId} : ${project.version}</name>
+
+    <build>
+        <plugins>
+            <!-- 
+            Bu plugin olmadığında da proje compile/deploy oluyor 
+            ama bu durumda mongo driver sunucuda lib/ext altına konulmalı
+            aksi takdirde mongo kutuphanesini gormuyor 
+            
+            ama bu plugin activleştirildiğinde contextRoot mantığı hiç bir şekilde bekleneni sağlamıyor.
+            
+            workaorund olarak şu yapılabilir:
+            bu plugin diasble edilir ve netbeans uzerinden web projesini propertieslerinden Run opsiyonunda context-root ayarlanır
+            yani standart java glasfish-web.xml e işleyecek şekilde verilebilir.
+            tabii bu yaklaşımda maven atlandığı için bir şekilde context-root deployment pakete dahil edilmiyor.
+            
+            tercih developerin
+            
+            gonul isterki plugin çalışsın :)
+            
+            -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-ear-plugin</artifactId>
+                <version>2.8</version>
+                <configuration>
+                    <version>6</version>
+                    <defaultLibBundleDir>lib</defaultLibBundleDir>
+                    <!--     
+                    <generateApplicationXml>true</generateApplicationXml>
+                    <applicationName>Gen</applicationName>
+                    <modules>
+                        <ejbModule>
+                            <groupId>${project.groupId}</groupId>
+                            <artifactId>uys-ejb</artifactId>
+                            <bundleFileName>ejb.jar</bundleFileName>
+                        </ejbModule>
+                        <webModule>
+                            <groupId>${project.groupId}</groupId>
+                            <artifactId>uys-web</artifactId>
+                            <bundleFileName>web.war</bundleFileName>
+                            <contextRoot>/root</contextRoot>
+                        </webModule>
+                    </modules>
+                    -->   
+                    <modules>
+                        <webModule>
+                            <groupId>${project.groupId}</groupId>
+                            <artifactId>uys-web</artifactId>
+                            <contextRoot>/</contextRoot>
+                        </webModule>
+                    </modules>
+                    
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>2.3.2</version>
+                <configuration>
+                    <source>1.7</source>
+                    <target>1.7</target>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>     
+    <dependencies>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <version>${project.version}</version>
+            <artifactId>uys-ejb</artifactId>
+            <type>ejb</type>
+        </dependency>        
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <version>${project.version}</version>
+            <artifactId>uys-web</artifactId>
+            <type>war</type>
+        </dependency>      
+    </dependencies>
+    
+</project>
+ 
