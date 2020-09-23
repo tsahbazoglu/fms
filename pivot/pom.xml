@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <groupId>tr.org.tspb</groupId>
+    <artifactId>pivot</artifactId>
+    <version>1.0-SNAPSHOT</version>
+    <packaging>jar</packaging>
+    <name>${project.groupId} : ${project.artifactId} : ${project.version}</name>
+    <dependencies>
+        <!--
+        mvn install:install-file -Dfile=$PATH_TO_FONTS/verdana.jar -DgroupId=org.tspb.uys -DartifactId=myverdana -Dversion=1.0.0 -Dpackaging=jar
+        -->
+        <dependency>
+            <groupId>org.tspb.uys</groupId>
+            <artifactId>myverdana</artifactId>
+            <version>1.0.0</version>
+        </dependency>
+        <!--
+        mvn install:install-file -Dfile=$PATH_TO_FONTS/dinnext_lt_pro.jar -DgroupId=org.tspb.uys -DartifactId=mydinnext -Dversion=1.0.0 -Dpackaging=jar
+        -->
+        <dependency>
+            <groupId>org.tspb.uys</groupId>
+            <artifactId>mydinnext</artifactId>
+            <version>1.0.0</version>
+        </dependency>        
+        
+        <!--required by com.jaspersoft.mongodb.connection.MongoDbConnection-->
+        <dependency>
+            <groupId>log4j</groupId>
+            <artifactId>log4j</artifactId>
+            <version>1.2.17</version>
+        </dependency>
+                
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>service</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>tr.org.tspb</groupId>
+            <artifactId>outsider</artifactId>
+            <version>1.0-SNAPSHOT</version>
+            <type>jar</type>
+        </dependency>
+        <dependency>
+            <groupId>tr.org.tspb</groupId>
+            <artifactId>constants</artifactId>
+            <version>1.0-SNAPSHOT</version>
+        </dependency>
+        <dependency>
+            <groupId>tr.org.tspb</groupId>
+            <artifactId>util</artifactId>
+            <version>1.0-SNAPSHOT</version>
+        </dependency>
+        <dependency>
+            <groupId>tr.org.tspb</groupId>
+            <artifactId>datamodel</artifactId>
+            <version>1.0-SNAPSHOT</version>
+        </dependency>
+        <dependency>
+            <groupId>tr.org.tspb</groupId>
+            <artifactId>factory</artifactId>
+            <version>1.0-SNAPSHOT</version>
+        </dependency>
+        <dependency>
+            <groupId>tr.org.tspb</groupId>
+            <artifactId>common</artifactId>
+            <version>1.0-SNAPSHOT</version>
+        </dependency>
+        <dependency>
+            <groupId>tr.org.tspb</groupId>
+            <artifactId>converter</artifactId>
+            <version>1.0-SNAPSHOT</version>
+        </dependency>
+        <dependency>
+            <groupId>net.sf.jasperreports</groupId>
+            <artifactId>jasperreports</artifactId>
+            <version>6.4.0</version>
+            <type>jar</type>
+        </dependency>
+        <dependency>
+            <groupId>tr.org.tspb</groupId>
+            <artifactId>uys-js-mongodb-datasource</artifactId>
+            <version>1.0.1</version>
+            <type>jar</type>
+        </dependency>
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-api</artifactId>
+            <version>1.7.29</version>
+            <scope>provided</scope>
+        </dependency>
+    </dependencies>
+    <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <maven.compiler.source>1.8</maven.compiler.source>
+        <maven.compiler.target>1.8</maven.compiler.target>
+    </properties>
+</project>
