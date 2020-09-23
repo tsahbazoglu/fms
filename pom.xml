@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+    <modelVersion>4.0.0</modelVersion>        
+        
+    <groupId>tr.org.tspb</groupId>
+    <artifactId>fms</artifactId>
+    <version>3.2-SNAPSHOT</version>
+    <packaging>pom</packaging>
+    <name>${project.groupId} : ${project.artifactId} : ${project.version}</name>
+    <modules>
+        <module>fms-ear</module>
+        <module>fms-ejb</module>
+        <module>fms-war</module>
+        <module>common</module>
+        <module>factory</module>
+        <module>notification</module>
+        <module>datamodel</module>
+        <module>constants</module>
+        <module>util</module>
+        <module>outsider</module>
+        <module>converter</module>
+        <module>service</module>
+        <module>fgtpswd</module>
+        <module>workflow</module>
+        <module>pivot</module>
+        <module>logger</module>
+        <module>table</module>
+        <module>page</module>
+        <module>architect</module>
+    </modules>
+    
+    <properties>
+        <jdk.source>7</jdk.source>
+        <jdk.target>7</jdk.target>
+        <jdk.debug>true</jdk.debug>
+        <jdk.optimize>false</jdk.optimize>
+        <encoding>UTF-8</encoding>
+    </properties>
+        
+    <build>
+        <pluginManagement>
+            <plugins>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-compiler-plugin</artifactId>
+                    <version>3.1</version>
+                    <configuration>
+                        <source>${jdk.source}</source>
+                        <target>${jdk.target}</target>
+                        <encoding>${encoding}</encoding>                                              
+                    </configuration>
+                </plugin>
+            </plugins>
+        </pluginManagement>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>2.3.2</version>
+                <configuration>
+                    <source>1.7</source>
+                    <target>1.7</target>
+                </configuration>
+            </plugin>
+            
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-site-plugin</artifactId>
+                <version>3.7.1</version>
+            </plugin>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-project-info-reports-plugin</artifactId>
+                <version>3.0.0</version>
+            </plugin>
+            
+            <plugin>
+                <groupId>org.jacoco</groupId>
+                <artifactId>jacoco-maven-plugin</artifactId>
+                <version>0.8.2</version>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>prepare-agent</goal>
+                        </goals>
+                    </execution>
+                    <!-- attached to Maven test phase -->
+                    <execution>
+                        <id>report</id>
+                        <phase>test</phase>
+                        <goals>
+                            <goal>report</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+       
+    </build>
+    <reporting>
+        <plugins>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>jdepend-maven-plugin</artifactId>
+                <version>2.0</version>
+            </plugin>
+        </plugins>
+    </reporting>
+    <repositories>
+        <repository>
+            <id>KamuSM</id>
+            <url>http://nexus.ozguryazilim.com.tr/content/repositories/KamuSM</url>
+        </repository>
+    </repositories>   
+</project>
+ 
