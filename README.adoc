@@ -16,20 +16,22 @@ v1.0.0, 2018-03-06
 
 FMS (Form Management System) project is aimed to accelerate development and deployment process of widely used form types like registration forms, tables and pivot input.
 
-Just download *link:https://git.tspb.org.tr/fms/fms/blob/master/quick-start-demo-config.js[quick-start-demo-config.js^]* and customize it to your requirements.
-
 All you need to do is accustom the configuration script file to your needs and import it to mongodb.
 
 You will get both the data structure and Web GUI in one shot.
 
-Check out our demo project and its config.js to discover all the features.
+Check out our live project configuratio files to discover all the features.
 
 == Install
 
+All installation process had been documented and dockerized in fms-docker repository
+
+*link:https://github.com/tsahbazoglu/fms-docker[fms-docker^]*
 
 == Live Site
+
 |===
-|url      | http://uys.tspb.org.tr
+|url      | *link:http://uys.tspb.org.tr[uys.tspb.org.tr^]*
 |username | DENEME_KURUM
 |pswd     | 123
 |===
