@@ -566,7 +566,8 @@ public class TwoDimModifyCtrl extends FmsTable implements ActionListener {
     public String provideOverAllCrossCheck() {
         ctrlService.init(formService.getMyForm().getMyProject().getConfigTable());
         try {
-            ctrlService.crossCheck(filterService.getTableFilterCurrent());
+            Document filterClone = new Document(filterService.getTableFilterCurrent());
+            ctrlService.crossCheck(filterClone);
         } catch (Exception ex) {
             logger.error("error occured", ex);
             dialogController.showPopupError(ex.getMessage());
