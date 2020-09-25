@@ -158,7 +158,8 @@ public class UpdateAjaxMB implements Serializable {
                 .concat(COMMA).concat(ID_CENTER_TOP);
         btnCheckAll = ID_2D_DATA_TABLE
                 .concat(COMMA).concat(ID_MSG_DLG)
-                .concat(COMMA).concat(ID_CENTER_TOP);
+                .concat(COMMA).concat(ID_CENTER_TOP)
+                .concat(COMMA).concat("id-tab-view:id2DCurrentObjectList:objectsDataTable");
         btnNdSave = ID_MSG_DLG
                 .concat(COMMA).concat(ID_CENTER_TOP)
                 .concat(COMMA).concat(ID_CURRENT_MYGRID_EDITABLE)
