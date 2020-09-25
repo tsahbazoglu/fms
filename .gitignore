@@ -6,3 +6,15 @@
 /logger/target/
 /notification/target/
 /outsider/target/
+/page/target/
+/pivot/target/
+/fms-ear/target/
+/fms-ejb/target/
+/datamodel/target/
+/util/target/
+/common/target/
+/service/target/
+/table/target/
+/workflow/target/
+/fms-war/target/
+/architect/target/
