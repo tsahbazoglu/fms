@@ -2,10 +2,9 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <parent>
-        <artifactId>uys</artifactId>
+        <artifactId>fms</artifactId>
         <groupId>tr.org.tspb</groupId>
-        <version>3.2-SNAPSHOT</version>
-        <relativePath>../pom.xml</relativePath>
+        <version>1.0.0</version>
     </parent>
     
     <artifactId>fms-ear</artifactId>
@@ -58,7 +57,7 @@
                     <modules>
                         <webModule>
                             <groupId>${project.groupId}</groupId>
-                            <artifactId>uys-web</artifactId>
+                            <artifactId>fms-web</artifactId>
                             <contextRoot>/</contextRoot>
                         </webModule>
                     </modules>
@@ -80,13 +79,13 @@
         <dependency>
             <groupId>${project.groupId}</groupId>
             <version>${project.version}</version>
-            <artifactId>uys-ejb</artifactId>
+            <artifactId>fms-ejb</artifactId>
             <type>ejb</type>
         </dependency>        
         <dependency>
             <groupId>${project.groupId}</groupId>
             <version>${project.version}</version>
-            <artifactId>uys-web</artifactId>
+            <artifactId>fms-web</artifactId>
             <type>war</type>
         </dependency>      
     </dependencies>

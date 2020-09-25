@@ -2,10 +2,9 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <parent>
-        <artifactId>uys</artifactId>
+        <artifactId>fms</artifactId>
         <groupId>tr.org.tspb</groupId>
-        <version>3.2-SNAPSHOT</version>
-        <relativePath>../pom.xml</relativePath>
+        <version>1.0.0</version>
     </parent>
 
     <artifactId>fms-web</artifactId>
@@ -79,55 +78,60 @@
         <dependency>
             <groupId>tr.org.tspb</groupId>
             <artifactId>fgt-pswd</artifactId>
-            <version>3.2-SNAPSHOT</version>
+            <version>1.0.0</version>
             <type>jar</type>
         </dependency>
         <dependency>
             <groupId>tr.org.tspb</groupId>
             <artifactId>constants</artifactId>
-            <version>1.0-SNAPSHOT</version>
+            <version>1.0.0</version>
             <type>jar</type>
         </dependency>
         <dependency>
             <groupId>tr.org.tspb</groupId>
             <artifactId>common</artifactId>
-            <version>1.0-SNAPSHOT</version>
+            <version>1.0.0</version>
             <type>jar</type>
         </dependency>
         <dependency>
             <groupId>tr.org.tspb</groupId>
             <artifactId>outsider</artifactId>
-            <version>1.0-SNAPSHOT</version>
+            <version>1.0.0</version>
             <type>jar</type>
         </dependency>
         <dependency>
             <groupId>tr.org.tspb</groupId>
             <artifactId>service</artifactId>
-            <version>1.0-SNAPSHOT</version>
+            <version>1.0.0</version>
             <type>jar</type>
         </dependency>
         <dependency>
             <groupId>tr.org.tspb</groupId>
             <artifactId>pivot</artifactId>
-            <version>1.0-SNAPSHOT</version>
+            <version>1.0.0</version>
             <type>jar</type>
         </dependency>
         <dependency>
             <groupId>tr.org.tspb</groupId>
             <artifactId>page</artifactId>
-            <version>1.0-SNAPSHOT</version>
+            <version>1.0.0</version>
             <type>jar</type>
         </dependency>
         <dependency>
             <groupId>tr.org.tspb</groupId>
             <artifactId>table</artifactId>
-            <version>1.0-SNAPSHOT</version>
+            <version>1.0.0</version>
             <type>jar</type>
         </dependency>
         <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>logger</artifactId>
-            <version>1.0-SNAPSHOT</version>
+            <version>1.0.0</version>
+        </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>workflow</artifactId>
+            <version>1.0.0</version>
         </dependency>
         <dependency>
             <groupId>org.primefaces</groupId>
@@ -143,12 +147,7 @@
             <groupId>${project.groupId}</groupId>
             <artifactId>esign</artifactId>
             <version>1.0-SNAPSHOT</version>
-        </dependency>
-        <dependency>
-            <groupId>${project.groupId}</groupId>
-            <artifactId>workflow</artifactId>
-            <version>1.0-SNAPSHOT</version>
-        </dependency>
+        </dependency>       
         <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>printer</artifactId>

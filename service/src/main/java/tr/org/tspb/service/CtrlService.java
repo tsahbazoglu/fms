@@ -654,6 +654,8 @@ public class CtrlService extends CommonSrv {
     }
 
     public void crossCheck(Document filter) throws Exception {
+        
+        dataService.resetMapReduceCache();
 
         if (filter.get(formService.getMyForm().getLoginFkField()) == null) {
             throw new NullNotExpectedException("Üye seçilmedi");
