@@ -20,7 +20,17 @@ All you need to do is accustom the configuration script file to your needs and i
 
 You will get both the data structure and Web GUI in one shot.
 
-Check out our live project configuratio files to discover all the features.
+Check out our live project configuration files to discover all the features.
+
+== Compile
+----
+cd github
+git clone https://github.com/tsahbazoglu/fms.git
+cd fms
+mvn clean install
+----
+
+== Release
 
 == Install
 
