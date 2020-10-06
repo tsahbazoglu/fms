@@ -157,7 +157,7 @@ public class MyActions {
                 "delete",
                 ACTION_SAVE,
                 SAVE_AS,
-                "download",
+                ACTION_DOWNLOAD,
                 EIMZA,
                 "checkAll",
                 EMAIL,
@@ -257,7 +257,7 @@ public class MyActions {
                     case SAVE_AS:
                         myActions.saveAs = value;
                         break;
-                    case "download":
+                    case ACTION_DOWNLOAD:
                         myActions.download = value;
                         break;
                     case EIMZA:
