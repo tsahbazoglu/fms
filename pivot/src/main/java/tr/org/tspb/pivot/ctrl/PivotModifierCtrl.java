@@ -590,7 +590,6 @@ public class PivotModifierCtrl extends PivotImpl {
                                 //kaydetme esnasında Kuruş kısmını tamamen atmak için round ettikten sonra 100 e çarpılmalı.
                                 customOlapHaspMap.setValue((long) (Math.round(((Number) value).doubleValue()) * 100));//veritabanına kuruş olarak gonderiyoruz
                             } else {
-
                                 try {
                                     customOlapHaspMap.setValue((long) (Math.round(toModel.parse(value.toString()).doubleValue()) * 100));
                                 } catch (Exception ex) {
@@ -624,19 +623,17 @@ public class PivotModifierCtrl extends PivotImpl {
 
                             if (value instanceof Number) {
                                 value = Math.round(((Number) value).doubleValue() * div);//veritabanına kuruş olarak gonderiyoruz
+                                value = Double.valueOf(value.toString());
+                                customOlapHaspMap.setValue(value);
                             } else {
-                                value = Math.round(toModel.parse(value.toString()).doubleValue() * div);
+                                try {
+                                    value = Math.round(toModel.parse(value.toString()).doubleValue() * div);
+                                    value = Double.valueOf(value.toString());
+                                    customOlapHaspMap.setValue(value);
+                                } catch (Exception ex) {
+                                    customOlapHaspMap.resetValue();
+                                }
                             }
-
-                            /*
-                             * MongoDriver 2.11.1 beahavior
-                             * 
-                             * Float,float, Double,double, Integer,int ==>> simple pure number
-                             * Long,long ==>> NumberLong(12345)
-                             */
-                            value = new Double(value.toString());
-
-                            customOlapHaspMap.setValue(value);
 
                             if ("kpbdb".equals(formService.getMyForm().getDb())) {
                                 Number lastCheck = (Number) customOlapHaspMap.getValue();
