@@ -1503,8 +1503,8 @@ public class MyForm implements MyFormXs {
             if (dbObjectForm.get(ACCESS_CONTROL_LEVEL_TWO) instanceof Document) {
                 this.myForm.accessControlLevelTwo = (Document) dbObjectForm.get(ACCESS_CONTROL_LEVEL_TWO);
             }
-            if (dbObjectForm.get("excelFormat") instanceof Document) {
-                this.myForm.excelFormat = (Document) dbObjectForm.get("excelFormat");
+            if (dbObjectForm.get(EXCEL_FORMAT) instanceof Document) {
+                this.myForm.excelFormat = (Document) dbObjectForm.get(EXCEL_FORMAT);
             }
             if (dbObjectForm.get(EVENT_PRE_SAVE) instanceof Document) {
                 this.myForm.eventPreSave = (Document) dbObjectForm.get(EVENT_PRE_SAVE);
