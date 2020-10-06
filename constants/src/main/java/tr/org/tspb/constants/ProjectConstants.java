@@ -177,6 +177,8 @@ public class ProjectConstants {
     public static final String EIMZA = "eimza";
     public static final String ESIGN_PROVIDER = "esign_provider";
     public static final String EXPRESSION = "expression";
+    public static final String EXCEL_FORMAT = "excelFormat";
+
     //F
     public static final String FIRSTANME = "firstname";
     public static final String FIELD_NOTE = "fieldNote";
@@ -338,6 +340,7 @@ public class ProjectConstants {
     public static final String ROW_LIST = "rowList";
     //S
     public static final String ACTION_NEW = "new";
+    public static final String ACTION_DOWNLOAD = "download";
     public static final String ACTION_SAVE = "save";
     public static final String SAVE_AS = "saveAs";
     public static final String SELECT_PLEASE = "Lütfen Seçiniz";
