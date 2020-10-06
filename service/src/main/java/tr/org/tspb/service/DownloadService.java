@@ -154,12 +154,17 @@ public class DownloadService extends CommonSrv {
     public void downloadExcell() {
 
         Bson sort = null;
+
+        int limit = 500;
         if (formService.getMyForm().getExcelFormat() != null) {
             sort = (Document) formService.getMyForm().getExcelFormat().get(SORT);
+            limit = ((Number) formService.getMyForm().getExcelFormat().get("limit")).intValue();
         }
 
-        List<Document> cursor = mongoDbUtil.find(formService.getMyForm().getDb(), formService.getMyForm().getTable(),
-                filterService.getTableFilterCurrent(), sort, 500);
+        List<Document> cursor;
+
+        cursor = mongoDbUtil.find(formService.getMyForm().getDb(), formService.getMyForm().getTable(),
+                filterService.getTableFilterCurrent(), sort, limit);
 
         try (XSSFWorkbook xssfWorkbook = new XSSFWorkbook()) {
 
