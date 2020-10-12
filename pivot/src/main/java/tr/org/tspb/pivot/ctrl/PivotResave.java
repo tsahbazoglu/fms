@@ -1,6 +1,5 @@
 package tr.org.tspb.pivot.ctrl;
 
-import com.jaspersoft.mongodb.connection.MongoDbConnection;
 import static tr.org.tspb.constants.ProjectConstants.DOLAR_GTE;
 import static tr.org.tspb.constants.ProjectConstants.DOLAR_IN;
 import static tr.org.tspb.constants.ProjectConstants.DOLAR_LTE;
@@ -15,7 +14,6 @@ import static tr.org.tspb.constants.ProjectConstants.UPSERT_DATE;
 import static tr.org.tspb.constants.ProjectConstants.VALUE;
 import com.mongodb.BasicDBList;
 import com.mongodb.client.model.Filters;
-import java.io.File;
 import tr.org.tspb.exceptions.UserException;
 import tr.org.tspb.common.util.CustomOlapHashMap;
 import java.util.ArrayList;
@@ -24,19 +22,12 @@ import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
 import javax.faces.model.SelectItem;
 import javax.inject.Inject;
-import net.sf.jasperreports.engine.JRException;
-import net.sf.jasperreports.engine.JRExporterParameter;
-import net.sf.jasperreports.engine.JasperExportManager;
-import net.sf.jasperreports.engine.JasperFillManager;
-import net.sf.jasperreports.engine.JasperPrint;
-import net.sf.jasperreports.engine.export.JRPdfExporter;
 import org.bson.Document;
 import org.bson.types.ObjectId;
 import tr.org.tspb.common.pojo.CellMultiDimensionKey;
@@ -46,8 +37,6 @@ import tr.org.tspb.dao.MyForm;
 import tr.org.tspb.constants.ProjectConstants;
 import static tr.org.tspb.constants.ProjectConstants.COMMON;
 import static tr.org.tspb.constants.ProjectConstants.DOLAR_NE;
-import static tr.org.tspb.constants.ProjectConstants.FILE_EXTENSION_JASPER;
-import static tr.org.tspb.constants.ProjectConstants.FILE_EXTENSION_PDF;
 import static tr.org.tspb.constants.ProjectConstants.FORMS;
 import static tr.org.tspb.constants.ProjectConstants.MONGO_ID;
 import static tr.org.tspb.constants.ProjectConstants.MONGO_LDAP_UID;
@@ -72,20 +61,20 @@ public class PivotResave extends PivotImpl {
     @OgmCreatorQualifier
     private OgmCreatorIntr ogmCreator;
 
-    private static final String SECINIZ = " seçiniz";
-    private static final String PARAMETER_PAGE_NUMBER = "parameterPageNumber";
-    private static final String DATA_BANK_TEMPLATE = "dataBankTemplate";
+    @Resource(lookup = ProjectConstants.CUSTOM_RESOURCE_MONGO_URL)
+    private String resourceMongoUrl;
 
-    private List<String> reportWebOzetMemberType;
+    @Resource(lookup = ProjectConstants.CUSTOM_RESOURCE_MONGO_ADMIN_PSWD)
+    private String resourceMongoAdminPswd;
+
+    private static final String SECINIZ = " seçiniz";
+    private static final String DATA_BANK_TEMPLATE = "dataBankTemplate";
 
     private String[] resaveForm = {"B2", "B3", "C1", "C2", "D1", "D2", "H1", "H2", "H3", "H4", "H5", "F11"};
     private String resaveMemberStr;
     private int resavePeriodStartStr;
     private int resavePeriodEndStr;
     private String resaveTemplateStr;
-    private boolean reportWebOzetSelectAll;
-    private Map<String, String> availaibleReportWebOzetMemberType;
-    List<SelectItem> reportWebOzetMemberTypes;
     List<SelectItem> resaveAllPeriods;
     List<SelectItem> resaveAllTemplates;
     List<SelectItem> resaveForms;
@@ -93,16 +82,6 @@ public class PivotResave extends PivotImpl {
 
     //    
     protected Map<CellMultiDimensionKey, List<CustomOlapHashMap>> pivotData;
-    private Integer jasperParameterPageNumber;
-    @Resource(lookup = ProjectConstants.CUSTOM_RESOURCE_MONGO_URL)
-    private String resourceMongoUrl;
-
-    @Resource(lookup = ProjectConstants.CUSTOM_RESOURCE_MONGO_ADMIN_PSWD)
-    private String resourceMongoAdminPswd;
-
-    public List<SelectItem> getReportWebOzetMemberTypes() {
-        return Collections.unmodifiableList(reportWebOzetMemberTypes);
-    }
 
     public List<SelectItem> getResaveForms() {
         if (resaveForms == null) {
@@ -171,129 +150,7 @@ public class PivotResave extends PivotImpl {
 
     @PostConstruct
     public void init() {
-        availaibleReportWebOzetMemberType = new HashMap<>();
-        availaibleReportWebOzetMemberType.put("AK", "Aracı Kurumlar (AK)");
-        availaibleReportWebOzetMemberType.put("B", "Bankalar (B)");
-        availaibleReportWebOzetMemberType.put("KTB", "Katılım Bankaları (KTB)");
-        availaibleReportWebOzetMemberType.put("MB", "Mevduat Bankaları (MB)");
-        availaibleReportWebOzetMemberType.put("YB", "Yatırım Bankaları (YB)");
-        availaibleReportWebOzetMemberType.put("KB", "Kalkınma Bankaları (KB)");
-        availaibleReportWebOzetMemberType.put("PYŞ", "Portföy Yönetim Şirketleri (PYŞ)");
-        availaibleReportWebOzetMemberType.put("MKYO", "Menkul Kıymetler Yatırım Ortaklığı (MKYO)");
-        availaibleReportWebOzetMemberType.put("GYO", "Gayri Menkul Yatırım Ortaklığı (GYO)");
-        availaibleReportWebOzetMemberType.put("GSYO", "Girişim Sermayesi Yatırım Ortaklığı (GSYO)");
 
-        reportWebOzetMemberTypes = new ArrayList<>();
-        for (Map.Entry<String, String> entry : availaibleReportWebOzetMemberType.entrySet()) {
-            reportWebOzetMemberTypes.add(new SelectItem(entry.getKey(), entry.getValue()));
-        }
-    }
-
-    public String webOzet() {
-        try {
-
-            String jasperPath = ProjectConstants.PATH_JASPER_JRXML
-                    .concat("/allInOne")
-                    .concat(FILE_EXTENSION_JASPER);
-
-            File file = new File(jasperPath);
-
-            if (!file.exists()) {
-                throw new Exception("Dosya Bulunamadı : <br/>".concat(jasperPath));
-            }
-
-            try (MongoDbConnection connection = connect()) {
-
-                Map parameterMap = new HashMap();
-                parameterMap.put("REPORT_CONNECTION", connection);
-                parameterMap.put("SUBREPORT_DIR", ProjectConstants.PATH_JASPER_JRXML.concat("/"));
-                parameterMap.put(PARAMETER_PAGE_NUMBER, jasperParameterPageNumber);
-                parameterMap.put("member_types", getReportWebOzetMemberType());
-                parameterMap.put("REPORT_LOCALE", new Locale("tr", "TR"));
-
-                StringBuilder membertypes = new StringBuilder();
-                for (String memberType : getReportWebOzetMemberType()) {
-                    membertypes.append(memberType).append("_");
-                }
-
-                JasperPrint jasperPrint = JasperFillManager.fillReport(jasperPath, parameterMap);
-
-                String destFileName = baseService.getProperties().getTmpDownloadPath().concat("allInOne__")
-                        .concat(membertypes.toString()).concat(FILE_EXTENSION_PDF);
-
-                String jasperVersion = "XXX";
-
-                if ("6.3.0".equals(jasperVersion)) {
-                    JRPdfExporter pdfExporter = new JRPdfExporter();
-                    pdfExporter.setParameter(JRExporterParameter.JASPER_PRINT, jasperPrint);
-                    pdfExporter.setParameter(JRExporterParameter.OUTPUT_FILE_NAME,
-                            baseService.getProperties().getTmpDownloadPath().concat("allInOne__").concat(membertypes.toString()).concat(FILE_EXTENSION_PDF));
-                    pdfExporter.exportReport();
-                } else {
-                    JasperExportManager.exportReportToPdfFile(jasperPrint, destFileName);
-                }
-            }
-        } catch (Exception ex) {
-            dialogController.showPopupError(ex.getMessage());
-        }
-
-        return null;
-    }
-
-    private MongoDbConnection connect() throws JRException {
-        String url = "mongodb://".concat(resourceMongoUrl).concat(":27017/uysdb");
-        return new MongoDbConnection(url, "tspb-db-admin", resourceMongoAdminPswd);
-    }
-
-    public String webOzetSeparatedly() {
-        try {
-            List<Document> cursor = mongoDbUtil.find(UYSDB, "reportMembers");
-
-            for (Document dBObject : cursor) {
-
-                String memberName = (String) dBObject.get(NAME);
-
-                String jasperPath = ProjectConstants.PATH_JASPER_JRXML
-                        .concat("/allInOneParameter")
-                        .concat(FILE_EXTENSION_JASPER);
-                File file = new File(jasperPath);
-
-                if (!file.exists()) {
-                    throw new Exception("Dosya Bulunamadı : <br/>".concat(jasperPath));
-                }
-
-                try (MongoDbConnection connection = connect()) {
-
-                    Map parameterMap = new HashMap();
-                    parameterMap.put(PARAMETER_PAGE_NUMBER, 1);
-                    parameterMap.put("REPORT_CONNECTION", connection);
-                    parameterMap.put("SUBREPORT_DIR", ProjectConstants.PATH_JASPER_JRXML.concat("/"));
-                    parameterMap.put("master_member_name", memberName);
-                    parameterMap.put("REPORT_LOCALE", new Locale("tr", "TR"));
-
-                    JasperPrint jasperPrint = JasperFillManager.fillReport(jasperPath, parameterMap);
-
-                    String destFileName = baseService.getProperties().getTmpDownloadPath().concat(memberName).concat(FILE_EXTENSION_PDF);
-
-                    String jasperVersion = "XXX";
-
-                    if ("6.3.0".equals(jasperVersion)) {
-                        // PdfFont font = new PdfFont("Symbol", "CP1252", true);
-                        JRPdfExporter pdfExporter = new JRPdfExporter();
-                        pdfExporter.setParameter(JRExporterParameter.JASPER_PRINT, jasperPrint);
-                        pdfExporter.setParameter(JRExporterParameter.OUTPUT_FILE_NAME,
-                                baseService.getProperties().getTmpDownloadPath().concat(memberName).concat(FILE_EXTENSION_PDF));
-                        pdfExporter.exportReport();
-                    } else {
-                        JasperExportManager.exportReportToPdfFile(jasperPrint, destFileName);
-                    }
-                }
-            }
-        } catch (Exception ex) {
-            dialogController.showPopupError(ex.getMessage());
-        }
-
-        return null;
     }
 
     /**
@@ -805,42 +662,6 @@ public class PivotResave extends PivotImpl {
 
     public void setResavePeriodStr(int resavePeriodStr) {
         this.resavePeriodStartStr = resavePeriodStr;
-    }
-
-    /**
-     *
-     * @return
-     */
-    public List<String> getReportWebOzetMemberType() {
-        return reportWebOzetMemberType;
-    }
-
-    /**
-     *
-     * @param reportWebOzetMemberType
-     */
-    public void setReportWebOzetMemberType(List<String> reportWebOzetMemberType) {
-        this.reportWebOzetMemberType = reportWebOzetMemberType;
-    }
-
-    public Integer getJasperParameterPageNumber() {
-        return jasperParameterPageNumber;
-    }
-
-    public void setJasperParameterPageNumber(Integer jasperParameterPageNumber) {
-        this.jasperParameterPageNumber = jasperParameterPageNumber;
-    }
-
-    public void onSelectAll() {
-        setReportWebOzetMemberType(reportWebOzetSelectAll ? new ArrayList<>(availaibleReportWebOzetMemberType.keySet()) : null);
-    }
-
-    public boolean isReportWebOzetSelectAll() {
-        return reportWebOzetSelectAll;
-    }
-
-    public void setReportWebOzetSelectAll(boolean reportWebOzetSelectAll) {
-        this.reportWebOzetSelectAll = reportWebOzetSelectAll;
     }
 
     @Override

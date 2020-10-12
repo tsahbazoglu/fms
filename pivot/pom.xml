@@ -10,23 +10,6 @@
     <packaging>jar</packaging>
     <name>${project.groupId} : ${project.artifactId} : ${project.version}</name>
     <dependencies>
-        <!--
-        mvn install:install-file -Dfile=$PATH_TO_FONTS/verdana.jar -DgroupId=org.tspb.uys -DartifactId=myverdana -Dversion=1.0.0 -Dpackaging=jar
-        -->
-        <dependency>
-            <groupId>org.tspb.uys</groupId>
-            <artifactId>myverdana</artifactId>
-            <version>1.0.0</version>
-        </dependency>
-        <!--
-        mvn install:install-file -Dfile=$PATH_TO_FONTS/dinnext_lt_pro.jar -DgroupId=org.tspb.uys -DartifactId=mydinnext -Dversion=1.0.0 -Dpackaging=jar
-        -->
-        <dependency>
-            <groupId>org.tspb.uys</groupId>
-            <artifactId>mydinnext</artifactId>
-            <version>1.0.0</version>
-        </dependency>        
-        
         <!--required by com.jaspersoft.mongodb.connection.MongoDbConnection-->
         <dependency>
             <groupId>log4j</groupId>
@@ -79,12 +62,6 @@
             <groupId>net.sf.jasperreports</groupId>
             <artifactId>jasperreports</artifactId>
             <version>6.4.0</version>
-            <type>jar</type>
-        </dependency>
-        <dependency>
-            <groupId>tr.org.tspb</groupId>
-            <artifactId>uys-js-mongodb-datasource</artifactId>
-            <version>1.0.1</version>
             <type>jar</type>
         </dependency>
         <dependency>
