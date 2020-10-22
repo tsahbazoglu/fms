@@ -170,9 +170,6 @@ public class CtrlService extends CommonSrv {
 
                 for (MyConstraintVariable myConstraintVariable : myConstraintFormula.getVariables()) {
 
-                    Object value = retrivedVariables.get(myConstraintVariable.getKey()).get(VALUE);
-                    sessionCacheRetrivedVariables.put(myConstraintVariable.getKey(), value == null ? 0 : value);
-
                     Object presentableFormOfValue = retrivedVariables.get(myConstraintVariable.getKey()).get(PRESENT);
 
                     if (presentableFormOfValue == null
@@ -181,7 +178,20 @@ public class CtrlService extends CommonSrv {
                     }
 
                     customNicePresenter = customNicePresenter.replaceAll(myConstraintVariable.getKey(), presentableFormOfValue.toString());
-                    formula = formula.replaceAll(myConstraintVariable.getKey(), "input.".concat(myConstraintVariable.getKey()));
+
+                    String param = myConstraintVariable.getKey();
+                    Object value = retrivedVariables.get(myConstraintVariable.getKey()).get(VALUE);
+
+                    if (value instanceof Long) {
+                        // https://bugs.openjdk.java.net/browse/JDK-8161665
+                        value = value.toString();
+                        sessionCacheRetrivedVariables.put(param, value == null ? 0 : value);
+                        formula = formula.replaceAll(param, String.format("Number(input.%s)", param));
+                    } else {
+                        sessionCacheRetrivedVariables.put(myConstraintVariable.getKey(), value == null ? 0 : value);
+                        formula = formula.replaceAll(param, "input.".concat(param));
+                    }
+
                 }
 
                 StringBuilder javaScriptFunction = new StringBuilder();
@@ -198,10 +208,9 @@ public class CtrlService extends CommonSrv {
 
                 Invocable inv = (Invocable) jsEngine;
 
-                Map resultMap = new HashMap();
-
                 Object result = inv.invokeFunction("constraint", sessionCacheRetrivedVariables);
 
+                Map resultMap = new HashMap();
                 resultMap.put(RESULT, result);
                 resultMap.put(EXPRESSION, customNicePresenter);
 
@@ -654,7 +663,7 @@ public class CtrlService extends CommonSrv {
     }
 
     public void crossCheck(Document filter) throws Exception {
-        
+
         dataService.resetMapReduceCache();
 
         if (filter.get(formService.getMyForm().getLoginFkField()) == null) {
