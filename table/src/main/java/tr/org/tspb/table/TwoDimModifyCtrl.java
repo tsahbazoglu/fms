@@ -130,7 +130,7 @@ public class TwoDimModifyCtrl extends FmsTable implements ActionListener {
     private transient StreamedContent file;
     private transient List<Map<String, Object>> successList = new ArrayList<>();
     private transient List<Map<String, Object>> failList = new ArrayList<>();
-    private final Map<String, Serializable> evenAttrs = new HashMap();
+    private final Map<String, Serializable> eventAttrs = new HashMap();
     private transient Map<String, Object> selectedRow;
     private static final String FAIL_LIST = "failList";
     private static final String SUCCESS_LIST = "successList";
@@ -1053,11 +1053,11 @@ public class TwoDimModifyCtrl extends FmsTable implements ActionListener {
             return;
         }
 
-        String failMessage = (String) evenAttrs.get(FAIL_MESSAGE);
+        String failMessage = (String) eventAttrs.get(FAIL_MESSAGE);
         try {
 
             //Only java native variables can be pass through jsf attributes
-            String successMessage = (String) evenAttrs.get(SUCCESS_MESSAGE);
+            String successMessage = (String) eventAttrs.get(SUCCESS_MESSAGE);
 
             TimeZone timeZone = TimeZone.getTimeZone("Asia/Istanbul");
             SIMPLE_DATE_FORMAT__3.setTimeZone(timeZone);
@@ -1072,9 +1072,9 @@ public class TwoDimModifyCtrl extends FmsTable implements ActionListener {
                                     .append(FORMS, PERIOD)
                                     .append(MONGO_ID, getSearchObjectValue(PERIOD))).get(0).get(NAME));
 
-            String myActionType = (String) evenAttrs.get(MY_ACTION_TYPE);
-            String javaFunc = (String) evenAttrs.get(JAVA_FUNC);
-            Code code = (Code) evenAttrs.get(MYACTION);
+            String myActionType = (String) eventAttrs.get(MY_ACTION_TYPE);
+            String javaFunc = (String) eventAttrs.get(JAVA_FUNC);
+            String code = (String) eventAttrs.get(MYACTION);
 
             if (myActionType == null) {
                 if (code == null) {
@@ -1090,7 +1090,7 @@ public class TwoDimModifyCtrl extends FmsTable implements ActionListener {
                         }
                     }
 
-                    mongoDbUtil.runCommand(formService.getMyForm().getDb(), code.getCode(), mySearchObject, null);
+                    mongoDbUtil.runCommand(formService.getMyForm().getDb(), code, mySearchObject, null);
 
                     putSearchObjectValue(PERIOD, SelectOneObjectIdConverter.NULL_VALUE);
 
@@ -1127,14 +1127,14 @@ public class TwoDimModifyCtrl extends FmsTable implements ActionListener {
         CtrlService.ControlResult controlResult = ctrlService.checkControlResult(filterService.getTableFilterCurrent());
         dynamicButtonName = controlResult.getDynamicButtonName();
         shouldSendForm = controlResult.isShouldSendForm();
-        evenAttrs.put(STYLE, controlResult.getStyle());
-        evenAttrs.put("caption", controlResult.getCaption());
-        evenAttrs.put(MYACTION, controlResult.getMyaction());
-        evenAttrs.put(MY_ACTION_TYPE, controlResult.getMyActionType());
-        evenAttrs.put(JAVA_FUNC, controlResult.getJavaFunc());
-        evenAttrs.put(SUCCESS_MESSAGE, controlResult.getSuccessMessage());
-        evenAttrs.put(FAIL_MESSAGE, controlResult.getFailMessage());
-        evenAttrs.put("DIALOG", controlResult.getDialog());
+        eventAttrs.put(STYLE, controlResult.getStyle());
+        eventAttrs.put("caption", controlResult.getCaption());
+        eventAttrs.put(MYACTION, controlResult.getMyaction());
+        eventAttrs.put(MY_ACTION_TYPE, controlResult.getMyActionType());
+        eventAttrs.put(JAVA_FUNC, controlResult.getJavaFunc());
+        eventAttrs.put(SUCCESS_MESSAGE, controlResult.getSuccessMessage());
+        eventAttrs.put(FAIL_MESSAGE, controlResult.getFailMessage());
+        eventAttrs.put("DIALOG", controlResult.getDialog());
 
     }
 

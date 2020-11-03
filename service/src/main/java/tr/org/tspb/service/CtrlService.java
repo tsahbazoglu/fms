@@ -830,11 +830,11 @@ public class CtrlService extends CommonSrv {
         if (eventList != null) {
             for (String eventKey : eventList.keySet()) {
                 Document dbObject = (Document) eventList.get(eventKey);
-                Code appearFunction = (Code) dbObject.get(CHECK_AND_WRITE_CONTROL_RESULT_FUNCTION);
-                if (appearFunction != null && !loginController.isUserInRole(formService.getMyForm().getMyProject().getAdminAndViewerRole())) {
-                    appearFunction = new Code(appearFunction.getCode().replace(DIEZ, DOLAR));
+                Code checkAndWriteControlResultFunc = (Code) dbObject.get(CHECK_AND_WRITE_CONTROL_RESULT_FUNCTION);
+                if (checkAndWriteControlResultFunc != null && !loginController.isUserInRole(formService.getMyForm().getMyProject().getAdminAndViewerRole())) {
+                    checkAndWriteControlResultFunc = new Code(checkAndWriteControlResultFunc.getCode().replace(DIEZ, DOLAR));
                     mongoDbUtil
-                            .runCommand(dbObject.get(FORM_DB).toString(), appearFunction.getCode(), filter, loginController.getRolesAsSet());
+                            .runCommand(dbObject.get(FORM_DB).toString(), checkAndWriteControlResultFunc.getCode(), filter, loginController.getRolesAsSet());
                 }
             }
         }
@@ -875,16 +875,14 @@ public class CtrlService extends CommonSrv {
                         }
 
                         if (gui instanceof Document) {
-                            controlResult.setStyle(((Document) gui).get(STYLE).toString());
-                            controlResult.setCaption(((Document) gui).get("caption").toString());
-                            controlResult.setDynamicButtonName(((Document) gui).get("caption").toString());
+                            controlResult.setStyle((String) ((Document) gui).get(STYLE));
+                            controlResult.setCaption((String) ((Document) gui).get("caption"));
+                            controlResult.setDynamicButtonName((String) ((Document) gui).get("caption"));
 
                             Object objectAction = dbObject.get(ACTION);
 
                             if (objectAction instanceof Code) {
-
-                                controlResult.setMyaction(dbObject.get(ACTION).toString());
-
+                                controlResult.setMyaction(((Code) objectAction).getCode());
                             } else if (objectAction instanceof Document) {
                                 Document action = (Document) objectAction;
                                 controlResult.setMyActionType(action.get(TYPE).toString());
