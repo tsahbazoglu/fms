@@ -121,7 +121,7 @@ public abstract class AbstractViewer implements FmsOnFlyData, Serializable {
                 List<Map> randomCars = new ArrayList<>();
                 for (Object obj : list) {
                     try {
-                        randomCars.add(mongoDbUtil.wrapIt(formService.getMyForm().getDbo(), (Document) obj));
+                        randomCars.add(mongoDbUtil.wrapIt(formService.getMyForm(), (Document) obj));
                     } catch (NullNotExpectedException ex) {
                         logger.error("error occured", ex);
                     }
@@ -134,7 +134,7 @@ public abstract class AbstractViewer implements FmsOnFlyData, Serializable {
                 List<Map> randomCars = new ArrayList<>();
                 for (Object obj : list) {
                     try {
-                        randomCars.add(mongoDbUtil.wrapIt(formService.getMyForm().getDbo(), (Document) obj));
+                        randomCars.add(mongoDbUtil.wrapIt(formService.getMyForm(), (Document) obj));
                     } catch (NullNotExpectedException ex) {
                         logger.error("error occured", ex);
                     }

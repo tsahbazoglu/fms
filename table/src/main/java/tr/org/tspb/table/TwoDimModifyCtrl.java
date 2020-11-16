@@ -1422,7 +1422,7 @@ public class TwoDimModifyCtrl extends FmsTable implements ActionListener {
             }
         }
 
-        List<Map> list = mongoDbUtil.find(formService.getMyForm().getDb(), formService.getMyForm().getDbo(),
+        List<Map> list = mongoDbUtil.find(formService.getMyForm(),
                 myForm.getTable(), filterService.getTableFilterCurrent(), null, startRow, maxResults,
                 sortMap,
                 null);

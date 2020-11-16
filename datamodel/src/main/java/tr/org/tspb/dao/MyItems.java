@@ -236,6 +236,30 @@ public class MyItems {
             return this;
         }
 
+        public Builder withSortSchemaVersion110(Set<String> roleSet) {
+
+            Document dbo = (Document) items;
+            Document sort = dbo.get(SORT, Document.class);
+
+            this.myItems.sort = new Document();
+
+            if (sort.get("func") != null) {
+                try {
+                    this.myItems.sort = (Document) fmsScriptRunner
+                            .runCommand(this.myItems.db, sort.get("func", String.class).replace(DIEZ, DOLAR), roleSet)
+                            .get(RETVAL);
+                } catch (Exception exception) {
+                    //nothing
+                }
+            } else if (sort.get("list") != null) {
+                for (Document d : (List<Document>) sort.get("list")) {
+                    this.myItems.sort.put(d.get("key", String.class), d.get("value", Integer.class));
+                }
+            }
+
+            return this;
+        }
+
         public Builder withQuery(boolean admin) {
 
             Document dbo = (Document) items;
@@ -257,6 +281,55 @@ public class MyItems {
                     this.myItems.query = new Document("fms_item_query_code_error", "fms_item_query_code_error");
                 }
             }
+            return this;
+        }
+
+        public Builder withQuerySchemaVersion110(boolean admin) {
+
+            Document dbo = (Document) items;
+
+            Document query_ = dbo.get(QUERY, Document.class);
+            if (admin && dbo.get(ADMIN_QUERY) != null) {
+                query_ = dbo.get(ADMIN_QUERY, Document.class);
+            }
+
+            this.myItems.query = new Document();
+
+            if (query_.get("func") != null) {
+                this.myItems.queryCode = new Code(query_.get("func", String.class));
+                try {
+                    this.myItems.query = (Document) fmsScriptRunner
+                            .runCommand(this.myItems.db, this.myItems.queryCode.getCode(), filter)
+                            .get(RETVAL);
+                } catch (Exception exception) {
+                    this.myItems.query = new Document("fms_item_query_code_error", "fms_item_query_code_error");
+                }
+            } else if (query_.get("list") != null) {
+
+                for (Document d : (List<Document>) query_.get("list")) {
+
+                    String key = d.get("key", String.class);
+                    String type = d.get("type", String.class);
+
+                    if (type == null) {
+                        type = "string";
+                    }
+
+                    switch (type) {
+                        case "number":
+                            this.myItems.query.put(key, d.get("value", Number.class));
+                            break;
+                        case "string":
+                            this.myItems.query.put(key, d.get("value", String.class).replaceAll(DIEZ, DOLAR));
+                            break;
+                        default:
+                            this.myItems.query.put(key, d.get("value", String.class).replaceAll(DIEZ, DOLAR));
+                            break;
+                    }
+
+                }
+            }
+
             return this;
         }
 
@@ -303,6 +376,37 @@ public class MyItems {
                         }
                     } else {
                         list.add(new ViewOrder(entry.getKey().toString(), ((Number) viewerKeyValue).intValue()));
+                    }
+                }
+
+                Collections.sort(list, new Comparator<ViewOrder>() {
+                    @Override
+                    public int compare(ViewOrder viewOrder, ViewOrder viewOrder1) {
+                        return Integer.compare(viewOrder.order, viewOrder1.order);
+                    }
+                });
+
+                this.myItems.view = new ArrayList<>();
+                for (ViewOrder viewOrder : list) {
+                    this.myItems.view.add(viewOrder.key);
+                }
+
+            }
+            return this;
+        }
+
+        public Builder withViewSchemaVersion110(Set<String> roleSet) {
+            Document dbo = (Document) items;
+            if (dbo.get(VIEW) instanceof List) {
+                List<Document> viewList = dbo.get(VIEW, List.class);
+
+                List<ViewOrder> list = new ArrayList<>();
+
+                for (Document entry : viewList) {
+                    if (entry.get("permit") == null || isUserInRole(roleSet, ((Document) entry).get("permit"))) {
+                        Number number = entry.get(ORDER, Number.class);
+                        Integer order = (number == null) ? 0 : number.intValue();
+                        list.add(new ViewOrder(entry.get("key").toString(), order == null ? 0 : order.intValue()));
                     }
                 }
 

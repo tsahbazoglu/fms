@@ -134,12 +134,14 @@ public class MyRule implements Serializable {
 
     public void arrangeActions(MyForm myForm, RoleMap loginController, Document searchObject) {
         this.myActions = new MyActions.Build(myForm.getMyProject().getViewerRole(), myForm.getDb(), loginController, searchObject, dbo.get(FORMACTIONS), fmsScriptRunner)
+                .init()
                 .base()
                 .build();
     }
 
     public void arrangeActions(MyForm myForm, RoleMap loginController, Document searchObject, MyMap crudObject, Object actions) {
         this.myActions = new MyActions.Build(myForm.getMyProject().getViewerRole(), myForm.getDb(), loginController, searchObject, actions, fmsScriptRunner)
+                .init()
                 .base()
                 .maskSaveWithCurrentCrudObject(crudObject)
                 .maskDeleteWithSave()

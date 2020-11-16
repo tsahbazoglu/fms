@@ -63,7 +63,7 @@ public interface MongoDbUtilIntr extends Serializable {
 
     public GridFSDBFile findFile(String db, DBObject filter) throws RuntimeException;
 
-    public List<Map<String, Object>> find(String db, Document selectedForm, String collectionName,
+    public List<Map<String, Object>> find(MyForm myForm, String collectionName,
             Map<String, Object> searchMap,
             Map<String, Object> returnMap,
             int skip,
@@ -71,7 +71,7 @@ public interface MongoDbUtilIntr extends Serializable {
             Map<String, Object> sortMap,
             String searchPrefix) throws NullNotExpectedException;
 
-    public DocumentRecursive wrapIt(Document selectedForm, Document dBObject) throws NullNotExpectedException;
+    public DocumentRecursive wrapIt(MyForm myForm, Document dBObject) throws NullNotExpectedException;
 
     public boolean insertIntoMongo(String db, String collectionName, List<Map> mongoListOfMap);
 

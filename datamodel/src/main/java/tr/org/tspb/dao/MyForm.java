@@ -28,6 +28,9 @@ import tr.org.tspb.pojo.UserDetail;
 public class MyForm implements MyFormXs {
 
     public static Map<String, String> cacheIonSettingIdCode;
+    public static final String SCHEMA_VERSION_100 = "1.0.0";
+    public static final String SCHEMA_VERSION_110 = "1.1.0";
+    public static final String SCHEMA_VERSION = "schemaVersion";
 
     public static final String ION_SETTING_ACTIVITY_STATUS = "ion_setting_activity_status";
 
@@ -102,6 +105,7 @@ public class MyForm implements MyFormXs {
     private List<String> ajaxFields = new ArrayList<>();
     private List<MyRule> workflowSteps = new ArrayList<>();
     private String workflowStartStep = "s0";
+    private String schemaVersion;
     private Object actions;
     private Object calculateQuery;
     private CrudRelatedKeyRender crkr;
@@ -125,6 +129,10 @@ public class MyForm implements MyFormXs {
     private List< MyField> fieldsAsList;
     private Map<String, MyField> fieldsRow;
     private MyMerge uploadMerge;
+
+    public String getSchemaVersion() {
+        return schemaVersion;
+    }
 
     public boolean isJsonViewer() {
         return jsonViewer;
@@ -635,6 +643,7 @@ public class MyForm implements MyFormXs {
 
     public void arrangeActions(RoleMap roleMap, Document searchObject, MyMap crudObject) {
         this.myActions = new MyActions.Build(this.getMyProject().getViewerRole(), this.getDb(), roleMap, searchObject, actions, fmsScriptRunner)
+                .init()
                 .base()
                 .maskSaveWithCurrentCrudObject(crudObject)
                 .maskDeleteWithSave()
@@ -1006,7 +1015,11 @@ public class MyForm implements MyFormXs {
         }
 
         public Builder maskUpperNode() throws Exception {
-            this.myForm.upperNode = ((Document) dbObjectForm.get(UPPER_NODES)).keySet().iterator().next().toString();
+            if (MyForm.SCHEMA_VERSION_110.equals(dbObjectForm.get(MyForm.SCHEMA_VERSION))) {
+                this.myForm.upperNode = ((List<String>) dbObjectForm.get(UPPER_NODES)).get(0);
+            } else {
+                this.myForm.upperNode = ((Document) dbObjectForm.get(UPPER_NODES)).keySet().iterator().next().toString();
+            }
             return this;
         }
 
@@ -1096,30 +1109,58 @@ public class MyForm implements MyFormXs {
 
         public Builder maskDefaultQueries() {
 
-            Code dfcq = (Code) dbObjectForm.get(DEFAULT_CURRENT_QUERY);
-            Code dfhq = (Code) dbObjectForm.get(DEFAULT_HISTORY_QUERY);
+            if (SCHEMA_VERSION_110.equals(dbObjectForm.get(SCHEMA_VERSION))) {
+                String dfcq = (String) dbObjectForm.get(DEFAULT_CURRENT_QUERY);
+                String dfhq = (String) dbObjectForm.get(DEFAULT_HISTORY_QUERY);
 
-            List<ObjectId> list = (List<ObjectId>) myForm.userDetail.getLoginFkSearchMapInListOfValues().get(DOLAR_IN);
-            Document docArg = new Document(this.myForm.searchObject);
-            if (this.myForm.loginFkField == null) {
-                throw new RuntimeException("loginFkField = null");
-            }
-            docArg.append(this.myForm.loginFkField, list.get(0));
+                List<ObjectId> list = (List<ObjectId>) myForm.userDetail.getLoginFkSearchMapInListOfValues().get(DOLAR_IN);
+                Document docArg = new Document(this.myForm.searchObject);
+                if (this.myForm.loginFkField == null) {
+                    throw new RuntimeException("loginFkField = null");
+                }
+                docArg.append(this.myForm.loginFkField, list.get(0));
 
-            this.myForm.defaultCurrentQuery = new HashMap();
-            this.myForm.defaultHistoryQuery = new HashMap();
+                this.myForm.defaultCurrentQuery = new HashMap();
+                this.myForm.defaultHistoryQuery = new HashMap();
 
-            if (dfcq != null) {
-                Document docCurrentQuery = (Document) this.myForm.fmsScriptRunner
-                        .runCommand("test", dfcq.getCode(), docArg, this.myForm.roleMap).get(RETVAL);
-                this.myForm.defaultCurrentQuery.putAll(docCurrentQuery);
+                if (dfcq != null) {
+                    Document docCurrentQuery = (Document) this.myForm.fmsScriptRunner
+                            .runCommand("test", dfcq, docArg, this.myForm.roleMap).get(RETVAL);
+                    this.myForm.defaultCurrentQuery.putAll(docCurrentQuery);
 
-            }
+                }
 
-            if (dfhq != null) {
-                Document docHistoryQuery = (Document) this.myForm.fmsScriptRunner
-                        .runCommand("test", dfhq.getCode(), docArg, this.myForm.roleMap).get(RETVAL);
-                this.myForm.defaultHistoryQuery.putAll(docHistoryQuery);
+                if (dfhq != null) {
+                    Document docHistoryQuery = (Document) this.myForm.fmsScriptRunner
+                            .runCommand("test", dfhq, docArg, this.myForm.roleMap).get(RETVAL);
+                    this.myForm.defaultHistoryQuery.putAll(docHistoryQuery);
+                }
+            } else {
+                Code dfcq = (Code) dbObjectForm.get(DEFAULT_CURRENT_QUERY);
+                Code dfhq = (Code) dbObjectForm.get(DEFAULT_HISTORY_QUERY);
+
+                List<ObjectId> list = (List<ObjectId>) myForm.userDetail.getLoginFkSearchMapInListOfValues().get(DOLAR_IN);
+                Document docArg = new Document(this.myForm.searchObject);
+                if (this.myForm.loginFkField == null) {
+                    throw new RuntimeException("loginFkField = null");
+                }
+                docArg.append(this.myForm.loginFkField, list.get(0));
+
+                this.myForm.defaultCurrentQuery = new HashMap();
+                this.myForm.defaultHistoryQuery = new HashMap();
+
+                if (dfcq != null) {
+                    Document docCurrentQuery = (Document) this.myForm.fmsScriptRunner
+                            .runCommand("test", dfcq.getCode(), docArg, this.myForm.roleMap).get(RETVAL);
+                    this.myForm.defaultCurrentQuery.putAll(docCurrentQuery);
+
+                }
+
+                if (dfhq != null) {
+                    Document docHistoryQuery = (Document) this.myForm.fmsScriptRunner
+                            .runCommand("test", dfhq.getCode(), docArg, this.myForm.roleMap).get(RETVAL);
+                    this.myForm.defaultHistoryQuery.putAll(docHistoryQuery);
+                }
             }
 
             if (admin) {
@@ -1480,6 +1521,7 @@ public class MyForm implements MyFormXs {
             this.myForm.group = (String) dbObjectForm.get(GROUP);
             this.myForm.name = (String) dbObjectForm.get(NAME);
             this.myForm.key = (String) dbObjectForm.get(FORM_KEY);
+            this.myForm.schemaVersion = (String) dbObjectForm.get(SCHEMA_VERSION);
             this.myForm.shortName = (String) dbObjectForm.get(SHORT_NAME);
             this.myForm.pageName = (String) dbObjectForm.get(PAGE_NAME);
             this.myForm.projectKey = (String) dbObjectForm.get(PROJECT_KEY);

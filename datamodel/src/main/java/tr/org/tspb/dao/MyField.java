@@ -921,29 +921,60 @@ public class MyField {
             return this;
         }
 
-        public Builder maskItemsAsMyItems(MyForm myForm, Map filter, boolean admin, Set<String> roles) {
+        public Builder maskItemsAsMyItems(String schemaVersion, Map filter, boolean admin, Set<String> roles) {
 
-            Object items = this.myField.dbo.get(ITEMS);
+            if (MyForm.SCHEMA_VERSION_110.equals(schemaVersion)) {
 
-            if (items instanceof Document) {
-                this.myField.itemsAsMyItems = new MyItems.Builder(filter, items, myField.fmsScriptRunner)
-                        .withQuery(admin)
-                        .withSort(roles)
-                        .withView(roles)
-                        .withHistoryQuery(admin)
-                        .withItemType(MyItems.ItemType.doc)
-                        .withLookup()
-                        .withQueryProjection()
-                        .withResultProjection()
-                        .build();
-            } else if (items instanceof List) {
-                this.myField.itemsAsMyItems = new MyItems.Builder(items)
-                        .withItemType(MyItems.ItemType.list)
-                        .withList()
-                        .build();
-            } else if (items instanceof Code) {
-                throw new UnsupportedOperationException("maskItemsAsMyItems.code");
+                Document itemsDoc = this.myField.dbo.get(ITEMS, Document.class);
+
+                if (itemsDoc == null) {
+                    return this;
+                }
+
+                if (itemsDoc.get("list") != null) {
+                    Object items = itemsDoc.get("list");
+                    this.myField.itemsAsMyItems = new MyItems.Builder(items)
+                            .withItemType(MyItems.ItemType.list)
+                            .withList()
+                            .build();
+                } else if (itemsDoc.get("func") != null) {
+                    throw new UnsupportedOperationException("maskItemsAsMyItems.code");
+                } else if (itemsDoc.get("ref") != null) {
+                    Object items = itemsDoc.get("ref");
+                    this.myField.itemsAsMyItems = new MyItems.Builder(filter, items, myField.fmsScriptRunner)
+                            .withQuerySchemaVersion110(admin)
+                            .withSortSchemaVersion110(roles)
+                            .withViewSchemaVersion110(roles)
+                            .withHistoryQuery(admin)
+                            .withItemType(MyItems.ItemType.doc)
+                            .withLookup()
+                            .withQueryProjection()
+                            .withResultProjection()
+                            .build();
+                }
+            } else {
+                Object items = this.myField.dbo.get(ITEMS);
+                if (items instanceof Document) {
+                    this.myField.itemsAsMyItems = new MyItems.Builder(filter, items, myField.fmsScriptRunner)
+                            .withQuery(admin)
+                            .withSort(roles)
+                            .withView(roles)
+                            .withHistoryQuery(admin)
+                            .withItemType(MyItems.ItemType.doc)
+                            .withLookup()
+                            .withQueryProjection()
+                            .withResultProjection()
+                            .build();
+                } else if (items instanceof List) {
+                    this.myField.itemsAsMyItems = new MyItems.Builder(items)
+                            .withItemType(MyItems.ItemType.list)
+                            .withList()
+                            .build();
+                } else if (items instanceof Code) {
+                    throw new UnsupportedOperationException("maskItemsAsMyItems.code");
+                }
             }
+
             return this;
         }
 

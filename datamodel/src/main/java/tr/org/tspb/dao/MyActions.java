@@ -10,6 +10,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import javax.print.Doc;
 import org.bson.Document;
 import org.bson.types.Code;
 import tr.org.tspb.datamodel.expected.FmsScriptRunner;
@@ -171,13 +172,30 @@ public class MyActions {
                 "ldap"
         ));
 
+        private String viewerRole;
+        private String db;
+        private RoleMap roleMap;
+        private Document searchObject;
+        private Object attrActions;
+        private FmsScriptRunner fmsScriptRunner;
+
         public Build(String viewerRole, String db, RoleMap roleMap, Document searchObject,//
                 Object attrActions, FmsScriptRunner fmsScriptRunner) {
+
+            this.viewerRole = viewerRole;
+            this.db = db;
+            this.roleMap = roleMap;
+            this.searchObject = searchObject;
+            this.attrActions = attrActions;
+            this.fmsScriptRunner = fmsScriptRunner;
 
             this.myActions = new MyActions();
             this.myActions.fmsScriptRunner = fmsScriptRunner;
 
             this.myActions.reset();
+        }
+
+        public Build init() {
 
             Document actions = new Document();
 
@@ -234,6 +252,27 @@ public class MyActions {
 
                 }
             }
+            return this;
+        }
+
+        public Build initAsSchemaVersion100() {
+
+            for (String key : ((Document) attrActions).keySet()) {
+                Document attrActionValue = ((Document) attrActions).get(key, Document.class);
+                if (attrActionValue.get("permit") != null) {
+                    for (String role : (List<String>) attrActionValue.get("permit")) {
+                        if (roleMap.isUserInRole(role)) {
+                            map.put(key, Boolean.TRUE);
+                        }
+                    }
+                } else if (attrActionValue.get("func") != null) {
+                    throw new UnsupportedOperationException("func attribute had not been implemented yet");
+                } else {
+                    map.put(key, Boolean.TRUE.equals(attrActionValue.get("shoot")));
+                }
+            }
+
+            return this;
         }
 
         public Build base() {

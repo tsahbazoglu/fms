@@ -535,51 +535,85 @@ public class OgmCreatorImpl implements OgmCreatorIntr {
             throw new NullNotExpectedException("fields property is resolved to null");
         }
 
-        if (!(docForm.get(FORMFIELDS) instanceof Document)) {
-            throw new NullNotExpectedException("fields property is resolved to null");
-        }
-
-        Document mongoFields = (Document) docForm.get(FORMFIELDS);
-
-        Set<String> keySet = mongoFields.keySet();
-
-        if (keySet.isEmpty()) {
-            throw new NullNotExpectedException("fields property is resolved to null");
-        }
-
         Map<String, MyField> fields = new HashMap<>();
 
-        for (String fieldKey : keySet) {
+        if (MyForm.SCHEMA_VERSION_110.equals(docForm.get(MyForm.SCHEMA_VERSION))) {
+            for (Document docField : (List<Document>) docForm.get(FORMFIELDS)) {
 
-            Document docField = (Document) mongoFields.get(fieldKey);
+                Converter converter = createConverter(docForm, docField);
 
-            Converter converter = createConverter(docForm, docField);
+                MyField myField = new MyField.Builder(myProject, docField, fmsScriptRunner)
+                        .maskShortName()
+                        .maskCode()
+                        .withRendered(calcRendered(roleMap, docField, filter))
+                        .withReadonly(calcReadOnly(docField, filter, roleMap))
+                        .maskAccesscontrol()
+                        .maskNdTypeAndNdAxis()
+                        .withDefaultValue(calcDefaultValue(myProject, docForm, docField, roleMap, filter, userDetail == null ? null : userDetail.getDbo().getObjectId()))
+                        .maskComponentType()
+                        .maskItemsAsMyItems((String) docForm.get(MyForm.SCHEMA_VERSION), filter, roleMap.isUserInRole(myProject.getAdminRole()), roleMap.keySet())
+                        .withConverter(converter, null)
+                        .maskRestOfThem()
+                        .maskDescription()
+                        .maskOrders()
+                        .maskAjax()
+                        .maskSearchAccess()
+                        .maskEmbeddedAsList()
+                        .cacheBsonConverter(converter instanceof BsonConverter)
+                        .build();
 
-            MyField myField = new MyField.Builder(myProject, docField, fmsScriptRunner)
-                    .maskShortName()
-                    .maskCode()
-                    .withRendered(calcRendered(roleMap, docField, filter))
-                    .withReadonly(calcReadOnly(docField, filter, roleMap))
-                    .maskAccesscontrol()
-                    .maskNdTypeAndNdAxis()
-                    .withDefaultValue(calcDefaultValue(myProject, docForm, docField, roleMap, filter, userDetail == null ? null : userDetail.getDbo().getObjectId()))
-                    .maskComponentType()
-                    .maskItemsAsMyItems(null, filter, roleMap.isUserInRole(myProject.getAdminRole()), roleMap.keySet())
-                    .withConverter(converter, null)
-                    .maskRestOfThem()
-                    .maskDescription()
-                    .maskOrders()
-                    .maskAjax()
-                    .maskSearchAccess()
-                    .maskEmbeddedAsList()
-                    .cacheBsonConverter(converter instanceof BsonConverter)
-                    .build();
+                FmsAutoComplete autoComplete = new OnFlyItems(myProject, myField, docForm, filter, roleMap, userDetail, mongoDbUtil);
 
-            FmsAutoComplete autoComplete = new OnFlyItems(myProject, myField, docForm, filter, roleMap, userDetail, mongoDbUtil);
+                myField.setAutoComplete(autoComplete);
 
-            myField.setAutoComplete(autoComplete);
+                fields.put(myField.getKey(), myField);
+            }
 
-            fields.put(fieldKey, myField);
+        } else {
+            if (!(docForm.get(FORMFIELDS) instanceof Document)) {
+                throw new NullNotExpectedException("fields property is resolved to null");
+            }
+
+            Document mongoFields = (Document) docForm.get(FORMFIELDS);
+
+            Set<String> keySet = mongoFields.keySet();
+
+            if (keySet.isEmpty()) {
+                throw new NullNotExpectedException("fields property is resolved to null");
+            }
+
+            for (String fieldKey : keySet) {
+
+                Document docField = (Document) mongoFields.get(fieldKey);
+
+                Converter converter = createConverter(docForm, docField);
+
+                MyField myField = new MyField.Builder(myProject, docField, fmsScriptRunner)
+                        .maskShortName()
+                        .maskCode()
+                        .withRendered(calcRendered(roleMap, docField, filter))
+                        .withReadonly(calcReadOnly(docField, filter, roleMap))
+                        .maskAccesscontrol()
+                        .maskNdTypeAndNdAxis()
+                        .withDefaultValue(calcDefaultValue(myProject, docForm, docField, roleMap, filter, userDetail == null ? null : userDetail.getDbo().getObjectId()))
+                        .maskComponentType()
+                        .maskItemsAsMyItems((String) docForm.get(MyForm.SCHEMA_VERSION), filter, roleMap.isUserInRole(myProject.getAdminRole()), roleMap.keySet())
+                        .withConverter(converter, null)
+                        .maskRestOfThem()
+                        .maskDescription()
+                        .maskOrders()
+                        .maskAjax()
+                        .maskSearchAccess()
+                        .maskEmbeddedAsList()
+                        .cacheBsonConverter(converter instanceof BsonConverter)
+                        .build();
+
+                FmsAutoComplete autoComplete = new OnFlyItems(myProject, myField, docForm, filter, roleMap, userDetail, mongoDbUtil);
+
+                myField.setAutoComplete(autoComplete);
+
+                fields.put(fieldKey, myField);
+            }
         }
 
         return fields;
@@ -609,7 +643,7 @@ public class OgmCreatorImpl implements OgmCreatorIntr {
                         .maskNdTypeAndNdAxis()
                         .withDefaultValue(calcDefaultValue(myProject, docForm, docField, roleMap, filter, userDetail.getDbo().getObjectId()))
                         .maskComponentType()
-                        .maskItemsAsMyItems(null, filter, roleMap.isUserInRole(myProject.getAdminRole()), roleMap.keySet())
+                        .maskItemsAsMyItems((String) docForm.get(MyForm.SCHEMA_VERSION), filter, roleMap.isUserInRole(myProject.getAdminRole()), roleMap.keySet())
                         .withConverter(converter, null)
                         .maskRestOfThem()
                         .maskDescription()
@@ -729,7 +763,7 @@ public class OgmCreatorImpl implements OgmCreatorIntr {
                 .maskNdTypeAndNdAxis()
                 .withDefaultValue(calcDefaultValue(myForm.getMyProject(), myForm.getDbo(), docField, roleMap, filter, null))
                 .maskComponentType()
-                .maskItemsAsMyItems(myForm, filter, roleMap.isUserInRole(myForm.getMyProject().getAdminRole()), roleMap.keySet())
+                .maskItemsAsMyItems(myForm.getSchemaVersion(), filter, roleMap.isUserInRole(myForm.getMyProject().getAdminRole()), roleMap.keySet())
                 .withConverter(converter, null)
                 .maskRestOfThem()
                 .maskDescription()
@@ -756,7 +790,7 @@ public class OgmCreatorImpl implements OgmCreatorIntr {
                 .maskNdTypeAndNdAxis()
                 .withDefaultValue(calcDefaultValue(myForm.getMyProject(), myForm.getDbo(), docField, roleMap, filter, null))
                 .maskComponentType()
-                .maskItemsAsMyItems(null, filter, roleMap.isUserInRole(myForm.getMyProject().getAdminRole()), roleMap.keySet())
+                .maskItemsAsMyItems(myForm.getSchemaVersion(), filter, roleMap.isUserInRole(myForm.getMyProject().getAdminRole()), roleMap.keySet())
                 .withConverter(converter, null)
                 .maskRestOfThem()
                 .maskDescription()
@@ -770,8 +804,19 @@ public class OgmCreatorImpl implements OgmCreatorIntr {
 
     @Override
     public MyActions getMyActions(MyForm myFormLarge, RoleMap roleMap, Document filter) {
+
+        if (MyForm.SCHEMA_VERSION_100.equals(myFormLarge.getSchemaVersion())
+                || MyForm.SCHEMA_VERSION_110.equals(myFormLarge.getSchemaVersion())) {
+            return new MyActions.Build(myFormLarge.getMyProject().getViewerRole(), myFormLarge.getDb(),
+                    roleMap, filter, myFormLarge.getActions(), fmsScriptRunner)
+                    .initAsSchemaVersion100()
+                    .base()
+                    .build();
+        }
+
         return new MyActions.Build(myFormLarge.getMyProject().getViewerRole(), myFormLarge.getDb(),
                 roleMap, filter, myFormLarge.getActions(), fmsScriptRunner)
+                .init()
                 .base()
                 .build();
     }

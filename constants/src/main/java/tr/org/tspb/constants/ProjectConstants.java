@@ -322,6 +322,8 @@ public class ProjectConstants {
 
     //Q
     public static final String QUERY = "query";
+    public static final String QUERY_CODE = "queryCode";
+
     //R
     public static final String READONLY = "readonly";
     public static final String RELATIONS = "relations";
@@ -424,6 +426,7 @@ public class ProjectConstants {
     //PUNCTATION
     public static final String DIEZ = "#";
     public static final String DOLAR = "$";
+    public static final String DOLAR_EXISTS = "$exists";
     public static final String DOLAR_GTE = "$gte";
     public static final String DOLAR_LTE = "$lte";
     public static final String DOLAR_IN = "$in";

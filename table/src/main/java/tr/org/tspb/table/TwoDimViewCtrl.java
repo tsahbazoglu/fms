@@ -137,7 +137,7 @@ public class TwoDimViewCtrl extends FmsTableView {
             }
         }
 
-        List<Map> list = mongoDbUtil.find(formService.getMyForm().getDb(), formService.getMyForm().getDbo(),
+        List<Map> list = mongoDbUtil.find(formService.getMyForm(),
                 myForm.getTable(), filterService.getTableFilterHistory(), null, startRow, maxResults,
                 sortMap,
                 null);

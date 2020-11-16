@@ -273,7 +273,8 @@ public class MongoDbUtilImplKeepOpen implements MongoDbUtilIntr {
         return gridFSDBFile;
     }
 
-    public List<Map<String, Object>> find(String db, Document selectedForm, String collectionName,
+    @Override
+    public List<Map<String, Object>> find(MyForm myForm, String collectionName,
             Map<String, Object> searchMap,
             Map<String, Object> returnMap,
             int skip,
@@ -283,14 +284,14 @@ public class MongoDbUtilImplKeepOpen implements MongoDbUtilIntr {
 
         List<Map<String, Object>> listMaps = new ArrayList<>();
 
-        if (!isThereTable(mongoClient, db, collectionName)) {
+        if (!isThereTable(mongoClient, myForm.getDb(), collectionName)) {
             return listMaps;//Collections.emptyList();
         }
 
         Document returnObject = returnMap == null ? new Document() : new Document(returnMap);
         Document searchObject = searchMap == null ? new Document() : new Document(searchMap);
 
-        FindIterable<Document> dbCursor = mongoClient.getDatabase(db).getCollection(collectionName).find(searchObject);
+        FindIterable<Document> dbCursor = mongoClient.getDatabase(myForm.getDb()).getCollection(collectionName).find(searchObject);
 
         if (sortMap != null && !sortMap.isEmpty()) {
             dbCursor.sort(new Document(sortMap));
@@ -299,24 +300,25 @@ public class MongoDbUtilImplKeepOpen implements MongoDbUtilIntr {
         dbCursor.skip(skip).limit(limit);
 
         for (Document doc : dbCursor) {
-            listMaps.add(wrapIt(selectedForm, doc));
+            listMaps.add(wrapIt(myForm, doc));
         }
         return listMaps;
     }
 
-    public DocumentRecursive wrapIt(Document selectedForm, Document dBObject) throws NullNotExpectedException {
+    public DocumentRecursive wrapIt(MyForm myForm, Document dBObject) throws NullNotExpectedException {
         Map manualDbRefs = new HashMap();
 
         for (String key : dBObject.keySet()) {
             if (dBObject.get(key) instanceof ObjectId && !MONGO_ID.equals(key)) {
                 Map def = new HashMap();
-                Map field = (Map) ((Map) selectedForm.get("fields")).get(key);
+                MyField field = myForm.getField(key);
+
                 if (field != null) {
-                    Map itemsDbo = ((Map) field.get(ITEMS));
+                    MyItems itemsDbo = field.getItemsAsMyItems();
                     if (itemsDbo != null) {
-                        String myDb = (String) itemsDbo.get(FORM_DB);
-                        def.put(FORM_DB, myDb == null ? selectedForm.get(FORM_DB) : myDb);
-                        def.put(COLLECTION_NAME, itemsDbo.get("itemTable"));
+                        String myDb = itemsDbo.getDb();
+                        def.put(FORM_DB, myDb == null ? myForm.getDb() : myDb);
+                        def.put(COLLECTION_NAME, itemsDbo.getTable());
                         def.put(MONGO_ID, dBObject.get(key));
                         manualDbRefs.put(key, def);
                     } else {
@@ -902,7 +904,9 @@ public class MongoDbUtilImplKeepOpen implements MongoDbUtilIntr {
     }
 
     public List<Document> find(String database, String collection, Bson filter, Bson sort, Number limit) {
-        FindIterable<Document> list = mongoClient.getDatabase(database).getCollection(collection)
+        FindIterable<Document> list = mongoClient
+                .getDatabase(database)
+                .getCollection(collection)
                 .find(filter);
 
         if (sort != null) {

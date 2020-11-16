@@ -54,7 +54,6 @@ import tr.org.tspb.exceptions.NullNotExpectedException;
 import tr.org.tspb.factory.cp.OgmCreatorIntr;
 import tr.org.tspb.factory.qualifier.OgmCreatorQualifier;
 import tr.org.tspb.pojo.DatabaseUser;
-import tr.org.tspb.pojo.MyLdapUser;
 import tr.org.tspb.pojo.PostSaveResult;
 import tr.org.tspb.pojo.PreSaveResult;
 import tr.org.tspb.pojo.UserDetail;
@@ -386,10 +385,39 @@ public class RepositoryService implements Serializable {
     public List<FormItem> findModuleForms(ModuleItem moduleItem) {
 
         Document query = new Document()
-                .append(UPPER_NODES.concat(DOT).concat(moduleItem.getModuleKey()), new Document("$exists", true))
+                .append(UPPER_NODES.concat(DOT).concat(moduleItem.getModuleKey()), new Document(DOLAR_EXISTS, true))
                 .append(ACCESS_CONTROL, new Document(DOLAR_IN, loginController.getRolesAsList()));
 
         List<Document> documents = mongoDbUtil.find(CONFIG_DB, moduleItem.getProject().getConfigTable(), query);
+
+        List<FormItem> formItems = new ArrayList<>();
+
+        for (Document dBObject : documents) {
+
+            Object formDisabled = dBObject.get(DISABLED);
+
+            if (Boolean.TRUE.equals(formDisabled)) {
+                continue;
+            }
+
+            if (formDisabled instanceof Document && !loginController.isUserInRole(((Document) formDisabled).getString(NOT_ON_USER_ROLE))) {
+                continue;
+            }
+
+            formItems.add(new FormItem(dBObject));
+        }
+
+        return formItems;
+
+    }
+
+    public List<FormItem> findModuleFormsSchemaVersion110(ModuleItem moduleItem) {
+
+        Bson filter = Filters.and(Filters.eq(MyForm.SCHEMA_VERSION, MyForm.SCHEMA_VERSION_110),
+                Filters.eq(UPPER_NODES, moduleItem.getModuleKey()),
+                Filters.eq(ACCESS_CONTROL, new Document(DOLAR_IN, loginController.getRolesAsList())));
+
+        List<Document> documents = mongoDbUtil.find(CONFIG_DB, moduleItem.getProject().getConfigTable(), filter);
 
         List<FormItem> formItems = new ArrayList<>();
 
