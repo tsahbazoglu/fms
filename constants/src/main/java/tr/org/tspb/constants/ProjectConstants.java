@@ -23,6 +23,7 @@ public class ProjectConstants {
     public static final String REPLACEABLE_KEY_WORD_FOR_FUNCTONS_LOGIN_MEMBER_ID = "fms_code{{login_member_id}}";
     public static final String REPLACEABLE_KEY_WORD_FOR_FUNCTONS_FILTER_MEMBER = "fms_code{{filter_member}}";
     public static final String REPLACEABLE_KEY_WORD_FOR_FUNCTONS_FILTER_PERIOD = "fms_code{{filter_period}}";
+    public static final String REPLACEABLE_KEY_WORD_FOR_FUNCTONS_FILTER_TEMPLATE = "fms_code{{filter_template}}";
 
     public static final String JMS_EMAIL_QUEUE = "jms/fmsEmailQueue";
     public static final String JMS_EMAIL_QUEUE_CONN_FACTORY = "jms/fmsEmailQueueConnectionFactory";
@@ -75,7 +76,7 @@ public class ProjectConstants {
     public static final String CALCULATE = "calculate";
     public static final String CALCULATE_ON_CLIENT = "calculateOnClient";
     public static final String CALCULATE_COLLECTION = "calculateCollection";
-    public static final String CALCULATE_QUERY = "calculateQuery";
+    public static final String CALCULATE_REF = "calculate-ref";
     public static final String CELL_VERSION = "cellVersion";
     public static final String CFG_TABLE_PROJECT = "project2";
     public static final String CHILDS = "childs";
