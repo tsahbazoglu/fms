@@ -543,6 +543,7 @@ public class OgmCreatorImpl implements OgmCreatorIntr {
                 Converter converter = createConverter(docForm, docField);
 
                 MyField myField = new MyField.Builder(myProject, docField, fmsScriptRunner)
+                        .maskAutoset((String) docForm.get(MyForm.SCHEMA_VERSION), roleMap)
                         .maskShortName()
                         .maskCode()
                         .withRendered(calcRendered(roleMap, docField, filter))
@@ -589,6 +590,7 @@ public class OgmCreatorImpl implements OgmCreatorIntr {
                 Converter converter = createConverter(docForm, docField);
 
                 MyField myField = new MyField.Builder(myProject, docField, fmsScriptRunner)
+                        .maskAutoset((String) docForm.get(MyForm.SCHEMA_VERSION), roleMap)
                         .maskShortName()
                         .maskCode()
                         .withRendered(calcRendered(roleMap, docField, filter))
@@ -635,6 +637,7 @@ public class OgmCreatorImpl implements OgmCreatorIntr {
                 Converter converter = createConverter(docForm, docField);
 
                 MyField myField = new MyField.Builder(myProject, docField, fmsScriptRunner)
+                        .maskAutoset((String) docForm.get(MyForm.SCHEMA_VERSION), roleMap)
                         .maskShortName()
                         .maskCode()
                         .withRendered(calcRendered(roleMap, docField, filter))
@@ -755,6 +758,7 @@ public class OgmCreatorImpl implements OgmCreatorIntr {
         calcReadOnly(docField, filter, roleMap);
 
         return new MyField.Builder(myForm.getMyProject(), docField, fmsScriptRunner)
+                .maskAutoset(myForm.getSchemaVersion(), roleMap)
                 .maskShortName()
                 .maskCode()
                 .withRendered(calcRendered(roleMap, docField, filter))
@@ -783,6 +787,7 @@ public class OgmCreatorImpl implements OgmCreatorIntr {
         calcReadOnly(docField, filter, roleMap);
 
         return new MyField.Builder(myForm.getMyProject(), docField, fmsScriptRunner)
+                .maskAutoset(myForm.getSchemaVersion(), roleMap)
                 .maskShortName()
                 .maskCode()
                 .withRendered(calcRendered(roleMap, docField, filter))
