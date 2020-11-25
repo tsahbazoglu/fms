@@ -266,7 +266,14 @@ public class MyActions {
                         }
                     }
                 } else if (attrActionValue.get("func") != null) {
-                    throw new UnsupportedOperationException("func attribute had not been implemented yet");
+                    String code = attrActionValue.get("func", String.class);
+                    code = code.replace(DIEZ, DOLAR);
+
+                    Document commandResult = fmsScriptRunner.runCommand(db,
+                            code, searchObject, roleMap.keySet());
+
+                    Boolean result = commandResult.getBoolean(RETVAL);
+                    map.put(key, result);
                 } else {
                     map.put(key, Boolean.TRUE.equals(attrActionValue.get("shoot")));
                 }
