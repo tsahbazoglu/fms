@@ -143,10 +143,9 @@ public abstract class PivotImpl implements Serializable, PivotApi {
 
         List<MyField> listOfMap = appScopeSrvCtrl.cacheAndGetDimensionItems(cacheKey);
 
-       // if (listOfMap != null) {
-          //  return listOfMap;
+        // if (listOfMap != null) {
+        //  return listOfMap;
         //}
-
         listOfMap = new ArrayList<>();
 
         myField.createSelectItems(getFilter(), rowObject,
