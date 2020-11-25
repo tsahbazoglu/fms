@@ -328,6 +328,152 @@ public class FilterUtil {
 
     }
 
+    public Document createTableHistoryScemaVersion110(MyForm selectedForm, Map<String, Object> baseCurrent, Map<String, Object> guiHistory,
+            boolean admin, UserDetail userDetail, RoleMap roleMap)
+            throws NullNotExpectedException {
+
+        Document filter = new Document();
+
+        filter.putAll(baseCurrent);
+
+        if (guiHistory != null) {
+            filter.putAll(guiHistory);
+        }
+
+        if (!admin) {
+            filter.put(selectedForm.getLoginFkField(), userDetail.getLoginFkSearchMapInListOfValues());
+        }
+
+        filter.put(MONGO_LDAP_UID, userDetail.getUsername());
+
+        FacesContext facesContext = FacesContext.getCurrentInstance();
+        if (facesContext != null) {
+            filter.put(CREATE_SESSIONID, ((HttpSession) facesContext.getExternalContext().getSession(false)).getId());
+        }
+
+        Map<String, Object> concurrentModification = new HashMap(filter);
+
+        for (Map.Entry<String, Object> entry : concurrentModification.entrySet()) {
+            Object value = entry.getValue();
+            if ((value == null || SelectOneObjectIdConverter.NULL_VALUE.equals(value))) {
+                filter.remove(entry.getKey());
+            }
+        }
+
+        Document modifiedSearchObject = new Document();
+
+        // to avoid java.util.ConcurrentModificationException
+        for (Map.Entry<String, Object> entry : filter.entrySet()) {
+            MyField myField = selectedForm.getField(entry.getKey());
+
+            if (myField == null) {
+                // this is the state when we surf accross forms with the search object 
+                // from previous forms
+                continue;
+            }
+
+            Object valueType = myField.getValueType();
+            String field = myField.getField();
+            Object value = entry.getValue();
+
+            /**
+             * for some form a "key" can be differ from "field" it represents
+             * (mongoDataBank.js / alternative channels)
+             */
+            if (field == null) {
+                throw new NullNotExpectedException("field must be defined for ".concat(entry.getKey()));
+            }
+
+            if (valueType == null
+                    || value == null
+                    || "null".equals(value)
+                    || SelectOneStringConverter.NULL_VALUE.equals(value)
+                    || value instanceof String && ((String) value).isEmpty()) {
+                continue;
+            }
+
+            if (value instanceof ObjectId) {
+                modifiedSearchObject.put(field, value);
+            } else if (value instanceof String) {
+
+                if (myField.getMyconverter() instanceof BsonConverter) {
+                    modifiedSearchObject.put(field, value);
+                } else if (myField.getMyconverter() instanceof TelmanStringConverter) {
+                    if (value.toString().startsWith("(!=)")) { // NOT EQUAL
+                        modifiedSearchObject.put(entry.getKey(),
+                                new Document(DOLAR_NE, value.toString().substring(4))
+                        );
+                    } else if (value.toString().startsWith("(!%)")) { // NOT LIKE
+                        modifiedSearchObject.put(entry.getKey(),
+                                new Document(DOLAR_OPTIONS, "i")
+                                        .append(DOLAR_REGEX, "^((?!" + value.toString().substring(4) + ").)*$")
+                        );
+                    } else {
+                        // EQUAL
+                        modifiedSearchObject.put(entry.getKey(),
+                                new Document(DOLAR_OPTIONS, "i")
+                                        //.append($REGEX, ((String) value).toUpperCase(new Locale("tr", "TR")))
+                                        .append(DOLAR_REGEX, value)
+                        );
+                    }
+
+                } else if (myField.getMyconverter() instanceof NumberConverter) {
+                    Object valueCopy = value;
+                    // NOT EQUAL
+                    if (value.toString().startsWith("(>)") || value.toString().startsWith("(<)")) {
+                        valueCopy = value.toString().substring(3);
+                    }
+
+                    if ("java.lang.Double".equals(valueType)) {
+                        valueCopy = Double.valueOf(((String) valueCopy).replace(COMMA, DOT));
+                    } else if ("java.lang.Integer".equals(valueType)) {
+                        valueCopy = Integer.valueOf(((String) valueCopy).replace(COMMA, DOT));
+                    } else {
+                        valueCopy = Integer.valueOf(((String) valueCopy).replace(COMMA, DOT));
+                    }
+
+                    if (value.toString().startsWith("(>)")) { // NOT EQUAL
+                        modifiedSearchObject.put(entry.getKey(), new Document(DOLAR_GTE, valueCopy));
+                    } else if (value.toString().startsWith("(<)")) { // NOT EQUAL
+                        modifiedSearchObject.put(entry.getKey(), new Document(DOLAR_LTE, valueCopy));
+                    } else {
+                        modifiedSearchObject.put(entry.getKey(), valueCopy);
+                    }
+
+                } else if ("true".equals(value) || "false".equals(value)) {
+                    modifiedSearchObject.put(entry.getKey(), Boolean.valueOf((String) value));
+                } else if ("java.lang.Integer".equals(valueType)) {
+                    modifiedSearchObject.put(entry.getKey(), Integer.valueOf(((String) value).replace(COMMA, DOT)));
+                } else if ("java.lang.Double".equals(valueType)) {
+                    modifiedSearchObject.put(entry.getKey(), 100 * Double.valueOf(((String) value).replace(COMMA, DOT)));
+                } else {
+                    modifiedSearchObject.put(entry.getKey(),
+                            new Document(DOLAR_OPTIONS, "i")
+                                    .append(DOLAR_REGEX, //((String) value).toUpperCase(new Locale("tr", "TR")))
+                                            value)
+                    );
+                }
+            }
+        }
+
+        if (selectedForm.getMyNamedQueries() != null && selectedForm.getMyNamedQueries().get(DEFAULT_QUERY) instanceof Document) {
+            modifiedSearchObject.putAll(((Document) selectedForm.getMyNamedQueries().get(DEFAULT_QUERY)));
+        } else if (selectedForm.getFindAndSaveFilter() != null) {
+            modifiedSearchObject.putAll(selectedForm.getFindAndSaveFilter());
+        } else {
+            modifiedSearchObject.put(FORMS, selectedForm.getForm());
+        }
+
+        modifiedSearchObject.putAll(new FmsNamedQueries(selectedForm, roleMap, userDetail, mongoDbUtil).filter());
+
+        if (!admin) {
+            modifiedSearchObject.put(selectedForm.getLoginFkField(), userDetail.getLoginFkSearchMapInListOfValues());
+        }
+
+        return modifiedSearchObject;
+
+    }
+
     public Document createTableFilter(MyForm myForm, Document baseCurrent, Map<String, Object> guiCurrent,
             boolean admin, UserDetail userDetail, RoleMap roleMap) throws NullNotExpectedException {
 
@@ -481,9 +627,9 @@ public class FilterUtil {
         }
 
         Document myNamedQueries = myForm.getMyNamedQueries();
-        if (myNamedQueries
-                != null && myNamedQueries.get(INCLUDE)
-                != null) {
+
+        if (myNamedQueries != null && myNamedQueries.get(INCLUDE) != null) {
+
             Document includeQuery = (Document) myNamedQueries.get(INCLUDE);
             String onUserRole = (String) includeQuery.get(ON_USER_ROLE);
             if (onUserRole != null && roleMap.isUserInRole(onUserRole)) {
@@ -541,6 +687,169 @@ public class FilterUtil {
                 modifiedFilter.putAll(query);
             }
         }
+
+        if (!admin) {
+            modifiedFilter.put(myForm.getLoginFkField(), userDetail.getLoginFkSearchMapInListOfValues());
+            filter.put(myForm.getLoginFkField(), userDetail.getLoginFkSearchMapInListOfValues());
+        }
+
+        return modifiedFilter;
+
+    }
+
+    public Document createTableFilterSchemaVersion110(MyForm myForm, Document baseCurrent, Map<String, Object> guiCurrent,
+            boolean admin, UserDetail userDetail, RoleMap roleMap) throws NullNotExpectedException {
+
+        Document filter = new Document();
+
+        filter.putAll(baseCurrent);
+
+        if (guiCurrent != null) {
+            for (String key : guiCurrent.keySet()) {
+                Object value = guiCurrent.get(key);
+                if (value instanceof PlainRecord) {
+                    value = ((PlainRecord) value).getObjectId();
+                }
+                filter.append(key, value);
+            }
+        }
+
+        for (Iterator<String> iterator = filter.keySet().iterator(); iterator.hasNext();) {
+            String key = iterator.next();
+            Object value = filter.get(key);
+            if ((value == null || SelectOneObjectIdConverter.NULL_VALUE.equals(value))) {
+                iterator.remove();
+            }
+
+        }
+
+        // apply autoset field values
+        for (MyField myField : myForm.getAutosetFields()) {
+
+            if (!admin && myForm.getLoginFkField().equals(myField.getKey())) {
+                filter.put(myForm.getLoginFkField(), userDetail.getLoginFkSearchMapInListOfValues());
+                continue;
+            }
+
+            Object filterValue = filter.get(myField.getKey());
+            if (filterValue == null) {
+                if (MyItems.ItemType.doc.equals(myField.getItemsAsMyItems().getItemType())) {
+                    Document document = resolveAutosetValue(myField.getItemsAsMyItems(), myForm, filter, false);
+                    if (document != null) {
+                        filter.put(myField.getKey(), document.get(MONGO_ID));
+                    } else {
+                        filter.put(myField.getKey(), SelectOneObjectIdConverter.NULL_VALUE);
+                    }
+                }
+            }
+        }
+
+        //modify filter
+        Document modifiedFilter = new Document();
+
+        // to avoid java.util.ConcurrentModificationException
+        for (Map.Entry<String, Object> entry : filter.entrySet()) {
+            MyField myField = myForm.getField(entry.getKey());
+
+            if (myField == null) {
+                // this is the state when we surf accross forms with the search object 
+                // from previous forms
+                continue;
+            }
+
+            Object filterType = myField.getValueType();
+            String filterField = myField.getField();
+            Object filterValue = entry.getValue();
+
+            /**
+             * for some form a "key" can be differ from "field" it represents
+             * (mongoDataBank.js / alternative channels)
+             */
+            if (filterField == null) {
+                throw new NullNotExpectedException("field must be defined for ".concat(entry.getKey()));
+            }
+
+            if (filterType == null
+                    || filterValue == null
+                    || "null".equals(filterValue)
+                    || SelectOneStringConverter.NULL_VALUE.equals(filterValue)
+                    || filterValue instanceof String && ((String) filterValue).isEmpty()) {
+                continue;
+            }
+
+            if (filterValue instanceof ObjectId) {
+                modifiedFilter.put(filterField, filterValue);
+            } else if (filterValue instanceof String) {
+
+                if (myField.getMyconverter() instanceof BsonConverter) {
+                    modifiedFilter.put(filterField, filterValue);
+                } else if (myField.getMyconverter() instanceof TelmanStringConverter) {
+                    if (filterValue.toString().startsWith("(!=)")) { // NOT EQUAL
+                        modifiedFilter.put(entry.getKey(),
+                                new Document(DOLAR_NE, filterValue.toString().substring(4))
+                        );
+                    } else if (filterValue.toString().startsWith("(!%)")) { // NOT LIKE
+                        modifiedFilter.put(entry.getKey(),
+                                new Document(DOLAR_OPTIONS, "i")
+                                        .append(DOLAR_REGEX, "^((?!" + filterValue.toString().substring(4) + ").)*$")
+                        );
+                    } else {
+                        // EQUAL
+                        modifiedFilter.put(entry.getKey(),
+                                new Document(DOLAR_OPTIONS, "i")
+                                        //.append($REGEX, ((String) value).toUpperCase(new Locale("tr", "TR")))
+                                        .append(DOLAR_REGEX, filterValue)
+                        );
+                    }
+
+                } else if (myField.getMyconverter() instanceof NumberConverter) {
+                    Object valueCopy = filterValue;
+                    // NOT EQUAL
+                    if (filterValue.toString().startsWith("(>)") || filterValue.toString().startsWith("(<)")) {
+                        valueCopy = filterValue.toString().substring(3);
+                    }
+
+                    if ("java.lang.Double".equals(filterType)) {
+                        valueCopy = Double.valueOf(((String) valueCopy).replace(COMMA, DOT));
+                    } else if ("java.lang.Integer".equals(filterType)) {
+                        valueCopy = Integer.valueOf(((String) valueCopy).replace(COMMA, DOT));
+                    } else {
+                        valueCopy = Integer.valueOf(((String) valueCopy).replace(COMMA, DOT));
+                    }
+
+                    if (filterValue.toString().startsWith("(>)")) { // NOT EQUAL
+                        modifiedFilter.put(entry.getKey(), new Document(DOLAR_GTE, valueCopy));
+                    } else if (filterValue.toString().startsWith("(<)")) { // NOT EQUAL
+                        modifiedFilter.put(entry.getKey(), new Document(DOLAR_LTE, valueCopy));
+                    } else {
+                        modifiedFilter.put(entry.getKey(), valueCopy);
+                    }
+
+                } else if ("true".equals(filterValue) || "false".equals(filterValue)) {
+                    modifiedFilter.put(entry.getKey(), Boolean.valueOf((String) filterValue));
+                } else if ("java.lang.Integer".equals(filterType)) {
+                    modifiedFilter.put(entry.getKey(), Integer.valueOf(((String) filterValue).replace(COMMA, DOT)));
+                } else if ("java.lang.Double".equals(filterType)) {
+                    modifiedFilter.put(entry.getKey(), 100 * Double.valueOf(((String) filterValue).replace(COMMA, DOT)));
+                } else {
+                    modifiedFilter.put(entry.getKey(),
+                            new Document(DOLAR_OPTIONS, "i")
+                                    .append(DOLAR_REGEX, //((String) value).toUpperCase(new Locale("tr", "TR")))
+                                            filterValue)
+                    );
+                }
+            }
+        }
+
+        if (myForm.getMyNamedQueries() != null && myForm.getMyNamedQueries().get(DEFAULT_QUERY) instanceof Document) {
+            modifiedFilter.putAll(((Document) myForm.getMyNamedQueries().get(DEFAULT_QUERY)));
+        } else if (myForm.getFindAndSaveFilter() != null) {
+            modifiedFilter.putAll(myForm.getFindAndSaveFilter());
+        } else {
+            modifiedFilter.put(FORMS, myForm.getForm());
+        }
+
+        modifiedFilter.putAll(new FmsNamedQueries(myForm, roleMap, userDetail, mongoDbUtil).filter());
 
         if (!admin) {
             modifiedFilter.put(myForm.getLoginFkField(), userDetail.getLoginFkSearchMapInListOfValues());
