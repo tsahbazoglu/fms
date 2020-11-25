@@ -38,7 +38,7 @@ public class RoleMap extends HashMap implements Serializable {
      * @return
      */
     public Boolean isUserInRole(Object commaSplittedRoles) {
-        if (commaSplittedRoles != null) {
+         if (commaSplittedRoles != null) {
             if (commaSplittedRoles instanceof List) {
                 for (String string : (Iterable<? extends String>) commaSplittedRoles) {
                     if (keySet().contains(string)) {
