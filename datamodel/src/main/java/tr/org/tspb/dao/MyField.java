@@ -41,7 +41,7 @@ public class MyField {
     private String accesscontrol;
     private Boolean searchAccess;
     private Boolean quickFilter;
-    private Object autoset;
+    private Boolean autoset;
     private String ajaxAction;
     private Code ajaxShowHide;
     private String ajaxUpdate;
@@ -393,7 +393,7 @@ public class MyField {
         return readonly;
     }
 
-    public Object getAutoset() {
+    public Boolean getAutoset() {
         return autoset;
     }
 
@@ -758,7 +758,6 @@ public class MyField {
             this.myField = new MyField();
             //
             this.myField.fmsScriptRunner = fmsScriptRunner;
-            this.myField.autoset = docField.get(AUTOSET);
             this.myField._id = (ObjectId) docField.get(MONGO_ID);
             this.myField.code = (String) docField.get(CODE);
             this.myField.calculate = (Code) docField.get(CALCULATE);
@@ -924,55 +923,68 @@ public class MyField {
         public Builder maskItemsAsMyItems(String schemaVersion, Map filter, boolean admin, Set<String> roles) {
 
             if (MyForm.SCHEMA_VERSION_110.equals(schemaVersion)) {
-
-                Document itemsDoc = this.myField.dbo.get(ITEMS, Document.class);
-
-                if (itemsDoc == null) {
-                    return this;
-                }
-
-                if (itemsDoc.get("list") != null) {
-                    Object items = itemsDoc.get("list");
-                    this.myField.itemsAsMyItems = new MyItems.Builder(items)
-                            .withItemType(MyItems.ItemType.list)
-                            .withList()
-                            .build();
-                } else if (itemsDoc.get("func") != null) {
-                    throw new UnsupportedOperationException("maskItemsAsMyItems.code");
-                } else if (itemsDoc.get("ref") != null) {
-                    Object items = itemsDoc.get("ref");
-                    this.myField.itemsAsMyItems = new MyItems.Builder(filter, items, myField.fmsScriptRunner)
-                            .withQuerySchemaVersion110(admin)
-                            .withSortSchemaVersion110(roles)
-                            .withViewSchemaVersion110(roles)
-                            .withHistoryQuery(admin)
-                            .withItemType(MyItems.ItemType.doc)
-                            .withLookup()
-                            .withQueryProjection()
-                            .withResultProjection()
-                            .build();
-                }
+                maskItemsAsMyItemsSchemaVersion110(schemaVersion, filter, admin, roles);
             } else {
-                Object items = this.myField.dbo.get(ITEMS);
-                if (items instanceof Document) {
-                    this.myField.itemsAsMyItems = new MyItems.Builder(filter, items, myField.fmsScriptRunner)
-                            .withQuery(admin)
-                            .withSort(roles)
-                            .withView(roles)
-                            .withHistoryQuery(admin)
-                            .withItemType(MyItems.ItemType.doc)
-                            .withLookup()
-                            .withQueryProjection()
-                            .withResultProjection()
-                            .build();
-                } else if (items instanceof List) {
-                    this.myField.itemsAsMyItems = new MyItems.Builder(items)
-                            .withItemType(MyItems.ItemType.list)
-                            .withList()
-                            .build();
-                } else if (items instanceof Code) {
-                    throw new UnsupportedOperationException("maskItemsAsMyItems.code");
-                }
+                maskItemsAsMyItemsNoScema(schemaVersion, filter, admin, roles);
+            }
+
+            return this;
+        }
+
+        private Builder maskItemsAsMyItemsNoScema(String schemaVersion, Map filter, boolean admin, Set<String> roles) {
+
+            Object items = this.myField.dbo.get(ITEMS);
+            if (items instanceof Document) {
+                this.myField.itemsAsMyItems = new MyItems.Builder(filter, items, myField.fmsScriptRunner)
+                        .withQuery(admin)
+                        .withSort(roles)
+                        .withView(roles)
+                        .withHistoryQuery(admin)
+                        .withItemType(MyItems.ItemType.doc)
+                        .withLookup()
+                        .withQueryProjection()
+                        .withResultProjection()
+                        .build();
+            } else if (items instanceof List) {
+                this.myField.itemsAsMyItems = new MyItems.Builder(items)
+                        .withItemType(MyItems.ItemType.list)
+                        .withList()
+                        .build();
+            } else if (items instanceof Code) {
+                throw new UnsupportedOperationException("maskItemsAsMyItems.code");
+            }
+
+            return this;
+        }
+
+        private Builder maskItemsAsMyItemsSchemaVersion110(String schemaVersion, Map filter, boolean admin, Set<String> roles) {
+
+            Document itemsDoc = this.myField.dbo.get(ITEMS, Document.class);
+
+            if (itemsDoc == null) {
+                return this;
+            }
+
+            if (itemsDoc.get("list") != null) {
+                Object items = itemsDoc.get("list");
+                this.myField.itemsAsMyItems = new MyItems.Builder(items)
+                        .withItemType(MyItems.ItemType.list)
+                        .withList()
+                        .build();
+            } else if (itemsDoc.get("func") != null) {
+                throw new UnsupportedOperationException("maskItemsAsMyItems.code");
+            } else if (itemsDoc.get("ref") != null) {
+                Object items = itemsDoc.get("ref");
+                this.myField.itemsAsMyItems = new MyItems.Builder(filter, items, myField.fmsScriptRunner)
+                        .withQuerySchemaVersion110(admin)
+                        .withSortSchemaVersion110(roles)
+                        .withViewSchemaVersion110(roles)
+                        .withHistoryQuerySchemaVersion110(admin)
+                        .withItemType(MyItems.ItemType.doc)
+                        .withLookup()
+                        .withQueryProjection()
+                        .withResultProjection()
+                        .build();
             }
 
             return this;
@@ -1105,6 +1117,44 @@ public class MyField {
                 }
             }
             return this;
+        }
+
+        public Builder maskAutoset(String schemaVersion, RoleMap roleMap) {
+            if (MyForm.SCHEMA_VERSION_110.equals(schemaVersion)) {
+                maskAutosetSchemaVersion110(roleMap);
+            } else {
+                maskAutosetNoSchema();
+            }
+            return this;
+        }
+
+        private void maskAutosetSchemaVersion110(RoleMap roleMap) {
+
+            Document autoset = this.myField.dbo.get(AUTOSET, Document.class);
+
+            if (autoset == null) {
+                this.myField.autoset = false;
+                return;
+            }
+
+            Boolean value = autoset.get(VALUE, Boolean.class);
+
+            if (value == null) {
+                List<Document> list = autoset.get("list", List.class);
+                for (Document docRoleValue : list) {
+                    List<String> roles = docRoleValue.get("roles", List.class);
+                    if (roles == null || roleMap.isUserInRole(roles)) {
+                        value = docRoleValue.get(VALUE, Boolean.class);
+                    }
+                }
+            }
+
+            this.myField.autoset = Boolean.TRUE.equals(value);
+
+        }
+
+        private void maskAutosetNoSchema() {
+            this.myField.autoset = this.myField.dbo.get(AUTOSET, Boolean.class);
         }
 
         public Builder maskShortName() {
