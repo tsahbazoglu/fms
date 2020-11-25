@@ -410,11 +410,11 @@ public class PivotModifierCtrl extends PivotImpl {
             Document accessControlLevelTwo = formService.getMyForm().getAccessControlLevelTwo();
             if (loginController.isUserInRole(accessControlLevelTwo.get(ON_USER_ROLE))) {
                 String db = (String) accessControlLevelTwo.get(FORM_DB);
-                Code func = (Code) accessControlLevelTwo.get("func");
+                String func = accessControlLevelTwo.get("func", String.class);
 
                 if (func != null) {
-                    func = new Code(func.getCode().replace(DIEZ, DOLAR));
-                    Document commandResult = mongoDbUtil.runCommand(db, func.getCode(), getFilter());
+                    func = func.replace(DIEZ, DOLAR);
+                    Document commandResult = mongoDbUtil.runCommand(db, func, getFilter());
 
                     Document value = (Document) commandResult.get(RETVAL);
 
