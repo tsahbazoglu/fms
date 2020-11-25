@@ -107,7 +107,7 @@ public class MyForm implements MyFormXs {
     private String workflowStartStep = "s0";
     private String schemaVersion;
     private Object actions;
-    private Object calculateQuery;
+    private CalculateTag calculateTag;
     private CrudRelatedKeyRender crkr;
     private MyProject myProject;
     private MyActions myActions;
@@ -227,8 +227,8 @@ public class MyForm implements MyFormXs {
         return searchForm;
     }
 
-    public Object getCalculateQuery() {
-        return this.calculateQuery;
+    public CalculateTag getCalculateQuery() {
+        return calculateTag;
     }
 
     public Number getColumnCount() {
@@ -642,12 +642,23 @@ public class MyForm implements MyFormXs {
     }
 
     public void arrangeActions(RoleMap roleMap, Document searchObject, MyMap crudObject) {
-        this.myActions = new MyActions.Build(this.getMyProject().getViewerRole(), this.getDb(), roleMap, searchObject, actions, fmsScriptRunner)
-                .init()
-                .base()
-                .maskSaveWithCurrentCrudObject(crudObject)
-                .maskDeleteWithSave()
-                .build();
+
+        if (MyForm.SCHEMA_VERSION_110.equals(this.getSchemaVersion())) {
+            this.myActions = new MyActions.Build(this.getMyProject().getViewerRole(), this.getDb(), roleMap, searchObject, actions, fmsScriptRunner)
+                    .initAsSchemaVersion100()
+                    .base()
+                    .maskSaveWithCurrentCrudObject(crudObject)
+                    .maskDeleteWithSave()
+                    .build();
+        } else {
+            this.myActions = new MyActions.Build(this.getMyProject().getViewerRole(), this.getDb(), roleMap, searchObject, actions, fmsScriptRunner)
+                    .init()
+                    .base()
+                    .maskSaveWithCurrentCrudObject(crudObject)
+                    .maskDeleteWithSave()
+                    .build();
+        }
+
         this.esignable = this.myActions.isEsign();
     }
 
@@ -1039,7 +1050,15 @@ public class MyForm implements MyFormXs {
         }
 
         public Builder maskDimension() throws Exception {
+            if (SCHEMA_VERSION_110.equals(dbObjectForm.get(SCHEMA_VERSION))) {
+                maskDimensionSchemaVersion110();
+            } else {
+                maskDimensionNoSchema();
+            }
+            return this;
+        }
 
+        public void maskDimensionNoSchema() throws Exception {
             Object dim = dbObjectForm.get(DIMENSION_LOWER_CASE);
 
             if (dim instanceof Document) {
@@ -1056,8 +1075,50 @@ public class MyForm implements MyFormXs {
             if (this.myForm.dimension == null) {
                 this.myForm.dimension = 0;
             }
+        }
 
-            return this;
+        public void maskDimensionSchemaVersion110() throws Exception {
+
+            Document dimension = dbObjectForm.get(DIMENSION_LOWER_CASE, Document.class);
+
+            String value = dimension.get("value", String.class);
+
+            if (value != null) {
+                switch (value) {
+                    case "page":
+                        this.myForm.dimension = 0;
+                        return;
+                    case "table":
+                        this.myForm.dimension = 1;
+                        return;
+                    case "grid":
+                        this.myForm.dimension = 2;
+                        return;
+                    default:
+                        throw new UnsupportedOperationException();
+                }
+            }
+
+            List<Document> list = dimension.get("list", List.class);
+
+            for (Document doc : list) {
+                List<String> listOfRoles = (List<String>) doc.get("roles");
+                if (listOfRoles == null || this.myForm.roleMap.isUserInRole(listOfRoles)) {
+
+                    switch (doc.get(VALUE).toString()) {
+                        case "page":
+                            this.myForm.dimension = 0;
+                            return;
+                        case "table":
+                            this.myForm.dimension = 1;
+                            return;
+                        case "grid":
+                            this.myForm.dimension = 2;
+                            return;
+
+                    }
+                }
+            }
         }
 
         public Builder maskVersionFields() {
@@ -1183,12 +1244,19 @@ public class MyForm implements MyFormXs {
 
         public Builder maskAutosetFields() throws Exception {
 
+            if (MyForm.SCHEMA_VERSION_110.equals(this.myForm.getSchemaVersion())) {
+                maskAutosetFieldsSchemaVersion110();
+            } else {
+                maskAutosetFieldsNoSchema();
+            }
+            return this;
+        }
+
+        private void maskAutosetFieldsNoSchema() throws Exception {
             for (String fieldKey : this.myForm.getFields().keySet()) {
                 MyField field = this.myForm.getField(fieldKey);
 
-                Object autosetAttr = field.getAutoset();
-
-                if (autosetAttr != null) {
+                if (field.getAutoset()) {
                     if (field.getItemsAsMyItems() == null) {
                         throw new Exception(String.format(""
                                 + "<b>Module Config File Validataion Failed.</b></br></br>"
@@ -1200,41 +1268,39 @@ public class MyForm implements MyFormXs {
 
                     if (!this.myForm.roleMap.isUserInRole(this.myForm.myProject.getAdminAndViewerRole())
                             || this.myForm.dimension.intValue() >= 2) {
-
-                        if (autosetAttr instanceof Boolean && Boolean.TRUE.equals(autosetAttr)) {
-                            this.myForm.autosetFields.add(field);
-                        } else if (autosetAttr instanceof Document) {
-
-                            Document onUserRoleMap = ((Document) autosetAttr);
-
-                            Set<String> roles = onUserRoleMap.keySet();
-
-                            int maxPriority = 0;
-                            String value = ACCEPT;
-
-                            for (String role : roles) {
-                                if (this.myForm.roleMap.isUserInRole(role)) {
-                                    Document roleDef = (Document) ((Document) field.getAutoset()).get(role);
-                                    int rolePriority = ((Number) roleDef.get(PRIORITY)).intValue();
-                                    if (rolePriority > maxPriority) {
-                                        maxPriority = rolePriority;
-                                        value = ((String) roleDef.get(VALUE));
-                                    }
-                                }
-                            }
-                            if (ACCEPT.equals(value)) {
-                                this.myForm.autosetFields.add(field);
-                            }
-                        } else {
-                            this.myForm.autosetFields.add(field);
-                        }
+                        this.myForm.autosetFields.add(field);
                     }
                 }
             }
 
             Collections.sort(this.myForm.autosetFields, new MyFieldComparator());
 
-            return this;
+        }
+
+        private void maskAutosetFieldsSchemaVersion110() throws Exception {
+
+            for (String fieldKey : this.myForm.getFields().keySet()) {
+
+                MyField field = this.myForm.getField(fieldKey);
+
+                if (field.getAutoset()) {
+                    if (field.getItemsAsMyItems() == null) {
+                        throw new Exception(String.format(""
+                                + "<b>Module Config File Validataion Failed.</b></br></br>"
+                                + "There is an autoset field \"%s\" without \"items\" property.</br>"
+                                + "Please make an ensure that this field shoud be defined as \"autoset\".</br>"
+                                + "You must define an \"items\" property for this field in case of ensuring for above mentioned.", //
+                                field.getName()));
+                    }
+
+                    if (!this.myForm.roleMap.isUserInRole(this.myForm.myProject.getAdminAndViewerRole())
+                            || this.myForm.dimension.intValue() >= 2) {
+                        this.myForm.autosetFields.add(field);
+                    }
+                }
+            }
+
+            Collections.sort(this.myForm.autosetFields, new MyFieldComparator());
         }
 
         public Builder validateForm() throws Exception {
@@ -1536,7 +1602,7 @@ public class MyForm implements MyFormXs {
             // unexpected properties //FIXME typesafe
             this.myForm.dbo = dbObjectForm;
             this.myForm.actions = dbObjectForm.get(CONFIG_ATTR_ACTIONS);
-            this.myForm.calculateQuery = dbObjectForm.get(CALCULATE_QUERY);
+            this.myForm.calculateTag = new CalculateTag(dbObjectForm.get(CALCULATE_REF, Document.class));
 
             // json properties
             if (dbObjectForm.get(CONSTRAINT_ITEMS) instanceof Document) {
