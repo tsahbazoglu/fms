@@ -748,7 +748,7 @@ public class CtrlService extends CommonSrv {
 
         MyForm constraintFormDef = appScopeSrvCtrl.getFormDefinitionByKey(configCollection, "constraint", filter);
 
-        Object constraintQuery = constraintFormDef.getMyNamedQueries().get("overAllCheck");
+        String overAllCheck = constraintFormDef.getMyNamedQueries().get("overAllCheck", String.class);
 
         /*
          overAllCheck: function(searchObject){
@@ -764,35 +764,33 @@ public class CtrlService extends CommonSrv {
          }
          } 
          */
-        if (constraintQuery instanceof Code) {
-            Code func = new Code(((Code) constraintQuery).getCode().replace(DIEZ, DOLAR));
+        overAllCheck = overAllCheck.replace(DIEZ, DOLAR);
 
-            Document tempSearchObject = new Document();
+        Document tempSearchObject = new Document();
 
-            if (loginController.isUserInRole(formService.getMyForm().getMyProject().getAdminRole())) {
-                tempSearchObject.put(
-                        formService.getMyForm().getLoginFkField(), filter.get(formService.getMyForm().getLoginFkField()));
-                tempSearchObject.put(
-                        PERIOD, filter.get(PERIOD));
-                tempSearchObject.put(
-                        TEMPLATE, filter.get(TEMPLATE));
-            } else {
-                tempSearchObject.put(
-                        formService.getMyForm().getLoginFkField(), loginController.getLoggedUserDetail().getDbo().getObjectId());
-                tempSearchObject.put(
-                        PERIOD, filter.get(PERIOD));
-                tempSearchObject.put(
-                        TEMPLATE, filter.get(TEMPLATE));
-            }
-
-            Document commandResult = mongoDbUtil
-                    .runCommand(formService.getMyForm().getDb(), func.getCode(), tempSearchObject, null);
-
-            constraintQuery = commandResult.get(RETVAL);
+        if (loginController.isUserInRole(formService.getMyForm().getMyProject().getAdminRole())) {
+            tempSearchObject.put(
+                    formService.getMyForm().getLoginFkField(), filter.get(formService.getMyForm().getLoginFkField()));
+            tempSearchObject.put(
+                    PERIOD, filter.get(PERIOD));
+            tempSearchObject.put(
+                    TEMPLATE, filter.get(TEMPLATE));
+        } else {
+            tempSearchObject.put(
+                    formService.getMyForm().getLoginFkField(), loginController.getLoggedUserDetail().getDbo().getObjectId());
+            tempSearchObject.put(
+                    PERIOD, filter.get(PERIOD));
+            tempSearchObject.put(
+                    TEMPLATE, filter.get(TEMPLATE));
         }
 
+        Document commandResult = mongoDbUtil
+                .runCommand(formService.getMyForm().getDb(), overAllCheck, tempSearchObject, null);
+
+        Document constraintQuery = commandResult.get(RETVAL, Document.class);
+
         List<Document> constraintCursor = mongoDbUtil
-                .find(constraintFormDef.getDb(), constraintFormDef.getTable(), (Document) constraintQuery, new Document(TRANSFER_ORDER, 1), null);
+                .find(constraintFormDef.getDb(), constraintFormDef.getTable(), constraintQuery, new Document(TRANSFER_ORDER, 1), null);
 
         boolean checkTestControl = false;//to accelarate followed loop
         List listOfTestControlNo = new ArrayList();
@@ -830,11 +828,11 @@ public class CtrlService extends CommonSrv {
         if (eventList != null) {
             for (String eventKey : eventList.keySet()) {
                 Document dbObject = (Document) eventList.get(eventKey);
-                Code checkAndWriteControlResultFunc = (Code) dbObject.get(CHECK_AND_WRITE_CONTROL_RESULT_FUNCTION);
+                String checkAndWriteControlResultFunc = dbObject.get(CHECK_AND_WRITE_CONTROL_RESULT_FUNCTION, String.class);
                 if (checkAndWriteControlResultFunc != null && !loginController.isUserInRole(formService.getMyForm().getMyProject().getAdminAndViewerRole())) {
-                    checkAndWriteControlResultFunc = new Code(checkAndWriteControlResultFunc.getCode().replace(DIEZ, DOLAR));
+                    checkAndWriteControlResultFunc = checkAndWriteControlResultFunc.replace(DIEZ, DOLAR);
                     mongoDbUtil
-                            .runCommand(dbObject.get(FORM_DB).toString(), checkAndWriteControlResultFunc.getCode(), filter, loginController.getRolesAsSet());
+                            .runCommand(dbObject.get(FORM_DB).toString(), checkAndWriteControlResultFunc, filter, loginController.getRolesAsSet());
                 }
             }
         }
@@ -850,16 +848,16 @@ public class CtrlService extends CommonSrv {
             if (eventList != null) {
                 for (String eventKey : eventList.keySet()) {
                     Document dbObject = (Document) eventList.get(eventKey);
-                    Code appearFunction = (Code) dbObject.get(LOOK_TO_CONTROL_RESULT_FUNC);
+                    String appearFunction = dbObject.get(LOOK_TO_CONTROL_RESULT_FUNC, String.class);
 
                     if (appearFunction == null) {
-                        appearFunction = (Code) dbObject.get(APPEAR_FUNCTION);
+                        appearFunction = dbObject.get(APPEAR_FUNCTION, String.class);
                     }
 
                     if (appearFunction != null && !loginController.isUserInRole(formService.getMyForm().getMyProject().getAdminAndViewerRole())) {
-                        appearFunction = new Code(appearFunction.getCode().replace(DIEZ, DOLAR));
+                        appearFunction = appearFunction.replace(DIEZ, DOLAR);
 
-                        Document commandResult = mongoDbUtil.runCommand(dbObject.get(FORM_DB).toString(), appearFunction.getCode(),
+                        Document commandResult = mongoDbUtil.runCommand(dbObject.get(FORM_DB).toString(), appearFunction,
                                 filter, loginController.getRolesAsSet());
 
                         Object value = commandResult.get(RETVAL);
