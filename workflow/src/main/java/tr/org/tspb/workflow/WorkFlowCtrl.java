@@ -207,11 +207,11 @@ public class WorkFlowCtrl implements FmsWorkFlow {
         this.crudObject = crudbject;
         this.filter = filter;
 
-        MyField smPreStateField = ogmCreator.getMyField(myForm, smPreState, filter, loginController.getRoleMap());
-        MyField smStateField = ogmCreator.getMyField(myForm, smState, filter, loginController.getRoleMap());
-        MyField smResultField = ogmCreator.getMyField(myForm, smResult, filter, loginController.getRoleMap());
-        MyField smTriggerField = ogmCreator.getMyField(myForm, smTrigger, filter, loginController.getRoleMap());
-        MyField smTriggerDateField = ogmCreator.getMyField(myForm, smTrigerDate, filter, loginController.getRoleMap());
+        MyField smPreStateField = ogmCreator.getMyField(myForm, smPreState, filter, loginController.getRoleMap(), loginController.getLoggedUserDetail());
+        MyField smStateField = ogmCreator.getMyField(myForm, smState, filter, loginController.getRoleMap(), loginController.getLoggedUserDetail());
+        MyField smResultField = ogmCreator.getMyField(myForm, smResult, filter, loginController.getRoleMap(), loginController.getLoggedUserDetail());
+        MyField smTriggerField = ogmCreator.getMyField(myForm, smTrigger, filter, loginController.getRoleMap(), loginController.getLoggedUserDetail());
+        MyField smTriggerDateField = ogmCreator.getMyField(myForm, smTrigerDate, filter, loginController.getRoleMap(), loginController.getLoggedUserDetail());
 
         this.fieldsAsList = new ArrayList<>();
 
