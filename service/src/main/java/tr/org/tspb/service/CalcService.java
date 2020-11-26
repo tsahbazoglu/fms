@@ -83,29 +83,17 @@ public class CalcService extends CommonSrv {
 
         resetMapCalculateCache();
 
-        if (myForm.getCalculateCollection() == null && myForm.getCalculateQuery() == null) {
+        if (!myForm.getCalculateQuery().isAvailable()) {
             return;
         }
 
         Map calculateAreaSearchMap = new HashMap();
 
-        Object calculateQuery = myForm.getCalculateQuery();
-
-        if (calculateQuery == null || calculateQuery instanceof String) {
-            calculateAreaSearchMap.put(FORM_DB, myForm.getDb());
-            calculateAreaSearchMap.put(RELATIONS, myForm.getForm());
-        }
-
-        if (calculateQuery == null) {
-            calculateAreaSearchMap.put(COLLECTION, myForm.getCalculateCollection());
-        } else if (calculateQuery instanceof String) {
-            calculateAreaSearchMap.put(COLLECTION, myForm.getCalculateQuery());
-        } else if (calculateQuery instanceof Code) {
-            Code code = (Code) calculateQuery;
-            Document commandResult = mongoDbUtil.runCommand(myForm.getDb(), code.getCode(), filter, null);
+        if (myForm.getCalculateQuery().isFunction()) {
+            Document commandResult = mongoDbUtil.runCommand(myForm.getDb(), myForm.getCalculateQuery().getFunc(), filter, null);
             calculateAreaSearchMap.putAll(((Document) commandResult.get(RETVAL)));
-        } else if (calculateQuery instanceof Document) {
-            calculateAreaSearchMap.putAll(((Document) calculateQuery));
+        } else if (myForm.getCalculateQuery().isDocument()) {
+            calculateAreaSearchMap.putAll(myForm.getCalculateQuery().getDoc());
         }
 
         List<Document> calculateFormulasRelatedToForm;
@@ -218,29 +206,17 @@ public class CalcService extends CommonSrv {
 
         resetMapCalculateCache();
 
-        if (myForm.getCalculateCollection() == null && myForm.getCalculateQuery() == null) {
+        if (!myForm.getCalculateQuery().isAvailable()) {
             return;
         }
 
         Map calculateAreaSearchMap = new HashMap();
 
-        Object calculateQuery = myForm.getCalculateQuery();
-
-        if (calculateQuery == null || calculateQuery instanceof String) {
-            calculateAreaSearchMap.put(FORM_DB, myForm.getDb());
-            calculateAreaSearchMap.put(RELATIONS, myForm.getForm());
-        }
-
-        if (calculateQuery == null) {
-            calculateAreaSearchMap.put(COLLECTION, myForm.getCalculateCollection());
-        } else if (calculateQuery instanceof String) {
-            calculateAreaSearchMap.put(COLLECTION, myForm.getCalculateQuery());
-        } else if (calculateQuery instanceof Code) {
-            Code code = (Code) calculateQuery;
-            Document commandResult = mongoDbUtil.runCommand(myForm.getDb(), code.getCode(), filter, null);
+        if (myForm.getCalculateQuery().isFunction()) {
+            Document commandResult = mongoDbUtil.runCommand(myForm.getDb(), myForm.getCalculateQuery().getFunc(), filter, null);
             calculateAreaSearchMap.putAll(((Document) commandResult.get(RETVAL)));
-        } else if (calculateQuery instanceof Document) {
-            calculateAreaSearchMap.putAll(((Document) calculateQuery));
+        } else if (myForm.getCalculateQuery().isDocument()) {
+            calculateAreaSearchMap.putAll(myForm.getCalculateQuery().getDoc());
         }
 
         List<Document> calculateFormulasRelatedToForm;
