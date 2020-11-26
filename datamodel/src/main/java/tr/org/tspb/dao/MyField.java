@@ -29,6 +29,8 @@ public class MyField {
     private static final String DEFAULT_CURRENT_VALUE = "defaultCurrentValue";
     private static final String DEFAULT_HISTORY_VALUE = "defaultHistoryValue";
 
+    private ObjectId loginMemberId;
+
 // <editor-fold defaultstate="collapsed" desc="encapsulated fields">
 
     /*
@@ -673,7 +675,7 @@ public class MyField {
         if (query != null && query.length() >= 1) {
             Document queryRexegIgnoreCaseQuery = new Document().append(DOLAR_REGEX, query).append(DOLAR_OPTIONS, "i");
             search.put(itemsAsMyItems.getSearchField(), queryRexegIgnoreCaseQuery);
-            itemsAsMyItems.reCreateQuery(search, crudRecord, fmsAutoComplete.getRoleMap(), fmsScriptRunner);
+            itemsAsMyItems.reCreateQuery(loginMemberId, search, crudRecord, fmsAutoComplete.getRoleMap(), fmsScriptRunner);
         }
         Document resultFilter = new Document(search);
         resultFilter.putAll(itemsAsMyItems.getQuery());
@@ -683,7 +685,7 @@ public class MyField {
     public void createSelectItems(Map filter, MyMap crudObject, RoleMap roleMap, UserDetail userDetail, boolean ajax) {
         if (this.itemsAsMyItems != null) {
             if (ajax) {
-                this.itemsAsMyItems.reCreateQuery(filter, crudObject, roleMap, fmsScriptRunner);
+                this.itemsAsMyItems.reCreateQuery(loginMemberId, filter, crudObject, roleMap, fmsScriptRunner);
             }
             this.selectItemsCurrent = fmsAutoComplete.createSelectItems(filter, crudObject);
             this.selectItemsHistory = fmsAutoComplete.createSelectItemsHistory(filter, crudObject);
@@ -752,10 +754,12 @@ public class MyField {
             this.myField.dbo = docField;
         }
 
-        public Builder(MyProject myProject, Document docField, FmsScriptRunner fmsScriptRunner) {
+        public Builder(ObjectId loginMemberId, MyProject myProject, Document docField, FmsScriptRunner fmsScriptRunner) {
 
             this.myProject = myProject;
             this.myField = new MyField();
+            //
+            this.myField.loginMemberId = loginMemberId;
             //
             this.myField.fmsScriptRunner = fmsScriptRunner;
             this.myField._id = (ObjectId) docField.get(MONGO_ID);
@@ -976,10 +980,10 @@ public class MyField {
             } else if (itemsDoc.get("ref") != null) {
                 Object items = itemsDoc.get("ref");
                 this.myField.itemsAsMyItems = new MyItems.Builder(filter, items, myField.fmsScriptRunner)
-                        .withQuerySchemaVersion110(admin)
+                        .withQuerySchemaVersion110(this.myField.loginMemberId, admin)
                         .withSortSchemaVersion110(roles)
                         .withViewSchemaVersion110(roles)
-                        .withHistoryQuerySchemaVersion110(admin)
+                        .withHistoryQuerySchemaVersion110(this.myField.loginMemberId, admin)
                         .withItemType(MyItems.ItemType.doc)
                         .withLookup()
                         .withQueryProjection()
