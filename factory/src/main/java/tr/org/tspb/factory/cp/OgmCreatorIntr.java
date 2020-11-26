@@ -44,9 +44,9 @@ public interface OgmCreatorIntr extends Serializable {
             RoleMap loginController, UserDetail userDetail)
             throws NullNotExpectedException, MongoOrmFailedException;
 
-    MyField getMyField(MyForm myForm, Document docField, Map searchObject, RoleMap roleMap);
+    MyField getMyField(MyForm myForm, Document docField, Map searchObject, RoleMap roleMap, UserDetail userDetail);
 
-    MyField getMyFieldPivot(MyForm myForm, Document docField, Map searchObject, RoleMap roleMap);
+    MyField getMyFieldPivot(MyForm myForm, Document docField, Map searchObject, RoleMap roleMap, UserDetail userDetail);
 
     public MyMap getCrudObject();
 

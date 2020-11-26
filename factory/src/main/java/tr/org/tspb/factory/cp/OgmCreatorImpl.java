@@ -542,7 +542,7 @@ public class OgmCreatorImpl implements OgmCreatorIntr {
 
                 Converter converter = createConverter(docForm, docField);
 
-                MyField myField = new MyField.Builder(myProject, docField, fmsScriptRunner)
+                MyField myField = new MyField.Builder(userDetail.getDbo().getObjectId(), myProject, docField, fmsScriptRunner)
                         .maskAutoset((String) docForm.get(MyForm.SCHEMA_VERSION), roleMap)
                         .maskShortName()
                         .maskCode()
@@ -589,7 +589,7 @@ public class OgmCreatorImpl implements OgmCreatorIntr {
 
                 Converter converter = createConverter(docForm, docField);
 
-                MyField myField = new MyField.Builder(myProject, docField, fmsScriptRunner)
+                MyField myField = new MyField.Builder(userDetail.getDbo().getObjectId(), myProject, docField, fmsScriptRunner)
                         .maskAutoset((String) docForm.get(MyForm.SCHEMA_VERSION), roleMap)
                         .maskShortName()
                         .maskCode()
@@ -636,7 +636,7 @@ public class OgmCreatorImpl implements OgmCreatorIntr {
 
                 Converter converter = createConverter(docForm, docField);
 
-                MyField myField = new MyField.Builder(myProject, docField, fmsScriptRunner)
+                MyField myField = new MyField.Builder(userDetail.getDbo().getObjectId(), myProject, docField, fmsScriptRunner)
                         .maskAutoset((String) docForm.get(MyForm.SCHEMA_VERSION), roleMap)
                         .maskShortName()
                         .maskCode()
@@ -749,15 +749,14 @@ public class OgmCreatorImpl implements OgmCreatorIntr {
     }
 
     @Override
-    public MyField getMyField(MyForm myForm, Document docField, Map filter, RoleMap roleMap
-    //FIXME add userDetail argument
-    ) {
+    public MyField getMyField(MyForm myForm, Document docField, Map filter,
+            RoleMap roleMap, UserDetail userDetail) {
 
         Converter converter = createConverter(myForm.getDbo(), docField);
 
         calcReadOnly(docField, filter, roleMap);
 
-        return new MyField.Builder(myForm.getMyProject(), docField, fmsScriptRunner)
+        return new MyField.Builder(userDetail.getDbo().getObjectId(), myForm.getMyProject(), docField, fmsScriptRunner)
                 .maskAutoset(myForm.getSchemaVersion(), roleMap)
                 .maskShortName()
                 .maskCode()
@@ -779,14 +778,12 @@ public class OgmCreatorImpl implements OgmCreatorIntr {
     }
 
     @Override
-    public MyField getMyFieldPivot(MyForm myForm, Document docField, Map filter, RoleMap roleMap
-    //add userDetail argument
-    ) {
+    public MyField getMyFieldPivot(MyForm myForm, Document docField, Map filter, RoleMap roleMap, UserDetail userDetail) {
         Converter converter = createConverter(myForm.getDbo(), docField);
 
         calcReadOnly(docField, filter, roleMap);
 
-        return new MyField.Builder(myForm.getMyProject(), docField, fmsScriptRunner)
+        return new MyField.Builder(userDetail.getDbo().getObjectId(), myForm.getMyProject(), docField, fmsScriptRunner)
                 .maskAutoset(myForm.getSchemaVersion(), roleMap)
                 .maskShortName()
                 .maskCode()
