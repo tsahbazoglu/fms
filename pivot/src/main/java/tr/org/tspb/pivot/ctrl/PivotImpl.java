@@ -440,8 +440,9 @@ public abstract class PivotImpl implements Serializable, PivotApi {
                     map.put(LIST_OF_VALUES, listDimensionZAXIS);
                     map.put(MY_CONVERTER, new SelectOneStringConverter());
 
-                    dimensionZet.add(ogmCreator//
-                            .getMyFieldPivot(myForm, new Document(map), getFilter(), loginController.getRoleMap()));
+                    dimensionZet.add(ogmCreator
+                            .getMyFieldPivot(myForm, new Document(map), getFilter(),
+                                    loginController.getRoleMap(), loginController.getLoggedUserDetail()));
                     break;
                 case doc:
 
@@ -502,7 +503,8 @@ public abstract class PivotImpl implements Serializable, PivotApi {
                     map.put(LIST_OF_VALUES, zetDimensionItems);
                     map.put(MY_CONVERTER, zetAxisConverter);
                     dimensionZet.add(ogmCreator//
-                            .getMyFieldPivot(myForm, new Document(map), getFilter(), loginController.getRoleMap()));
+                            .getMyFieldPivot(myForm, new Document(map), getFilter(),
+                                    loginController.getRoleMap(), loginController.getLoggedUserDetail()));
                     break;
 
             }
