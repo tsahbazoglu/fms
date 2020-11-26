@@ -1,6 +1,7 @@
 package tr.org.tspb.dao;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import static tr.org.tspb.constants.ProjectConstants.*;
 import java.util.Collections;
 import java.util.Comparator;
@@ -10,6 +11,8 @@ import java.util.Map.Entry;
 import java.util.Set;
 import org.bson.Document;
 import org.bson.types.Code;
+import org.bson.types.ObjectId;
+import tr.org.tspb.constants.ProjectConstants;
 import tr.org.tspb.datamodel.expected.FmsScriptRunner;
 import tr.org.tspb.pojo.RoleMap;
 
@@ -34,6 +37,8 @@ public class MyItems {
         mongo
     }
 
+    private MyField myField;
+
     private ScriptEnv scriptEnv;
     private ItemType itemType;
     private MyLookup lookup;
@@ -52,6 +57,7 @@ public class MyItems {
     private List list;
     private Code code;
     private Code queryCode;
+    private Document itemsDoc;
 
     @Override
     public String toString() {
@@ -284,61 +290,11 @@ public class MyItems {
             return this;
         }
 
-        public Builder withQuerySchemaVersion110(boolean admin) {
-
-            Document dbo = (Document) items;
-
-            Document query_ = dbo.get(QUERY, Document.class);
-            if (admin && dbo.get(ADMIN_QUERY) != null) {
-                query_ = dbo.get(ADMIN_QUERY, Document.class);
-            }
-
-            this.myItems.query = new Document();
-
-            if (query_.get("func") != null) {
-                this.myItems.queryCode = new Code(query_.get("func", String.class));
-                try {
-                    this.myItems.query = (Document) fmsScriptRunner
-                            .runCommand(this.myItems.db, this.myItems.queryCode.getCode(), filter)
-                            .get(RETVAL);
-                } catch (Exception exception) {
-                    this.myItems.query = new Document("fms_item_query_code_error", "fms_item_query_code_error");
-                }
-            } else if (query_.get("list") != null) {
-
-                for (Document d : (List<Document>) query_.get("list")) {
-
-                    String key = d.get("key", String.class);
-                    String type = d.get("type", String.class);
-
-                    if (type == null) {
-                        type = "string";
-                    }
-
-                    switch (type) {
-                        case "number":
-                            this.myItems.query.put(key, d.get("value", Number.class));
-                            break;
-                        case "string":
-                            this.myItems.query.put(key, d.get("value", String.class).replaceAll(DIEZ, DOLAR));
-                            break;
-                        default:
-                            this.myItems.query.put(key, d.get("value", String.class).replaceAll(DIEZ, DOLAR));
-                            break;
-                    }
-
-                }
-            }
-
-            return this;
-        }
-
         public Builder withHistoryQuery(boolean admin) {
 
             Document dbo = (Document) items;
 
             Object historyQuery_ = dbo.get(HISTORY_QUERY);
-
             if (admin && dbo.get(ADMIN_QUERY) != null) {
                 historyQuery_ = dbo.get(ADMIN_QUERY);
             }
@@ -354,6 +310,18 @@ public class MyItems {
                 this.myItems.historyQuery = this.myItems.query;
             }
 
+            return this;
+        }
+
+        public Builder withQuerySchemaVersion110(ObjectId loginMemberId, boolean admin) {
+            this.myItems.itemsDoc = (Document) items;
+            this.myItems.createCurrentQuery(loginMemberId, admin, filter, fmsScriptRunner);
+            return this;
+        }
+
+        public Builder withHistoryQuerySchemaVersion110(ObjectId loginMemberId, boolean admin) {
+            this.myItems.itemsDoc = (Document) items;
+            this.myItems.createHistoryQuery(loginMemberId, admin, filter, fmsScriptRunner);
             return this;
         }
 
@@ -446,6 +414,11 @@ public class MyItems {
             return this;
         }
 
+        public Builder withParent(MyField myField) {
+            this.myItems.myField = myField;
+            return this;
+        }
+
         public MyItems build() {
             return this.myItems;
         }
@@ -483,21 +456,202 @@ public class MyItems {
         }
     }
 
-    public void reCreateQuery(Map filter, MyMap crudObject, RoleMap roleMap, FmsScriptRunner fmsScriptRunner) {
+    public void reCreateQuery(ObjectId loginMemberId, Map filter, MyMap crudObject, RoleMap roleMap, FmsScriptRunner fmsScriptRunner) {
         if (queryCode != null) {
             Document tempDbObject = new Document(crudObject);
             tempDbObject.remove(INODE); // INODE is not serialized
             if (filter != null) {
                 tempDbObject.putAll(filter);
             }
+
             Object object = fmsScriptRunner
                     .runCommand(db, queryCode.getCode(), tempDbObject)
                     .get(RETVAL);
+
             if (object instanceof Document) {
                 this.query = (Document) object;
             } else {
                 this.query = new Document("noresult", "noresult");
             }
+        } else {
+            boolean admin = roleMap.isUserInRole(myField.getMyForm().getMyProject().getAdminAndViewerRole());
+            createCurrentQuery(loginMemberId, admin, filter, fmsScriptRunner);
+        }
+    }
+
+    private void createCurrentQuery(ObjectId loginMemberId, boolean admin, Map filter, FmsScriptRunner fmsScriptRunner) throws RuntimeException {
+
+        Document query_ = itemsDoc.get(QUERY, Document.class);
+        if (admin && itemsDoc.get(ADMIN_QUERY) != null) {
+            query_ = itemsDoc.get(ADMIN_QUERY, Document.class);
+        }
+
+        this.query = new Document();
+
+        String func = query_.get("func", String.class);
+        List<Document> listOfFilter = query_.get("list", List.class);
+
+        if (func != null) {
+            this.queryCode = new Code(func);
+            try {
+                this.query = (Document) fmsScriptRunner
+                        .runCommand(this.db, this.queryCode.getCode(), filter)
+                        .get(RETVAL);
+            } catch (Exception exception) {
+                this.query = new Document("fms_item_query_code_error", "fms_item_query_code_error");
+            }
+        } else if (listOfFilter != null) {
+
+            for (Document d : listOfFilter) {
+
+                String key = d.get("key", String.class);
+
+                Document refValue = d.get("ref-value", Document.class);
+                String fmsValue = d.get("fms-value", String.class);
+                String strValue = d.get("string-value", String.class);
+                Number numberValue = d.get("number-value", Number.class);
+
+                if (refValue != null) {
+                    this.query.put(key, new ItemsQueryRef(refValue, filter, fmsScriptRunner).value());
+                } else if (fmsValue != null) {
+                    switch (fmsValue) {
+                        case ProjectConstants.REPLACEABLE_KEY_WORD_FOR_FUNCTONS_FILTER_PERIOD:
+                            this.query.put(key, filter.get("period") == null ? "no result" : filter.get("period"));
+                            break;
+                        case ProjectConstants.REPLACEABLE_KEY_WORD_FOR_FUNCTONS_FILTER_TEMPLATE:
+                            this.query.put(key, filter.get("template") == null ? "no result" : filter.get("template"));
+                            break;
+                        case ProjectConstants.REPLACEABLE_KEY_WORD_FOR_FUNCTONS_LOGIN_MEMBER_ID:
+                            this.query.put(key, loginMemberId == null ? "no result" : loginMemberId);
+                            break;
+                        default:
+                            throw new RuntimeException("could not find replaceble word");
+                    }
+                } else if (strValue != null) {
+                    this.query.put(key, strValue);
+                } else if (numberValue != null) {
+                    this.query.put(key, numberValue);
+                } else {
+
+                    String type = d.get("type", String.class);
+                    if (type == null) {
+                        type = "string";
+                    }
+                    switch (type) {
+                        case "number":
+                            this.query.put(key, d.get(VALUE, Number.class));
+                            break;
+                        case "string":
+                            this.query.put(key, d.get(VALUE, String.class).replaceAll(DIEZ, DOLAR));
+                            break;
+                        case "in":
+                            this.query.put(key, new Document(DOLAR_IN, Arrays.asList(d.get(VALUE, String.class).replaceAll(DIEZ, DOLAR).split(","))));
+                            break;
+                        case "ne":
+                            this.query.put(key, new Document(DOLAR_NE, d.get(VALUE, String.class).replaceAll(DIEZ, DOLAR)));
+                            break;
+                        case "regex":
+                            this.query.put(key, new Document(DOLAR_REGEX, d.get(VALUE, String.class).replaceAll(DIEZ, DOLAR)));
+                            break;
+                        default:
+                            throw new UnsupportedOperationException("field.items.query.type is not supported  : " + type);
+                    }
+                }
+            }
+        } else {
+            throw new RuntimeException("field.items.query has not property func or list");
+        }
+    }
+
+    private void createHistoryQuery(ObjectId loginMemberId, boolean admin, Map filter, FmsScriptRunner fmsScriptRunner) throws RuntimeException {
+
+        Document historyQuery_ = itemsDoc.get(HISTORY_QUERY, Document.class);
+        if (admin && itemsDoc.get(ADMIN_QUERY) != null) {
+            historyQuery_ = itemsDoc.get(ADMIN_QUERY, Document.class);
+        }
+
+        if (historyQuery_ == null) {
+            this.historyQuery = this.query;
+            return;
+        }
+
+        this.historyQuery = new Document();
+
+        String func = historyQuery_.get("func", String.class);
+        List<Document> listOfFilter = historyQuery_.get("list", List.class);
+
+        if (func != null) {
+            try {
+                this.historyQuery = (Document) fmsScriptRunner
+                        .runCommand(this.db, func, filter)
+                        .get(RETVAL);
+            } catch (Exception exception) {
+                this.historyQuery = new Document("fms_item_query_code_error", "fms_item_query_code_error");
+            }
+        } else if (listOfFilter != null) {
+
+            for (Document d : listOfFilter) {
+
+                String key = d.get("key", String.class);
+
+                Document refValue = d.get("ref-value", Document.class);
+                String fmsValue = d.get("fms-value", String.class);
+                String strValue = d.get("string-value", String.class);
+                Number numberValue = d.get("number-value", Number.class);
+
+                if (refValue != null) {
+
+                    this.historyQuery.put(key, new ItemsQueryRef(refValue, filter, fmsScriptRunner).value());
+
+                } else if (fmsValue != null) {
+
+                    switch (fmsValue) {
+                        case ProjectConstants.REPLACEABLE_KEY_WORD_FOR_FUNCTONS_FILTER_PERIOD:
+                            this.historyQuery.put(key, filter.get("period") == null ? "no result" : filter.get("period"));
+                            break;
+                        case ProjectConstants.REPLACEABLE_KEY_WORD_FOR_FUNCTONS_FILTER_TEMPLATE:
+                            this.historyQuery.put(key, filter.get("template") == null ? "no result" : filter.get("template"));
+                            break;
+                        case ProjectConstants.REPLACEABLE_KEY_WORD_FOR_FUNCTONS_LOGIN_MEMBER_ID:
+                            this.historyQuery.put(key, loginMemberId == null ? "no result" : loginMemberId);
+                            break;
+                        default:
+                            throw new RuntimeException("could not find replaceble word");
+                    }
+
+                } else if (strValue != null) {
+                    this.historyQuery.put(key, strValue);
+                } else if (numberValue != null) {
+                    this.historyQuery.put(key, numberValue);
+                } else {
+
+                    String type = d.get("type", String.class);
+                    if (type == null) {
+                        type = "string";
+                    }
+                    switch (type) {
+                        case "number":
+                            this.historyQuery.put(key, d.get(VALUE, Number.class));
+                            break;
+                        case "string":
+                            this.historyQuery.put(key, d.get(VALUE, String.class).replaceAll(DIEZ, DOLAR));
+                            break;
+                        case "in":
+                            this.historyQuery.put(key, new Document(DOLAR_IN, Arrays.asList(d.get(VALUE, String.class).replaceAll(DIEZ, DOLAR).split(","))));
+                            break;
+                        case "ne":
+                            this.historyQuery.put(key, new Document(DOLAR_NE, d.get(VALUE, String.class).replaceAll(DIEZ, DOLAR)));
+                            break;
+                        case "regex":
+                            this.historyQuery.put(key, new Document(DOLAR_REGEX, d.get(VALUE, String.class).replaceAll(DIEZ, DOLAR)));
+                            break;
+                        default:
+                            throw new UnsupportedOperationException("field.items.query.type is not supported  : " + type);
+                    }
+                }
+            }
+        } else {
+            throw new RuntimeException("field.items.query has not property func or list");
         }
     }
 

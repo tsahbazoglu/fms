@@ -1709,6 +1709,9 @@ public class MyForm implements MyFormXs {
             this.myForm.fields = fields;
 
             for (MyField myField : fields.values()) {
+
+                myField.setMyForm(this.myForm);
+
                 if (INPUT_FILE.equals(myField.getComponentType())) {
                     myForm.hasAttachedFiles = true;
                 }

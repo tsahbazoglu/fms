@@ -30,6 +30,7 @@ public class MyField {
     private static final String DEFAULT_HISTORY_VALUE = "defaultHistoryValue";
 
     private ObjectId loginMemberId;
+    private MyForm myForm;
 
 // <editor-fold defaultstate="collapsed" desc="encapsulated fields">
 
@@ -744,6 +745,14 @@ public class MyField {
         return quickFilter;
     }
 
+    public MyForm getMyForm() {
+        return myForm;
+    }
+
+    public void setMyForm(MyForm myForm) {
+        this.myForm = myForm;
+    }
+
     public static class Builder {
 
         private final MyField myField;
@@ -948,11 +957,13 @@ public class MyField {
                         .withLookup()
                         .withQueryProjection()
                         .withResultProjection()
+                        .withParent(this.myField)
                         .build();
             } else if (items instanceof List) {
                 this.myField.itemsAsMyItems = new MyItems.Builder(items)
                         .withItemType(MyItems.ItemType.list)
                         .withList()
+                        .withParent(this.myField)
                         .build();
             } else if (items instanceof Code) {
                 throw new UnsupportedOperationException("maskItemsAsMyItems.code");
@@ -974,6 +985,7 @@ public class MyField {
                 this.myField.itemsAsMyItems = new MyItems.Builder(items)
                         .withItemType(MyItems.ItemType.list)
                         .withList()
+                        .withParent(this.myField)
                         .build();
             } else if (itemsDoc.get("func") != null) {
                 throw new UnsupportedOperationException("maskItemsAsMyItems.code");
@@ -988,6 +1000,7 @@ public class MyField {
                         .withLookup()
                         .withQueryProjection()
                         .withResultProjection()
+                        .withParent(this.myField)
                         .build();
             }
 
