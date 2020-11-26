@@ -195,21 +195,40 @@ public class FilterService extends CommonSrv {
     }
 
     public void createTableFilterCurrent(MyForm myForm) throws NullNotExpectedException {
-        this.tableFilterCurrent = FilterUtil.instance(mongoDbUtil, ogmCreatorIntr).createTableFilter(myForm,
-                baseFilterCurrent,
-                guiFiltersCurrent,
-                loginController.isUserInRole(formService.getMyForm().getMyProject().getAdminAndViewerRole()),
-                loginController.getLoggedUserDetail(),
-                loginController.getRoleMap());
+        if (MyForm.SCHEMA_VERSION_110.equals(myForm.getSchemaVersion())) {
+            this.tableFilterCurrent = FilterUtil.instance(mongoDbUtil, ogmCreatorIntr).createTableFilterSchemaVersion110(myForm,
+                    baseFilterCurrent,
+                    guiFiltersCurrent,
+                    loginController.isUserInRole(formService.getMyForm().getMyProject().getAdminAndViewerRole()),
+                    loginController.getLoggedUserDetail(),
+                    loginController.getRoleMap());
+        } else {
+            this.tableFilterCurrent = FilterUtil.instance(mongoDbUtil, ogmCreatorIntr).createTableFilter(myForm,
+                    baseFilterCurrent,
+                    guiFiltersCurrent,
+                    loginController.isUserInRole(formService.getMyForm().getMyProject().getAdminAndViewerRole()),
+                    loginController.getLoggedUserDetail(),
+                    loginController.getRoleMap());
+        }
     }
 
     public void createTableFilterHistory(MyForm myForm) throws NullNotExpectedException {
-        this.tableFilterHistory = FilterUtil.instance(mongoDbUtil, ogmCreatorIntr).createTableHistory(myForm,
-                baseFilterHistory,
-                guiFiltersHistory,
-                loginController.isUserInRole(formService.getMyForm().getMyProject().getAdminAndViewerRole()),
-                loginController.getLoggedUserDetail(),
-                loginController.getRoleMap());
+
+        if (MyForm.SCHEMA_VERSION_110.equals(myForm.getSchemaVersion())) {
+            this.tableFilterHistory = FilterUtil.instance(mongoDbUtil, ogmCreatorIntr).createTableHistoryScemaVersion110(myForm,
+                    baseFilterHistory,
+                    guiFiltersHistory,
+                    loginController.isUserInRole(formService.getMyForm().getMyProject().getAdminAndViewerRole()),
+                    loginController.getLoggedUserDetail(),
+                    loginController.getRoleMap());
+        } else {
+            this.tableFilterHistory = FilterUtil.instance(mongoDbUtil, ogmCreatorIntr).createTableHistory(myForm,
+                    baseFilterHistory,
+                    guiFiltersHistory,
+                    loginController.isUserInRole(formService.getMyForm().getMyProject().getAdminAndViewerRole()),
+                    loginController.getLoggedUserDetail(),
+                    loginController.getRoleMap());
+        }
     }
 
     public List<Document> createDocuments(MyItems myItems, MyForm selectedForm, Map<String, Object> filter, boolean history) {
