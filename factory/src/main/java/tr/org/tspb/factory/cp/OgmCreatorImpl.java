@@ -804,20 +804,27 @@ public class OgmCreatorImpl implements OgmCreatorIntr {
 
     }
 
+    /**
+     *
+     * @param myFormLarge
+     * @param roleMap
+     * @param filter
+     * @return
+     */
     @Override
-    public MyActions getMyActions(MyForm myFormLarge, RoleMap roleMap, Document filter) {
+    public MyActions getMyActions(MyForm myFormLarge, RoleMap roleMap, Document filter, UserDetail userDetail) {
 
         if (MyForm.SCHEMA_VERSION_100.equals(myFormLarge.getSchemaVersion())
                 || MyForm.SCHEMA_VERSION_110.equals(myFormLarge.getSchemaVersion())) {
             return new MyActions.Build(myFormLarge.getMyProject().getViewerRole(), myFormLarge.getDb(),
-                    roleMap, filter, myFormLarge.getActions(), fmsScriptRunner)
+                    roleMap, filter, myFormLarge.getActions(), fmsScriptRunner, userDetail)
                     .initAsSchemaVersion100()
                     .base()
                     .build();
         }
 
         return new MyActions.Build(myFormLarge.getMyProject().getViewerRole(), myFormLarge.getDb(),
-                roleMap, filter, myFormLarge.getActions(), fmsScriptRunner)
+                roleMap, filter, myFormLarge.getActions(), fmsScriptRunner, userDetail)
                 .init()
                 .base()
                 .build();
