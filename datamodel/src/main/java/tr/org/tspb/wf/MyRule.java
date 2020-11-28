@@ -16,6 +16,7 @@ import static tr.org.tspb.constants.ProjectConstants.FORMFIELDS;
 import tr.org.tspb.pojo.RoleMap;
 import org.bson.Document;
 import tr.org.tspb.datamodel.expected.FmsScriptRunner;
+import tr.org.tspb.pojo.UserDetail;
 
 /**
  *
@@ -36,6 +37,7 @@ public class MyRule implements Serializable {
     private boolean last;
     private Document dbo;
     private FmsScriptRunner fmsScriptRunner;
+    private UserDetail userDetail; //FIXME should be iitialized
 
     private List<MyTransition> transitions;
 
@@ -132,15 +134,17 @@ public class MyRule implements Serializable {
         }
     }
 
-    public void arrangeActions(MyForm myForm, RoleMap loginController, Document searchObject) {
-        this.myActions = new MyActions.Build(myForm.getMyProject().getViewerRole(), myForm.getDb(), loginController, searchObject, dbo.get(FORMACTIONS), fmsScriptRunner)
+    public void arrangeActions(MyForm myForm, RoleMap roleMap, Document searchObject) {
+        this.myActions = new MyActions.Build(myForm.getMyProject().getViewerRole(), myForm.getDb(),
+                roleMap, searchObject, dbo.get(FORMACTIONS), fmsScriptRunner, userDetail)
                 .init()
                 .base()
                 .build();
     }
 
-    public void arrangeActions(MyForm myForm, RoleMap loginController, Document searchObject, MyMap crudObject, Object actions) {
-        this.myActions = new MyActions.Build(myForm.getMyProject().getViewerRole(), myForm.getDb(), loginController, searchObject, actions, fmsScriptRunner)
+    public void arrangeActions(MyForm myForm, RoleMap roleMap, Document searchObject, MyMap crudObject, Object actions) {
+        this.myActions = new MyActions.Build(myForm.getMyProject().getViewerRole(), myForm.getDb(),
+                roleMap, searchObject, actions, fmsScriptRunner, userDetail)
                 .init()
                 .base()
                 .maskSaveWithCurrentCrudObject(crudObject)
