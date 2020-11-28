@@ -9,7 +9,7 @@ import tr.org.tspb.datamodel.expected.FmsScriptRunner;
  *
  * @author Telman Şahbazoğlu
  */
-public class ItemsQueryRef {
+public class TagItemsQueryRef {
 
     /*
     
@@ -29,7 +29,7 @@ public class ItemsQueryRef {
     private Document query;
     private FmsScriptRunner fmsScriptRunner;
 
-    public ItemsQueryRef(Document ref, Map filter, FmsScriptRunner fmsScriptRunner) {
+    public TagItemsQueryRef(Document ref, Map filter, FmsScriptRunner fmsScriptRunner) {
 
         this.fmsScriptRunner = fmsScriptRunner;
 
