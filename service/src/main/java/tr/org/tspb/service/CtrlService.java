@@ -1117,14 +1117,14 @@ public class CtrlService extends CommonSrv {
     }
 
     public List<Document> createConstraintCursor(Document docConstraintItems, Document filter) {
-        String constraintDB = (String) docConstraintItems.get(FORM_DB);
-        String constraintCollection = (String) docConstraintItems.get(COLLECTION);
+        String constraintDB = docConstraintItems.get(FORM_DB, String.class);
+        String constraintCollection = docConstraintItems.get(COLLECTION, String.class);
         Object constraintQuery = docConstraintItems.get(QUERY);
 
-        if (constraintQuery instanceof Code) {
+        if (constraintQuery instanceof String) {
 
             Document commandResult = mongoDbUtil
-                    .runCommand(formService.getMyForm().getDb(), ((Code) constraintQuery).getCode(), filter, null);
+                    .runCommand(formService.getMyForm().getDb(), constraintQuery.toString(), filter, null);
 
             constraintQuery = commandResult.get(RETVAL);
         }
