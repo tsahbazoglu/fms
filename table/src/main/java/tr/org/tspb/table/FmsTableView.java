@@ -87,7 +87,7 @@ public abstract class FmsTableView extends AbstractViewer {
         setData(new FmsTableDataModel(this));
 
         MyActions myActions = ogmCreator
-                .getMyActions(formService.getMyForm(), loginController.getRoleMap(), filter);
+                .getMyActions(formService.getMyForm(), loginController.getRoleMap(), filter, loginController.getLoggedUserDetail());
 
         formService.getMyForm().initActions(myActions);
 
