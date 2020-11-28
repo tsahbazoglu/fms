@@ -38,8 +38,12 @@ public class MyForm implements MyFormXs {
     private static final String ION_FORM_1160_NOTIFY_TYPE_000 = "ion_form_1160_notify_type_000";
     private static final String ION_SETTING_NOTIFY_TYPE_001 = "ion_setting_notify_type_001";
     private static final String ION_SETTING_NOTIFY_TYPE_000 = "ion_setting_notify_type_000";
-
+    //
+    public RoleMap roleMap;
+    public UserDetail userDetail;
+    public Map searchObject;
     private String loginFkField;
+    //    
     private String posAmountField;
     private String posOrderIdField;
     private String importTextFormat;
@@ -644,14 +648,16 @@ public class MyForm implements MyFormXs {
     public void arrangeActions(RoleMap roleMap, Document searchObject, MyMap crudObject) {
 
         if (MyForm.SCHEMA_VERSION_110.equals(this.getSchemaVersion())) {
-            this.myActions = new MyActions.Build(this.getMyProject().getViewerRole(), this.getDb(), roleMap, searchObject, actions, fmsScriptRunner)
+            this.myActions = new MyActions.Build(this.getMyProject().getViewerRole(), this.getDb(),
+                    roleMap, searchObject, actions, fmsScriptRunner, userDetail)
                     .initAsSchemaVersion100()
                     .base()
                     .maskSaveWithCurrentCrudObject(crudObject)
                     .maskDeleteWithSave()
                     .build();
         } else {
-            this.myActions = new MyActions.Build(this.getMyProject().getViewerRole(), this.getDb(), roleMap, searchObject, actions, fmsScriptRunner)
+            this.myActions = new MyActions.Build(this.getMyProject().getViewerRole(), this.getDb(),
+                    roleMap, searchObject, actions, fmsScriptRunner, userDetail)
                     .init()
                     .base()
                     .maskSaveWithCurrentCrudObject(crudObject)
@@ -810,10 +816,6 @@ public class MyForm implements MyFormXs {
             return false;
         }
     }
-
-    public RoleMap roleMap;
-    public UserDetail userDetail;
-    public Map searchObject;
 
     public static class Builder {
 
@@ -1095,7 +1097,7 @@ public class MyForm implements MyFormXs {
                         this.myForm.dimension = 2;
                         return;
                     default:
-                        throw new UnsupportedOperationException();
+                        throw new UnsupportedOperationException(value.concat(" is not in available values [page, table, grid]"));
                 }
             }
 
