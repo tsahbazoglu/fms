@@ -512,7 +512,7 @@ public class MyItems {
                 Number numberValue = d.get("number-value", Number.class);
 
                 if (refValue != null) {
-                    this.query.put(key, new ItemsQueryRef(refValue, filter, fmsScriptRunner).value());
+                    this.query.put(key, new TagItemsQueryRef(refValue, filter, fmsScriptRunner).value());
                 } else if (fmsValue != null) {
                     switch (fmsValue) {
                         case ProjectConstants.REPLACEABLE_KEY_WORD_FOR_FUNCTONS_FILTER_PERIOD:
@@ -601,7 +601,7 @@ public class MyItems {
 
                 if (refValue != null) {
 
-                    this.historyQuery.put(key, new ItemsQueryRef(refValue, filter, fmsScriptRunner).value());
+                    this.historyQuery.put(key, new TagItemsQueryRef(refValue, filter, fmsScriptRunner).value());
 
                 } else if (fmsValue != null) {
 
