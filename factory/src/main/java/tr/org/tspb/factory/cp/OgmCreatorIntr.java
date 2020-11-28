@@ -50,6 +50,6 @@ public interface OgmCreatorIntr extends Serializable {
 
     public MyMap getCrudObject();
 
-    public MyActions getMyActions(MyForm myFormLarge, RoleMap roleMap, Document filter);
+    public MyActions getMyActions(MyForm myFormLarge, RoleMap roleMap, Document filter, UserDetail userDetail);
 
 }
