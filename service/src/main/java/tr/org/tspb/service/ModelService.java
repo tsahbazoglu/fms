@@ -50,7 +50,7 @@ public class ModelService extends CommonSrv {
                         loginController.getRoleMap(), loginController.getLoggedUserDetail());
 
         MyActions myActions = ogmCreator
-                .getMyActions(myForm, loginController.getRoleMap(), new Document());
+                .getMyActions(myForm, loginController.getRoleMap(), new Document(), loginController.getLoggedUserDetail());
 
         myForm.initActions(myActions);
 
