@@ -604,7 +604,7 @@ public class RepositoryService implements Serializable {
         MyActions myActions = appScopeSrvCtrl.getCacheActions(cacheKey);
         // if (myActions == null) {
         myActions = ogmCreator
-                .getMyActions(myFormLarge, loginController.getRoleMap(), filterService.getBaseFilterCurrent());
+                .getMyActions(myFormLarge, loginController.getRoleMap(), filterService.getBaseFilterCurrent(), loginController.getLoggedUserDetail());
         appScopeSrvCtrl.putCacheActions(cacheKey, myActions);
         // }
         return myActions;
