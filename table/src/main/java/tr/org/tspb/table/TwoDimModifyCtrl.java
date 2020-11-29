@@ -461,7 +461,7 @@ public class TwoDimModifyCtrl extends FmsTable implements ActionListener {
         try {
             filterService.createTableFilterCurrent(formService.getMyForm());
             MyActions myActions = ogmCreator
-                    .getMyActions(formService.getMyForm(), loginController.getRoleMap(), filterService.getTableFilterCurrent());
+                    .getMyActions(formService.getMyForm(), loginController.getRoleMap(), filterService.getTableFilterCurrent(), loginController.getLoggedUserDetail());
             formService.getMyForm().initActions(myActions);
             //FIXME 02.10.2019 Volkan&Telman : set row count also on drawGUI phase
             ((FmsTableDataModel) getData()).initRowCount(findDataCount());
@@ -1097,7 +1097,8 @@ public class TwoDimModifyCtrl extends FmsTable implements ActionListener {
                     armActionAtrrs();
 
                     MyActions myActions = ogmCreator
-                            .getMyActions(formService.getMyForm(), loginController.getRoleMap(), filterService.getTableFilterCurrent());
+                            .getMyActions(formService.getMyForm(), loginController.getRoleMap(),
+                                    filterService.getTableFilterCurrent(), loginController.getLoggedUserDetail());
 
                     formService.getMyForm().initActions(myActions);
 
