@@ -390,7 +390,7 @@ public class ProjectConstants {
     public static final String UNIQUE = "UNIQUE";
     public static final String UNIQUE_INDEX_LIST = "uniqueIndexList";
     public static final String UYSFORMAT = "uysformat";
-    public static final String USER_CONSTANT_NOTE = "userConstantNote";
+    public static final String USER_CONSTANT_NOTE = "user-constant-note";
     public static final String USER_CONSTANT_NOTE_LIST = "userConstantNoteList";
     public static final String UPLOAD_DATE = "uploadDate";
     public static final String UPLOAD_MERGE_FIELDS = "uploadMergeFields";
