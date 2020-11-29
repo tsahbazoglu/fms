@@ -1,8 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package tr.org.tspb.dao;
 
 import java.util.Arrays;
@@ -23,7 +18,7 @@ import tr.org.tspb.pojo.UserDetail;
 
 /**
  *
- * @author telman
+ * @author Telman Şahbazoğlu
  */
 public class TagActionRef {
 
