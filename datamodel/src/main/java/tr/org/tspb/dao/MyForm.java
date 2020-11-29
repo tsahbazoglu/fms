@@ -977,27 +977,60 @@ public class MyForm implements MyFormXs {
             return this;
         }
 
+        private enum ListCheck {
+            ONEOF,
+            ALL
+        }
+
         public Builder maskNotes() {
-            Object objUserConstantNote = dbObjectForm.get(USER_CONSTANT_NOTE);
-            if (objUserConstantNote instanceof String) {
-                this.myForm.userConstantNote = (String) objUserConstantNote;
-            } else if (objUserConstantNote instanceof Code) {
-                if (admin) {
-                    this.myForm.userConstantNote = "";
-                } else {
-                    Code code = (Code) objUserConstantNote;
-                    code = new Code(code.getCode().replace(DIEZ, DOLAR));
+
+            Document objUserConstantNote = dbObjectForm.get(USER_CONSTANT_NOTE, Document.class);
+
+            this.myForm.userConstantNote = "";
+            this.myForm.userConstantNoteList = new ArrayList<>();
+
+            if (objUserConstantNote != null) {
+                List<String> values = objUserConstantNote.getList("value", String.class);
+                String func = objUserConstantNote.get("func", String.class);
+                List<Document> listOfRoles = objUserConstantNote.getList("list", Document.class);
+
+                String listCheckStrategy = objUserConstantNote.getString("list-check-strategy");
+                
+                ListCheck listCheck = ListCheck.ONEOF;
+                
+                if (listCheckStrategy != null) {
+                    switch (listCheckStrategy) {
+                        case "all":
+                            listCheck = ListCheck.ALL;
+                            break;
+                        case "oneof":
+                            listCheck = ListCheck.ONEOF;
+                            break;
+                        default:
+                            listCheck = ListCheck.ONEOF;
+                    }
+                }
+
+                if (values != null) {
+                    this.myForm.userConstantNoteList.addAll(values);
+                }
+
+                if (func != null) {
+                    func = func.replace(DIEZ, DOLAR);
                     Document commandResult = this.myForm.fmsScriptRunner
-                            .runCommand(CONFIG_DB, code.getCode(), searchObject, this.myForm.roleMap.keySet());
+                            .runCommand(CONFIG_DB, func, searchObject, this.myForm.roleMap.keySet());
 
                     Object returnValue = commandResult.get(RETVAL);
 
                     if (returnValue instanceof String) {
-                        this.myForm.userConstantNote = (String) returnValue;
+                        this.myForm.userConstantNoteList.add((String) returnValue);
                     } else if (returnValue instanceof List) {
-                        this.myForm.userConstantNote = "";
                         this.myForm.userConstantNoteList = (List) returnValue;
                     }
+                }
+                
+                if (listOfRoles != null) {
+                    listCheck(listOfRoles, listCheck);
                 }
             }
 
@@ -1005,6 +1038,20 @@ public class MyForm implements MyFormXs {
                 this.myForm.userConstantNoteList = (List) dbObjectForm.get(USER_CONSTANT_NOTE_LIST);
             }
             return this;
+        }
+
+        private void listCheck(List<Document> listOfRoles, ListCheck listCheck) {
+
+            for (Document document : listOfRoles) {
+                List<String> roles = document.getList("roles", String.class);
+                if (roles == null || this.myForm.roleMap.isUserInRole(roles)) {
+                    this.myForm.userConstantNoteList.addAll(document.getList("value", String.class));
+                    if (ListCheck.ONEOF.equals(listCheck)) {
+                        return;
+                    }
+                }
+            }
+
         }
 
         public Builder maskEvents() throws Exception {
