@@ -15,12 +15,13 @@
             columnClasses="VTopHLeftW50pNowrap,VTopHLeftW50pNowrap"
             width="100%"
             >
-
             <h:panelGrid width="100%">
-
-
                 <p:toolbar rendered="#{not esignViewCtrl.preventedMultiTab}">
                     <f:facet name="left">
+                        <p:button  
+                            icon="ui-icon-home" 
+                            disabled="true">
+                        </p:button>
                         <p:commandButton 
                             value="Bu sayfa ile ilgili açıklamalar için tıklayınız" 
                             action="#{pivotModifierCtrl.showAllNote}" 
