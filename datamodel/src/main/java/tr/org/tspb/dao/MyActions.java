@@ -10,10 +10,10 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import javax.print.Doc;
 import org.bson.Document;
 import org.bson.types.Code;
 import tr.org.tspb.datamodel.expected.FmsScriptRunner;
+import tr.org.tspb.pojo.UserDetail;
 
 /**
  *
@@ -178,13 +178,15 @@ public class MyActions {
         private Document searchObject;
         private Object attrActions;
         private FmsScriptRunner fmsScriptRunner;
+        private UserDetail userDetail;
 
         public Build(String viewerRole, String db, RoleMap roleMap, Document searchObject,//
-                Object attrActions, FmsScriptRunner fmsScriptRunner) {
+                Object attrActions, FmsScriptRunner fmsScriptRunner, UserDetail userDetail) {
 
             this.viewerRole = viewerRole;
             this.db = db;
             this.roleMap = roleMap;
+            this.userDetail = userDetail;
             this.searchObject = searchObject;
             this.attrActions = attrActions;
             this.fmsScriptRunner = fmsScriptRunner;
@@ -274,6 +276,8 @@ public class MyActions {
 
                     Boolean result = commandResult.getBoolean(RETVAL);
                     map.put(key, result);
+                } else if (attrActionValue.get("ref") != null) {
+                    map.put(key, TagActionRef.calc(attrActionValue.get("ref", Document.class), searchObject, userDetail, fmsScriptRunner));
                 } else {
                     map.put(key, Boolean.TRUE.equals(attrActionValue.get("shoot")));
                 }
