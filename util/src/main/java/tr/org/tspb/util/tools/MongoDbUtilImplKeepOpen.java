@@ -370,14 +370,15 @@ public class MongoDbUtilImplKeepOpen implements MongoDbUtilIntr {
         return value;
     }
 
+    @Override
     public Document trigger(Document projectSpaceMap, Document trigger, List roles) {
         if (trigger != null) {
-            Code function = (Code) trigger.get("op");
+            String function = trigger.get("op", String.class);
 
             if (function != null) {
                 final Document command = new Document();
                 //command.put("$eval", String.format(replaceFuncCode(function.getCode()), replaceParams(projectSpaceMap)));
-                Document result = runCommand((String) trigger.get(FORM_DB), function.getCode(), projectSpaceMap, roles);
+                Document result = runCommand(trigger.get(FORM_DB, String.class), function, projectSpaceMap, roles);
 
                 Object returnValue = result.get(RETVAL);
 
