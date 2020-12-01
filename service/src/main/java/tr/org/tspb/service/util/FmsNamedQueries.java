@@ -56,6 +56,8 @@ public class FmsNamedQueries {
                         for (Document document : list) {
                             String key = document.get("key", String.class);
                             String fmsValue = document.get("fms-value", String.class);
+                            String stringValue = document.get("string-value", String.class);
+                            Number numberValue = document.get("number-value", Number.class);
 
                             if (fmsValue != null) {
                                 switch (fmsValue) {
@@ -64,6 +66,12 @@ public class FmsNamedQueries {
                                         break;
                                     default:
                                 }
+                            } else if (stringValue != null) {
+                                filter.put(key, stringValue);
+                            } else if (numberValue != null) {
+                                filter.put(key, numberValue);
+                            } else {
+                                throw new RuntimeException("cannot set quey value");
                             }
                         }
 
