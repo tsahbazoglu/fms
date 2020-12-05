@@ -3,15 +3,15 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package tr.org.tspb.service;
+package tr.org.tspb.dao;
 
 import java.util.List;
 import java.util.Map;
 import org.bson.Document;
 import static tr.org.tspb.constants.ProjectConstants.DOLAR_IN;
 import static tr.org.tspb.constants.ProjectConstants.REPLACEABLE_KEY_WORD_FOR_FUNCTONS_LOGIN_MEMBER_ID;
+import tr.org.tspb.datamodel.expected.FmsScriptRunner;
 import tr.org.tspb.pojo.UserDetail;
-import tr.org.tspb.util.tools.MongoDbUtilIntr;
 
 /**
  *
@@ -19,7 +19,7 @@ import tr.org.tspb.util.tools.MongoDbUtilIntr;
  */
 public class TagEventCheckListDoc {
 
-    public static boolean value(MongoDbUtilIntr mongoDbUtil, Map myFilter, UserDetail userDetail, List<Document> checks) {
+    public static boolean value(FmsScriptRunner fmsScriptRunner, Map myFilter, UserDetail userDetail, List<Document> checks) {
 
         boolean result = true;
 
@@ -39,9 +39,8 @@ public class TagEventCheckListDoc {
                 List<Document> filters = doc.getList("query", Document.class);
                 Document query = createQuery(filters, userDetail);
 
-                if (mongoDbUtil.count(db, table, query) <= 0) {
-                    return false;
-                }
+                result = result && fmsScriptRunner.findOne(db, table, query) != null;
+
             }
         }
 
