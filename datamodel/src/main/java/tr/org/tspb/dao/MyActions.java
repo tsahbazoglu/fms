@@ -21,6 +21,8 @@ import tr.org.tspb.pojo.UserDetail;
  */
 public class MyActions {
 
+    private MyForm myForm;
+
     private boolean create;
     private boolean delete;
     private boolean save;
@@ -37,7 +39,13 @@ public class MyActions {
     private boolean payment;
     private boolean pdf;
     private boolean ldap;
+    private boolean sendForms;
     private FmsScriptRunner fmsScriptRunner;
+
+    private FmsAction saveAction;
+    private FmsAction deleteAction;
+    private FmsAction checkAllAction;
+    private FmsAction sendFormAction;
 
     private List<DynamicButton> list;
 
@@ -149,6 +157,26 @@ public class MyActions {
         return list;
     }
 
+    public FmsAction getSaveAction() {
+        return saveAction;
+    }
+
+    public FmsAction getDeleteAction() {
+        return deleteAction;
+    }
+
+    public FmsAction getCheckAllAction() {
+        return checkAllAction;
+    }
+
+    public boolean isSendForms() {
+        return sendForms;
+    }
+
+    public FmsAction getSendFormAction() {
+        return sendFormAction;
+    }
+
     public static class Build {
 
         private MyActions myActions;
@@ -160,7 +188,7 @@ public class MyActions {
                 SAVE_AS,
                 ACTION_DOWNLOAD,
                 EIMZA,
-                "checkAll",
+                ACTION_CHECK_ALL,
                 EMAIL,
                 "eimza1D",
                 "eimza2D",
@@ -169,7 +197,8 @@ public class MyActions {
                 "customDownload",
                 "payment",
                 "pdf",
-                "ldap"
+                "ldap",
+                ACTION_SEND_FROMS
         ));
 
         private String viewerRole;
@@ -260,27 +289,47 @@ public class MyActions {
         public Build initAsSchemaVersion100() {
 
             for (String key : ((Document) attrActions).keySet()) {
-                Document attrActionValue = ((Document) attrActions).get(key, Document.class);
-                if (attrActionValue.get("permit") != null) {
-                    for (String role : (List<String>) attrActionValue.get("permit")) {
-                        if (roleMap.isUserInRole(role)) {
-                            map.put(key, Boolean.TRUE);
-                        }
+
+                Document action = ((Document) attrActions).get(key, Document.class);
+
+                Boolean enable = Boolean.FALSE;
+                ActionEnableResult enableResult = null;
+
+                if (action.get("permit") != null) {
+                    if (roleMap.isUserInRole(action.get("permit"))) {
+                        enable = Boolean.TRUE;
                     }
-                } else if (attrActionValue.get("func") != null) {
-                    String code = attrActionValue.get("func", String.class);
+                } else if (action.get("func") != null) {
+                    String code = action.get("func", String.class);
                     code = code.replace(DIEZ, DOLAR);
 
                     Document commandResult = fmsScriptRunner.runCommand(db,
                             code, searchObject, roleMap.keySet());
 
-                    Boolean result = commandResult.getBoolean(RETVAL);
-                    map.put(key, result);
-                } else if (attrActionValue.get("ref") != null) {
-                    map.put(key, TagActionRef.calc(attrActionValue.get("ref", Document.class), searchObject, userDetail, fmsScriptRunner));
+                    enable = commandResult.getBoolean(RETVAL);
+                } else if (action.get("ref") != null) {
+                    enable = TagActionRef.calc(action.get("ref", Document.class), searchObject, userDetail, fmsScriptRunner);
+                } else if (action.get(EVENT_ENABLE) != null) {
+                    enableResult = checkControlResultSchemaVersion110(searchObject, action);
+                    enable = enableResult.isEnable();
                 } else {
-                    map.put(key, Boolean.TRUE.equals(attrActionValue.get("shoot")));
+                    enable = Boolean.TRUE.equals(action.get("shoot"));
                 }
+
+                map.put(key, enable);
+
+                switch (key) {
+                    case ACTION_SAVE:
+                        myActions.saveAction = new FmsAction(enable, enableResult, action, myActions.myForm.getRegistredFunctions());
+                        break;
+                    case ACTION_CHECK_ALL:
+                        myActions.checkAllAction = new FmsAction(enable, enableResult, action, myActions.myForm.getRegistredFunctions());
+                        break;
+                    case ACTION_SEND_FROMS:
+                        myActions.sendFormAction = new FmsAction(enable, enableResult, action, myActions.myForm.getRegistredFunctions());
+                        break;
+                }
+
             }
 
             return this;
@@ -313,7 +362,7 @@ public class MyActions {
                     case EIMZA:
                         myActions.esign = value;
                         break;
-                    case "checkAll":
+                    case ACTION_CHECK_ALL:
                         myActions.checkAll = value;
                         break;
                     case EMAIL:
@@ -343,6 +392,9 @@ public class MyActions {
                     case "ldap":
                         myActions.ldap = value;
                         break;
+                    case ACTION_SEND_FROMS:
+                        myActions.sendForms = value;
+                        break;
                 }
             }
             return this;
@@ -363,6 +415,11 @@ public class MyActions {
             return this;
         }
 
+        public Build maskMyForm(MyForm myForm) {
+            this.myActions.myForm = myForm;
+            return this;
+        }
+
         public Build maskDeleteWithSave() {
             if (this.myActions.delete) {
                 this.myActions.delete = this.myActions.save;
@@ -373,6 +430,71 @@ public class MyActions {
         public MyActions build() {
             return myActions;
         }
+
+        //
+        private ActionEnableResult checkControlResultSchemaVersion110(Document filter, Document event) {
+
+            ActionEnableResult controlResult = new ActionEnableResult();
+
+            Document enable = event.get(EVENT_ENABLE, Document.class);
+
+            String func = enable.getString("func");
+            List<Document> listOfChecks = enable.getList("list", Document.class);
+
+            if (func != null && !roleMap.isUserInRole(this.myActions.myForm.getMyProject().getAdminAndViewerRole())) {
+                func = func.replace(DIEZ, DOLAR);
+
+                Document commandResult = fmsScriptRunner.runCommand(event.get(FORM_DB).toString(), func,
+                        filter, roleMap.keySet());
+
+                Object value = commandResult.get(RETVAL);
+                controlResult.setEnable(Boolean.TRUE.equals(value));
+            } else if (listOfChecks != null) {
+                controlResult.setEnable(TagEventCheckListDoc.value(fmsScriptRunner, filter, userDetail, listOfChecks));
+            }
+
+            if (controlResult.isEnable()) {
+                Object gui = event.get(GUI);
+
+                if (gui instanceof Code) {
+                    Document commandResult = fmsScriptRunner.runCommand(this.myActions.myForm.getDb(), ((Code) gui).getCode(), filter, null);
+                    gui = commandResult.get(RETVAL);
+                }
+
+                if (gui instanceof Document) {
+                    controlResult.setStyle(((Document) gui).getString(STYLE));
+                    controlResult.setCaption(((Document) gui).getString("caption"));
+                    controlResult.setDynamicButtonName(((Document) gui).getString("caption"));
+
+                    Document objectAction = event.get(ACTION, Document.class);
+
+                    String actionFunc = objectAction.getString("func");
+                    Document actionRef = objectAction.get("ref", Document.class);
+
+                    if (actionFunc != null) {
+                        controlResult.setMyaction(actionFunc);
+                    } else if (actionRef != null) {
+                        controlResult.setMyActionType(actionRef.get(TYPE).toString());
+
+                        if ("START_DIALOG".equals(controlResult.getMyActionType())) {
+                            controlResult.setDialog(actionRef.get("dialog").toString());
+                        }
+
+                        if (actionRef.get("func") != null) {
+                            controlResult.setMyaction(actionRef.get("func").toString());
+                        }
+
+                        if (actionRef.get(JAVA_FUNC) != null) {
+                            controlResult.setJavaFunc(actionRef.getString(JAVA_FUNC));
+                        }
+                    }
+                    controlResult.setSuccessMessage(((Document) gui).getString(SUCCESS_MESSAGE));
+                    controlResult.setFailMessage(((Document) gui).getString(FAIL_MESSAGE));
+                }
+            }
+            return controlResult;
+        }
+
     }
 
 }
