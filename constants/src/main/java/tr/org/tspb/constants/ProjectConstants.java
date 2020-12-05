@@ -61,9 +61,8 @@ public class ProjectConstants {
     public static final String AJAX_EFFECTED_KEYS = "ajax_effected_keys";
     public static final String APPLY_TO_QUERY = "applyToQuery";
     public static final String APPLY_LIST_OF_OBJECTIDS = "applyListOfObjectIds";
-    public static final String APPEAR_FUNCTION = "appearFunction";
     public static final String CHECK_AND_WRITE_CONTROL_RESULT_FUNCTION = "checkAndWriteControlResultFunc";
-    public static final String LOOK_TO_CONTROL_RESULT_FUNC = "lookToControlResultFunc";
+    public static final String EVENT_ENABLE = "event-enable";
     public static final String ATTACHMENTS = "ekler";
     public static final String ATTACHMENTS_1 = "ek1";
     public static final String ATTRIBUTES = "attributes";
@@ -342,9 +341,12 @@ public class ProjectConstants {
     public static final String REF_COLLECTION = "refCollection";
     public static final String ROW_LIST = "rowList";
     //S
+
+    public static final String ACTION_CHECK_ALL = "checkAll";
     public static final String ACTION_NEW = "new";
     public static final String ACTION_DOWNLOAD = "download";
     public static final String ACTION_SAVE = "save";
+    public static final String ACTION_SEND_FROMS = "sendForms";
     public static final String SAVE_AS = "saveAs";
     public static final String SELECT_PLEASE = "Lütfen Seçiniz";
     public static final String SELF = "self";
