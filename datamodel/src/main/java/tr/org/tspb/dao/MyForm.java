@@ -85,6 +85,7 @@ public class MyForm implements MyFormXs {
     private Document myNamedQueries;
     private Document events;
     private Document excelFormat;
+    private Document registredFunctions;
     private List<String> zetDimension;
     private HashMap<String, Object> defaultCurrentQuery;
     private HashMap<String, Object> defaultHistoryQuery;
@@ -650,6 +651,7 @@ public class MyForm implements MyFormXs {
         if (MyForm.SCHEMA_VERSION_110.equals(this.getSchemaVersion())) {
             this.myActions = new MyActions.Build(this.getMyProject().getViewerRole(), this.getDb(),
                     roleMap, searchObject, actions, fmsScriptRunner, userDetail)
+                    .maskMyForm(this)
                     .initAsSchemaVersion100()
                     .base()
                     .maskSaveWithCurrentCrudObject(crudObject)
@@ -796,6 +798,10 @@ public class MyForm implements MyFormXs {
 
     public String getPageName() {
         return pageName;
+    }
+
+    public Document getRegistredFunctions() {
+        return registredFunctions;
     }
 
     private static class OrderedKey {
@@ -995,9 +1001,9 @@ public class MyForm implements MyFormXs {
                 List<Document> listOfRoles = objUserConstantNote.getList("list", Document.class);
 
                 String listCheckStrategy = objUserConstantNote.getString("list-check-strategy");
-                
+
                 ListCheck listCheck = ListCheck.ONEOF;
-                
+
                 if (listCheckStrategy != null) {
                     switch (listCheckStrategy) {
                         case "all":
@@ -1028,7 +1034,7 @@ public class MyForm implements MyFormXs {
                         this.myForm.userConstantNoteList = (List) returnValue;
                     }
                 }
-                
+
                 if (listOfRoles != null) {
                     listCheck(listOfRoles, listCheck);
                 }
@@ -1769,6 +1775,20 @@ public class MyForm implements MyFormXs {
                     myForm.ajaxFields.add(myField.getKey());
                 }
             }
+            return this;
+        }
+
+        public Builder maskRegistredFunctions() {
+
+            List<Document> listDoc = dbObjectForm.getList("registred-functions", Document.class);
+
+            if (listDoc != null) {
+                this.myForm.registredFunctions = new Document();
+                for (Document document : listDoc) {
+                    this.myForm.registredFunctions.append(document.getString("key"), document.getString("value"));
+                }
+            }
+
             return this;
         }
 
