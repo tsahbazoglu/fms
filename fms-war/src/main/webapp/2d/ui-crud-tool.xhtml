@@ -55,11 +55,11 @@
                 update="#{updateAjaxMB.btnCheckAllAsAdmin}"
                 />
             <p:commandButton 
-                value="#{twoDimModifyCtrl.dynamicButtonName}" 
+                value="#{formService.myForm.myActions.sendFormAction.enableResult.caption}" 
                 actionListener="#{twoDimModifyCtrl.processActionExternal}" 
-                rendered="#{twoDimModifyCtrl.shouldSendForm}"
+                rendered="#{formService.myForm.myActions.sendForms}"
                 style="white-space: nowrap;"
-                update=":idMessageDialog,:idCenterTop"
+                update=":idMessageDialog,:idCenterTop,#{updateAjaxMB.btnCheckAllAsAdmin}"
                 />
             <p:commandButton 
                 value="Excele Aktar" 
