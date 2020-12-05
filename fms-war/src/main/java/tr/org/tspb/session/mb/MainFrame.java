@@ -815,6 +815,7 @@ public class MainFrame implements Serializable {
         myFormLarge.initActions(repositoryService.getAndCacheMyAction(myFormLarge));
 
         formService.setMyForm(myFormLarge);
+        
         filterService.initQuickFilters();
 
         twoDimModifyCtrl.drawGUI(myFormLarge);
