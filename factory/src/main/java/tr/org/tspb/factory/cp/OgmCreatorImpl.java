@@ -402,6 +402,7 @@ public class OgmCreatorImpl implements OgmCreatorIntr {
 
             return new MyForm.Builder(myProject, dboForm, filter, roleMap, userDetail, fmsScriptRunner, fmsRunMongoCmd)
                     .withOthers()
+                    .maskRegistredFunctions()
                     .maskFilter(mongoDbUtil.replaceToDollar((Document) dboForm.get(FORM_FILTER)))
                     .maskZetDimension()
                     .maskAccesscontrol()
@@ -809,6 +810,7 @@ public class OgmCreatorImpl implements OgmCreatorIntr {
      * @param myFormLarge
      * @param roleMap
      * @param filter
+     * @param userDetail
      * @return
      */
     @Override
@@ -818,6 +820,7 @@ public class OgmCreatorImpl implements OgmCreatorIntr {
                 || MyForm.SCHEMA_VERSION_110.equals(myFormLarge.getSchemaVersion())) {
             return new MyActions.Build(myFormLarge.getMyProject().getViewerRole(), myFormLarge.getDb(),
                     roleMap, filter, myFormLarge.getActions(), fmsScriptRunner, userDetail)
+                    .maskMyForm(myFormLarge)
                     .initAsSchemaVersion100()
                     .base()
                     .build();
