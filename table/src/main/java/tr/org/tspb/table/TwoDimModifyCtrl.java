@@ -40,7 +40,6 @@ import org.primefaces.event.SelectEvent;
 import org.primefaces.model.StreamedContent;
 import org.xml.sax.SAXException;
 import tr.org.tspb.util.stereotype.MyController;
-import java.io.Serializable;
 import javax.inject.Inject;
 import org.bson.Document;
 import tr.org.tspb.exceptions.FormConfigException;
@@ -70,6 +69,7 @@ import tr.org.tspb.dao.MyMap;
 import tr.org.tspb.outsider.FmsWorkFlow;
 import tr.org.tspb.pojo.UserDetail;
 import static tr.org.tspb.constants.ProjectConstants.*;
+import tr.org.tspb.dao.FmsAction;
 import tr.org.tspb.dao.MyActions;
 import tr.org.tspb.dao.MyBaseRecord;
 import tr.org.tspb.dao.MyItems;
@@ -123,14 +123,11 @@ public class TwoDimModifyCtrl extends FmsTable implements ActionListener {
     private static final int EVENT_SIZE = 5;
     private boolean disabledSearchButton;
     private List<String> eventLog = new ArrayList<>(EVENT_SIZE);
-    private boolean shouldSendForm;
     private String calculateFormulaId;
-    private String dynamicButtonName = "Gönder";
     private List<String> selectedFormMessages;
     private transient StreamedContent file;
     private transient List<Map<String, Object>> successList = new ArrayList<>();
     private transient List<Map<String, Object>> failList = new ArrayList<>();
-    private final Map<String, Serializable> eventAttrs = new HashMap();
     private transient Map<String, Object> selectedRow;
     private static final String FAIL_LIST = "failList";
     private static final String SUCCESS_LIST = "successList";
@@ -444,28 +441,36 @@ public class TwoDimModifyCtrl extends FmsTable implements ActionListener {
 
     public void valueChangeListenerTableSearch(AjaxBehaviorEvent event) {
         search();
+        MyActions myActions = ogmCreator
+                .getMyActions(formService.getMyForm(), loginController.getRoleMap(), filterService.getTableFilterCurrent(), loginController.getLoggedUserDetail());
+        formService.getMyForm().initActions(myActions);
+
     }
 
     public String actionSearchObject() {
         search();
+        MyActions myActions = ogmCreator
+                .getMyActions(formService.getMyForm(), loginController.getRoleMap(), filterService.getTableFilterCurrent(), loginController.getLoggedUserDetail());
+        formService.getMyForm().initActions(myActions);
+
         return null;
     }
 
     public String resetFilter() {
         filterService.getGuiFilterCurrent().clear();
         search();
+        MyActions myActions = ogmCreator
+                .getMyActions(formService.getMyForm(), loginController.getRoleMap(), filterService.getTableFilterCurrent(), loginController.getLoggedUserDetail());
+        formService.getMyForm().initActions(myActions);
+
         return null;
     }
 
     private void search() {
         try {
             filterService.createTableFilterCurrent(formService.getMyForm());
-            MyActions myActions = ogmCreator
-                    .getMyActions(formService.getMyForm(), loginController.getRoleMap(), filterService.getTableFilterCurrent(), loginController.getLoggedUserDetail());
-            formService.getMyForm().initActions(myActions);
             //FIXME 02.10.2019 Volkan&Telman : set row count also on drawGUI phase
             ((FmsTableDataModel) getData()).initRowCount(findDataCount());
-            armActionAtrrs();
         } catch (NullNotExpectedException ex) {
 
         }
@@ -568,11 +573,21 @@ public class TwoDimModifyCtrl extends FmsTable implements ActionListener {
         try {
             Document filterClone = new Document(filterService.getTableFilterCurrent());
             ctrlService.crossCheck(filterClone);
+            callAdditionalAction(filterClone, formService.getMyForm().getMyActions().getCheckAllAction());
         } catch (Exception ex) {
             logger.error("error occured", ex);
             dialogController.showPopupError(ex.getMessage());
         }
         return null;
+    }
+
+    public void callAdditionalAction(Document filter, FmsAction fmsAction) {
+
+        ctrlService.init(formService.getMyForm().getMyProject().getConfigTable());
+
+        if (fmsAction.isEnable() && fmsAction.getActionFunc() != null) {
+            mongoDbUtil.runCommand(fmsAction.getDb(), fmsAction.getActionFunc(), filter, loginController.getRolesAsSet());
+        }
     }
 
     public String chooseEditor() {
@@ -647,8 +662,7 @@ public class TwoDimModifyCtrl extends FmsTable implements ActionListener {
             successList = map.get(SUCCESS_LIST);
             failList = map.get(FAIL_LIST);
 
-            ctrlService.init(formService.getMyForm().getMyProject().getConfigTable());
-            ctrlService.checkAndWriteControlResult(filterService.getTableFilterCurrent());
+            callAdditionalAction(filterService.getTableFilterCurrent(), formService.getMyForm().getMyActions().getSaveAction());
 
             formService.getMyForm().runAjaxBulk(getComponentMap(), crudObject, loginController.getRoleMap(), loginController.getLoggedUserDetail());
 
@@ -711,8 +725,7 @@ public class TwoDimModifyCtrl extends FmsTable implements ActionListener {
             successList = map.get(SUCCESS_LIST);
             failList = map.get(FAIL_LIST);
 
-            ctrlService.init(formService.getMyForm().getMyProject().getConfigTable());
-            ctrlService.checkAndWriteControlResult(filterService.getTableFilterCurrent());
+            callAdditionalAction(filterService.getTableFilterCurrent(), formService.getMyForm().getMyActions().getSaveAction());
 
             formService.getMyForm().runAjaxBulk(getComponentMap(), crudObject, loginController.getRoleMap(), loginController.getLoggedUserDetail());
             dialogController.showPopup(CRUD_OPERATION_DIALOG2);
@@ -828,14 +841,6 @@ public class TwoDimModifyCtrl extends FmsTable implements ActionListener {
             dialogController.showPopupError(ex.toString());
         }
         return null;
-    }
-
-    public boolean isShouldSendForm() {
-        return shouldSendForm;
-    }
-
-    public String getDynamicButtonName() {
-        return dynamicButtonName;
     }
 
     public String performCancel() {
@@ -1022,8 +1027,10 @@ public class TwoDimModifyCtrl extends FmsTable implements ActionListener {
         }
 
         search();
+
     }
 
+    @Deprecated
     public void processActionExternal(ActionEvent ae) {
         try {
             processAction(ae);
@@ -1032,26 +1039,11 @@ public class TwoDimModifyCtrl extends FmsTable implements ActionListener {
         }
     }
 
+    @Deprecated
     @Override
     public void processAction(ActionEvent ae) throws AbortProcessingException {
+        /*
         armActionAtrrs();
-
-        if (!shouldSendForm) {
-            StringBuilder sb = new StringBuilder();
-            sb.append("<ul>");
-            sb.append("<li>");
-            sb.append("Hatalı veri girişleriniz mevcut.");
-            sb.append("</li>");
-            sb.append("<li>");
-            sb.append("'Tüm Sayfaları Kontrol Et' düğmesine tıklayarak hata ve uyarıları tespit ediniz");
-            sb.append("</li>");
-            sb.append("<li>");
-            sb.append("hataları gideriniz ve uyarılara açıklama yazınız.");
-            sb.append("</li>");
-            sb.append("</ul>");
-            dialogController.showPopupWarning(sb.toString(), MESSAGE_DIALOG);
-            return;
-        }
 
         String failMessage = (String) eventAttrs.get(FAIL_MESSAGE);
         try {
@@ -1113,29 +1105,89 @@ public class TwoDimModifyCtrl extends FmsTable implements ActionListener {
         } catch (Exception ex) {
             dialogController.showPopupInfo(failMessage, MESSAGE_DIALOG);
         }
+         */
 
     }
 
-    private void armActionAtrrs() {
-        /*
-        this is an additonal re-check to prevent mutipage attack hack
-        test case:
-        1) user can open who  browser instance and achive the success to sendForm on first of them.
-        2) make an error on second browser.
-        3) send form form the first browser
-         */
+    public String sendForm() throws AbortProcessingException {
 
-        CtrlService.ControlResult controlResult = ctrlService.checkControlResult(filterService.getTableFilterCurrent());
-        dynamicButtonName = controlResult.getDynamicButtonName();
-        shouldSendForm = controlResult.isShouldSendForm();
-        eventAttrs.put(STYLE, controlResult.getStyle());
-        eventAttrs.put("caption", controlResult.getCaption());
-        eventAttrs.put(MYACTION, controlResult.getMyaction());
-        eventAttrs.put(MY_ACTION_TYPE, controlResult.getMyActionType());
-        eventAttrs.put(JAVA_FUNC, controlResult.getJavaFunc());
-        eventAttrs.put(SUCCESS_MESSAGE, controlResult.getSuccessMessage());
-        eventAttrs.put(FAIL_MESSAGE, controlResult.getFailMessage());
-        eventAttrs.put("DIALOG", controlResult.getDialog());
+        if (!formService.getMyForm().getMyActions().isSaveAs()) {
+            StringBuilder sb = new StringBuilder();
+            sb.append("<ul>");
+            sb.append("<li>");
+            sb.append("Hatalı veri girişleriniz mevcut.");
+            sb.append("</li>");
+            sb.append("<li>");
+            sb.append("'Tüm Sayfaları Kontrol Et' düğmesine tıklayarak hata ve uyarıları tespit ediniz");
+            sb.append("</li>");
+            sb.append("<li>");
+            sb.append("hataları gideriniz ve uyarılara açıklama yazınız.");
+            sb.append("</li>");
+            sb.append("</ul>");
+            dialogController.showPopupWarning(sb.toString(), MESSAGE_DIALOG);
+            return null;
+        }
+
+        String failMessage = formService.getMyForm().getMyActions().getSendFormAction().getEnableResult().getFailMessage();
+
+        try {
+
+            //Only java native variables can be pass through jsf attributes
+            String successMessage = formService.getMyForm().getMyActions().getSendFormAction().getEnableResult().getSuccessMessage();
+
+            TimeZone timeZone = TimeZone.getTimeZone("Asia/Istanbul");
+            SIMPLE_DATE_FORMAT__3.setTimeZone(timeZone);
+
+            String projectBasedPeriodColectionName = formService.getMyForm().getField(PERIOD).getItemsAsMyItems().getTable();
+
+            successMessage = String.format(successMessage, SIMPLE_DATE_FORMAT__3.format(new Date()),
+                    uysApplicationMB.getApplicationSearchResults(
+                            new Document()
+                                    .append(FORM_DB, formService.getMyForm().getDb())
+                                    .append(COLLECTION, projectBasedPeriodColectionName)
+                                    .append(FORMS, PERIOD)
+                                    .append(MONGO_ID, getSearchObjectValue(PERIOD))).get(0).get(NAME));
+
+            String myActionType = formService.getMyForm().getMyActions().getSendFormAction().getEnableResult().getMyActionType();
+            String javaFunc = formService.getMyForm().getMyActions().getSendFormAction().getEnableResult().getJavaFunc();
+            String code = formService.getMyForm().getMyActions().getSendFormAction().getEnableResult().getMyaction();
+
+            if (myActionType == null) {
+                if (code == null) {
+                    dialogController.showPopupWarning("Bu olay üzerinde eylem tanımlı değil.<br/>Sistem yöneticisi ile iletişime geçiniz.", MESSAGE_DIALOG);
+                } else {
+                    Document mySearchObject = repositoryService.expandCrudObject(formService.getMyForm(), getSearchObjectAsDbo());
+
+                    for (MyField myField : formService.getMyForm().getAutosetFields()) {
+                        if (mySearchObject.get(myField.getKey()) == null
+                                || SelectOneObjectIdConverter.NULL_VALUE.equals(mySearchObject.get(myField.getKey()))) {
+                            throw new Exception(
+                                    MessageFormat.format("arama kriterlerinde {0} belirsiz.", myField.getKey()));
+                        }
+                    }
+
+                    mongoDbUtil.runCommand(formService.getMyForm().getDb(), code, mySearchObject, null);
+
+                    putSearchObjectValue(PERIOD, SelectOneObjectIdConverter.NULL_VALUE);
+
+                    MyActions myActions = ogmCreator
+                            .getMyActions(formService.getMyForm(), loginController.getRoleMap(),
+                                    filterService.getTableFilterCurrent(), loginController.getLoggedUserDetail());
+
+                    formService.getMyForm().initActions(myActions);
+
+                    actionSearchObject();
+
+                    dialogController.showPopupInfo(successMessage, MESSAGE_DIALOG);
+                }
+            } else if ("java".equals(myActionType)) {
+                Method method = this.getClass().getMethod(javaFunc, new Class[]{});
+                method.invoke(this, new Object[]{});
+            }
+        } catch (Exception ex) {
+            dialogController.showPopupInfo(failMessage, MESSAGE_DIALOG);
+        }
+        return null;
 
     }
 
