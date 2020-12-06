@@ -48,11 +48,13 @@ import tr.org.tspb.converter.base.SelectOneObjectIdConverter;
 import tr.org.tspb.dao.MyField;
 import tr.org.tspb.dao.MyForm;
 import tr.org.tspb.dao.MyMap;
+import tr.org.tspb.dao.TagEvent;
 import tr.org.tspb.exceptions.FormConfigException;
 import tr.org.tspb.exceptions.MongoOrmFailedException;
 import tr.org.tspb.exceptions.MoreThenOneInListException;
 import tr.org.tspb.exceptions.UserException;
 import tr.org.tspb.pojo.MyConstraintFormula;
+import tr.org.tspb.pojo.PostSaveResult;
 
 /**
  *
@@ -78,7 +80,7 @@ public class PivotModifierCtrl extends PivotImpl {
     protected Map<CellMultiDimensionKey, List<CustomOlapHashMap>> pivotData;
 
     @Inject
-    RepositoryService repositoryService;
+    private RepositoryService repositoryService;
 
     private String saveObject() throws Exception {
 
@@ -218,11 +220,8 @@ public class PivotModifierCtrl extends PivotImpl {
             }
         }
 
-        Document trigger = formService.getMyForm().getEventPostSave();
-
-        if (trigger == null || !"application".equals(trigger.get(TYPE))) {
-            mongoDbUtil.trigger(new Document(getFilter()), trigger, loginController.getRolesAsList());
-        }
+        repositoryService
+                .runEventPostSave(new Document(getFilter()), formService.getMyForm(), null);
 
         refreshPivotData();
 
@@ -394,9 +393,9 @@ public class PivotModifierCtrl extends PivotImpl {
 
         selectedFormMessages = createFormMsg(formService.getMyForm());
 
-        Document trigger = formService.getMyForm().getEventFormSelection();
-        if (trigger != null && "showWarnErrPopup".equals(trigger.get(TYPE))) {
-            dialogController.showPopupInfoWithOk(trigger.get(MESSAGE).toString(), MESSAGE_DIALOG);
+        TagEvent trigger = formService.getMyForm().getEventFormSelection();
+        if (trigger != null && "showWarnErrPopup".equals(trigger.getType())) {
+            dialogController.showPopupInfoWithOk(trigger.getMsg(), MESSAGE_DIALOG);
         }
 
         refreshPivotData();
