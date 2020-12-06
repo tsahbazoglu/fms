@@ -45,6 +45,7 @@ import tr.org.tspb.dao.MyForm;
 import tr.org.tspb.dao.MyFormXs;
 import tr.org.tspb.dao.MyMap;
 import tr.org.tspb.dao.MyProject;
+import tr.org.tspb.dao.TagEvent;
 import tr.org.tspb.datamodel.custom.TuikData;
 import tr.org.tspb.datamodel.gui.FormItem;
 import tr.org.tspb.datamodel.gui.ModuleItem;
@@ -148,22 +149,27 @@ public class RepositoryService implements Serializable {
     }
 
     public PostSaveResult runEventPostSave(Document operatedObject, MyForm myForm, MyMap crudObject) throws MongoOrmFailedException {
-        Document trigger = myForm.getEventPostSave();
-        if (trigger != null) {
-            if ("application".equals(trigger.get(TYPE))) {
-                Map calculateAreaSearchMap = new HashMap();
-                Document cacheQueryMap = (Document) trigger.get("cacheQuery");
-                for (String key : cacheQueryMap.keySet()) {
-                    calculateAreaSearchMap.put(key, crudObject.get(key));
-                }
-                calculateAreaSearchMap.put(FORM_DB, trigger.get(FORM_DB));
-                calculateAreaSearchMap.put(COLLECTION, trigger.get(COLLECTION));
-                appScopeSrvCtrl.removeApplicationSearchResults(calculateAreaSearchMap);
-            } else if ("showWarnErrPopup".equals(trigger.get(TYPE))) {
-                return new PostSaveResult(true, trigger.get(MESSAGE).toString(), PostSaveResult.MessageGuiType.facesMessage, null);
-            } else {
-                Document result = mongoDbUtil.trigger(operatedObject, trigger, loginController.getRolesAsList());
-                return new PostSaveResult(true, result.get("facesMessage").toString(), PostSaveResult.MessageGuiType.facesMessage, null);
+
+        TagEvent tagEvent = myForm.getEventPostSave();
+
+        if (tagEvent != null) {
+
+            switch (tagEvent.getType()) {
+                case application:
+                    Map calculateAreaSearchMap = new HashMap();
+                    Document cacheQueryMap = tagEvent.getCacheQuery();
+                    for (String key : cacheQueryMap.keySet()) {
+                        calculateAreaSearchMap.put(key, crudObject.get(key));
+                    }
+                    calculateAreaSearchMap.put(FORM_DB, tagEvent.getDb());
+                    calculateAreaSearchMap.put(COLLECTION, tagEvent.getTable());
+                    appScopeSrvCtrl.removeApplicationSearchResults(calculateAreaSearchMap);
+                    break;
+                case showWarnErrPopup:
+                    return new PostSaveResult(true, tagEvent.getMsg(), PostSaveResult.MessageGuiType.facesMessage, null);
+                default:
+                    Document result = mongoDbUtil.trigger(operatedObject, tagEvent, loginController.getRolesAsList());
+                    return new PostSaveResult(true, result.get("facesMessage", String.class), PostSaveResult.MessageGuiType.facesMessage, null);
             }
         }
         return PostSaveResult.getNullSingleton();
@@ -175,7 +181,7 @@ public class RepositoryService implements Serializable {
             return PreSaveResult.getNullSingleton();
         }
 
-        String eventPreSaveDB = (String) myForm.getEventPreSave().get(FORM_DB);
+        String eventPreSaveDB = myForm.getEventPreSave().getDb();
 
         if (eventPreSaveDB == null) {
             return PreSaveResult.getErrSingleton();
@@ -184,8 +190,8 @@ public class RepositoryService implements Serializable {
         Document myCrudObject = new Document(crudObject);
         myCrudObject.remove(INODE);// we remove it bacuase of MyForm class cannot be serialized for mongo.doEval
 
-        Code code = (Code) myForm.getEventPreSave().get("jsFunction");
-        Document commandResult = mongoDbUtil.runCommand(eventPreSaveDB, code.getCode(), query, myCrudObject);
+        String code = myForm.getEventPreSave().getJsFunction();
+        Document commandResult = mongoDbUtil.runCommand(eventPreSaveDB, code, query, myCrudObject);
         Object result = commandResult.get(RETVAL);
 
         if (Boolean.TRUE.equals(result)) {
