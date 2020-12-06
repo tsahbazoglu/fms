@@ -273,7 +273,6 @@ public class OgmCreatorImpl implements OgmCreatorIntr {
                     .maskFieldsKeySet()
                     .maskCurrentRendered()
                     .maskNotes()
-                    .maskEvents()
                     .maskUpperNode()
                     .maskDimension()
                     .maskVersionFields()
@@ -402,7 +401,6 @@ public class OgmCreatorImpl implements OgmCreatorIntr {
 
             return new MyForm.Builder(myProject, dboForm, filter, roleMap, userDetail, fmsScriptRunner, fmsRunMongoCmd)
                     .withOthers()
-                    .maskRegistredFunctions()
                     .maskFilter(mongoDbUtil.replaceToDollar((Document) dboForm.get(FORM_FILTER)))
                     .maskZetDimension()
                     .maskAccesscontrol()
@@ -415,7 +413,6 @@ public class OgmCreatorImpl implements OgmCreatorIntr {
                     .maskRowFieldsKeySet()
                     .maskCurrentRendered()
                     .maskNotes()
-                    .maskEvents()
                     .maskUpperNode()
                     .maskDimension()
                     .maskVersionFields()
