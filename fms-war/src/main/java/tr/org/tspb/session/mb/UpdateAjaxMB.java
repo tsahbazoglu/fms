@@ -127,7 +127,8 @@ public class UpdateAjaxMB implements Serializable {
                 .concat(COMMA).concat(ID_TWO_DIM_DLG_PNL)
                 .concat(COMMA).concat("id_2d_DialogControlAndSave")
                 .concat(COMMA).concat(ID_TABLE_UPLOADED_FILES)
-                .concat(COMMA).concat(ID_MSG_DLG);
+                .concat(COMMA).concat(ID_MSG_DLG)
+                .concat(COMMA).concat("id-tab-view:id-2d-action-form:id-2d-action-toolbar");
         btn2dSaveAs = ID_2D_DATA_TABLE
                 .concat(COMMA).concat(ID_2D_CURRENT_LIST)
                 .concat(COMMA).concat(ID_CENTER_TOP)
@@ -159,7 +160,8 @@ public class UpdateAjaxMB implements Serializable {
         btnCheckAll = ID_2D_DATA_TABLE
                 .concat(COMMA).concat(ID_MSG_DLG)
                 .concat(COMMA).concat(ID_CENTER_TOP)
-                .concat(COMMA).concat("id-tab-view:id2DCurrentObjectList:objectsDataTable");
+                .concat(COMMA).concat("id-tab-view:id2DCurrentObjectList:objectsDataTable")
+                .concat(COMMA).concat("id-tab-view:id-2d-action-form:id-2d-action-toolbar");
         btnNdSave = ID_MSG_DLG
                 .concat(COMMA).concat(ID_CENTER_TOP)
                 .concat(COMMA).concat(ID_CURRENT_MYGRID_EDITABLE)
