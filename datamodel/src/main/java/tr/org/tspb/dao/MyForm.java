@@ -76,16 +76,14 @@ public class MyForm implements MyFormXs {
     private Document subGroups;
     private Document dbo;
     private Document constraintItems;
-    private Document eventPreSave;
-    private Document eventPostSave;
-    private Document eventPostDelete;
-    private Document eventPreDelete;
-    private Document eventFormSelection;
+    private TagEvent eventPreSave;
+    private TagEvent eventPostSave;
+    private TagEvent eventPostDelete;
+    private TagEvent eventPreDelete;
+    private TagEvent eventFormSelection;
     private Document accessControlLevelTwo;
     private Document myNamedQueries;
-    private Document events;
     private Document excelFormat;
-    private Document registredFunctions;
     private List<String> zetDimension;
     private HashMap<String, Object> defaultCurrentQuery;
     private HashMap<String, Object> defaultHistoryQuery;
@@ -196,14 +194,6 @@ public class MyForm implements MyFormXs {
         return currentRendered;
     }
 
-    public Document getEventFormSelection() {
-        return eventFormSelection;
-    }
-
-    public Document getEventPreSave() {
-        return eventPreSave;
-    }
-
     public Map<String, MyField> getFieldsRow() {
         return Collections.unmodifiableMap(fieldsRow);
     }
@@ -238,10 +228,6 @@ public class MyForm implements MyFormXs {
 
     public Number getColumnCount() {
         return columnCount;
-    }
-
-    public Document getEventPreDelete() {
-        return eventPreDelete;
     }
 
     public int getHandsonColWidths() {
@@ -312,11 +298,23 @@ public class MyForm implements MyFormXs {
         return tranzient;
     }
 
-    public Document getEventPostDelete() {
+    public TagEvent getEventFormSelection() {
+        return eventFormSelection;
+    }
+
+    public TagEvent getEventPreSave() {
+        return eventPreSave;
+    }
+
+    public TagEvent getEventPreDelete() {
+        return eventPreDelete;
+    }
+
+    public TagEvent getEventPostDelete() {
         return eventPostDelete;
     }
 
-    public Document getEventPostSave() {
+    public TagEvent getEventPostSave() {
         return eventPostSave;
     }
 
@@ -350,10 +348,6 @@ public class MyForm implements MyFormXs {
 
     public String getName() {
         return name;
-    }
-
-    public Document getEvents() {
-        return events;
     }
 
     public String getTable() {
@@ -800,10 +794,6 @@ public class MyForm implements MyFormXs {
         return pageName;
     }
 
-    public Document getRegistredFunctions() {
-        return registredFunctions;
-    }
-
     private static class OrderedKey {
 
         private final int orderno;
@@ -1058,26 +1048,6 @@ public class MyForm implements MyFormXs {
                 }
             }
 
-        }
-
-        public Builder maskEvents() throws Exception {
-
-            if (dbObjectForm.get(FORM_EVENTS) instanceof Document) {
-
-                this.myForm.events = (Document) dbObjectForm.get(FORM_EVENTS);
-
-                for (String eventKey : this.myForm.events.keySet()) {
-                    Document event = (Document) this.myForm.events.get(eventKey);
-                    if (event.get(ACTION) == null) {
-                        String errorMsg = MessageFormat//
-                                .format("<ul><li>The \"{0}.action\" property is missed.</br>"
-                                        + "It seems you have defined \"{0}\" on form,</br>"
-                                        + "but forget to set \"action\" on this.", eventKey);
-                        throw new Exception(errorMsg);
-                    }
-                }
-            }
-            return this;
         }
 
         public Builder maskUpperNode() throws Exception {
@@ -1669,21 +1639,13 @@ public class MyForm implements MyFormXs {
             if (dbObjectForm.get(EXCEL_FORMAT) instanceof Document) {
                 this.myForm.excelFormat = (Document) dbObjectForm.get(EXCEL_FORMAT);
             }
-            if (dbObjectForm.get(EVENT_PRE_SAVE) instanceof Document) {
-                this.myForm.eventPreSave = (Document) dbObjectForm.get(EVENT_PRE_SAVE);
-            }
-            if (dbObjectForm.get(EVENT_POST_SAVE) instanceof Document) {
-                this.myForm.eventPostSave = (Document) dbObjectForm.get(EVENT_POST_SAVE);
-            }
-            if (dbObjectForm.get(EVENT_POST_DELETE) instanceof Document) {
-                this.myForm.eventPostDelete = (Document) dbObjectForm.get(EVENT_POST_DELETE);
-            }
-            if (dbObjectForm.get(EVENT_FORM_SELECTION) instanceof Document) {
-                this.myForm.eventFormSelection = (Document) dbObjectForm.get(EVENT_FORM_SELECTION);
-            }
-            if (dbObjectForm.get(EVENT_PRE_DELETE) instanceof Document) {
-                this.myForm.eventPreDelete = (Document) dbObjectForm.get(EVENT_PRE_DELETE);
-            }
+
+            this.myForm.eventPreSave = TagEvent.value(dbObjectForm.get(EVENT_PRE_SAVE, Document.class), this.myForm.myProject.getRegistredFunctions());
+            this.myForm.eventPostSave = TagEvent.value(dbObjectForm.get(EVENT_POST_SAVE, Document.class), this.myForm.myProject.getRegistredFunctions());
+            this.myForm.eventPostDelete = TagEvent.value(dbObjectForm.get(EVENT_POST_DELETE, Document.class), this.myForm.myProject.getRegistredFunctions());
+            this.myForm.eventFormSelection = TagEvent.value(dbObjectForm.get(EVENT_FORM_SELECTION, Document.class), this.myForm.myProject.getRegistredFunctions());
+            this.myForm.eventPreDelete = TagEvent.value(dbObjectForm.get(EVENT_PRE_DELETE, Document.class), this.myForm.myProject.getRegistredFunctions());
+
             if (dbObjectForm.get(SUB_GROUPS) instanceof Document) {
                 this.myForm.subGroups = ((Document) dbObjectForm.get(SUB_GROUPS));
             }
@@ -1775,20 +1737,6 @@ public class MyForm implements MyFormXs {
                     myForm.ajaxFields.add(myField.getKey());
                 }
             }
-            return this;
-        }
-
-        public Builder maskRegistredFunctions() {
-
-            List<Document> listDoc = dbObjectForm.getList("registred-functions", Document.class);
-
-            if (listDoc != null) {
-                this.myForm.registredFunctions = new Document();
-                for (Document document : listDoc) {
-                    this.myForm.registredFunctions.append(document.getString("key"), document.getString("value"));
-                }
-            }
-
             return this;
         }
 
