@@ -1,5 +1,6 @@
 package tr.org.tspb.dao;
 
+import java.util.List;
 import static tr.org.tspb.constants.ProjectConstants.*;
 import java.util.Map;
 import org.bson.Document;
@@ -21,6 +22,7 @@ public class MyProject {
     private final String loginDetailTable;
     private final String loginDetailLdapUID;
     private final String key;
+    private Document registredFunctions;
 
     public MyProject(Map docProject, String loginDetailDb, String loginDetailTable, String loginDetailLdapUID, Document loginDetailQuery) {
         this.configCollection = docProject.get(CONFIG_COLLECTIONS).toString();
@@ -42,6 +44,12 @@ public class MyProject {
         this.loginDetailLdapUID = loginDetailLdapUID;
         this.loginDetailQuery = loginDetailQuery;
 
+        this.maskRegistredFunctions(new Document(docProject));
+
+    }
+
+    public Document getRegistredFunctions() {
+        return registredFunctions;
     }
 
     public String getAdminRole() {
@@ -86,6 +94,19 @@ public class MyProject {
 
     public String getKey() {
         return key;
+    }
+
+    public final void maskRegistredFunctions(Document docProject) {
+
+        List<Document> listDoc = docProject.getList("registred-functions", Document.class);
+
+        if (listDoc != null) {
+            this.registredFunctions = new Document();
+            for (Document document : listDoc) {
+                this.registredFunctions.append(document.getString("key"), document.getString("value"));
+            }
+        }
+
     }
 
 }
