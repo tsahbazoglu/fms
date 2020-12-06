@@ -63,6 +63,7 @@ import tr.org.tspb.dao.MyField;
 import tr.org.tspb.dao.MyForm;
 import tr.org.tspb.dao.MyMap;
 import tr.org.tspb.dao.MyNotifies;
+import tr.org.tspb.dao.TagEvent;
 import tr.org.tspb.exceptions.FormConfigException;
 import tr.org.tspb.exceptions.LdapException;
 import tr.org.tspb.exceptions.NullNotExpectedException;
@@ -302,9 +303,9 @@ public class CrudOneDim implements ValueChangeListener, Serializable {
 
         selectedFormMessages = createFormMsg(myForm);
 
-        Document trigger = myForm.getEventFormSelection();
-        if (trigger != null && "showWarnErrPopup".equals(trigger.get(TYPE))) {
-            dialogController.showPopupInfoWithOk(trigger.get(MESSAGE).toString(), MESSAGE_DIALOG);
+        TagEvent trigger = myForm.getEventFormSelection();
+        if (trigger != null && TagEvent.TagEventType.showWarnErrPopup.equals(trigger.getType())) {
+            dialogController.showPopupInfoWithOk(trigger.getMsg(), MESSAGE_DIALOG);
         }
 
         if ("debug".equals(baseService.getProperties().getDebugMode())) {
