@@ -441,27 +441,27 @@ public class TwoDimModifyCtrl extends FmsTable implements ActionListener {
 
     public void valueChangeListenerTableSearch(AjaxBehaviorEvent event) {
         search();
-        MyActions myActions = ogmCreator
-                .getMyActions(formService.getMyForm(), loginController.getRoleMap(), filterService.getTableFilterCurrent(), loginController.getLoggedUserDetail());
-        formService.getMyForm().initActions(myActions);
+        resetActions();
 
     }
 
     public String actionSearchObject() {
         search();
+        resetActions();
+
+        return null;
+    }
+
+    private void resetActions() {
         MyActions myActions = ogmCreator
                 .getMyActions(formService.getMyForm(), loginController.getRoleMap(), filterService.getTableFilterCurrent(), loginController.getLoggedUserDetail());
         formService.getMyForm().initActions(myActions);
-
-        return null;
     }
 
     public String resetFilter() {
         filterService.getGuiFilterCurrent().clear();
         search();
-        MyActions myActions = ogmCreator
-                .getMyActions(formService.getMyForm(), loginController.getRoleMap(), filterService.getTableFilterCurrent(), loginController.getLoggedUserDetail());
-        formService.getMyForm().initActions(myActions);
+        resetActions();
 
         return null;
     }
@@ -574,6 +574,7 @@ public class TwoDimModifyCtrl extends FmsTable implements ActionListener {
             Document filterClone = new Document(filterService.getTableFilterCurrent());
             ctrlService.crossCheck(filterClone);
             callAdditionalAction(filterClone, formService.getMyForm().getMyActions().getCheckAllAction());
+            resetActions();
         } catch (Exception ex) {
             logger.error("error occured", ex);
             dialogController.showPopupError(ex.getMessage());
@@ -614,6 +615,7 @@ public class TwoDimModifyCtrl extends FmsTable implements ActionListener {
             saveObject(null);
             ((FmsTableDataModel) getData()).initRowCount(findDataCount());
             ((FmsTableDataModel) getData()).emptyListOfData();
+            resetActions();
         } catch (FormConfigException | LdapException | MongoOrmFailedException
                 | MoreThenOneInListException | NullNotExpectedException
                 | RecursiveLimitExceedException | UserException
@@ -677,10 +679,10 @@ public class TwoDimModifyCtrl extends FmsTable implements ActionListener {
         try {
 
             if (formService.getMyForm().getEventPreSave() != null) {
-                String db = (String) formService.getMyForm().getEventPreSave().get(FORM_DB);
-                Code code = (Code) formService.getMyForm().getEventPreSave().get("jsFunction");
+                String db = formService.getMyForm().getEventPreSave().getDb();
+                String code = formService.getMyForm().getEventPreSave().getJsFunction();
                 if (db != null) {
-                    Document commandResult = mongoDbUtil.runCommand(db, code.getCode(), filterService.getTableFilterCurrent(), crudObject);
+                    Document commandResult = mongoDbUtil.runCommand(db, code, filterService.getTableFilterCurrent(), crudObject);
                     if (commandResult.getBoolean(RETVAL)) {
                         dialogController.showPopupInfoWithOk("<ul>"
                                 + "<li><font color='red'>Kaydetme İşlemi Gerçekleştirilemedi.</font></li>"
@@ -1170,11 +1172,7 @@ public class TwoDimModifyCtrl extends FmsTable implements ActionListener {
 
                     putSearchObjectValue(PERIOD, SelectOneObjectIdConverter.NULL_VALUE);
 
-                    MyActions myActions = ogmCreator
-                            .getMyActions(formService.getMyForm(), loginController.getRoleMap(),
-                                    filterService.getTableFilterCurrent(), loginController.getLoggedUserDetail());
-
-                    formService.getMyForm().initActions(myActions);
+                    resetActions();
 
                     actionSearchObject();
 
