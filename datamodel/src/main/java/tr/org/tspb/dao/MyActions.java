@@ -320,13 +320,16 @@ public class MyActions {
 
                 switch (key) {
                     case ACTION_SAVE:
-                        myActions.saveAction = new FmsAction(enable, enableResult, action, myActions.myForm.getRegistredFunctions());
+                        myActions.saveAction = new FmsAction(enable, enableResult, action,
+                                myActions.myForm.getMyProject().getRegistredFunctions());
                         break;
                     case ACTION_CHECK_ALL:
-                        myActions.checkAllAction = new FmsAction(enable, enableResult, action, myActions.myForm.getRegistredFunctions());
+                        myActions.checkAllAction = new FmsAction(enable, enableResult, action,
+                                myActions.myForm.getMyProject().getRegistredFunctions());
                         break;
                     case ACTION_SEND_FROMS:
-                        myActions.sendFormAction = new FmsAction(enable, enableResult, action, myActions.myForm.getRegistredFunctions());
+                        myActions.sendFormAction = new FmsAction(enable, enableResult, action,
+                                myActions.myForm.getMyProject().getRegistredFunctions());
                         break;
                 }
 
