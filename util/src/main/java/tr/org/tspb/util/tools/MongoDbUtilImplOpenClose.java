@@ -54,6 +54,7 @@ import tr.org.tspb.dao.MyLookup;
 import tr.org.tspb.dao.refs.PlainRecord;
 import tr.org.tspb.pojo.RoleMap;
 import tr.org.tspb.dao.FmsFile;
+import tr.org.tspb.dao.TagEvent;
 
 /**
  *
@@ -358,14 +359,15 @@ public class MongoDbUtilImplOpenClose implements MongoDbUtilIntr {
         return value;
     }
 
-    public Document trigger(Document projectSpaceMap, Document trigger, List roles) {
+    @Override
+    public Document trigger(Document projectSpaceMap, TagEvent trigger, List roles) {
         if (trigger != null) {
-            Code function = (Code) trigger.get("op");
+            String function = trigger.getOp();
 
             if (function != null) {
                 final Document command = new Document();
                 //command.put("$eval", String.format(replaceFuncCode(function.getCode()), replaceParams(projectSpaceMap)));
-                return runCommand((String) trigger.get(FORM_DB), function.getCode(), projectSpaceMap, roles);
+                return runCommand(trigger.getDb(), function, projectSpaceMap, roles);
             }
         }
         return new Document();

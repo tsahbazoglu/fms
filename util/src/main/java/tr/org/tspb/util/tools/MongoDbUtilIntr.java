@@ -22,6 +22,7 @@ import tr.org.tspb.dao.MyItems;
 import tr.org.tspb.dao.MyLookup;
 import tr.org.tspb.pojo.RoleMap;
 import tr.org.tspb.dao.FmsFile;
+import tr.org.tspb.dao.TagEvent;
 
 /**
  *
@@ -81,7 +82,7 @@ public interface MongoDbUtilIntr extends Serializable {
 
     public Object getValue(Map dbObject, String dottedString);
 
-    public Document trigger(Document projectSpaceMap, Document trigger, List roles);
+    public Document trigger(Document projectSpaceMap, TagEvent trigger, List roles);
 
     public List<String> replaceParams(Object... objects);
 
