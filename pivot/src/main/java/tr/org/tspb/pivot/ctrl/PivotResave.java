@@ -45,6 +45,7 @@ import static tr.org.tspb.constants.ProjectConstants.UYSDB;
 import tr.org.tspb.factory.qualifier.OgmCreatorQualifier;
 import tr.org.tspb.service.FilterService;
 import tr.org.tspb.factory.cp.OgmCreatorIntr;
+import tr.org.tspb.service.RepositoryService;
 import tr.org.tspb.util.stereotype.MyController;
 
 /**
@@ -66,6 +67,9 @@ public class PivotResave extends PivotImpl {
 
     @Resource(lookup = ProjectConstants.CUSTOM_RESOURCE_MONGO_ADMIN_PSWD)
     private String resourceMongoAdminPswd;
+
+    @Inject
+    private RepositoryService repositoryService;
 
     private static final String SECINIZ = " seçiniz";
     private static final String DATA_BANK_TEMPLATE = "dataBankTemplate";
@@ -615,11 +619,8 @@ public class PivotResave extends PivotImpl {
             }
         }
 
-        Document trigger = formService.getMyForm().getEventPostSave();
-
-        if (trigger == null || !"application".equals(trigger.get(TYPE))) {
-            mongoDbUtil.trigger(new Document(getFilter()), trigger, loginController.getRolesAsList());
-        }
+        repositoryService
+                .runEventPostSave(new Document(getFilter()), formService.getMyForm(), null);
 
         return null;
     }
