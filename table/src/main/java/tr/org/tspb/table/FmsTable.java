@@ -72,9 +72,11 @@ import javax.annotation.PostConstruct;
 import tr.org.tspb.common.qualifier.MyCtrlServiceQualifier;
 import tr.org.tspb.dao.ChildFilter;
 import tr.org.tspb.dao.MyBaseRecord;
+import tr.org.tspb.exceptions.MongoOrmFailedException;
 import tr.org.tspb.factory.qualifier.OgmCreatorQualifier;
 import tr.org.tspb.service.CtrlService;
 import tr.org.tspb.factory.cp.OgmCreatorIntr;
+import tr.org.tspb.pojo.PostSaveResult;
 import tr.org.tspb.service.CalcService;
 
 /**
@@ -166,7 +168,7 @@ public abstract class FmsTable extends FmsTableView {
             return false;
         }
 
-        String eventPreSaveDB = (String) formService.getMyForm().getEventPreSave().get(FORM_DB);
+        String eventPreSaveDB = formService.getMyForm().getEventPreSave().getDb();
 
         if (eventPreSaveDB == null) {
             //FIXME messagebundle
@@ -180,8 +182,8 @@ public abstract class FmsTable extends FmsTableView {
         Document myCrudObject = new Document(crudObject);
         myCrudObject.remove(INODE);// we remove it bacuase of MyForm class cannot be serialized for mongo.doEval
 
-        Code code = (Code) formService.getMyForm().getEventPreSave().get("jsFunction");
-        Document commandResult = mongoDbUtil.runCommand(eventPreSaveDB, code.getCode(), query, myCrudObject);
+        String code = formService.getMyForm().getEventPreSave().getJsFunction();
+        Document commandResult = mongoDbUtil.runCommand(eventPreSaveDB, code, query, myCrudObject);
         Object result = commandResult.get(RETVAL);
 
         if (Boolean.TRUE.equals(result)) {
@@ -843,7 +845,7 @@ public abstract class FmsTable extends FmsTableView {
     }
 
     private ObjectId saveOneDimensionObject(Document operatedObject, String username, MyForm myForm, String ip, String sessionId)
-            throws MessagingException, NullNotExpectedException, LdapException, FormConfigException {
+            throws MessagingException, NullNotExpectedException, LdapException, FormConfigException, MongoOrmFailedException {
 
         MyForm inode = (MyForm) operatedObject.get(INODE);
         operatedObject.remove(INODE);//just to sutisfy the icefaces
@@ -1011,29 +1013,10 @@ public abstract class FmsTable extends FmsTableView {
         }
         //end : provide uploaded file relation
 
-        Document trigger = myForm.getEventPostSave();
-        if (trigger != null) {
-            if ("application".equals(trigger.get(TYPE))) {
-                Map calculateAreaSearchMap = new HashMap();
-                Document cacheQueryMap = (Document) trigger.get("cacheQuery");
-                for (String key : cacheQueryMap.keySet()) {
-                    calculateAreaSearchMap.put(key, operatedObject.get(key));
-                }
-                calculateAreaSearchMap.put(FORM_DB, trigger.get(FORM_DB));
-                calculateAreaSearchMap.put(COLLECTION, trigger.get(COLLECTION));
-                uysApplicationMB.removeApplicationSearchResults(calculateAreaSearchMap);
-            } else if ("showWarnErrPopup".equals(trigger.get(TYPE))) {
-                dialogController.showPopupInfoWithOk(trigger.get(MESSAGE).toString(), MESSAGE_DIALOG);
-            } else if ("obfuscateLdapPassword".equals(trigger.get(TYPE))) {
-                if ("003".equals(((Document) result.get("status")).get(CODE))) { // ÜYELİKTEN ÇIKTI
-                    ldapService.updatePswd(new MyLdapUser(result).getUid());
-                    dialogController.showPopupInfoWithOk(
-                            "https://support.tspb.org.tr/issues/4251 </br> nolu işisteri gereği kullanıcının şifresi değiştirilerek sisteme girişi engellendi.",
-                            MESSAGE_DIALOG);
-                }
-            } else {
-                mongoDbUtil.trigger(operatedObject, trigger, loginController.getRolesAsList());
-            }
+        PostSaveResult postSaveResult = repositoryService.runEventPostSave(operatedObject, myForm, null);
+
+        if (postSaveResult.getMsg() != null) {
+            dialogController.showPopupInfoWithOk(postSaveResult.getMsg(), MESSAGE_DIALOG);
         }
 
         if (formService.getMyForm().getMyNotifies() != null) {
@@ -1106,7 +1089,7 @@ public abstract class FmsTable extends FmsTableView {
     }
 
     public ObjectId saveObject(MyForm myForm, LoginController loginMB, MyMap crudObject)
-            throws UserException, MessagingException, NullNotExpectedException, LdapException, FormConfigException {
+            throws UserException, MessagingException, NullNotExpectedException, LdapException, FormConfigException, MongoOrmFailedException {
 
         Object loginFkFieldValue = crudObject.get(formService.getMyForm().getLoginFkField());
 
