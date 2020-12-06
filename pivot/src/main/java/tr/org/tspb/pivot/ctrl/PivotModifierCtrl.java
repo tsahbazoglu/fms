@@ -394,7 +394,7 @@ public class PivotModifierCtrl extends PivotImpl {
         selectedFormMessages = createFormMsg(formService.getMyForm());
 
         TagEvent trigger = formService.getMyForm().getEventFormSelection();
-        if (trigger != null && "showWarnErrPopup".equals(trigger.getType())) {
+        if (trigger != null && TagEvent.TagEventType.showWarnErrPopup.equals(trigger.getType())) {
             dialogController.showPopupInfoWithOk(trigger.getMsg(), MESSAGE_DIALOG);
         }
 
