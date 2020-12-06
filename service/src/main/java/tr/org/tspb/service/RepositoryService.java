@@ -32,7 +32,6 @@ import java.util.regex.Pattern;
 import javax.inject.Inject;
 import org.bson.Document;
 import org.bson.conversions.Bson;
-import org.bson.types.Code;
 import org.bson.types.ObjectId;
 import tr.org.tspb.common.qualifier.MyLoginQualifier;
 import tr.org.tspb.common.services.AppScopeSrvCtrl;
