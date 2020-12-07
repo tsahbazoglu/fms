@@ -1,6 +1,7 @@
 package tr.org.tspb.dao;
 
 import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
 import org.bson.Document;
 import tr.org.tspb.constants.ProjectConstants;
@@ -29,7 +30,10 @@ public class TagActionRef {
 
         Document query = new Document();
 
-        for (Document d : ref.get("query", Document.class).getList("list", Document.class)) {
+        String func = ref.get("query", Document.class).getString("func");
+        List<Document> list = ref.get("query", Document.class).getList("list", Document.class);
+
+        for (Document d : list) {
 
             String key = d.get("key", String.class);
 
