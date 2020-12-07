@@ -90,7 +90,7 @@ public class PivotModifierCtrl extends PivotImpl {
 
         for (MyField myField : formService.getMyForm().getAutosetFields()) {
 
-            Object autosetKeyValue = getSearchObjectValue(myField.getKey());
+            Object autosetKeyValue = getSearchObjectValue(myField.getField());
 
             if (autosetKeyValue == null) {
                 throw new UserException("Lütfen ".concat(myField.getName()).concat(SECINIZ));
@@ -116,7 +116,7 @@ public class PivotModifierCtrl extends PivotImpl {
          * //FIXME burada uysdb değeri selectedForm üzerinden değil
          * db.ldapMatch.findOne() üzerinden yapılmalı.
          *
-         * Cünkü farklı projeler farklı kullnıcı listesine sahip olabilir
+         * Cünkü farklı projeler farklı kullanıcı listesine sahip olabilir
          * ileride ama şimdilik hepsi uysdb projesi ile ortak
          */
         if (!loginController.isUserInRole(formService.getMyForm().getMyProject().getAdminRole())//
