@@ -88,8 +88,8 @@ public class MyForm implements MyFormXs {
     private HashMap<String, Object> defaultCurrentQuery;
     private HashMap<String, Object> defaultHistoryQuery;
     private List uniqueIndexList;
-    private Code funcNote;//constantly stay on the page
-    private Code esignEmailToRecipients;
+    private String funcNote;//constantly stay on the page
+    private String esignEmailToRecipients;
     private Number menuOrder;
     private Number columnCount;
     private Number dimension;
@@ -186,7 +186,7 @@ public class MyForm implements MyFormXs {
         return esignEmailBccRecipients;
     }
 
-    public Code getEsignEmailToRecipients() {
+    public String getEsignEmailToRecipients() {
         return esignEmailToRecipients;
     }
 
@@ -250,7 +250,7 @@ public class MyForm implements MyFormXs {
         return readOnlyNote;
     }
 
-    public Code getFuncNote() {
+    public String getFuncNote() {
         return funcNote;
     }
 
@@ -551,7 +551,7 @@ public class MyForm implements MyFormXs {
         crudObjAsDoc.remove(INODE);
 
         Document commandResult = fmsScriptRunner.runCommand(selectedForm.getDb(),
-                myField.getAjaxShowHide().getCode(), crudObject.get(myField.getKey()), crudObjAsDoc, roleMap);
+                myField.getAjaxShowHide(), crudObject.get(myField.getKey()), crudObjAsDoc, roleMap);
 
         Object result = commandResult.get(RETVAL);
 
@@ -1654,12 +1654,8 @@ public class MyForm implements MyFormXs {
             }
 
             // code properties
-            if (dbObjectForm.get(ESIGN_EMAIL_TO_RECIPIENTS) instanceof Code) {
-                this.myForm.esignEmailToRecipients = (Code) dbObjectForm.get(ESIGN_EMAIL_TO_RECIPIENTS);
-            }
-            if (dbObjectForm.get(FUNC_NOTE) instanceof Code) {
-                this.myForm.funcNote = (Code) dbObjectForm.get(FUNC_NOTE);
-            }
+            this.myForm.esignEmailToRecipients = dbObjectForm.getString(ESIGN_EMAIL_TO_RECIPIENTS);
+            this.myForm.funcNote = dbObjectForm.getString(FUNC_NOTE);
 
             // number properties
             if (dbObjectForm.get(COLUMN_COUNT) instanceof Number) {
