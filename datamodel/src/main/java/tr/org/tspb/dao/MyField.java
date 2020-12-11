@@ -46,7 +46,7 @@ public class MyField {
     private Boolean quickFilter;
     private Boolean autoset;
     private String ajaxAction;
-    private Code ajaxShowHide;
+    private String ajaxShowHide;
     private String ajaxUpdate;
     private List<String> ajaxEffectedKeys = new ArrayList<>();
     private boolean ajax;
@@ -161,7 +161,7 @@ public class MyField {
     }
 
 // <editor-fold defaultstate="collapsed" desc="getters">
-    public Code getAjaxShowHide() {
+    public String getAjaxShowHide() {
         return ajaxShowHide;
     }
 
@@ -1105,9 +1105,7 @@ public class MyField {
 
             this.myField.ajax = Boolean.TRUE.equals(this.myField.dbo.get(AJAX));
 
-            if (this.myField.dbo.get("ajaxShowHide") instanceof Code) {
-                this.myField.ajaxShowHide = (Code) this.myField.dbo.get("ajaxShowHide");
-            }
+            this.myField.ajaxShowHide = this.myField.dbo.getString("ajaxShowHide");
 
             if (this.myField.dbo.get(AJAX_ACTION) instanceof String) {
                 this.myField.ajaxAction = this.myField.dbo.get(AJAX_ACTION).toString();
