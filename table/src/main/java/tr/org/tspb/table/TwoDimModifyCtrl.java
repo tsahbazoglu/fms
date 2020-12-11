@@ -69,7 +69,7 @@ import tr.org.tspb.dao.MyMap;
 import tr.org.tspb.outsider.FmsWorkFlow;
 import tr.org.tspb.pojo.UserDetail;
 import static tr.org.tspb.constants.ProjectConstants.*;
-import tr.org.tspb.dao.FmsAction;
+import tr.org.tspb.dao.TagActionsAction;
 import tr.org.tspb.dao.MyActions;
 import tr.org.tspb.dao.MyBaseRecord;
 import tr.org.tspb.dao.MyItems;
@@ -498,11 +498,7 @@ public class TwoDimModifyCtrl extends FmsTable implements ActionListener {
 
     public String getSelectedFormFuncNote() {
         if (formService.getMyForm().getName() != null && formService.getMyForm().getFuncNote() != null) {
-
-            String code = formService.getMyForm().getFuncNote().getCode();
-
-            Document commandResult = mongoDbUtil.findOne(formService.getMyForm().getDb(), code, filterService.getTableFilterCurrent());
-
+            Document commandResult = mongoDbUtil.findOne(formService.getMyForm().getDb(), formService.getMyForm().getFuncNote(), filterService.getTableFilterCurrent());
             return commandResult.getString(RETVAL);
         } else {
             return null;
@@ -582,7 +578,7 @@ public class TwoDimModifyCtrl extends FmsTable implements ActionListener {
         return null;
     }
 
-    public void callAdditionalAction(Document filter, FmsAction fmsAction) {
+    public void callAdditionalAction(Document filter, TagActionsAction fmsAction) {
 
         ctrlService.init(formService.getMyForm().getMyProject().getConfigTable());
 
@@ -1008,8 +1004,7 @@ public class TwoDimModifyCtrl extends FmsTable implements ActionListener {
                 selectedFormMessages.add(formService.getMyForm().getReadOnlyNote());
             }
             if (formService.getMyForm().getFuncNote() != null) {
-                String code = formService.getMyForm().getFuncNote().getCode();
-                Document commandResult = mongoDbUtil.runCommand(formService.getMyForm().getDb(), code, filter);
+                Document commandResult = mongoDbUtil.runCommand(formService.getMyForm().getDb(), formService.getMyForm().getFuncNote(), filter);
                 String commandResultValue = commandResult.getString(RETVAL);
                 if (commandResultValue != null) {
                     selectedFormMessages.add(commandResultValue);
@@ -1111,24 +1106,47 @@ public class TwoDimModifyCtrl extends FmsTable implements ActionListener {
 
     }
 
-    public String sendForm() throws AbortProcessingException {
+    public String norecord() {
 
-        if (!formService.getMyForm().getMyActions().isSaveAs()) {
-            StringBuilder sb = new StringBuilder();
-            sb.append("<ul>");
-            sb.append("<li>");
-            sb.append("Hatalı veri girişleriniz mevcut.");
-            sb.append("</li>");
-            sb.append("<li>");
-            sb.append("'Tüm Sayfaları Kontrol Et' düğmesine tıklayarak hata ve uyarıları tespit ediniz");
-            sb.append("</li>");
-            sb.append("<li>");
-            sb.append("hataları gideriniz ve uyarılara açıklama yazınız.");
-            sb.append("</li>");
-            sb.append("</ul>");
-            dialogController.showPopupWarning(sb.toString(), MESSAGE_DIALOG);
-            return null;
+        try {
+            String successMessage = formService.getMyForm().getMyActions().getNorecordAction().getEnableResult().getSuccessMessage();
+
+            String code = formService.getMyForm().getMyActions().getNorecordAction().getEnableResult().getMyaction();
+            List<TagActionsAction.Operation> list = formService.getMyForm().getMyActions().getNorecordAction().getOperations();
+
+            if (code != null) {
+                Document mySearchObject = repositoryService.expandCrudObject(formService.getMyForm(), getSearchObjectAsDbo());
+
+                for (MyField myField : formService.getMyForm().getAutosetFields()) {
+                    if (mySearchObject.get(myField.getKey()) == null
+                            || SelectOneObjectIdConverter.NULL_VALUE.equals(mySearchObject.get(myField.getKey()))) {
+                        throw new Exception(
+                                MessageFormat.format("arama kriterlerinde {0} belirsiz.", myField.getKey()));
+                    }
+                }
+                mongoDbUtil.runCommand(formService.getMyForm().getDb(), code, mySearchObject, null);
+            } else if (list != null) {
+                for (TagActionsAction.Operation operation : list) {
+                    if (operation.getOp().equals("upsert")) {
+                        mongoDbUtil.upsertOne(operation.getDb(), operation.getTable(), operation.getFilter(), operation.getSet());
+                    }
+                }
+            }
+
+            resetActions();
+
+            actionSearchObject();
+
+            dialogController.showPopupInfo(successMessage, MESSAGE_DIALOG);
+
+        } catch (Exception ex) {
+            String failMessage = formService.getMyForm().getMyActions().getNorecordAction().getEnableResult().getFailMessage();
+            dialogController.showPopupInfo(failMessage, MESSAGE_DIALOG);
         }
+        return null;
+    }
+
+    public String sendForm() {
 
         String failMessage = formService.getMyForm().getMyActions().getSendFormAction().getEnableResult().getFailMessage();
 
@@ -1140,15 +1158,10 @@ public class TwoDimModifyCtrl extends FmsTable implements ActionListener {
             TimeZone timeZone = TimeZone.getTimeZone("Asia/Istanbul");
             SIMPLE_DATE_FORMAT__3.setTimeZone(timeZone);
 
-            String projectBasedPeriodColectionName = formService.getMyForm().getField(PERIOD).getItemsAsMyItems().getTable();
-
             successMessage = String.format(successMessage, SIMPLE_DATE_FORMAT__3.format(new Date()),
-                    uysApplicationMB.getApplicationSearchResults(
-                            new Document()
-                                    .append(FORM_DB, formService.getMyForm().getDb())
-                                    .append(COLLECTION, projectBasedPeriodColectionName)
-                                    .append(FORMS, PERIOD)
-                                    .append(MONGO_ID, getSearchObjectValue(PERIOD))).get(0).get(NAME));
+                    mongoDbUtil.findOne("uysdb", "common", Filters.and(
+                            Filters.eq(FORMS, PERIOD),
+                            Filters.eq(MONGO_ID, getSearchObjectValue(PERIOD)))).getString(NAME));
 
             String myActionType = formService.getMyForm().getMyActions().getSendFormAction().getEnableResult().getMyActionType();
             String javaFunc = formService.getMyForm().getMyActions().getSendFormAction().getEnableResult().getJavaFunc();
