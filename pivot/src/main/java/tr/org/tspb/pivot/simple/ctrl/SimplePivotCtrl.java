@@ -205,11 +205,7 @@ public class SimplePivotCtrl extends SimplePivotCtrlAdmin {
 //            msgs.add(myForm.getReadOnlyNote());
 //        }
         if (myForm.getFuncNote() != null) {
-
-            String code = myForm.getFuncNote().getCode();
-
-            Document commandResult = mongoDbUtil.runCommand(myForm.getDb(), code, filterService.getTableFilterCurrent());
-
+            Document commandResult = mongoDbUtil.runCommand(myForm.getDb(), myForm.getFuncNote(), filterService.getTableFilterCurrent());
             String commandResultValue = commandResult.getString(RETVAL);
             if (commandResultValue != null) {
                 msgs.add(commandResultValue);
