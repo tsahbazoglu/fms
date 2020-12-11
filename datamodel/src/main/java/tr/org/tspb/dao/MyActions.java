@@ -40,12 +40,14 @@ public class MyActions {
     private boolean pdf;
     private boolean ldap;
     private boolean sendForms;
+    private boolean norecord;
     private FmsScriptRunner fmsScriptRunner;
 
-    private FmsAction saveAction;
-    private FmsAction deleteAction;
-    private FmsAction checkAllAction;
-    private FmsAction sendFormAction;
+    private TagActionsAction saveAction;
+    private TagActionsAction deleteAction;
+    private TagActionsAction checkAllAction;
+    private TagActionsAction sendFormAction;
+    private TagActionsAction norecordAction;
 
     private List<DynamicButton> list;
 
@@ -157,15 +159,15 @@ public class MyActions {
         return list;
     }
 
-    public FmsAction getSaveAction() {
+    public TagActionsAction getSaveAction() {
         return saveAction;
     }
 
-    public FmsAction getDeleteAction() {
+    public TagActionsAction getDeleteAction() {
         return deleteAction;
     }
 
-    public FmsAction getCheckAllAction() {
+    public TagActionsAction getCheckAllAction() {
         return checkAllAction;
     }
 
@@ -173,8 +175,16 @@ public class MyActions {
         return sendForms;
     }
 
-    public FmsAction getSendFormAction() {
+    public TagActionsAction getSendFormAction() {
         return sendFormAction;
+    }
+
+    public boolean isNorecord() {
+        return norecord;
+    }
+
+    public TagActionsAction getNorecordAction() {
+        return norecordAction;
     }
 
     public static class Build {
@@ -198,7 +208,8 @@ public class MyActions {
                 "payment",
                 "pdf",
                 "ldap",
-                ACTION_SEND_FROMS
+                ACTION_SEND_FROMS,
+                ACTION_NORECORD
         ));
 
         private String viewerRole;
@@ -320,16 +331,19 @@ public class MyActions {
 
                 switch (key) {
                     case ACTION_SAVE:
-                        myActions.saveAction = new FmsAction(enable, enableResult, action,
-                                myActions.myForm.getMyProject().getRegistredFunctions());
+                        myActions.saveAction = new TagActionsAction(enable, enableResult, action,
+                                myActions.myForm.getMyProject().getRegistredFunctions(), searchObject, userDetail);
                         break;
                     case ACTION_CHECK_ALL:
-                        myActions.checkAllAction = new FmsAction(enable, enableResult, action,
-                                myActions.myForm.getMyProject().getRegistredFunctions());
+                        myActions.checkAllAction = new TagActionsAction(enable, enableResult, action,
+                                myActions.myForm.getMyProject().getRegistredFunctions(), searchObject, userDetail);
                         break;
                     case ACTION_SEND_FROMS:
-                        myActions.sendFormAction = new FmsAction(enable, enableResult, action,
-                                myActions.myForm.getMyProject().getRegistredFunctions());
+                        myActions.sendFormAction = new TagActionsAction(enable, enableResult, action,
+                                myActions.myForm.getMyProject().getRegistredFunctions(), searchObject, userDetail);
+                    case ACTION_NORECORD:
+                        myActions.norecordAction = new TagActionsAction(enable, enableResult, action,
+                                myActions.myForm.getMyProject().getRegistredFunctions(), searchObject, userDetail);
                         break;
                 }
 
@@ -398,6 +412,9 @@ public class MyActions {
                     case ACTION_SEND_FROMS:
                         myActions.sendForms = value;
                         break;
+                    case ACTION_NORECORD:
+                        myActions.norecord = value;
+                        break;
                 }
             }
             return this;
@@ -447,8 +464,8 @@ public class MyActions {
             if (func != null && !roleMap.isUserInRole(this.myActions.myForm.getMyProject().getAdminAndViewerRole())) {
                 func = func.replace(DIEZ, DOLAR);
 
-                Document commandResult = fmsScriptRunner.runCommand(event.get(FORM_DB).toString(), func,
-                        filter, roleMap.keySet());
+                Document commandResult = fmsScriptRunner
+                        .runCommand(enable.getString(FORM_DB), func, filter, roleMap.keySet());
 
                 Object value = commandResult.get(RETVAL);
                 controlResult.setEnable(Boolean.TRUE.equals(value));
@@ -465,9 +482,12 @@ public class MyActions {
                 }
 
                 if (gui instanceof Document) {
-                    controlResult.setStyle(((Document) gui).getString(STYLE));
-                    controlResult.setCaption(((Document) gui).getString("caption"));
-                    controlResult.setDynamicButtonName(((Document) gui).getString("caption"));
+
+                    Document guiDoc = (Document) gui;
+
+                    controlResult.setStyle(guiDoc.getString(STYLE));
+                    controlResult.setCaption(guiDoc.getString("caption"));
+                    controlResult.setDynamicButtonName(guiDoc.getString("caption"));
 
                     Document objectAction = event.get(ACTION, Document.class);
 
