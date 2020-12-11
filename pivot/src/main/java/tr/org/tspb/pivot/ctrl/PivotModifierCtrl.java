@@ -719,11 +719,7 @@ public class PivotModifierCtrl extends PivotImpl {
             selectedFormMessages.add(myForm.getReadOnlyNote());
         }
         if (myForm.getFuncNote() != null) {
-
-            String code = myForm.getFuncNote().getCode();
-
-            Document commandResult = mongoDbUtil.runCommand(myForm.getDb(), code, getFilter());
-
+            Document commandResult = mongoDbUtil.runCommand(myForm.getDb(), myForm.getFuncNote(), getFilter());
             String commandResultValue = commandResult.getString(RETVAL);
             if (commandResultValue != null) {
                 selectedFormMessages.add(commandResultValue);
