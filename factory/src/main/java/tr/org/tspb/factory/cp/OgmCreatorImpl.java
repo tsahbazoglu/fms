@@ -89,6 +89,9 @@ import tr.org.tspb.util.tools.MongoDbUtilIntr;
 public class OgmCreatorImpl implements OgmCreatorIntr {
 
     private MongoDbUtilIntr mongoDbUtil;
+    FmsScriptRunner fmsScriptRunner = new FmsScriptRunner1();
+    FmsRunMongoCmd fmsRunMongoCmd = new FmsRunMongoCmd1();
+    Map<String, Document> cacheDocumentForm = new HashMap<>();
 
     public OgmCreatorImpl(MongoDbUtilIntr mongoDbUtil) {
         this.mongoDbUtil = mongoDbUtil;
@@ -97,53 +100,50 @@ public class OgmCreatorImpl implements OgmCreatorIntr {
     private OgmCreatorImpl() {
     }
 
-    FmsScriptRunner fmsScriptRunner = new FmsScriptRunner1();
-    FmsRunMongoCmd fmsRunMongoCmd = new FmsRunMongoCmd1();
-    Map<String, Document> cacheDocumentForm = new HashMap<>();
-
     private boolean calcRendered(RoleMap roleMap, Document docField, Map searchObject) {
 
-        Object dboRendered = docField.get(RENDERED);
+        Document dboRendered = docField.get(RENDERED, Document.class);
 
-        boolean localRendered = Boolean.TRUE.equals(dboRendered);
+        if (dboRendered == null) {
+            return false;
+        }
 
-        if (dboRendered instanceof Document) {
+        Boolean booleanValue = dboRendered.getBoolean("boolean-value");
+        Document refValue = dboRendered.get("ref-value", Document.class);
+        String funcValue = dboRendered.getString("func-value");
 
-            Document renderedObject = (Document) dboRendered;
+        if (booleanValue != null) {
+            return booleanValue;
+        } else if (funcValue != null) {
+            funcValue = funcValue.replace(DIEZ, DOLAR);
+            if (docField.get(FORM_DB) == null) {
+                throw new RuntimeException("field." + docField.get("key") + ".rendered is defined as func. 'db' tag is required.");
+            }
+            Document commandResult = mongoDbUtil.runCommand(docField.get(FORM_DB).toString(),
+                    funcValue, searchObject, roleMap.keySet());
+            return Boolean.TRUE.equals(commandResult.get(RETVAL));
+        } else if (refValue != null) {
 
-            String onUserRole = (String) renderedObject.get(ON_USER_ROLE);
+            String onUserRole = (String) refValue.get(ON_USER_ROLE);
             if (onUserRole != null) {
-                localRendered = roleMap.isUserInRole(onUserRole);
+                return roleMap.isUserInRole(onUserRole);
             } else {
-                String db = (String) renderedObject.get(FORM_DB);
-                String collection = (String) renderedObject.get(COLLECTION);
-                String returnKey = (String) renderedObject.get(RETURN_KEY);
-                Document query = (Document) renderedObject.get(QUERY);
+                String db = (String) refValue.get(FORM_DB);
+                String collection = (String) refValue.get(COLLECTION);
+                String returnKey = (String) refValue.get(RETURN_KEY);
+                Document query = (Document) refValue.get(QUERY);
 
                 query = mongoDbUtil.replaceToDollar(query);
 
                 Document result = mongoDbUtil.findOne(db, collection, (Document) query);
 
                 if (result == null || (HAYIR.equals(result.get(returnKey)))) {
-                    localRendered = false;
+                    return false;
                 }
             }
-
-        } else if (dboRendered instanceof Code) {
-            Code appearFunction = (Code) dboRendered;
-            appearFunction = new Code(appearFunction.getCode().replace(DIEZ, DOLAR));
-
-            if (docField.get(FORM_DB) == null) {
-                throw new RuntimeException("field." + docField.get("key") + ".rendered is defined as func. 'db' tag is required.");
-            }
-
-            Document commandResult = mongoDbUtil.runCommand(docField.get(FORM_DB).toString(),
-                    appearFunction.getCode(), searchObject, roleMap.keySet());
-
-            localRendered = Boolean.TRUE.equals(commandResult.get(RETVAL));
         }
 
-        return localRendered;
+        return false;
     }
 
     private Object calcDefaultValue(MyProject myProject, Document docForm, Document docField, RoleMap roleMap, Map searchObject,
