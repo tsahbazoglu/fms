@@ -9,6 +9,8 @@ import java.util.List;
 import java.util.Map;
 import org.bson.Document;
 import static tr.org.tspb.constants.ProjectConstants.DOLAR_IN;
+import static tr.org.tspb.constants.ProjectConstants.PERIOD;
+import static tr.org.tspb.constants.ProjectConstants.REPLACEABLE_KEY_WORD_FOR_FUNCTONS_FILTER_PERIOD;
 import static tr.org.tspb.constants.ProjectConstants.REPLACEABLE_KEY_WORD_FOR_FUNCTONS_LOGIN_MEMBER_ID;
 import tr.org.tspb.datamodel.expected.FmsScriptRunner;
 import tr.org.tspb.pojo.UserDetail;
@@ -37,9 +39,19 @@ public class TagEventCheckListDoc {
                 String db = doc.getString("db");
                 String table = doc.getString("table");
                 List<Document> filters = doc.getList("query", Document.class);
-                Document query = createQuery(filters, userDetail);
+                String decision = doc.getString("check");
+                Document query = createQuery(filters, userDetail, myFilter);
 
-                result = result && fmsScriptRunner.findOne(db, table, query) != null;
+                switch (decision) {
+                    case "existence":
+                        result = result && fmsScriptRunner.findOne(db, table, query) != null;
+                        break;
+                    case "non-existence":
+                        result = result && fmsScriptRunner.findOne(db, table, query) == null;
+                        break;
+                    default:
+                        result = result && fmsScriptRunner.findOne(db, table, query) != null;
+                }
 
             }
         }
@@ -47,7 +59,7 @@ public class TagEventCheckListDoc {
         return result;
     }
 
-    private static Document createQuery(List<Document> filters, UserDetail userDetail) throws RuntimeException {
+    private static Document createQuery(List<Document> filters, UserDetail userDetail, Map myFilter) throws RuntimeException {
         Document query = new Document();
         for (Document filter : filters) {
             String key = filter.getString("key");
@@ -63,6 +75,9 @@ public class TagEventCheckListDoc {
                 switch (fmsValue) {
                     case REPLACEABLE_KEY_WORD_FOR_FUNCTONS_LOGIN_MEMBER_ID:
                         query.append(key, userDetail.getDbo().getObjectId());
+                        break;
+                    case REPLACEABLE_KEY_WORD_FOR_FUNCTONS_FILTER_PERIOD:
+                        query.append(key, myFilter.get(PERIOD));
                         break;
                     default:
                         throw new RuntimeException(fmsValue.concat(" is not supported"));
