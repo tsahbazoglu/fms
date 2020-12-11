@@ -56,10 +56,17 @@
                 />
             <p:commandButton 
                 value="#{formService.myForm.myActions.sendFormAction.enableResult.caption}" 
-                actionListener="#{twoDimModifyCtrl.processActionExternal}" 
+                actionListener="#{twoDimModifyCtrl.sendForm}" 
                 rendered="#{formService.myForm.myActions.sendForms}"
                 style="white-space: nowrap;"
-                update=":idMessageDialog,:idCenterTop,#{updateAjaxMB.btnCheckAllAsAdmin}"
+                update="#{updateAjaxMB.btnCheckAll}"
+                />
+            <p:commandButton 
+                value="#{formService.myForm.myActions.norecordAction.enableResult.caption}" 
+                actionListener="#{twoDimModifyCtrl.norecord}" 
+                rendered="#{formService.myForm.myActions.norecord}"
+                style="white-space: nowrap;"
+                update="#{updateAjaxMB.btnCheckAll}"
                 />
             <p:commandButton 
                 value="Excele Aktar" 
