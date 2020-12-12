@@ -1,5 +1,6 @@
 package tr.org.tspb.dao;
 
+import com.mongodb.MongoConfigurationException;
 import tr.org.tspb.pojo.RoleMap;
 import static tr.org.tspb.constants.ProjectConstants.*;
 import tr.org.tspb.wf.MyRule;
@@ -1119,6 +1120,10 @@ public class MyForm implements MyFormXs {
                     case "grid":
                         this.myForm.dimension = 2;
                         return;
+                    //FIXME
+                    case "out_of_project_pattern":
+                        this.myForm.dimension = 999;
+                        return;
                     default:
                         throw new UnsupportedOperationException(value.concat(" is not in available values [page, table, grid]"));
                 }
@@ -1277,13 +1282,13 @@ public class MyForm implements MyFormXs {
             return this;
         }
 
-        private void maskAutosetFieldsNoSchema() throws Exception {
+        private void maskAutosetFieldsNoSchema() throws MongoConfigurationException {
             for (String fieldKey : this.myForm.getFields().keySet()) {
                 MyField field = this.myForm.getField(fieldKey);
 
                 if (field.getAutoset()) {
                     if (field.getItemsAsMyItems() == null) {
-                        throw new Exception(String.format(""
+                        throw new MongoConfigurationException(String.format(""
                                 + "<b>Module Config File Validataion Failed.</b></br></br>"
                                 + "There is an autoset field \"%s\" without \"items\" property.</br>"
                                 + "Please make an ensure that this field shoud be defined as \"autoset\".</br>"
