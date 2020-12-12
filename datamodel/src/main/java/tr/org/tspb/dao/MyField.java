@@ -54,8 +54,8 @@ public class MyField {
     private String code;//this is the case for nd
     private String calculateEngine;
     private String componentType;
-    private Code calculateOnClient;
-    private Code calculate;
+    private String calculateOnClient;
+    private String calculate;
     private Boolean calculateOnListView;
     private Boolean calculateOnCrudView;
     private Boolean calculateAfterSave;
@@ -348,11 +348,11 @@ public class MyField {
         return defaultValue;
     }
 
-    public Code getCalculateOnClient() {
+    public String getCalculateOnClient() {
         return calculateOnClient;
     }
 
-    public Code getCalculate() {
+    public String getCalculate() {
         return calculate;
     }
 
@@ -773,13 +773,13 @@ public class MyField {
             this.myField.fmsScriptRunner = fmsScriptRunner;
             this.myField._id = (ObjectId) docField.get(MONGO_ID);
             this.myField.code = (String) docField.get(CODE);
-            this.myField.calculate = (Code) docField.get(CALCULATE);
+            this.myField.calculate = docField.getString(CALCULATE);
             this.myField.calculateOnSave = Boolean.TRUE.equals(docField.get(CALCULATE_ON_SAVE));
             this.myField.calculateAfterSave = Boolean.TRUE.equals(docField.get(CALCULATE_AFTER_SAVE));
             this.myField.calculateAfterDelete = Boolean.TRUE.equals(docField.get(CALCULATE_AFTER_DELETE));
             this.myField.calculateOnListView = Boolean.TRUE.equals(docField.get(CALCULATE_ON_LIST_VIEW));
             this.myField.calculateOnCrudView = Boolean.TRUE.equals(docField.get(CALCULATE_ON_CRUD_VIEW));
-            this.myField.calculateOnClient = (Code) docField.get(CALCULATE_ON_CLIENT);
+            this.myField.calculateOnClient = docField.getString(CALCULATE_ON_CLIENT);
             this.myField.converterInstance = (String) docField.get(CONVERTER_INSTANCE);
             this.myField.converterFormat = (String) docField.get(CONVERTER_FORMAT);
             this.myField.converterParam = (String) docField.get(CONVERTER_PARAM);
@@ -800,7 +800,12 @@ public class MyField {
             this.myField.myFormKey = (String) docField.get(FORM_KEY);
             this.myField.money = Boolean.TRUE.equals(docField.get(MONEY));
             this.myField.maxMoney = (String) docField.get(MAX_MONEY);
-            this.myField.maxValue = (Double) docField.get(MAX_VALUE);
+
+            Number number = docField.get(MAX_VALUE, Number.class);
+            if (number != null) {
+                this.myField.maxValue = number.doubleValue();
+            }
+
             this.myField.mask = (String) docField.get(MASK);
             this.myField.minFractationDigits = docField.get(MIN_FRACTATION_DIGITIS);
             this.myField.maxFractationDigits = docField.get(MAX_FRACTATION_DIGITIS);
