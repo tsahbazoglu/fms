@@ -365,13 +365,17 @@ public class MyItems {
 
         public Builder withViewSchemaVersion110(Set<String> roleSet) {
             Document dbo = (Document) items;
-            if (dbo.get(VIEW) instanceof List) {
-                List<Document> viewList = dbo.get(VIEW, List.class);
+
+            List<Document> viewList = dbo.get(VIEW, List.class);
+
+            this.myItems.view = new ArrayList<>();
+
+            if (viewList != null) {
 
                 List<ViewOrder> list = new ArrayList<>();
 
                 for (Document entry : viewList) {
-                    if (entry.get("permit") == null || isUserInRole(roleSet, ((Document) entry).get("permit"))) {
+                    if (entry.get("permit") == null || isUserInRole(roleSet, entry.get("permit"))) {
                         Number number = entry.get(ORDER, Number.class);
                         Integer order = (number == null) ? 0 : number.intValue();
                         list.add(new ViewOrder(entry.get("key").toString(), order == null ? 0 : order.intValue()));
@@ -385,11 +389,11 @@ public class MyItems {
                     }
                 });
 
-                this.myItems.view = new ArrayList<>();
                 for (ViewOrder viewOrder : list) {
                     this.myItems.view.add(viewOrder.key);
                 }
-
+            } else {
+                this.myItems.view.add("_id");
             }
             return this;
         }
@@ -558,8 +562,6 @@ public class MyItems {
                     }
                 }
             }
-        } else {
-            throw new RuntimeException("field.items.query has not property func or list");
         }
     }
 
@@ -650,8 +652,6 @@ public class MyItems {
                     }
                 }
             }
-        } else {
-            throw new RuntimeException("field.items.query has not property func or list");
         }
     }
 
