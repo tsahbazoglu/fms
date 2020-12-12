@@ -388,17 +388,7 @@ public class OnFlyItems implements FmsAutoComplete {
             items.addAll(documentsToSelectItems(cursor, myItems.getView()));
 
             if (myItems.getSort().isEmpty()) {
-                Collections.sort(items, new Comparator<SelectItem>() {
-                    @Override
-                    public int compare(SelectItem t1, SelectItem t2) {
-                        String m1 = t1.getLabel();
-                        String m2 = t2.getLabel();
-                        if (m1.equalsIgnoreCase("diğer")) {
-                            return 1;
-                        }
-                        return m1.compareToIgnoreCase(m2);
-                    }
-                });
+                sortItemsByLabel(items);
             }
         } else {
             mongoDbUtil.createIndex(myItems);
