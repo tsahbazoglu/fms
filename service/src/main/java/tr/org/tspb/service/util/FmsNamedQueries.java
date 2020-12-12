@@ -33,10 +33,15 @@ public class FmsNamedQueries {
 
         filter = new Document();
 
+        if (null == myNamedQueries) {
+            return;
+        }
+
+        List<Document> includeQuery = myNamedQueries.getList(INCLUDE, Document.class);
+
         boolean noRoleExist = true;
 
-        if (myNamedQueries != null && myNamedQueries.get(INCLUDE) != null) {
-            List<Document> includeQuery = (List<Document>) myNamedQueries.get(INCLUDE);
+        if (includeQuery != null) {
             for (Document doc : includeQuery) {
 
                 List<String> roles = doc.get("roles", List.class);
