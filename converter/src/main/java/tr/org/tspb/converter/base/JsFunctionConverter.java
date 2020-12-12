@@ -274,7 +274,7 @@ public class JsFunctionConverter implements Converter {
 
         MyField field = myFrom.getField(fieldKey);
 
-        Code calculateOnClient = field.getCalculateOnClient();
+        String calculateOnClient = field.getCalculateOnClient();
 
         String calculateEngine = field.getCalculateEngine();
 
@@ -283,14 +283,15 @@ public class JsFunctionConverter implements Converter {
         try {
             Object value;
             if ("clientSideJS".equals(calculateEngine) && calculateOnClient != null) {
-                calculateOnClient = new Code(calculateOnClient.getCode().replace(DIEZ, DOLAR));
+                calculateOnClient = calculateOnClient.replace(DIEZ, DOLAR);
                 // String jsScriptString = "calculate=" + calculateOnClient.toString();
-                String jsScriptString = "calculate=" + calculateOnClient.getCode();
+                String jsScriptString = "calculate=" + calculateOnClient;
                 jsEngine.eval(jsScriptString);
                 Invocable inv = (Invocable) jsEngine;
                 value = inv.invokeFunction("calculate", b.toJson());
             } else {
-                Code code = field.getCalculate();
+//FIXME should be rewritten to clean up org.bson.types.Code all over the code 
+                Code code = new Code(field.getCalculate());
                 b.put("calculate", code);
 
                 String codeString = "function(bsonObject){return  bsonObject.calculate()}";
