@@ -1,14 +1,10 @@
 package tr.org.tspb.common.services;
 
-import com.mongodb.client.model.Filters;
 import tr.org.tspb.constants.ProjectConstants;
 import static tr.org.tspb.constants.ProjectConstants.FORM_KEY;
 import static tr.org.tspb.constants.ProjectConstants.PATH_PDF_TOOLS;
 import static tr.org.tspb.constants.ProjectConstants.PRODUCT;
 import static tr.org.tspb.constants.ProjectConstants.TEST;
-import static tr.org.tspb.constants.ProjectConstants.COLLECTION;
-import static tr.org.tspb.constants.ProjectConstants.FORM_DB;
-import static tr.org.tspb.constants.ProjectConstants.MONGO_LDAP_UID;
 import tr.org.tspb.util.stereotype.MyServices;
 import java.util.HashMap;
 import java.util.Map;
@@ -17,6 +13,7 @@ import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
 import javax.faces.context.FacesContext;
 import org.bson.Document;
+import tr.org.tspb.dao.TagLogin;
 
 /**
  *
@@ -32,7 +29,6 @@ public class BaseService extends AbstractSrv {
     private ReportProperties reportProperties;
     private Properties properties;
     private String webContext;
-
     private final String ESIGN_DOOR_ENVIRONMENT = "ENVIRONMENT";
 
     @PostConstruct
@@ -68,17 +64,44 @@ public class BaseService extends AbstractSrv {
         return properties;
     }
 
+    public String getLoginDB() {
+        return appProperties.tagLogin.getDb();
+    }
+
+    public String getLoginTable() {
+        return appProperties.tagLogin.getTable();
+    }
+
+    public String getLoginUsernameField() {
+        return appProperties.tagLogin.getUsernanmeField();
+    }
+
+    public String getLoginEmailField() {
+        return appProperties.tagLogin.getEmailField();
+    }
+
+    public TagLogin getTagLogin() {
+        return appProperties.tagLogin;
+    }
+
+    public String getWebContext() {
+        if (webContext == null) {
+            String protocol = FacesContext.getCurrentInstance().getExternalContext().getRequestScheme();
+            String serverName = FacesContext.getCurrentInstance().getExternalContext().getRequestServerName();
+            String serverPort = ":".concat(String.valueOf(FacesContext.getCurrentInstance().getExternalContext().getRequestServerPort()));
+            String contextPath = FacesContext.getCurrentInstance().getExternalContext().getRequestContextPath();
+            webContext = protocol.concat("://").concat(serverName).concat("https".equals(protocol) ? "" : serverPort).concat(contextPath);
+        }
+        return webContext;
+    }
+
     public class ReportProperties {
+
         public final String loginFormKey = "member";
     }
 
     public class AppProperties {
 
-        private String loginDB;
-        private String loginTable;
-        private String loginUsernameField;
-        private String loginEmailField = ProjectConstants.EMAIL;
-        //
         private String pdfTool;
         private String googleRecaptchaSecret;
         private final String mainProjectCode;
@@ -104,6 +127,7 @@ public class BaseService extends AbstractSrv {
         private String esignCtxtEnv;
         private final String tmpDownloadPath;
         private final Map<String, String> delegateInitialSearch;
+        private final TagLogin tagLogin;
 
         public AppProperties(Properties document) {
             googleRecaptchaSecret = document.getProperty("googleRecaptchaSecret");
@@ -133,17 +157,7 @@ public class BaseService extends AbstractSrv {
             delegateInitialSearch = new HashMap<>();
             delegateInitialSearch.put("status", "000");
 
-            Document dboLdapMatch = mongoDbUtil.findOne(ProjectConstants.CONFIG_DB, ProjectConstants.COLLECTION_LDAP_MATCH,
-                    Filters.eq(ProjectConstants.PROJECT_CODE, mainProjectCode));
-
-            if (dboLdapMatch == null) {
-                throw new RuntimeException(ProjectConstants.COLLECTION_LDAP_MATCH.concat(" had not been defined yet. please contact with system administrator."));
-            }
-
-            loginDB = dboLdapMatch.get(FORM_DB).toString();
-            loginTable = dboLdapMatch.get(COLLECTION).toString();
-            loginUsernameField = dboLdapMatch.get(MONGO_LDAP_UID).toString();
-            loginEmailField = "email";
+            tagLogin = new TagLogin((Document) document.get("LOGIN"));
 
         }
 
@@ -247,22 +261,6 @@ public class BaseService extends AbstractSrv {
             return delegateInitialSearch;
         }
 
-        public String getLoginDB() {
-            return loginDB;
-        }
-
-        public String getLoginTable() {
-            return loginTable;
-        }
-
-        public String getLoginUsernameField() {
-            return loginUsernameField;
-        }
-
-        public String getLoginEmailField() {
-            return loginEmailField;
-        }
-
         public String getGoogleRecaptchaSecret() {
             return googleRecaptchaSecret;
         }
@@ -270,17 +268,6 @@ public class BaseService extends AbstractSrv {
         public String getUploadTable() {
             return "ion_uploaded_files";
         }
-    }
-
-    public String getWebContext() {
-        if (webContext == null) {
-            String protocol = FacesContext.getCurrentInstance().getExternalContext().getRequestScheme();
-            String serverName = FacesContext.getCurrentInstance().getExternalContext().getRequestServerName();
-            String serverPort = ":".concat(String.valueOf(FacesContext.getCurrentInstance().getExternalContext().getRequestServerPort()));
-            String contextPath = FacesContext.getCurrentInstance().getExternalContext().getRequestContextPath();
-            webContext = protocol.concat("://").concat(serverName).concat("https".equals(protocol) ? "" : serverPort).concat(contextPath);
-        }
-        return webContext;
     }
 
 }

@@ -537,8 +537,9 @@ public class RepositoryService implements Serializable {
     }
 
     public MyProject getMyProject(String projectKey) throws NullNotExpectedException, FormConfigException {
-        return ogmCreator
-                .getMyProject(mongoDbUtil.findOne(CONFIG_DB, CFG_TABLE_PROJECT, new Document(FORM_KEY, projectKey)));
+        return ogmCreator.getMyProject(
+                mongoDbUtil.findOne(CONFIG_DB, CFG_TABLE_PROJECT, Filters.eq(FORM_KEY, projectKey)),
+                baseService.getTagLogin());
     }
 
     public MyForm getMyFormLarge(MyProject myProject, String formKey)

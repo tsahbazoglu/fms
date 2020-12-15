@@ -1,5 +1,6 @@
 package tr.org.tspb.service;
 
+import com.mongodb.client.model.Filters;
 import tr.org.tspb.common.services.LoginController;
 import tr.org.tspb.util.stereotype.MyServices;
 import javax.inject.Inject;
@@ -10,6 +11,7 @@ import tr.org.tspb.dao.MyProject;
 import tr.org.tspb.exceptions.MongoOrmFailedException;
 import tr.org.tspb.exceptions.NullNotExpectedException;
 import tr.org.tspb.common.qualifier.MyLoginQualifier;
+import tr.org.tspb.common.services.BaseService;
 import tr.org.tspb.constants.ProjectConstants;
 import static tr.org.tspb.constants.ProjectConstants.CFG_TABLE_PROJECT;
 import tr.org.tspb.dao.MyActions;
@@ -32,6 +34,9 @@ public class ModelService extends CommonSrv {
     @OgmCreatorQualifier
     private OgmCreatorIntr ogmCreator;
 
+    @Inject
+    private BaseService baseService;
+
     private String projectAndFormKey;
 
     private MyForm selectedForm;
@@ -43,10 +48,12 @@ public class ModelService extends CommonSrv {
         String projectKey = selectedFormInfos[1];
 
         MyProject myProject = ogmCreator
-                .getMyProject(mongoDbUtil.findOne(ProjectConstants.CONFIG_DB, CFG_TABLE_PROJECT, new Document(FORM_KEY, projectKey)));
+                .getMyProject(mongoDbUtil
+                        .findOne(ProjectConstants.CONFIG_DB, CFG_TABLE_PROJECT, Filters.eq(FORM_KEY, projectKey)),
+                        baseService.getTagLogin());
 
         MyForm myForm = ogmCreator
-                .getMyFormLarge(myProject, myProject.getConfigTable(), new Document(FORM_KEY, formKey), new Document(),
+                .getMyFormLarge(myProject, myProject.getConfigTable(), Filters.eq(FORM_KEY, formKey), new Document(),
                         loginController.getRoleMap(), loginController.getLoggedUserDetail());
 
         MyActions myActions = ogmCreator

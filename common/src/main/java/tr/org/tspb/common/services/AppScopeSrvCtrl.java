@@ -125,7 +125,7 @@ public class AppScopeSrvCtrl {
     public MyProject getProject(String key, Document projectDoc) throws NullNotExpectedException, FormConfigException {
         MyProject myProject = cacheProjects.get(key);
         if (myProject == null) {
-            myProject = ogmCreator.getMyProject(projectDoc);
+            myProject = ogmCreator.getMyProject(projectDoc, baseService.getTagLogin());
             cacheProjects.put(key, myProject);
         }
         return myProject;
@@ -310,22 +310,11 @@ public class AppScopeSrvCtrl {
             cacheIdByLdapUid = new HashMap();
             cacheIdByKpbMemberName = new HashMap();
 
-            Document dboLdapMatch = mongoDbUtil.findOne("configdb", "ldapMatch",
-                    new Document(PROJECT_CODE, baseService.getProperties().getMainProjectCode()));
-
-            String loginFormKey = "member";
-
-            String loginDB = dboLdapMatch.get(FORM_DB).toString();
-            String loginTable = dboLdapMatch.get(COLLECTION).toString();
-
-            if (dboLdapMatch.get("loginFormKey") instanceof String) {
-                loginFormKey = dboLdapMatch.get("loginFormKey").toString();
-            }
-
-            Document query = new Document(FORMS, loginFormKey);
             Document view = new Document(NAME, 1).append(MONGO_LDAP_UID, 1);
 
-            List<Document> cursor = mongoDbUtil.find(loginDB, loginTable, query);
+            List<Document> cursor = mongoDbUtil.find(baseService.getLoginDB(),
+                    baseService.getLoginTable(),
+                    baseService.getTagLogin().getFilter());
 
             for (Document nextElement : cursor) {
                 cacheIdByLdapUid.put(nextElement.get(MONGO_LDAP_UID).toString(), (ObjectId) nextElement.get(MONGO_ID));
@@ -676,7 +665,10 @@ public class AppScopeSrvCtrl {
         String cacheKey = configCollection.concat(":").concat(form);
         if (mapForms.get(cacheKey) == null) {
             MyProject myProject = ogmCreator
-                    .getMyProject(mongoDbUtil.findOne("configdb", CFG_TABLE_PROJECT, new Document(CONFIG_COLLECTIONS, configCollection)));
+                    .getMyProject(mongoDbUtil
+                            .findOne("configdb", CFG_TABLE_PROJECT, Filters.eq(CONFIG_COLLECTIONS, configCollection)),
+                            baseService.getTagLogin());
+
             mapForms.put(cacheKey, ogmCreator
                     .getMyFormLarge(myProject, configCollection, new Document(FORM, form), searchObject,
                             loginController.getRoleMap(), loginController.getLoggedUserDetail()));
@@ -695,7 +687,9 @@ public class AppScopeSrvCtrl {
         if (mapForms.get(cacheKey) == null) {
 
             MyProject myProject = ogmCreator
-                    .getMyProject(mongoDbUtil.findOne("configdb", CFG_TABLE_PROJECT, new Document(CONFIG_COLLECTIONS, configCollection)));
+                    .getMyProject(mongoDbUtil
+                            .findOne("configdb", CFG_TABLE_PROJECT, Filters.eq(CONFIG_COLLECTIONS, configCollection)),
+                            baseService.getTagLogin());
 
             mapForms.put(cacheKey, ogmCreator
                     .getMyFormLarge(myProject, configCollection, new Document(FORM_KEY, collectionKey), searchObject,

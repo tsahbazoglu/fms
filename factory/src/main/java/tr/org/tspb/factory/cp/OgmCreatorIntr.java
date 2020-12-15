@@ -11,6 +11,7 @@ import java.util.Map;
 import org.bson.Document;
 import tr.org.tspb.dao.MyActions;
 import tr.org.tspb.dao.MyMap;
+import tr.org.tspb.dao.TagLogin;
 import tr.org.tspb.exceptions.FormConfigException;
 import tr.org.tspb.pojo.UserDetail;
 
@@ -20,9 +21,9 @@ import tr.org.tspb.pojo.UserDetail;
  */
 public interface OgmCreatorIntr extends Serializable {
 
-    MyProject getMyProject(Document dbo) throws NullNotExpectedException, FormConfigException;
+    MyProject getMyProject(Document dbo, TagLogin tagLogin) throws NullNotExpectedException, FormConfigException;
 
-    MyProject getMyProject(String projectKey) throws NullNotExpectedException, FormConfigException;
+    MyProject getMyProject(String projectKey, TagLogin login) throws NullNotExpectedException, FormConfigException;
 
     MyForm getMyFormExternal(MyProject myProject, String configCollection, Map formSearch, Map searchObject,
             RoleMap loginController, UserDetail userDetail)

@@ -63,7 +63,8 @@ public class PPolicyProviderImpl implements PPolicyProvider, Serializable {
         Map query = new HashMap();
         query.put(ProjectConstants.EMAIL, recipients);
 
-        long count = repositoryService.count(baseService.getProperties().getLoginDB(), baseService.getProperties().getLoginTable(), query);
+        long count = repositoryService.count(baseService.getLoginDB(),
+                baseService.getLoginTable(), query);
 
         if (count == 1) {
             mailService.sendMail(subject, message, recipients);
@@ -80,11 +81,11 @@ public class PPolicyProviderImpl implements PPolicyProvider, Serializable {
         Map query = new HashMap();
         query.put(ProjectConstants.EMAIL, shortTokenEmail);
 
-        if (repositoryService.count(baseService.getProperties().getLoginDB(), baseService.getProperties().getLoginTable(), query) == 1) {
+        if (repositoryService.count(baseService.getLoginDB(), baseService.getLoginTable(), query) == 1) {
 
-            Map document = repositoryService.one(baseService.getProperties().getLoginDB(), baseService.getProperties().getLoginTable(), query);
+            Map document = repositoryService.one(baseService.getLoginDB(), baseService.getLoginTable(), query);
 
-            String ldapUID = (String) document.get(baseService.getProperties().getLoginUsernameField());
+            String ldapUID = (String) document.get(baseService.getLoginUsernameField());
 
             if (ldapUID != null) {
                 Date today = new Date();
@@ -109,14 +110,14 @@ public class PPolicyProviderImpl implements PPolicyProvider, Serializable {
         Map query = new HashMap();
         query.put(ProjectConstants.EMAIL, shortTokenEmail);
 
-        long count = repositoryService.count(baseService.getProperties().getLoginDB(), baseService.getProperties().getLoginTable(), query);
+        long count = repositoryService.count(baseService.getLoginDB(), baseService.getLoginTable(), query);
 
         switch ((int) count) {
             case 0:
                 throw new RuntimeException("Kullanıcı Adı veya E-posta yalnış.");
             case 1:
-                Map document = repositoryService.one(baseService.getProperties().getLoginDB(), baseService.getProperties().getLoginTable(), query);
-                ldapService.updatePswd((String) document.get(baseService.getProperties().getLoginUsernameField()), pswd);
+                Map memberDoc = repositoryService.one(baseService.getLoginDB(), baseService.getLoginTable(), query);
+                ldapService.updatePswd((String) memberDoc.get(baseService.getLoginUsernameField()), pswd);
                 break;
             default:
                 throw new RuntimeException("Bu Kullanıcı e-postası ile birden falza kullanıcı tanımlı.");
@@ -130,7 +131,7 @@ public class PPolicyProviderImpl implements PPolicyProvider, Serializable {
         Map query = new HashMap();
         query.put(ProjectConstants.EMAIL, email);
 
-        return (int) repositoryService.count(baseService.getProperties().getLoginDB(), baseService.getProperties().getLoginTable(), query);
+        return (int) repositoryService.count(baseService.getLoginDB(), baseService.getLoginTable(), query);
 
     }
 }

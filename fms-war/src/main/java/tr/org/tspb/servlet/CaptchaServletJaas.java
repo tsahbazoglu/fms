@@ -115,10 +115,10 @@ public class CaptchaServletJaas extends HttpServlet {
                 break;
             case "/anonym":
                 try {
-                String loginDB = baseService.getProperties().getLoginDB();
-                String loginTable = baseService.getProperties().getLoginTable();
-                String usernameField = baseService.getProperties().getLoginUsernameField();
-                String emailField = baseService.getProperties().getLoginEmailField();
+                String loginDB = baseService.getLoginDB();
+                String loginTable = baseService.getLoginTable();
+                String usernameField = baseService.getLoginUsernameField();
+                String emailField = baseService.getLoginEmailField();
 
                 String username = "anonim";
                 String whatisit = "anonim";
@@ -269,10 +269,10 @@ public class CaptchaServletJaas extends HttpServlet {
 
         try {
 
-            String loginDB = baseService.getProperties().getLoginDB();
-            String loginTable = baseService.getProperties().getLoginTable();
-            String usernameField = baseService.getProperties().getLoginUsernameField();
-            String emailField = baseService.getProperties().getLoginEmailField();
+            String loginDB = baseService.getLoginDB();
+            String loginTable = baseService.getLoginTable();
+            String usernameField = baseService.getLoginUsernameField();
+            String emailField = baseService.getLoginEmailField();
 
             //exist check
             Map searchMap = new HashMap();

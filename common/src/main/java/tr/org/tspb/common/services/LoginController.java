@@ -127,9 +127,9 @@ public class LoginController implements Serializable {
             roleAsList.add(x.toString());
         }
 
-        String loginDB = baseService.getProperties().getLoginDB();
-        String loginTable = baseService.getProperties().getLoginTable();
-        String loginUsernameField = baseService.getProperties().getLoginUsernameField();
+        String loginDB = baseService.getLoginDB();
+        String loginTable = baseService.getLoginTable();
+        String loginUsernameField = baseService.getLoginUsernameField();
 
         Document query = new Document(loginUsernameField, loggedUserDetail.getUsername());
 
@@ -364,8 +364,8 @@ public class LoginController implements Serializable {
         List<UserDetail.EimzaPersonel> listofEligibale = new ArrayList<>();
 
         for (Document delegationRecord : eimzaInfo) {
-            Document delegatedFieldRecord = mongoDbUtil.findOne(serverProperties.getLoginDB(),
-                    serverProperties.getLoginTable(),
+            Document delegatedFieldRecord = mongoDbUtil.findOne(baseService.getLoginDB(),
+                    baseService.getLoginTable(),
                     Filters.eq(MONGO_ID, delegationRecord.get(delegatedField, ObjectId.class)));
 
             UserDetail.EimzaPersonel eimzaPersonel

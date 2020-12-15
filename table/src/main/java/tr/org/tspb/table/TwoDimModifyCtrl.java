@@ -427,10 +427,10 @@ public class TwoDimModifyCtrl extends FmsTable implements ActionListener {
         Document commandResult = mongoDbUtil
                 .runCommand(formService.getMyForm().getDb(), recipientListOfMembers2.getCode(), filterService.getTableFilterCurrent());
 
-        String loginDB = baseService.getProperties().getLoginDB();
-        String loginTable = baseService.getProperties().getLoginTable();
-
-        List<Document> listOf = mongoDbUtil.find(loginDB, loginTable, new Document(MONGO_ID, new Document(DOLAR_IN, commandResult.get(RETVAL))));
+        List<Document> listOf = mongoDbUtil.find(
+                baseService.getLoginDB(),
+                baseService.getLoginTable(),
+                Filters.in(MONGO_ID, commandResult.get(RETVAL)));
 
         for (Document loginRecord : listOf) {
             String email = (String) loginRecord.get(EMAIL);
@@ -1274,9 +1274,9 @@ public class TwoDimModifyCtrl extends FmsTable implements ActionListener {
             crudObject.put(myField.getKey(), filterService.getTableFilterCurrent().get(myField.getKey()));
         }
 
-        String userDB = baseService.getProperties().getLoginDB();
-        String userTable = baseService.getProperties().getLoginTable();
-        String userLdapUID = baseService.getProperties().getLoginUsernameField();
+        String userDB = baseService.getLoginDB();
+        String userTable = baseService.getLoginTable();
+        String userLdapUID = baseService.getLoginUsernameField();
 
         if (userDB.equals(myForm.getDb()) && userTable.equals(myForm.getTable()) && myForm.getField(userLdapUID) != null) {
             crudObject.put(MONGO_LDAP_UID, generateLdapUID(null));

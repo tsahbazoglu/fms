@@ -121,7 +121,6 @@ public class ProjectConstants {
     public static final String CALCULATE_ENGINE = "calculateEngine";
     public static final String CURRENT_RENDERED = "currentRendered";
     public static final String COLLECTION_SYSTEM_MESSAGES = "appmessages"; // https://support.tspb.org.tr/issues/4603
-    public static final String COLLECTION_LDAP_MATCH = "ldapMatch"; // https://support.tspb.org.tr/issues/4603
     public static final String CUSTOM_RESOURCE_PDFTOOL = "PDFTOOL";
     public static final String CONTROL_COLLECTION = "controlCollection";
     public static final String COLUMN_LIST = "columList";

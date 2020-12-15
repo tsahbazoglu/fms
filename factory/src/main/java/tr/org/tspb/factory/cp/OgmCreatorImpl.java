@@ -1,6 +1,5 @@
 package tr.org.tspb.factory.cp;
 
-import com.mongodb.client.model.Filters;
 import htmlflow.StaticHtml;
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -53,7 +52,6 @@ import static tr.org.tspb.constants.ProjectConstants.MONGO_LDAP_UID;
 import static tr.org.tspb.constants.ProjectConstants.MY_CONVERTER;
 import static tr.org.tspb.constants.ProjectConstants.NAME;
 import static tr.org.tspb.constants.ProjectConstants.ON_USER_ROLE;
-import static tr.org.tspb.constants.ProjectConstants.PROJECT_CODE;
 import static tr.org.tspb.constants.ProjectConstants.PROJECT_KEY;
 import static tr.org.tspb.constants.ProjectConstants.QUERY;
 import static tr.org.tspb.constants.ProjectConstants.READONLY;
@@ -79,6 +77,7 @@ import tr.org.tspb.pojo.ComponentType;
 import tr.org.tspb.pojo.UserDetail;
 import tr.org.tspb.factory.util.OnFlyItems;
 import tr.org.tspb.dao.MyFieldComparator;
+import tr.org.tspb.dao.TagLogin;
 import tr.org.tspb.exceptions.FormConfigException;
 import tr.org.tspb.util.tools.MongoDbUtilIntr;
 
@@ -453,53 +452,13 @@ public class OgmCreatorImpl implements OgmCreatorIntr {
     }
 
     @Override
-    public MyProject getMyProject(Document docProject) throws NullNotExpectedException, FormConfigException {
+    public MyProject getMyProject(Document docProject, TagLogin tagLogin) throws NullNotExpectedException, FormConfigException {
 
-        String projectKey = docProject.get(FORM_KEY).toString();
-
-        Document docLdapMatch = mongoDbUtil.findOne("configdb", "ldapMatch", Filters.eq(PROJECT_CODE, projectKey));
-        if (docLdapMatch == null) {
-            String html = StaticHtml
-                    .view()
-                    .html()
-                    .head()
-                    .__() //head
-                    .body()
-                    .div().attrClass("container")
-                    .p().text("Konfigürasyon Eksikliği : ").__()
-                    .br().__()
-                    .br().__()
-                    .p().text("cfgdatabase=db.getSisterDB('configdb');").__()
-                    .br().__()
-                    .br().__()
-                    .p().text("cfgdatabase.ldapMatch.findOne({projectCode:".concat(projectKey).concat("}")).__()
-                    .br().__()
-                    .br().__()
-                    .p().text("cfgdatabase.ldapMatch.update({projectCode:".concat(projectKey).concat("}, {$set: {")).__()
-                    .br().__()
-                    .p().text("db: 'uysdb',").__()
-                    .br().__()
-                    .p().text("collection: 'common',").__()
-                    .br().__()
-                    .p().text("query: {forms: 'member'},").__()
-                    .br().__()
-                    .p().text("ldapUID: 'ldapUID'}},").__()
-                    .br().__()
-                    .p().text("{upsert: true});").__()
-                    .__()
-                    .__() //body
-                    .__() //html
-                    .render();
-            throw new FormConfigException(html);
-        }
-
-        String projectCode = docLdapMatch.get(PROJECT_CODE).toString();
-        String db = docLdapMatch.get(FORM_DB).toString();
-        String collection = docLdapMatch.get(COLLECTION).toString();
-        Document query = mongoDbUtil.replaceToDollar((Document) docLdapMatch.get(QUERY));
-        String ldapUID = docLdapMatch.get(MONGO_LDAP_UID).toString();
-
-        MyProject myProject = new MyProject(docProject, db, collection, ldapUID, query);
+        MyProject myProject = new MyProject(docProject,
+                tagLogin.getDb(),
+                tagLogin.getTable(),
+                tagLogin.getUsernanmeField(),
+                tagLogin.getFilter());
 
         return myProject;
     }
@@ -511,14 +470,14 @@ public class OgmCreatorImpl implements OgmCreatorIntr {
      * @throws tr.org.tspb.exceptions.NullNotExpectedException
      */
     @Override
-    public MyProject getMyProject(String projectKey) throws NullNotExpectedException, FormConfigException {
+    public MyProject getMyProject(String projectKey, TagLogin tagLogin) throws NullNotExpectedException, FormConfigException {
         Document project = mongoDbUtil.findOne("configdb", CFG_TABLE_PROJECT, new Document(FORM_KEY, projectKey));
 
         if (project == null) {
             throw new NullNotExpectedException("The related project has not been found");
         }
 
-        return getMyProject(project);
+        return getMyProject(project, tagLogin);
     }
 
     @Override
