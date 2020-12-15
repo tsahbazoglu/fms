@@ -53,7 +53,7 @@ public class ModelService extends CommonSrv {
                         baseService.getTagLogin());
 
         MyForm myForm = ogmCreator
-                .getMyFormLarge(myProject, myProject.getConfigTable(), Filters.eq(FORM_KEY, formKey), new Document(),
+                .getMyFormLarge(myProject, myProject.getConfigTable(), new Document(FORM_KEY, formKey), new Document(),
                         loginController.getRoleMap(), loginController.getLoggedUserDetail());
 
         MyActions myActions = ogmCreator
