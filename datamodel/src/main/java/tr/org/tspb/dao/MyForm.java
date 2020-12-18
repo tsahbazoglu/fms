@@ -1686,8 +1686,8 @@ public class MyForm implements MyFormXs {
             return this;
         }
 
-        public Builder maskFilter(Document filter) {
-            this.myForm.searchForm = filter;
+        public Builder maskFilter() {
+            this.myForm.searchForm = this.myForm.fmsScriptRunner.replaceToDolar(dbObjectForm.get(FORM_FILTER, Document.class));
             return this;
         }
 
