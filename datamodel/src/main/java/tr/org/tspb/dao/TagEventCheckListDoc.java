@@ -13,6 +13,7 @@ import static tr.org.tspb.constants.ProjectConstants.PERIOD;
 import static tr.org.tspb.constants.ProjectConstants.REPLACEABLE_KEY_WORD_FOR_FUNCTONS_FILTER_PERIOD;
 import static tr.org.tspb.constants.ProjectConstants.REPLACEABLE_KEY_WORD_FOR_FUNCTONS_LOGIN_MEMBER_ID;
 import tr.org.tspb.datamodel.expected.FmsScriptRunner;
+import tr.org.tspb.pojo.RoleMap;
 import tr.org.tspb.pojo.UserDetail;
 
 /**
@@ -21,41 +22,56 @@ import tr.org.tspb.pojo.UserDetail;
  */
 public class TagEventCheckListDoc {
 
-    public static boolean value(FmsScriptRunner fmsScriptRunner, Map myFilter, UserDetail userDetail, List<Document> checks) {
+    public static boolean value(FmsScriptRunner fmsScriptRunner, Map myFilter, UserDetail userDetail, RoleMap roleMap, List<Document> checks) {
 
-        boolean result = true;
+        Boolean result = null;
+
+        Document noRoleDoc = null;
 
         for (Document check : checks) {
-
-            String func = check.getString("func");
-            Document doc = check.get("ref", Document.class);
-
-            if (func != null) {
-
-                throw new UnsupportedOperationException("func is not supported yet");
-
-            } else if (doc != null) {
-
-                String db = doc.getString("db");
-                String table = doc.getString("table");
-                List<Document> filters = doc.getList("query", Document.class);
-                String decision = doc.getString("check");
-                Document query = createQuery(filters, userDetail, myFilter);
-
-                switch (decision) {
-                    case "existence":
-                        result = result && fmsScriptRunner.findOne(db, table, query) != null;
-                        break;
-                    case "non-existence":
-                        result = result && fmsScriptRunner.findOne(db, table, query) == null;
-                        break;
-                    default:
-                        result = result && fmsScriptRunner.findOne(db, table, query) != null;
-                }
-
+            List<String> roles = check.getList("roles", String.class);
+            if (roles == null) {
+                noRoleDoc = check;
+            } else if (roleMap.isUserInRole(roles)) {
+                result = applyCheck(check, result, userDetail, myFilter, fmsScriptRunner);
             }
         }
 
+        if (result == null && noRoleDoc != null) {
+            result = applyCheck(noRoleDoc, result, userDetail, myFilter, fmsScriptRunner);
+        }
+
+        return Boolean.TRUE.equals(result);
+    }
+
+    private static boolean applyCheck(Document check, boolean result, UserDetail userDetail, Map myFilter, FmsScriptRunner fmsScriptRunner) throws RuntimeException {
+        Boolean value = check.getBoolean("value");
+        String func = check.getString("func");
+        Document doc = check.get("ref", Document.class);
+        if (value != null) {
+            result = result && Boolean.TRUE.equals(value);
+        } else if (func != null) {
+            throw new UnsupportedOperationException("func is not supported yet");
+        } else if (doc != null) {
+
+            String db = doc.getString("db");
+            String table = doc.getString("table");
+            List<Document> filters = doc.getList("query", Document.class);
+            String decision = doc.getString("check");
+            Document query = createQuery(filters, userDetail, myFilter);
+
+            switch (decision) {
+                case "existence":
+                    result = result && fmsScriptRunner.findOne(db, table, query) != null;
+                    break;
+                case "non-existence":
+                    result = result && fmsScriptRunner.findOne(db, table, query) == null;
+                    break;
+                default:
+                    result = result && fmsScriptRunner.findOne(db, table, query) != null;
+            }
+
+        }
         return result;
     }
 
