@@ -77,6 +77,7 @@ import tr.org.tspb.pojo.ComponentType;
 import tr.org.tspb.pojo.UserDetail;
 import tr.org.tspb.factory.util.OnFlyItems;
 import tr.org.tspb.dao.MyFieldComparator;
+import tr.org.tspb.dao.TagEventCheckListDoc;
 import tr.org.tspb.dao.TagLogin;
 import tr.org.tspb.exceptions.FormConfigException;
 import tr.org.tspb.util.tools.MongoDbUtilIntr;
@@ -99,7 +100,7 @@ public class OgmCreatorImpl implements OgmCreatorIntr {
     private OgmCreatorImpl() {
     }
 
-    private boolean calcRendered(RoleMap roleMap, Document docField, Map searchObject) {
+    private boolean calcRendered(RoleMap roleMap, Document docField, Map searchObject, UserDetail userDetail) {
 
         Document dboRendered = docField.get(RENDERED, Document.class);
 
@@ -110,6 +111,7 @@ public class OgmCreatorImpl implements OgmCreatorIntr {
         Boolean booleanValue = dboRendered.getBoolean("boolean-value");
         Document refValue = dboRendered.get("ref-value", Document.class);
         String funcValue = dboRendered.getString("func-value");
+        List<Document> checkList = dboRendered.getList("check-list", Document.class);
 
         if (booleanValue != null) {
             return booleanValue;
@@ -140,6 +142,8 @@ public class OgmCreatorImpl implements OgmCreatorIntr {
                     return false;
                 }
             }
+        } else if (checkList != null) {
+            return TagEventCheckListDoc.value(fmsScriptRunner, searchObject, userDetail, roleMap, checkList);
         }
 
         return false;
@@ -262,7 +266,7 @@ public class OgmCreatorImpl implements OgmCreatorIntr {
 
             return new MyForm.Builder(myProject, dboForm, searchObject, roleMap, userDetail, fmsScriptRunner, fmsRunMongoCmd)
                     .withOthers()
-                    .maskFilter(mongoDbUtil.replaceToDollar((Document) dboForm.get(FORM_FILTER)))
+                    .maskFilter()
                     .maskAccesscontrol()
                     .maskReadOnlyNote()
                     .maskUserNote()
@@ -303,7 +307,7 @@ public class OgmCreatorImpl implements OgmCreatorIntr {
             return new MyForm.Builder(myProject, dboForm, searchObject, roleMap, userDetail, fmsScriptRunner, fmsRunMongoCmd)
                     .maskKey()
                     .maskLoginFkField()
-                    .maskFilter(mongoDbUtil.replaceToDollar((Document) dboForm.get(FORM_FILTER)))
+                    .maskFilter()
                     .maskDefaultQueries()
                     .maskDimension()
                     .maskFormType()
@@ -323,7 +327,7 @@ public class OgmCreatorImpl implements OgmCreatorIntr {
 
             return new MyForm.Builder(myProject, dboForm, searchObject, roleMap, userDetail, fmsScriptRunner, fmsRunMongoCmd)
                     .withOthers()
-                    .maskFilter(mongoDbUtil.replaceToDollar((Document) dboForm.get(FORM_FILTER)))
+                    .maskFilter()
                     .maskFields(fieldsSmall)
                     .build();
 
@@ -349,7 +353,7 @@ public class OgmCreatorImpl implements OgmCreatorIntr {
 
             return new MyForm.Builder(myProject, dboForm, searchObject, roleMap, userDetail, fmsScriptRunner, fmsRunMongoCmd)
                     .withOthers()
-                    .maskFilter(mongoDbUtil.replaceToDollar((Document) dboForm.get(FORM_FILTER)))
+                    .maskFilter()
                     .maskFields(fieldsSmall)
                     .withFieldsAsList(fieldsAsList)
                     .maskDimension()
@@ -400,7 +404,7 @@ public class OgmCreatorImpl implements OgmCreatorIntr {
 
             return new MyForm.Builder(myProject, dboForm, filter, roleMap, userDetail, fmsScriptRunner, fmsRunMongoCmd)
                     .withOthers()
-                    .maskFilter(mongoDbUtil.replaceToDollar((Document) dboForm.get(FORM_FILTER)))
+                    .maskFilter()
                     .maskZetDimension()
                     .maskAccesscontrol()
                     .maskReadOnlyNote()
@@ -503,7 +507,7 @@ public class OgmCreatorImpl implements OgmCreatorIntr {
                         .maskAutoset((String) docForm.get(MyForm.SCHEMA_VERSION), roleMap)
                         .maskShortName()
                         .maskCode()
-                        .withRendered(calcRendered(roleMap, docField, filter))
+                        .withRendered(calcRendered(roleMap, docField, filter, userDetail))
                         .withReadonly(calcReadOnly(docField, filter, roleMap))
                         .maskAccesscontrol()
                         .maskNdTypeAndNdAxis()
@@ -550,7 +554,7 @@ public class OgmCreatorImpl implements OgmCreatorIntr {
                         .maskAutoset((String) docForm.get(MyForm.SCHEMA_VERSION), roleMap)
                         .maskShortName()
                         .maskCode()
-                        .withRendered(calcRendered(roleMap, docField, filter))
+                        .withRendered(calcRendered(roleMap, docField, filter, userDetail))
                         .withReadonly(calcReadOnly(docField, filter, roleMap))
                         .maskAccesscontrol()
                         .maskNdTypeAndNdAxis()
@@ -597,7 +601,7 @@ public class OgmCreatorImpl implements OgmCreatorIntr {
                         .maskAutoset((String) docForm.get(MyForm.SCHEMA_VERSION), roleMap)
                         .maskShortName()
                         .maskCode()
-                        .withRendered(calcRendered(roleMap, docField, filter))
+                        .withRendered(calcRendered(roleMap, docField, filter, userDetail))
                         .withReadonly(calcReadOnly(docField, filter, roleMap))
                         .maskAccesscontrol()
                         .maskNdTypeAndNdAxis()
@@ -717,7 +721,7 @@ public class OgmCreatorImpl implements OgmCreatorIntr {
                 .maskAutoset(myForm.getSchemaVersion(), roleMap)
                 .maskShortName()
                 .maskCode()
-                .withRendered(calcRendered(roleMap, docField, filter))
+                .withRendered(calcRendered(roleMap, docField, filter, userDetail))
                 .withReadonly(calcReadOnly(docField, filter, roleMap))
                 .maskAccesscontrol()
                 .maskNdTypeAndNdAxis()
@@ -744,7 +748,7 @@ public class OgmCreatorImpl implements OgmCreatorIntr {
                 .maskAutoset(myForm.getSchemaVersion(), roleMap)
                 .maskShortName()
                 .maskCode()
-                .withRendered(calcRendered(roleMap, docField, filter))
+                .withRendered(calcRendered(roleMap, docField, filter, userDetail))
                 .withReadonly(calcReadOnly(docField, filter, roleMap))
                 .maskNdTypeAndNdAxis()
                 .withDefaultValue(calcDefaultValue(myForm.getMyProject(), myForm.getDbo(), docField, roleMap, filter, null))
