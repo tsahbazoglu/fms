@@ -39,72 +39,79 @@ public class FmsNamedQueries {
 
         List<Document> includeQuery = myNamedQueries.getList(INCLUDE, Document.class);
 
-        boolean noRoleExist = true;
-
         if (includeQuery != null) {
-            for (Document doc : includeQuery) {
+            runLoopBreak(includeQuery, roleMap, userDetail, myForm, mongoDbUtil);
+        }
 
-                List<String> roles = doc.get("roles", List.class);
+    }
 
-                if (roles == null || roleMap.isUserInRole(roles)) {
+    private void runLoopBreak(List<Document> includeQuery, RoleMap roleMap, UserDetail userDetail, MyForm myForm, MongoDbUtilIntr mongoDbUtil) throws RuntimeException {
 
-                    noRoleExist = false;
+        Document noRolesDoc = null;
+        boolean noRole = true;
 
-                    Document queryDoc = doc.get("query", Document.class);
+        for (Document doc : includeQuery) {
 
-                    List<Document> list = queryDoc.get("list", List.class);
+            List<String> roles = doc.get("roles", List.class);
+            if (roles == null) {
+                noRolesDoc = doc;
+            } else if (roleMap.isUserInRole(roles)) {
+                noRole = false;
+                applyQuery(doc, userDetail, myForm, mongoDbUtil, roleMap);
+            }
 
-                    String func = queryDoc.get("func", String.class);
+        }
 
-                    if (list != null) {
+        if (noRole && noRolesDoc != null) {
+            applyQuery(noRolesDoc, userDetail, myForm, mongoDbUtil, roleMap);
+        }
 
-                        for (Document document : list) {
-                            String key = document.get("key", String.class);
-                            String fmsValue = document.get("fms-value", String.class);
-                            String stringValue = document.get("string-value", String.class);
-                            Number numberValue = document.get("number-value", Number.class);
+    }
 
-                            if (fmsValue != null) {
-                                switch (fmsValue) {
-                                    case ProjectConstants.REPLACEABLE_KEY_WORD_FOR_FUNCTONS_LOGIN_MEMBER_ID:
-                                        filter.put(key, userDetail.getDbo().getObjectId());
-                                        break;
-                                    default:
-                                }
-                            } else if (stringValue != null) {
-                                filter.put(key, stringValue);
-                            } else if (numberValue != null) {
-                                filter.put(key, numberValue);
-                            } else {
-                                throw new RuntimeException("cannot set quey value");
-                            }
-                        }
+    private void applyQuery(Document doc, UserDetail userDetail, MyForm myForm, MongoDbUtilIntr mongoDbUtil, RoleMap roleMap) throws RuntimeException {
+        Document queryDoc = doc.get("query", Document.class);
 
-                    } else if (func != null) {
+        List<Document> list = queryDoc.get("list", List.class);
 
-                        func = func.replace(DIEZ, DOLAR);
-                        Map map = new HashMap();
-                        map.put(MONGO_LDAP_UID, userDetail.getUsername());
-                        map.put(myForm.getLoginFkField(), filter.get(myForm.getLoginFkField()));
-                        FacesContext facesContext = FacesContext.getCurrentInstance();
-                        if (facesContext != null) {
-                            map.put(CREATE_SESSIONID, ((HttpSession) facesContext.getExternalContext().getSession(false)).getId());
-                        }
-                        Document commandResult = mongoDbUtil.runCommand(myForm.getDb(), func, map, roleMap.keySet());
-                        filter.putAll(commandResult.get(RETVAL, Document.class));
+        String func = queryDoc.get("func", String.class);
+
+        if (list != null) {
+
+            for (Document document : list) {
+                String key = document.get("key", String.class);
+                String fmsValue = document.get("fms-value", String.class);
+                String stringValue = document.get("string-value", String.class);
+                Number numberValue = document.get("number-value", Number.class);
+
+                if (fmsValue != null) {
+                    switch (fmsValue) {
+                        case ProjectConstants.REPLACEABLE_KEY_WORD_FOR_FUNCTONS_LOGIN_MEMBER_ID:
+                            filter.put(key, userDetail.getDbo().getObjectId());
+                            break;
+                        default:
                     }
+                } else if (stringValue != null) {
+                    filter.put(key, stringValue);
+                } else if (numberValue != null) {
+                    filter.put(key, numberValue);
+                } else {
+                    throw new RuntimeException("cannot set quey value");
                 }
             }
+
+        } else if (func != null) {
+
+            func = func.replace(DIEZ, DOLAR);
+            Map map = new HashMap();
+            map.put(MONGO_LDAP_UID, userDetail.getUsername());
+            map.put(myForm.getLoginFkField(), filter.get(myForm.getLoginFkField()));
+            FacesContext facesContext = FacesContext.getCurrentInstance();
+            if (facesContext != null) {
+                map.put(CREATE_SESSIONID, ((HttpSession) facesContext.getExternalContext().getSession(false)).getId());
+            }
+            Document commandResult = mongoDbUtil.runCommand(myForm.getDb(), func, map, roleMap.keySet());
+            filter.putAll(commandResult.get(RETVAL, Document.class));
         }
-
-        if (noRoleExist && !roleMap.isUserInRole(myForm.getMyProject().getAdminAndViewerRole())) {
-
-            throw new NullNotExpectedException(
-                    "</br>You are not a priveleged user for this query or you a not found in ths project database.</br>"
-                    + "It seems the related module config file is not set properly.</br>"
-                    + "Please contact with module architect.");
-        }
-
     }
 
     public Document filter() {
