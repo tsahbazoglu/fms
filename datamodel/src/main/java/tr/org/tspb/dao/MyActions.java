@@ -470,7 +470,7 @@ public class MyActions {
                 Object value = commandResult.get(RETVAL);
                 controlResult.setEnable(Boolean.TRUE.equals(value));
             } else if (listOfChecks != null) {
-                controlResult.setEnable(TagEventCheckListDoc.value(fmsScriptRunner, filter, userDetail, listOfChecks));
+                controlResult.setEnable(TagEventCheckListDoc.value(fmsScriptRunner, filter, userDetail, roleMap, listOfChecks));
             }
 
             if (controlResult.isEnable()) {
