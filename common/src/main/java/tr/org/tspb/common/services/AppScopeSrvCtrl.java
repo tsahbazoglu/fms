@@ -245,8 +245,10 @@ public class AppScopeSrvCtrl {
     }
 
     public ObjectId getActivityStatusHayir() {
+        //FIXME generalize  and remove this function
         if (activityStatusHayir == null) {
-            activityStatusHayir = (ObjectId) mongoDbUtil.findOne("iondb", MyForm.ION_SETTING_ACTIVITY_STATUS, new Document(CODE, ION_SETTING_ACTIVITY_STATUS_001))
+            activityStatusHayir = (ObjectId) mongoDbUtil
+                    .findOne("iondb", MyForm.ION_SETTING_ACTIVITY_STATUS, new Document(CODE, ION_SETTING_ACTIVITY_STATUS_001))
                     .get(MONGO_ID);
         }
         return activityStatusHayir;
@@ -277,20 +279,6 @@ public class AppScopeSrvCtrl {
             }
         }
         return Collections.unmodifiableMap(cacheIonSettingNotifyType);
-
-    }
-
-    public Map<String, String> cacheIonSettingActivityStatus() {
-        if (cacheIonSettingActivityStatus == null) {
-            cacheIonSettingActivityStatus = new HashMap();
-
-            List<Document> cursor = mongoDbUtil.find("iondb", MyForm.ION_SETTING_ACTIVITY_STATUS);
-
-            for (Document nextElement : cursor) {
-                cacheIonSettingActivityStatus.put(nextElement.get(MONGO_ID).toString(), nextElement.get(CODE).toString());
-            }
-        }
-        return Collections.unmodifiableMap(cacheIonSettingActivityStatus);
 
     }
 
