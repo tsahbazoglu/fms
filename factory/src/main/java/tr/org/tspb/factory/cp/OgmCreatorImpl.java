@@ -245,11 +245,6 @@ public class OgmCreatorImpl implements OgmCreatorIntr {
                     MyForm.cacheIonSettingIdCode.put(nextElement.get(MONGO_ID).toString(), nextElement.get(CODE).toString());
                 }
 
-                cursor = mongoDbUtil.find("iondb", "ion_form_1160_notify_types");
-
-                for (Document nextElement : cursor) {
-                    MyForm.cacheIonSettingIdCode.put(nextElement.get(MONGO_ID).toString(), nextElement.get(CODE).toString());
-                }
             }
 
             Map<String, MyField> fields = createFields(myProject, dboForm, searchObject, roleMap, userDetail);
@@ -285,7 +280,6 @@ public class OgmCreatorImpl implements OgmCreatorIntr {
                     .maskMyRules()
                     .maskMyNotifies()
                     .validateForm()
-                    .fixMe()
                     .maskAjax()
                     .validateFields()
                     .maskWorkflowRelation()
@@ -425,7 +419,6 @@ public class OgmCreatorImpl implements OgmCreatorIntr {
                     .maskMyRules()
                     .maskMyNotifies()
                     .validateForm()
-                    .fixMe()
                     .maskAjax()
                     .validateFields()
                     .maskWorkflowRelation()
