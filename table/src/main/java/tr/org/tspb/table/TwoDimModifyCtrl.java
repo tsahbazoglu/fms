@@ -466,11 +466,23 @@ public class TwoDimModifyCtrl extends FmsTable implements ActionListener {
         return null;
     }
 
+    private int rowCount = 0;
+    private int limit = 5000;
+
     private void search() {
         try {
             filterService.createTableFilterCurrent(formService.getMyForm());
             //FIXME 02.10.2019 Volkan&Telman : set row count also on drawGUI phase
-            ((FmsTableDataModel) getData()).initRowCount(findDataCount());
+
+            rowCount = findDataCount();
+
+            if (rowCount > limit) {
+                ((FmsTableDataModel) getData()).initRowCount(0);
+                dialogController.showPopupInfo("sorgu sonucuna göre kayıt sayısı 5000 nin üzerinde. Filtre seçiminizi daraltınız", MESSAGE_DIALOG);
+            } else {
+                ((FmsTableDataModel) getData()).initRowCount(rowCount);
+            }
+
         } catch (NullNotExpectedException ex) {
 
         }
@@ -1435,26 +1447,14 @@ public class TwoDimModifyCtrl extends FmsTable implements ActionListener {
                         httpSession.removeAttribute(HTTP_SESSION_ATTR_MAP_REQURED_CONTROL);
                     }
                     break;
-                case "ion_form_1170_notify_type_toggle":
-                    formService.getMyForm().runAjaxIonForm1170NotifyTypeToggle(crudObject, loginController.getRoleMap());
-                    throw new UnsupportedOperationException("review ajax functionality");
-                case "ion_form_1170_activity_status_toggle":
-                    formService.getMyForm().runAjaxIonForm1170ActivityStatusToggle(crudObject, loginController.getRoleMap());
-                    throw new UnsupportedOperationException("review ajax functionality");
-                case "ion_form_1160_notify_type_toggle":
-                    formService.getMyForm().runAjaxIonForm1160NotifyTypeToggle(crudObject, loginController.getRoleMap());
-                    throw new UnsupportedOperationException("review ajax functionality");
-                case "ion_form_1160_activity_status_toggle":
-                    formService.getMyForm().runAjaxIonForm1160ActivityStatusToggle(crudObject, loginController.getRoleMap());
-                    throw new UnsupportedOperationException("review ajax functionality");
                 case "uys_member_generate_ldapUID":
                     formService.getMyForm().runAjax__uys_member_generate_ldapUID(crudObject);
                     throw new UnsupportedOperationException("review ajax functionality");
-                case "ion_form_1350_override_required_check":
-                    formService.getMyForm().runAjaxIonForm1350OverrideRequiredCheck(getComponentMap(), formService.getMyForm(), crudObject);
-                    throw new UnsupportedOperationException("review ajax functionality");
                 case "render":
                     formService.getMyForm().runAjaxRender(myField, getComponentMap(), formService.getMyForm(), crudObject,
+                            loginController.getRoleMap(), loginController.getLoggedUserDetail(), filterService.getTableFilterCurrent());
+                case "render-ref":
+                    formService.getMyForm().runAjaxRenderRef(myField, getComponentMap(), formService.getMyForm(), crudObject,
                             loginController.getRoleMap(), loginController.getLoggedUserDetail(), filterService.getTableFilterCurrent());
                 default:
                     break;
@@ -1473,6 +1473,10 @@ public class TwoDimModifyCtrl extends FmsTable implements ActionListener {
 
     @Override
     public List<Map> findLazyData(int startRow, int maxResults) throws NullNotExpectedException {
+
+        if (rowCount > limit) {
+            return new ArrayList<>();
+        }
 
         MyForm myForm = formService.getMyForm();
         if (myForm == null || myForm.getKey() == null) {
