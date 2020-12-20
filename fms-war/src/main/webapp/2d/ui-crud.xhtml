@@ -131,7 +131,9 @@
             </f:facet>
 
             <f:facet name="right">
-                <p:outputLabel value="{_id : ObjectId('#{twoDimModifyCtrl.myObject['_id']}')}"/>
+                <p:outputLabel                     
+                    rendered="#{roleMB[mainFrame.architectRole]}"
+                    value="{_id : ObjectId('#{twoDimModifyCtrl.myObject['_id']}')}"/>
             </f:facet>
 
         </p:toolbar>
