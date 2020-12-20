@@ -50,6 +50,7 @@ public class MyField {
     private String ajaxUpdate;
     private List<String> ajaxEffectedKeys = new ArrayList<>();
     private boolean ajax;
+    private TagAjaxRef tagAjaxRef;
     // C
     private String code;//this is the case for nd
     private String calculateEngine;
@@ -753,6 +754,10 @@ public class MyField {
         this.myForm = myForm;
     }
 
+    public TagAjaxRef getTagAjaxRef() {
+        return tagAjaxRef;
+    }
+
     public static class Builder {
 
         private final MyField myField;
@@ -1108,16 +1113,19 @@ public class MyField {
 
         public Builder maskAjax() {
 
-            this.myField.ajax = Boolean.TRUE.equals(this.myField.dbo.get(AJAX));
-
-            this.myField.ajaxShowHide = this.myField.dbo.getString("ajaxShowHide");
-
-            if (this.myField.dbo.get(AJAX_ACTION) instanceof String) {
-                this.myField.ajaxAction = this.myField.dbo.get(AJAX_ACTION).toString();
+            Document ajax = this.myField.dbo.get(AJAX, Document.class);
+            if (ajax == null) {
+                return this;
             }
 
-            if (this.myField.dbo.get(AJAX_EFFECTED_KEYS) instanceof List) {
-                this.myField.ajaxEffectedKeys = (List) this.myField.dbo.get(AJAX_EFFECTED_KEYS);
+            this.myField.ajax = Boolean.TRUE.equals(ajax.getBoolean("enable"));
+            this.myField.ajaxShowHide = ajax.getString("show-hide");
+            this.myField.ajaxAction = ajax.getString(AJAX_ACTION);
+            this.myField.ajaxEffectedKeys = ajax.getList(AJAX_EFFECTED_KEYS, String.class);
+
+            Document ajaxRef = ajax.get("ref", Document.class);
+            if (ajaxRef != null) {
+                this.myField.tagAjaxRef = new TagAjaxRef(ajaxRef);
             }
 
             return this;
@@ -1161,11 +1169,22 @@ public class MyField {
 
             if (value == null) {
                 List<Document> list = autoset.get("list", List.class);
+
+                Document noRoleDoc = null;
+                boolean noRole = true;
+
                 for (Document docRoleValue : list) {
                     List<String> roles = docRoleValue.get("roles", List.class);
-                    if (roles == null || roleMap.isUserInRole(roles)) {
-                        value = docRoleValue.get(VALUE, Boolean.class);
+                    if (roles == null) {
+                        noRoleDoc = docRoleValue;
+                    } else if (roleMap.isUserInRole(roles)) {
+                        noRole = false;
+                        value = docRoleValue.getBoolean(VALUE);
                     }
+                }
+
+                if (noRole && noRoleDoc != null) {
+                    value = noRoleDoc.getBoolean(VALUE);
                 }
             }
 
