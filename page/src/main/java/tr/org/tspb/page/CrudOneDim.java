@@ -851,8 +851,8 @@ public class CrudOneDim implements ValueChangeListener, Serializable {
             if ("iondb".equals(myForm.getDb()) && !myForm.isHasAttachedFiles()) {
                 /*
                  eimza bidirim formlarında 
-                 eğer formun eki ajax olarak schemadan kaldırıldıysa (ornegin : ion_form_1170 )
-                 kayederken daha oceden eklenen ekleri sil. aksi takdirde bunlar eimzaya yansıyor
+                 eğer formun eki ajax olarak schemadan kaldırıldıysa
+                 kayderken daha önceden eklenen ekleri sil. aksi takdirde bunlar eimzaya yansıyor
                  */
 
                 mongoDbUtil.removeFile(baseService.getProperties().getUploadTable(),
@@ -954,10 +954,14 @@ public class CrudOneDim implements ValueChangeListener, Serializable {
                 case "render":
                     formService.getMyForm().runAjaxRender(myField, componentMap, formService.getMyForm(), crudObject,
                             loginController.getRoleMap(), loginController.getLoggedUserDetail(), filterService.getTableFilterCurrent());
+                case "render-ref":
+                    formService.getMyForm().runAjaxRenderRef(myField, componentMap, formService.getMyForm(), crudObject,
+                            loginController.getRoleMap(), loginController.getLoggedUserDetail(), filterService.getTableFilterCurrent());
                 default:
                     break;
             }
         } catch (Exception ex) {
+            logger.error("error occured", ex);
             addMessage(null, null, ex.getMessage(), FacesMessage.SEVERITY_ERROR);
         }
     }
