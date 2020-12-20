@@ -1002,8 +1002,8 @@ public abstract class FmsTable extends FmsTableView {
             if ("iondb".equals(myForm.getDb()) && !myForm.isHasAttachedFiles()) {
                 /*
                  eimza bidirim formlarında 
-                 eğer formun eki ajax olarak schemadan kaldırıldıysa (ornegin : ion_form_1170 )
-                 kayederken daha oceden eklenen ekleri sil. aksi takdirde bunlar eimzaya yansıyor
+                 eğer formun eki ajax olarak schemadan kaldırıldıysa
+                 kayderken daha önceden eklenen ekleri sil. aksi takdirde bunlar eimzaya yansıyor
                  */
 
                 mongoDbUtil.removeFile(baseService.getProperties().getUploadTable(),
