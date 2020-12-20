@@ -55,10 +55,10 @@ public class ProjectConstants {
     public static final String ACTIVITY_STATUS = "activity_status";
     public static final String FORMACTIONS = "actions";
     public static final String ACTION = "action";
-    public static final String AJAX_ACTION = "ajax_action";
+    public static final String AJAX_ACTION = "action";
     public static final String AJAX_UPDATE = "ajax_update";
     public static final String AJAX = "ajax";
-    public static final String AJAX_EFFECTED_KEYS = "ajax_effected_keys";
+    public static final String AJAX_EFFECTED_KEYS = "effected_keys";
     public static final String APPLY_TO_QUERY = "applyToQuery";
     public static final String APPLY_LIST_OF_OBJECTIDS = "applyListOfObjectIds";
     public static final String CHECK_AND_WRITE_CONTROL_RESULT_FUNCTION = "checkAndWriteControlResultFunc";
