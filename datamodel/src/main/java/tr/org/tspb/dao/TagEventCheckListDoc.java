@@ -5,6 +5,7 @@
  */
 package tr.org.tspb.dao;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import org.bson.Document;
@@ -24,21 +25,25 @@ public class TagEventCheckListDoc {
 
     public static boolean value(FmsScriptRunner fmsScriptRunner, Map myFilter, UserDetail userDetail, RoleMap roleMap, List<Document> checks) {
 
-        Boolean result = null;
+        boolean result = false;
 
-        Document noRoleDoc = null;
+        List<Document> noRoleChecks = new ArrayList<>();
+        boolean noRole = true;
 
         for (Document check : checks) {
             List<String> roles = check.getList("roles", String.class);
             if (roles == null) {
-                noRoleDoc = check;
+                noRoleChecks.add(check);
             } else if (roleMap.isUserInRole(roles)) {
+                noRole = false;
                 result = applyCheck(check, result, userDetail, myFilter, fmsScriptRunner);
             }
         }
 
-        if (result == null && noRoleDoc != null) {
-            result = applyCheck(noRoleDoc, result, userDetail, myFilter, fmsScriptRunner);
+        if (noRole && !noRoleChecks.isEmpty()) {
+            for (Document noRoleDoc : noRoleChecks) {
+                result = applyCheck(noRoleDoc, result, userDetail, myFilter, fmsScriptRunner);
+            }
         }
 
         return Boolean.TRUE.equals(result);
