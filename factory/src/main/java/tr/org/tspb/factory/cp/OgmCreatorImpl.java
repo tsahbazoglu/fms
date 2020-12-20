@@ -69,7 +69,6 @@ import tr.org.tspb.converter.base.TelmanStringConverter;
 import tr.org.tspb.dao.ChildFilter;
 import tr.org.tspb.dao.FmsAutoComplete;
 import tr.org.tspb.dao.MyActions;
-import static tr.org.tspb.dao.MyForm.ION_SETTING_ACTIVITY_STATUS;
 import tr.org.tspb.dao.MyMap;
 import tr.org.tspb.datamodel.expected.FmsRunMongoCmd;
 import tr.org.tspb.datamodel.expected.FmsScriptRunner;
@@ -229,23 +228,6 @@ public class OgmCreatorImpl implements OgmCreatorIntr {
             throw new NullNotExpectedException("no form regarding to formSearch query");
         }
         try {
-
-            if (MyForm.cacheIonSettingIdCode == null) {
-                MyForm.cacheIonSettingIdCode = new HashMap();
-
-                List<Document> cursor = mongoDbUtil.find("iondb", ION_SETTING_ACTIVITY_STATUS);
-
-                for (Document nextElement : cursor) {
-                    MyForm.cacheIonSettingIdCode.put(nextElement.get(MONGO_ID).toString(), nextElement.get(CODE).toString());
-                }
-
-                cursor = mongoDbUtil.find("iondb", "ion_setting_notify_type");
-
-                for (Document nextElement : cursor) {
-                    MyForm.cacheIonSettingIdCode.put(nextElement.get(MONGO_ID).toString(), nextElement.get(CODE).toString());
-                }
-
-            }
 
             Map<String, MyField> fields = createFields(myProject, dboForm, searchObject, roleMap, userDetail);
 
