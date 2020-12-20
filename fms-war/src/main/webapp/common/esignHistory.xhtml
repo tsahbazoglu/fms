@@ -104,7 +104,10 @@
                         <f:setPropertyActionListener target="#{esignController.eimzaFileID}" value="#{x._id}"/>
                     </p:commandButton>
                 </p:column>
-                <p:column width="180px;" headerText="">
+                <p:column 
+                    rendered="#{roleMB[formService.myForm.myProject.adminAndViewerRole]}"
+                    width="180px;"
+                    headerText="">
                     <p:commandButton
                         id ="id-btn-show-metadata"
                         value="MetaData Göster" 

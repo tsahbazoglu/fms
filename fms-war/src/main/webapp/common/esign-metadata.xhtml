@@ -11,7 +11,9 @@
         <title></title>
     </h:head>
 
-    <h:panelGroup>
+    <h:panelGroup
+        rendered="#{roleMB[formService.myForm.myProject.adminAndViewerRole]}"
+        >
         <h:outputText value="Bidirim Zarfının MetaData Bilgisi" style="font-size: 22px;font-weight: bolder;color: #b3b3b3;"/>
         <br/>
         <br/>
