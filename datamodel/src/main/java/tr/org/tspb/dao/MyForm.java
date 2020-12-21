@@ -28,17 +28,12 @@ import tr.org.tspb.pojo.UserDetail;
  */
 public class MyForm implements MyFormXs {
 
-    public static Map<String, String> cacheIonSettingIdCode;
     public static final String SCHEMA_VERSION_100 = "1.0.0";
     public static final String SCHEMA_VERSION_110 = "1.1.0";
     public static final String SCHEMA_VERSION = "schemaVersion";
 
     public static final String ION_SETTING_ACTIVITY_STATUS = "ion_setting_activity_status";
 
-    private static final String ION_FORM_1160_NOTIFY_TYPE_001 = "ion_form_1160_notify_type_001";
-    private static final String ION_FORM_1160_NOTIFY_TYPE_000 = "ion_form_1160_notify_type_000";
-    private static final String ION_SETTING_NOTIFY_TYPE_001 = "ion_setting_notify_type_001";
-    private static final String ION_SETTING_NOTIFY_TYPE_000 = "ion_setting_notify_type_000";
     //
     public RoleMap roleMap;
     public UserDetail userDetail;
@@ -414,11 +409,11 @@ public class MyForm implements MyFormXs {
         for (String ajaxFieldKey : ajaxFields) {
             MyField myField = getField(ajaxFieldKey);
             switch (myField.getAjaxAction()) {
-                case "ion_form_1350_override_required_check":
-                    runAjaxIonForm1350OverrideRequiredCheck(componentMap, this, crudObject);
-                    break;
                 case "render":
                     runAjaxRender(myField, componentMap, this, crudObject, roleMap, userDetail, null);
+                    break;
+                case "render-ref":
+                    runAjaxRenderRef(myField, componentMap, this, crudObject, roleMap, userDetail, null);
                     break;
                 default:
                     break;
@@ -493,49 +488,6 @@ public class MyForm implements MyFormXs {
         }
     }
 
-    public void runAjaxIonForm1170NotifyTypeToggle(Map crudObject, RoleMap loginController) {
-        fieldsAsList.clear();
-        throw new UnsupportedOperationException();
-    }
-
-    public void runAjaxIonForm1170ActivityStatusToggle(Map crudObject, RoleMap loginController) {
-        fieldsAsList.clear();
-        throw new UnsupportedOperationException();
-    }
-
-    public void runAjaxIonForm1160NotifyTypeToggle(Map crudObject, RoleMap loginController) {
-        fieldsAsList.clear();
-        throw new UnsupportedOperationException();
-    }
-
-    public void runAjaxIonForm1160ActivityStatusToggle(Map crudObject, RoleMap loginController) {
-        fieldsAsList.clear();
-        throw new UnsupportedOperationException();
-    }
-
-    public void runAjaxIonForm1350OverrideRequiredCheck(Map<String, MyField> componentMap,
-            final MyForm selectedForm, Map crudObject) {
-        if ("ion_form_1350".equals(selectedForm.getKey())) {
-
-            String checkFieldKey = "pay_sahipligi_varmi";
-            String effefctedFieldKey = "pay_sahipligi_orani";
-
-            Object checkFieldValue = crudObject.get(checkFieldKey);
-
-            if (HAYIR.equals(checkFieldValue)) {
-                crudObject.remove(effefctedFieldKey);
-            }
-
-            MyField mf = componentMap.get(effefctedFieldKey);
-
-            if (mf != null) {
-                mf.setRendered("EVET".equals(checkFieldValue));
-            }
-
-            Collections.sort(fieldsAsList, new MyFieldComparator());
-        }
-    }
-
     public void runAjaxRender(MyField myField,
             Map<String, MyField> componentMap,
             final MyForm selectedForm,
@@ -589,51 +541,40 @@ public class MyForm implements MyFormXs {
         }
     }
 
-    public void runAjaxIonForm1340KasStatusSelection(Map<String, MyField> componentMap, final MyForm selectedForm, Map crudObject,
-            List<String> selectedFormAjaxFieldKeySetAsList) {
-        if ("ion_form_1340".equals(selectedForm.getKey())) {
-            Object value = crudObject.get("kas_status");
+    public void runAjaxRenderRef(MyField myField,
+            Map<String, MyField> componentMap,
+            final MyForm selectedForm,
+            MyMap crudObject,
+            RoleMap roleMap,
+            UserDetail userDetail,
+            Document filter) {
 
-            if ("EVET".equals(value)) {
-                if (componentMap.containsKey("karli_kas_musteri_sayisi")) {
-                    componentMap.get("karli_kas_musteri_sayisi").setRendered(true);
-                }
-                if (componentMap.containsKey("kas_musteri_sayisi")) {
-                    componentMap.get("kas_musteri_sayisi").setRendered(true);
-                }
-                if (componentMap.containsKey("kar_oran")) {
-                    componentMap.get("kar_oran").setRendered(true);
-                }
-                if (componentMap.containsKey("zarar_oran")) {
-                    componentMap.get("zarar_oran").setRendered(true);
-                }
-            } else if (HAYIR.equals(value)) {
-                crudObject.remove("karli_kas_musteri_sayisi");
-                crudObject.remove("kas_musteri_sayisi");
-                crudObject.remove("kar_oran");
-                crudObject.remove("zarar_oran");
-                if (componentMap.containsKey("karli_kas_musteri_sayisi")) {
-                    componentMap.get("karli_kas_musteri_sayisi").setRendered(false);
-                }
-                if (componentMap.containsKey("kas_musteri_sayisi")) {
-                    componentMap.get("kas_musteri_sayisi").setRendered(false);
-                }
-                if (componentMap.containsKey("kar_oran")) {
-                    componentMap.get("kar_oran").setRendered(false);
-                }
-                if (componentMap.containsKey("zarar_oran")) {
-                    componentMap.get("zarar_oran").setRendered(false);
+        myField.getAjaxEffectedKeys().forEach((key) -> {
+            crudObject.removeUnSetKey(key);
+        });
+
+        Document crudObjAsDoc = new Document(crudObject);
+        crudObjAsDoc.remove(INODE);
+
+        myField.getTagAjaxRef().resolveRenderedFields(fmsScriptRunner, crudObject);
+
+        for (String fieldKey : myField.getTagAjaxRef().getRender().keySet()) {
+
+            MyField myField1 = componentMap.get(fieldKey);
+
+            if (myField1 != null) {
+                if (Boolean.TRUE.equals(myField.getTagAjaxRef().getRender().get(fieldKey))) {
+                    myField1.setRendered(true);
+                    myField1.createSelectItems(filter, crudObject, roleMap, userDetail, true);
+                } else {
+                    crudObject.remove(fieldKey);
+                    crudObject.addUnSetKey(fieldKey);
+                    myField1.setRendered(false);
                 }
             }
-            Collections.sort(selectedFormAjaxFieldKeySetAsList, new Comparator<String>() {
-                @Override
-                public int compare(String t, String t1) {
-                    String nameCurrent = selectedForm.getField(t).getOrder().toString();
-                    String nameNext = selectedForm.getField(t1).getOrder().toString();
-                    return nameNext.compareTo(nameCurrent);
-                }
-            });
+
         }
+
     }
 
     public void initActions(MyActions myActions) {
@@ -1460,133 +1401,6 @@ public class MyForm implements MyFormXs {
             return this;
         }
 
-        public Builder fixMe() throws Exception {
-
-            if ("ion_form_1170".equals(this.myForm.key)) {
-                this.myForm.crkr = new CrudRelatedKeyRender<Map>() {
-                    @Override
-                    boolean getRender(Map t, String key) {
-
-                        if (t == null || key == null) {
-                            return true;
-                        }
-
-                        Object notify_type = t.get("notify_type");
-                        if (notify_type != null) {
-                            notify_type = cacheIonSettingIdCode.get(notify_type.toString());
-                        }
-
-                        Object activity_status = t.get(ACTIVITY_STATUS);
-                        if (activity_status != null) {
-                            activity_status = cacheIonSettingIdCode.get(activity_status.toString());
-                        }
-
-                        boolean xxx = true;
-                        switch (key) {
-                            case ACTIVITY_STATUS:
-                                xxx = ION_SETTING_NOTIFY_TYPE_001.equals(notify_type);
-                                break;
-                            case ATTACHMENTS:
-                                xxx = ION_SETTING_NOTIFY_TYPE_001.equals(notify_type) && "ion_setting_activity_status_001".equals(activity_status);
-                                break;
-                            case "manager_ad_soyad":
-                                xxx = ION_SETTING_NOTIFY_TYPE_000.equals(notify_type) || ION_SETTING_NOTIFY_TYPE_001.equals(notify_type) || "ion_setting_notify_type_003".equals(notify_type);
-                                break;
-                            case "posta_kodu":
-                                xxx = ION_SETTING_NOTIFY_TYPE_000.equals(notify_type) || ION_SETTING_NOTIFY_TYPE_001.equals(notify_type) || "ion_setting_notify_type_004".equals(notify_type);
-                                break;
-                            case TELEPHONE:
-                                xxx = ION_SETTING_NOTIFY_TYPE_000.equals(notify_type) || ION_SETTING_NOTIFY_TYPE_001.equals(notify_type) || "ion_setting_notify_type_005".equals(notify_type);
-                                break;
-                            case "faks":
-                                xxx = ION_SETTING_NOTIFY_TYPE_000.equals(notify_type) || ION_SETTING_NOTIFY_TYPE_001.equals(notify_type) || "ion_setting_notify_type_006".equals(notify_type);
-                                break;
-                            case "org_name":
-                                xxx = ION_SETTING_NOTIFY_TYPE_000.equals(notify_type) || ION_SETTING_NOTIFY_TYPE_001.equals(notify_type) || "ion_setting_notify_type_002".equals(notify_type);
-                                break;
-                            case "org_type":
-                                xxx = ION_SETTING_NOTIFY_TYPE_000.equals(notify_type) || ION_SETTING_NOTIFY_TYPE_001.equals(notify_type) || "ion_setting_notify_type_002".equals(notify_type);
-                                break;
-                            case "address":
-                                xxx = ION_SETTING_NOTIFY_TYPE_000.equals(notify_type) || ION_SETTING_NOTIFY_TYPE_001.equals(notify_type);
-                                break;
-                            case "bulundugu_il":
-                                xxx = ION_SETTING_NOTIFY_TYPE_000.equals(notify_type) || ION_SETTING_NOTIFY_TYPE_001.equals(notify_type);
-                                break;
-                            case "bulundugu_ilce":
-                                xxx = ION_SETTING_NOTIFY_TYPE_000.equals(notify_type) || ION_SETTING_NOTIFY_TYPE_001.equals(notify_type);
-                                break;
-                        }
-                        return xxx;
-                    }
-                };
-            } else if ("ion_form_1160".equals(this.myForm.key) && this.myForm.roleMap.isUserInRole("pyuser,akuser")) {
-                this.myForm.crkr = new CrudRelatedKeyRender<Map>() {
-                    @Override
-                    boolean getRender(Map t, String key) {
-
-                        if (t == null || key == null) {
-                            return true;
-                        }
-
-                        Object notifyType = t.get("notify_type");
-                        if (notifyType != null) {
-                            notifyType = cacheIonSettingIdCode.get(notifyType.toString());
-                        }
-
-                        Object activityStatus = t.get(ACTIVITY_STATUS);
-                        if (activityStatus != null) {
-                            activityStatus = cacheIonSettingIdCode.get(activityStatus.toString());
-                        }
-                        switch (key) {
-                            case ACTIVITY_STATUS:
-                                return ION_FORM_1160_NOTIFY_TYPE_001.equals(notifyType);
-                            case ATTACHMENTS:
-                                return ION_FORM_1160_NOTIFY_TYPE_001.equals(notifyType) && "ion_setting_activity_status_001".equals(activityStatus);
-                            case "posta_kodu":
-                                return ION_FORM_1160_NOTIFY_TYPE_000.equals(notifyType) || ION_FORM_1160_NOTIFY_TYPE_001.equals(notifyType) || "ion_form_1160_notify_type_002".equals(notifyType);
-                            case TELEPHONE:
-                                return ION_FORM_1160_NOTIFY_TYPE_000.equals(notifyType) || ION_FORM_1160_NOTIFY_TYPE_001.equals(notifyType) || "ion_form_1160_notify_type_003".equals(notifyType);
-                            case "call_center_no":
-                                return ION_FORM_1160_NOTIFY_TYPE_000.equals(notifyType) || ION_FORM_1160_NOTIFY_TYPE_001.equals(notifyType) || "ion_form_1160_notify_type_004".equals(notifyType);
-                            case "faks":
-                                return ION_FORM_1160_NOTIFY_TYPE_000.equals(notifyType) || ION_FORM_1160_NOTIFY_TYPE_001.equals(notifyType) || "ion_form_1160_notify_type_005".equals(notifyType);
-                            case EMAIL:
-                                return ION_FORM_1160_NOTIFY_TYPE_000.equals(notifyType) || ION_FORM_1160_NOTIFY_TYPE_001.equals(notifyType) || "ion_form_1160_notify_type_006".equals(notifyType);
-                            case "web_site":
-                                return ION_FORM_1160_NOTIFY_TYPE_000.equals(notifyType) || ION_FORM_1160_NOTIFY_TYPE_001.equals(notifyType) || "ion_form_1160_notify_type_007".equals(notifyType);
-                            case "tax_office_name":
-                                return ION_FORM_1160_NOTIFY_TYPE_000.equals(notifyType) || ION_FORM_1160_NOTIFY_TYPE_001.equals(notifyType) || "ion_form_1160_notify_type_008".equals(notifyType);
-                            case "tax_id_no":
-                                return ION_FORM_1160_NOTIFY_TYPE_000.equals(notifyType) || ION_FORM_1160_NOTIFY_TYPE_001.equals(notifyType) || "ion_form_1160_notify_type_009".equals(notifyType);
-                            case "main_aggrement_date":
-                                return ION_FORM_1160_NOTIFY_TYPE_000.equals(notifyType) || ION_FORM_1160_NOTIFY_TYPE_001.equals(notifyType) || "ion_form_1160_notify_type_010".equals(notifyType);
-                            case "tic_sicil_kayit_il":
-                                return ION_FORM_1160_NOTIFY_TYPE_000.equals(notifyType) || ION_FORM_1160_NOTIFY_TYPE_001.equals(notifyType) || "ion_form_1160_notify_type_011".equals(notifyType);
-                            case "tic_sicil_kayit_tarihi":
-                                return ION_FORM_1160_NOTIFY_TYPE_000.equals(notifyType) || ION_FORM_1160_NOTIFY_TYPE_001.equals(notifyType) || "ion_form_1160_notify_type_012".equals(notifyType);
-                            case "tic_sicil_no":
-                                return ION_FORM_1160_NOTIFY_TYPE_000.equals(notifyType) || ION_FORM_1160_NOTIFY_TYPE_001.equals(notifyType) || "ion_form_1160_notify_type_013".equals(notifyType);
-                            case "tic_sicil_meslek_grubu":
-                                return ION_FORM_1160_NOTIFY_TYPE_000.equals(notifyType) || ION_FORM_1160_NOTIFY_TYPE_001.equals(notifyType) || "ion_form_1160_notify_type_014".equals(notifyType);
-                            case "nace_kodu":
-                                return ION_FORM_1160_NOTIFY_TYPE_000.equals(notifyType) || ION_FORM_1160_NOTIFY_TYPE_001.equals(notifyType) || "ion_form_1160_notify_type_015".equals(notifyType);
-                            case "city":
-                                return ION_FORM_1160_NOTIFY_TYPE_000.equals(notifyType) || ION_FORM_1160_NOTIFY_TYPE_001.equals(notifyType);
-                            case "country":
-                                return ION_FORM_1160_NOTIFY_TYPE_000.equals(notifyType) || ION_FORM_1160_NOTIFY_TYPE_001.equals(notifyType);
-                            case "address":
-                                return ION_FORM_1160_NOTIFY_TYPE_000.equals(notifyType) || ION_FORM_1160_NOTIFY_TYPE_001.equals(notifyType);
-                        }
-                        return true;
-                    }
-
-                };
-            }
-
-            return this;
-        }
-
         public Builder withFieldsAsList(List<MyField> fieldsAsList) {
             this.myForm.fieldsAsList = fieldsAsList;
             return this;
@@ -1699,16 +1513,16 @@ public class MyForm implements MyFormXs {
         public Builder maskAjax() {
             for (MyField myField : this.myForm.fields.values()) {
                 if (myField.getAjaxEffectedKeys() != null && !myField.getAjaxEffectedKeys().isEmpty()) {
-                    StringBuilder sb = new StringBuilder();
+                    StringBuilder jsfAjaxUpdateValue = new StringBuilder();
                     for (String ajaxKey : myField.getAjaxEffectedKeys()) {
                         MyField relatedField = this.myForm.getField(ajaxKey);
                         if (relatedField != null) {
                             String styleClass = "id-class-".concat(ajaxKey);
                             relatedField.setStyleClass(styleClass);
-                            sb.append(String.format("@(.%s),", styleClass));
+                            jsfAjaxUpdateValue.append(String.format("@(.%s),", styleClass));
                         }
                     }
-                    myField.setAjaxUpdate(sb.toString());
+                    myField.setAjaxUpdate(jsfAjaxUpdateValue.toString());
                 }
             }
             return this;
