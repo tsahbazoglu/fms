@@ -22,7 +22,6 @@ import org.bson.types.Code;
 import org.bson.types.ObjectId;
 import tr.org.tspb.constants.ProjectConstants;
 import static tr.org.tspb.constants.ProjectConstants.CFG_TABLE_PROJECT;
-import static tr.org.tspb.constants.ProjectConstants.CODE;
 import static tr.org.tspb.constants.ProjectConstants.COLLECTION;
 import static tr.org.tspb.constants.ProjectConstants.COMMON;
 import static tr.org.tspb.constants.ProjectConstants.COMPONENTTYPE;
@@ -43,7 +42,6 @@ import static tr.org.tspb.constants.ProjectConstants.FIELDS_ROW;
 import static tr.org.tspb.constants.ProjectConstants.FORMFIELDS;
 import static tr.org.tspb.constants.ProjectConstants.FORMS;
 import static tr.org.tspb.constants.ProjectConstants.FORM_DB;
-import static tr.org.tspb.constants.ProjectConstants.FORM_FILTER;
 import static tr.org.tspb.constants.ProjectConstants.FORM_KEY;
 import static tr.org.tspb.constants.ProjectConstants.HAYIR;
 import static tr.org.tspb.constants.ProjectConstants.LOGIN_FK;
@@ -465,7 +463,7 @@ public class OgmCreatorImpl implements OgmCreatorIntr {
     }
 
     private Map<String, MyField> createFields(MyProject myProject, Document docForm, Map filter,
-            RoleMap roleMap, UserDetail userDetail) throws NullNotExpectedException {
+            RoleMap roleMap, UserDetail userDetail) throws NullNotExpectedException, FormConfigException {
 
         if (docForm.get(FORMFIELDS) == null) {
             throw new NullNotExpectedException("fields property is resolved to null");
@@ -558,7 +556,7 @@ public class OgmCreatorImpl implements OgmCreatorIntr {
     }
 
     private Map<String, MyField> createRowFields(MyProject myProject, Document docForm,
-            Map filter, RoleMap roleMap, UserDetail userDetail) {
+            Map filter, RoleMap roleMap, UserDetail userDetail) throws FormConfigException {
 
         Map<String, MyField> fieldsRow = new HashMap<>();
 
@@ -686,7 +684,7 @@ public class OgmCreatorImpl implements OgmCreatorIntr {
 
     @Override
     public MyField getMyField(MyForm myForm, Document docField, Map filter,
-            RoleMap roleMap, UserDetail userDetail) {
+            RoleMap roleMap, UserDetail userDetail) throws FormConfigException {
 
         Converter converter = createConverter(myForm.getDbo(), docField);
 
@@ -714,7 +712,8 @@ public class OgmCreatorImpl implements OgmCreatorIntr {
     }
 
     @Override
-    public MyField getMyFieldPivot(MyForm myForm, Document docField, Map filter, RoleMap roleMap, UserDetail userDetail) {
+    public MyField getMyFieldPivot(MyForm myForm, Document docField, Map filter, RoleMap roleMap, UserDetail userDetail)
+            throws FormConfigException {
         Converter converter = createConverter(myForm.getDbo(), docField);
 
         calcReadOnly(docField, filter, roleMap);

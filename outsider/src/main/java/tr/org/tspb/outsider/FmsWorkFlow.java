@@ -4,6 +4,7 @@ import java.io.Serializable;
 import org.bson.Document;
 import tr.org.tspb.dao.MyForm;
 import tr.org.tspb.dao.MyMap;
+import tr.org.tspb.exceptions.FormConfigException;
 
 /**
  *
@@ -11,7 +12,7 @@ import tr.org.tspb.dao.MyMap;
  */
 public interface FmsWorkFlow extends Serializable {
 
-    public void init(MyForm selectedForm, MyMap crudObject, Document searchObject);
+    public void init(MyForm selectedForm, MyMap crudObject, Document searchObject) throws FormConfigException;
 
     public void reset();
 

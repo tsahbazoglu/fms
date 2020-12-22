@@ -40,6 +40,7 @@ import tr.org.tspb.common.qualifier.MyLoginQualifier;
 import tr.org.tspb.common.services.LoginController;
 import tr.org.tspb.outsider.FmsWorkFlow;
 import tr.org.tspb.dao.MyFieldComparator;
+import tr.org.tspb.exceptions.FormConfigException;
 import tr.org.tspb.factory.qualifier.OgmCreatorQualifier;
 import tr.org.tspb.util.qualifier.KeepOpenQualifier;
 import tr.org.tspb.util.tools.MongoDbUtilIntr;
@@ -202,7 +203,7 @@ public class WorkFlowCtrl implements FmsWorkFlow {
     }
 
     @Override
-    public void init(MyForm myForm, MyMap crudbject, Document filter) {
+    public void init(MyForm myForm, MyMap crudbject, Document filter) throws FormConfigException {
         this.myForm = myForm;
         this.crudObject = crudbject;
         this.filter = filter;

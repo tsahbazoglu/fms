@@ -19,6 +19,7 @@ import org.bson.types.Code;
 import org.bson.types.ObjectId;
 import tr.org.tspb.dao.refs.PlainRecord;
 import tr.org.tspb.datamodel.expected.FmsScriptRunner;
+import tr.org.tspb.exceptions.FormConfigException;
 
 /**
  *
@@ -943,13 +944,14 @@ public class MyField {
             return this;
         }
 
-        public Builder maskItemsAsMyItems(String schemaVersion, Map filter, boolean admin, Set<String> roles) {
+        public Builder maskItemsAsMyItems(String schemaVersion, Map filter, boolean admin, Set<String> roles)
+                throws FormConfigException {
 
-            if (MyForm.SCHEMA_VERSION_110.equals(schemaVersion)) {
-                maskItemsAsMyItemsSchemaVersion110(schemaVersion, filter, admin, roles);
-            } else {
-                maskItemsAsMyItemsNoScema(schemaVersion, filter, admin, roles);
-            }
+            //if (MyForm.SCHEMA_VERSION_110.equals(schemaVersion)) {
+            maskItemsAsMyItemsSchemaVersion110(schemaVersion, filter, admin, roles);
+            //} else {
+            //  maskItemsAsMyItemsNoScema(schemaVersion, filter, admin, roles);
+            //}
 
             return this;
         }
@@ -982,36 +984,43 @@ public class MyField {
             return this;
         }
 
-        private Builder maskItemsAsMyItemsSchemaVersion110(String schemaVersion, Map filter, boolean admin, Set<String> roles) {
+        private Builder maskItemsAsMyItemsSchemaVersion110(String schemaVersion, Map filter, boolean admin, Set<String> roles)
+                throws FormConfigException {
 
-            Document itemsDoc = this.myField.dbo.get(ITEMS, Document.class);
+            try {
 
-            if (itemsDoc == null) {
-                return this;
-            }
+                Document itemsDoc = this.myField.dbo.get(ITEMS, Document.class);
 
-            if (itemsDoc.get("list") != null) {
-                Object items = itemsDoc.get("list");
-                this.myField.itemsAsMyItems = new MyItems.Builder(items)
-                        .withItemType(MyItems.ItemType.list)
-                        .withList()
-                        .withParent(this.myField)
-                        .build();
-            } else if (itemsDoc.get("func") != null) {
-                throw new UnsupportedOperationException("maskItemsAsMyItems.code");
-            } else if (itemsDoc.get("ref") != null) {
-                Object items = itemsDoc.get("ref");
-                this.myField.itemsAsMyItems = new MyItems.Builder(filter, items, myField.fmsScriptRunner)
-                        .withQuerySchemaVersion110(this.myField.loginMemberId, admin)
-                        .withSortSchemaVersion110(roles)
-                        .withViewSchemaVersion110(roles)
-                        .withHistoryQuerySchemaVersion110(this.myField.loginMemberId, admin)
-                        .withItemType(MyItems.ItemType.doc)
-                        .withLookup()
-                        .withQueryProjection()
-                        .withResultProjection()
-                        .withParent(this.myField)
-                        .build();
+                if (itemsDoc == null) {
+                    return this;
+                }
+
+                if (itemsDoc.get("list") != null) {
+                    Object items = itemsDoc.get("list");
+                    this.myField.itemsAsMyItems = new MyItems.Builder(items)
+                            .withItemType(MyItems.ItemType.list)
+                            .withList()
+                            .withParent(this.myField)
+                            .build();
+                } else if (itemsDoc.get("func") != null) {
+                    throw new UnsupportedOperationException("maskItemsAsMyItems.code");
+                } else if (itemsDoc.get("ref") != null) {
+                    Object items = itemsDoc.get("ref");
+                    this.myField.itemsAsMyItems = new MyItems.Builder(filter, items, myField.fmsScriptRunner)
+                            .withQuerySchemaVersion110(this.myField.loginMemberId, admin)
+                            .withSortSchemaVersion110(roles)
+                            .withViewSchemaVersion110(roles)
+                            .withHistoryQuerySchemaVersion110(this.myField.loginMemberId, admin)
+                            .withItemType(MyItems.ItemType.doc)
+                            .withLookup()
+                            .withQueryProjection()
+                            .withResultProjection()
+                            .withParent(this.myField)
+                            .build();
+                }
+
+            } catch (Exception e) {
+                throw new FormConfigException("field : " + this.myField.key + " : error in getting field.items", e);
             }
 
             return this;

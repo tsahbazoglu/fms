@@ -40,6 +40,7 @@ import tr.org.tspb.service.DataService;
 import tr.org.tspb.service.FormService;
 import tr.org.tspb.util.service.DlgCtrl;
 import tr.org.tspb.dao.MyFieldComparator;
+import tr.org.tspb.exceptions.FormConfigException;
 import tr.org.tspb.util.qualifier.KeepOpenQualifier;
 import tr.org.tspb.util.tools.MongoDbUtilIntr;
 import tr.org.tspb.factory.cp.OgmCreatorIntr;
@@ -404,7 +405,7 @@ public abstract class PivotImpl implements Serializable, PivotApi {
      *
      * @param myForm
      */
-    protected void createDimensionZet(MyForm myForm) {
+    protected void createDimensionZet(MyForm myForm) throws FormConfigException {
 
         dimensionZet = new ArrayList<>();
 

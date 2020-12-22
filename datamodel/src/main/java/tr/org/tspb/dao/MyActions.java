@@ -303,28 +303,35 @@ public class MyActions {
 
                 Document action = ((Document) attrActions).get(key, Document.class);
 
-                Boolean enable = Boolean.FALSE;
+                boolean enable = false;
+
                 ActionEnableResult enableResult = null;
 
-                if (action.get("permit") != null) {
-                    if (roleMap.isUserInRole(action.get("permit"))) {
-                        enable = Boolean.TRUE;
-                    }
-                } else if (action.get("func") != null) {
-                    String code = action.get("func", String.class);
-                    code = code.replace(DIEZ, DOLAR);
+                List<String> permit = action.getList("permit", String.class);
+                List<String> block = action.getList("block", String.class);
+                Boolean shoot = action.getBoolean("shoot");
+                String func = action.getString("func");
+                Document ref = action.get("ref", Document.class);
 
-                    Document commandResult = fmsScriptRunner.runCommand(db,
-                            code, searchObject, roleMap.keySet());
+                if (permit == null || roleMap.isUserInRole(permit)) {
+                    enable = true;
+                }
 
+                if (block != null && roleMap.isUserInRole(block)) {
+                    enable = false;
+                }
+
+                if (func != null) {
+                    func = func.replace(DIEZ, DOLAR);
+                    Document commandResult = fmsScriptRunner.runCommand(db, func, searchObject, roleMap.keySet());
                     enable = commandResult.getBoolean(RETVAL);
-                } else if (action.get("ref") != null) {
-                    enable = TagActionRef.calc(action.get("ref", Document.class), searchObject, userDetail, fmsScriptRunner);
+                } else if (ref != null) {
+                    enable = TagActionRef.calc(ref, searchObject, userDetail, fmsScriptRunner);
                 } else if (action.get(EVENT_ENABLE) != null) {
                     enableResult = checkControlResultSchemaVersion110(searchObject, action);
                     enable = enableResult.isEnable();
-                } else {
-                    enable = Boolean.TRUE.equals(action.get("shoot"));
+                } else if (shoot != null) {
+                    enable = shoot;
                 }
 
                 map.put(key, enable);

@@ -11,11 +11,11 @@ public class FormConfigException extends Exception {
     }
 
     public FormConfigException(String message) {
-        super(message.concat(" is not expeted to be null"));
+        super("<br/><br/>".concat(message).concat("<br/><br/> Please contact with the related form adminsitrator"));
     }
 
     public FormConfigException(String message, Exception ex) {
-        super(message.concat(" is not expeted to be null"), ex);
+        super("<br/><br/>".concat(message).concat("<br/><br/> Please contact with the related form adminsitrator"), ex);
     }
 
 }

@@ -1,5 +1,6 @@
 package tr.org.tspb.dao;
 
+import com.mongodb.MongoConfigurationException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import static tr.org.tspb.constants.ProjectConstants.*;
@@ -14,6 +15,7 @@ import org.bson.types.Code;
 import org.bson.types.ObjectId;
 import tr.org.tspb.constants.ProjectConstants;
 import tr.org.tspb.datamodel.expected.FmsScriptRunner;
+import tr.org.tspb.exceptions.FormConfigException;
 import tr.org.tspb.pojo.RoleMap;
 
 /**
@@ -363,39 +365,46 @@ public class MyItems {
             return this;
         }
 
-        public Builder withViewSchemaVersion110(Set<String> roleSet) {
-            Document dbo = (Document) items;
+        public Builder withViewSchemaVersion110(Set<String> roleSet) throws FormConfigException {
 
-            List<Document> viewList = dbo.get(VIEW, List.class);
+            try {
 
-            this.myItems.view = new ArrayList<>();
+                Document dbo = (Document) items;
 
-            if (viewList != null) {
+                List<Document> viewList = dbo.get(VIEW, List.class);
 
-                List<ViewOrder> list = new ArrayList<>();
+                this.myItems.view = new ArrayList<>();
 
-                for (Document entry : viewList) {
-                    if (entry.get("permit") == null || isUserInRole(roleSet, entry.get("permit"))) {
-                        Number number = entry.get(ORDER, Number.class);
-                        Integer order = (number == null) ? 0 : number.intValue();
-                        list.add(new ViewOrder(entry.get("key").toString(), order == null ? 0 : order.intValue()));
+                if (viewList != null) {
+
+                    List<ViewOrder> list = new ArrayList<>();
+
+                    for (Document entry : viewList) {
+                        if (entry.get("permit") == null || isUserInRole(roleSet, entry.get("permit"))) {
+                            Number number = entry.get(ORDER, Number.class);
+                            Integer order = (number == null) ? 0 : number.intValue();
+                            list.add(new ViewOrder(entry.get("key").toString(), order == null ? 0 : order.intValue()));
+                        }
                     }
-                }
 
-                Collections.sort(list, new Comparator<ViewOrder>() {
-                    @Override
-                    public int compare(ViewOrder viewOrder, ViewOrder viewOrder1) {
-                        return Integer.compare(viewOrder.order, viewOrder1.order);
+                    Collections.sort(list, new Comparator<ViewOrder>() {
+                        @Override
+                        public int compare(ViewOrder viewOrder, ViewOrder viewOrder1) {
+                            return Integer.compare(viewOrder.order, viewOrder1.order);
+                        }
+                    });
+
+                    for (ViewOrder viewOrder : list) {
+                        this.myItems.view.add(viewOrder.key);
                     }
-                });
-
-                for (ViewOrder viewOrder : list) {
-                    this.myItems.view.add(viewOrder.key);
+                } else {
+                    this.myItems.view.add("_id");
                 }
-            } else {
-                this.myItems.view.add("_id");
+            } catch (Exception ex) {
+                throw new FormConfigException("failed on getting items view", ex);
             }
             return this;
+
         }
 
         public Builder withQueryProjection() {
@@ -485,80 +494,83 @@ public class MyItems {
 
     private void createCurrentQuery(ObjectId loginMemberId, boolean admin, Map filter, FmsScriptRunner fmsScriptRunner) throws RuntimeException {
 
-        Document query_ = itemsDoc.get(QUERY, Document.class);
-        if (admin && itemsDoc.get(ADMIN_QUERY) != null) {
-            query_ = itemsDoc.get(ADMIN_QUERY, Document.class);
-        }
+        if (itemsDoc != null) {
 
-        this.query = new Document();
-
-        String func = query_.get("func", String.class);
-        List<Document> listOfFilter = query_.get("list", List.class);
-
-        if (func != null) {
-            this.queryCode = new Code(func);
-            try {
-                this.query = (Document) fmsScriptRunner
-                        .runCommand(this.db, this.queryCode.getCode(), filter)
-                        .get(RETVAL);
-            } catch (Exception exception) {
-                this.query = new Document("fms_item_query_code_error", "fms_item_query_code_error");
+            Document query_ = itemsDoc.get(QUERY, Document.class);
+            if (admin && itemsDoc.get(ADMIN_QUERY) != null) {
+                query_ = itemsDoc.get(ADMIN_QUERY, Document.class);
             }
-        } else if (listOfFilter != null) {
 
-            for (Document d : listOfFilter) {
+            this.query = new Document();
 
-                String key = d.get("key", String.class);
+            String func = query_.get("func", String.class);
+            List<Document> listOfFilter = query_.get("list", List.class);
 
-                Document refValue = d.get("ref-value", Document.class);
-                String fmsValue = d.get("fms-value", String.class);
-                String strValue = d.get("string-value", String.class);
-                Number numberValue = d.get("number-value", Number.class);
+            if (func != null) {
+                this.queryCode = new Code(func);
+                try {
+                    this.query = (Document) fmsScriptRunner
+                            .runCommand(this.db, this.queryCode.getCode(), filter)
+                            .get(RETVAL);
+                } catch (Exception exception) {
+                    this.query = new Document("fms_item_query_code_error", "fms_item_query_code_error");
+                }
+            } else if (listOfFilter != null) {
 
-                if (refValue != null) {
-                    this.query.put(key, new TagItemsQueryRef(refValue, filter, fmsScriptRunner).value());
-                } else if (fmsValue != null) {
-                    switch (fmsValue) {
-                        case ProjectConstants.REPLACEABLE_KEY_WORD_FOR_FUNCTONS_FILTER_PERIOD:
-                            this.query.put(key, filter.get("period") == null ? "no result" : filter.get("period"));
-                            break;
-                        case ProjectConstants.REPLACEABLE_KEY_WORD_FOR_FUNCTONS_FILTER_TEMPLATE:
-                            this.query.put(key, filter.get("template") == null ? "no result" : filter.get("template"));
-                            break;
-                        case ProjectConstants.REPLACEABLE_KEY_WORD_FOR_FUNCTONS_LOGIN_MEMBER_ID:
-                            this.query.put(key, loginMemberId == null ? "no result" : loginMemberId);
-                            break;
-                        default:
-                            throw new RuntimeException("could not find replaceble word");
-                    }
-                } else if (strValue != null) {
-                    this.query.put(key, strValue);
-                } else if (numberValue != null) {
-                    this.query.put(key, numberValue);
-                } else {
+                for (Document d : listOfFilter) {
 
-                    String type = d.get("type", String.class);
-                    if (type == null) {
-                        type = "string";
-                    }
-                    switch (type) {
-                        case "number":
-                            this.query.put(key, d.get(VALUE, Number.class));
-                            break;
-                        case "string":
-                            this.query.put(key, d.get(VALUE, String.class).replaceAll(DIEZ, DOLAR));
-                            break;
-                        case "in":
-                            this.query.put(key, new Document(DOLAR_IN, Arrays.asList(d.get(VALUE, String.class).replaceAll(DIEZ, DOLAR).split(","))));
-                            break;
-                        case "ne":
-                            this.query.put(key, new Document(DOLAR_NE, d.get(VALUE, String.class).replaceAll(DIEZ, DOLAR)));
-                            break;
-                        case "regex":
-                            this.query.put(key, new Document(DOLAR_REGEX, d.get(VALUE, String.class).replaceAll(DIEZ, DOLAR)));
-                            break;
-                        default:
-                            throw new UnsupportedOperationException("field.items.query.type is not supported  : " + type);
+                    String key = d.get("key", String.class);
+
+                    Document refValue = d.get("ref-value", Document.class);
+                    String fmsValue = d.get("fms-value", String.class);
+                    String strValue = d.get("string-value", String.class);
+                    Number numberValue = d.get("number-value", Number.class);
+
+                    if (refValue != null) {
+                        this.query.put(key, new TagItemsQueryRef(refValue, filter, fmsScriptRunner).value());
+                    } else if (fmsValue != null) {
+                        switch (fmsValue) {
+                            case ProjectConstants.REPLACEABLE_KEY_WORD_FOR_FUNCTONS_FILTER_PERIOD:
+                                this.query.put(key, filter.get("period") == null ? "no result" : filter.get("period"));
+                                break;
+                            case ProjectConstants.REPLACEABLE_KEY_WORD_FOR_FUNCTONS_FILTER_TEMPLATE:
+                                this.query.put(key, filter.get("template") == null ? "no result" : filter.get("template"));
+                                break;
+                            case ProjectConstants.REPLACEABLE_KEY_WORD_FOR_FUNCTONS_LOGIN_MEMBER_ID:
+                                this.query.put(key, loginMemberId == null ? "no result" : loginMemberId);
+                                break;
+                            default:
+                                throw new RuntimeException("could not find replaceble word");
+                        }
+                    } else if (strValue != null) {
+                        this.query.put(key, strValue);
+                    } else if (numberValue != null) {
+                        this.query.put(key, numberValue);
+                    } else {
+
+                        String type = d.get("type", String.class);
+                        if (type == null) {
+                            type = "string";
+                        }
+                        switch (type) {
+                            case "number":
+                                this.query.put(key, d.get(VALUE, Number.class));
+                                break;
+                            case "string":
+                                this.query.put(key, d.get(VALUE, String.class).replaceAll(DIEZ, DOLAR));
+                                break;
+                            case "in":
+                                this.query.put(key, new Document(DOLAR_IN, Arrays.asList(d.get(VALUE, String.class).replaceAll(DIEZ, DOLAR).split(","))));
+                                break;
+                            case "ne":
+                                this.query.put(key, new Document(DOLAR_NE, d.get(VALUE, String.class).replaceAll(DIEZ, DOLAR)));
+                                break;
+                            case "regex":
+                                this.query.put(key, new Document(DOLAR_REGEX, d.get(VALUE, String.class).replaceAll(DIEZ, DOLAR)));
+                                break;
+                            default:
+                                throw new UnsupportedOperationException("field.items.query.type is not supported  : " + type);
+                        }
                     }
                 }
             }
