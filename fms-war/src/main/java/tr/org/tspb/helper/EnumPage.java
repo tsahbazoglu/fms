@@ -198,23 +198,23 @@ public enum EnumPage {
             null
     ),
     FMS_PIVOT_1D(
-            "/fmsPivot/fmsPivot.xhtml",
-            "/fmsPivot/fmsPivot.xhtml",
+            "/fmspivot/fmsPivot.xhtml",
+            "/fmspivot/fmsPivot.xhtml",
             "Admin",
             "İşlemler | Dönem",
             null,
             null,
-            "/fmsPivot/fmsPivotTool.xhtml",
+            "/fmspivot/fmsPivotTool.xhtml",
             "/common/esignHistory.xhtml"
     ),
     FMS_PIVOT_2D(
-            "/fmsPivot/fmsPivot.xhtml",
-            "/fmsPivot/fmsPivot.xhtml",
+            "/fmspivot/fmsPivot.xhtml",
+            "/fmspivot/fmsPivot.xhtml",
             "Admin",
             "İşlemler | Dönem",
             null,
             null,
-            "/fmsPivot/fmsPivotTool.xhtml",
+            "/fmspivot/fmsPivotTool.xhtml",
             "/common/esignHistory.xhtml"
     );
 //    ,
