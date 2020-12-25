@@ -19,6 +19,8 @@ public interface FmsScriptRunner {
 
     public Document findOne(String db, String collection, Document document);
 
+    public long count(String db, String collection, Document document);
+
     public Document replaceToDolar(Document document);
 
     public boolean runActionAsDbTableFilterResult(Document actionDoc, RoleMap roleMap, Map filter);
