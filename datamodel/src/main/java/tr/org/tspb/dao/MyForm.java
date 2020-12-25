@@ -842,7 +842,7 @@ public class MyForm implements MyFormXs {
         }
 
         public Builder maskZetDimension() throws Exception {
-            this.myForm.zetDimension = (List) dbObjectForm.get("zetDimension");
+            this.myForm.zetDimension = dbObjectForm.getList(ZET_DIMENSION, String.class);
             return this;
         }
 
