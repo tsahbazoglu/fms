@@ -27,9 +27,11 @@ import static tr.org.tspb.constants.ProjectConstants.FORM_KEY;
 import static tr.org.tspb.constants.ProjectConstants.MONGO_ID;
 import static tr.org.tspb.constants.ProjectConstants.PERIOD;
 import static tr.org.tspb.constants.ProjectConstants.TEMPLATE;
+import static tr.org.tspb.constants.ProjectConstants.ZET_DIMENSION;
 import tr.org.tspb.dao.MyFormXs;
 import tr.org.tspb.dao.refs.PlainRecord;
 import tr.org.tspb.dp.nullobj.PlainRecordData;
+import tr.org.tspb.exceptions.FormConfigException;
 import tr.org.tspb.service.util.FilterUtil;
 import tr.org.tspb.util.service.DlgCtrl;
 
@@ -125,7 +127,7 @@ public class FilterService extends CommonSrv {
         return org.apache.commons.codec.digest.DigestUtils.sha256Hex(sb.toString());
     }
 
-    public void createPivotCurrentAndHistoryFilters() {
+    public void createPivotCurrentAndHistoryFilters() throws FormConfigException {
         createPivotFilterCurrent();
         createPivotFilterHistory();
     }
@@ -135,9 +137,15 @@ public class FilterService extends CommonSrv {
         createTableFilterHistory(myForm);
     }
 
-    public void createPivotFilterCurrent() {
+    public void createPivotFilterCurrent() throws FormConfigException {
+
         pivotFilterCurrent = new Document();
         MyForm myForm = formService.getMyForm();
+
+        if (myForm.getZetDimension() == null) {
+            throw new FormConfigException(ZET_DIMENSION.concat(" is resolved to null"));
+        }
+
         for (String key : myForm.getZetDimension()) {
             // take into account an alternativechannels form's 
             // periodFilter and period. 
@@ -154,6 +162,7 @@ public class FilterService extends CommonSrv {
             }
         }
         pivotFilterCurrent.put(FORMS, formService.getMyForm().getKey());
+
     }
 
     public void createPivotFilterHistory() {
