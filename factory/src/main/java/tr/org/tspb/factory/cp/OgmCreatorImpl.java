@@ -791,6 +791,12 @@ public class OgmCreatorImpl implements OgmCreatorIntr {
         }
 
         @Override
+        public long count(String db, String collection, Document query) {
+            Document filter = mongoDbUtil.replaceToDollar(query);
+            return mongoDbUtil.count(db, collection, (Document) filter);
+        }
+
+        @Override
         public boolean runActionAsDbTableFilterResult(Document actionDoc, RoleMap roleMap, Map filter) {
             return mongoDbUtil.runActionAsDbTableFilterResult(actionDoc, roleMap, filter);
         }
