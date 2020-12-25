@@ -6,13 +6,20 @@
 package tr.org.tspb.dao;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import org.bson.Document;
+import static tr.org.tspb.constants.ProjectConstants.DIEZ;
+import static tr.org.tspb.constants.ProjectConstants.DOLAR;
 import static tr.org.tspb.constants.ProjectConstants.DOLAR_IN;
+import static tr.org.tspb.constants.ProjectConstants.DOLAR_NE;
+import static tr.org.tspb.constants.ProjectConstants.DOLAR_NIN;
+import static tr.org.tspb.constants.ProjectConstants.DOLAR_REGEX;
 import static tr.org.tspb.constants.ProjectConstants.PERIOD;
 import static tr.org.tspb.constants.ProjectConstants.REPLACEABLE_KEY_WORD_FOR_FUNCTONS_FILTER_PERIOD;
 import static tr.org.tspb.constants.ProjectConstants.REPLACEABLE_KEY_WORD_FOR_FUNCTONS_LOGIN_MEMBER_ID;
+import static tr.org.tspb.constants.ProjectConstants.VALUE;
 import tr.org.tspb.datamodel.expected.FmsScriptRunner;
 import tr.org.tspb.pojo.RoleMap;
 import tr.org.tspb.pojo.UserDetail;
@@ -25,10 +32,10 @@ public class TagEventCheckListDoc {
 
     public static boolean value(FmsScriptRunner fmsScriptRunner, Map myFilter, UserDetail userDetail, RoleMap roleMap, List<Document> checks) {
 
-        boolean result = false;
-
         List<Document> noRoleChecks = new ArrayList<>();
         boolean noRole = true;
+
+        boolean result = true;
 
         for (Document check : checks) {
             List<String> roles = check.getList("roles", String.class);
@@ -41,6 +48,7 @@ public class TagEventCheckListDoc {
         }
 
         if (noRole && !noRoleChecks.isEmpty()) {
+            result = true;
             for (Document noRoleDoc : noRoleChecks) {
                 result = applyCheck(noRoleDoc, result, userDetail, myFilter, fmsScriptRunner);
             }
@@ -50,6 +58,11 @@ public class TagEventCheckListDoc {
     }
 
     private static boolean applyCheck(Document check, boolean result, UserDetail userDetail, Map myFilter, FmsScriptRunner fmsScriptRunner) throws RuntimeException {
+
+        if (result == false) {
+            return false;
+        }
+
         Boolean value = check.getBoolean("value");
         String func = check.getString("func");
         Document doc = check.get("ref", Document.class);
@@ -61,9 +74,13 @@ public class TagEventCheckListDoc {
 
             String db = doc.getString("db");
             String table = doc.getString("table");
+
             List<Document> filters = doc.getList("query", Document.class);
-            String decision = doc.getString("check");
+            List<Document> countFilters = doc.getList("count-filter", Document.class);
+
             Document query = createQuery(filters, userDetail, myFilter);
+
+            String decision = doc.getString("check");
 
             switch (decision) {
                 case "existence":
@@ -71,6 +88,12 @@ public class TagEventCheckListDoc {
                     break;
                 case "non-existence":
                     result = result && fmsScriptRunner.findOne(db, table, query) == null;
+                    break;
+                case "count>0":
+                    Document countQuery = createQuery(countFilters, userDetail, myFilter);
+                    long x = fmsScriptRunner.count(db, table, query);
+                    long y = fmsScriptRunner.count(db, table, countQuery);
+                    result = (x > 0 && y > 0 && x == y);
                     break;
                 default:
                     result = result && fmsScriptRunner.findOne(db, table, query) != null;
@@ -84,15 +107,17 @@ public class TagEventCheckListDoc {
         Document query = new Document();
         for (Document filter : filters) {
             String key = filter.getString("key");
-            String stringValue = filter.getString("string-value");
-            List<String> arrayValue = filter.getList("array-value", String.class);
-            String fmsValue = filter.getString("fms-value");
 
-            if (stringValue != null) {
-                query.append(key, stringValue);
-            } else if (arrayValue != null) {
-                query.append(key, new Document(DOLAR_IN, arrayValue));
-            } else if (fmsValue != null) {
+            boolean hasStrValue = filter.containsKey("string-value");
+            boolean hasArrayValue = filter.containsKey("array-value");
+            boolean hasFmsValue = filter.containsKey("fms-value");
+
+            if (hasStrValue) {
+                query.append(key, filter.getString("string-value"));
+            } else if (hasArrayValue) {
+                query.append(key, new Document(DOLAR_IN, filter.getList("array-value", String.class)));
+            } else if (hasFmsValue) {
+                String fmsValue = filter.getString("fms-value");
                 switch (fmsValue) {
                     case REPLACEABLE_KEY_WORD_FOR_FUNCTONS_LOGIN_MEMBER_ID:
                         query.append(key, userDetail.getDbo().getObjectId());
@@ -104,7 +129,38 @@ public class TagEventCheckListDoc {
                         throw new RuntimeException(fmsValue.concat(" is not supported"));
                 }
             } else {
-                throw new RuntimeException(key.concat(" has a not supported type of value"));
+
+                String type = filter.get("type", String.class);
+                if (type == null) {
+                    type = "string";
+                }
+
+                if (filter.get(VALUE) == null) {
+                    query.put(key, null);
+                } else {
+                    switch (type) {
+                        case "number":
+                            query.put(key, filter.get(VALUE, Number.class));
+                            break;
+                        case "string":
+                            query.put(key, filter.get(VALUE, String.class).replaceAll(DIEZ, DOLAR));
+                            break;
+                        case "in":
+                            query.put(key, new Document(DOLAR_IN, Arrays.asList(filter.get(VALUE, String.class).replaceAll(DIEZ, DOLAR).split(","))));
+                            break;
+                        case "nin":
+                            query.put(key, new Document(DOLAR_NIN, Arrays.asList(filter.get(VALUE, String.class).replaceAll(DIEZ, DOLAR).split(","))));
+                            break;
+                        case "ne":
+                            query.put(key, new Document(DOLAR_NE, filter.get(VALUE, String.class).replaceAll(DIEZ, DOLAR)));
+                            break;
+                        case "regex":
+                            query.put(key, new Document(DOLAR_REGEX, filter.get(VALUE, String.class).replaceAll(DIEZ, DOLAR)));
+                            break;
+                        default:
+                            throw new UnsupportedOperationException("field.items.query.type is not supported  : " + type);
+                    }
+                }
             }
         }
         return query;
