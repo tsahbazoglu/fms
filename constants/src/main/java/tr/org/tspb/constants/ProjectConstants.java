@@ -70,10 +70,18 @@ public class ProjectConstants {
     public static final String ACCESS_CONTROL_LEVEL_TWO = "accessControlLevelTwo";
     //B
     //C
+    public static final String CALCULATE_ON_LIST_VIEW = "on-list-view";
+    public static final String CALCULATE_ON_CRUD_VIEW = "on-crud-view";
+    public static final String CALCULATE_ON_POST = "on-post";
+    public static final String CALCULATE_ON_SAVE = "on-save";
+    public static final String CALCULATE_AFTER_SAVE = "after-save";
+    public static final String CALCULATE_AFTER_DELETE = "after-delete";
+    public static final String CALCULATE_ENGINE = "engine";
     public static final String CALCULATE_AREA = "calculateArea";
-    public static final String CALCULATED = "calculated";
+    public static final String CALCULATE_ENABLE = "enabled";
     public static final String CALCULATE = "calculate";
-    public static final String CALCULATE_ON_CLIENT = "calculateOnClient";
+    public static final String CALCULATE_ACTION = "action";
+    public static final String CALCULATE_ON_CLIENT = "on-client";
     public static final String CALCULATE_COLLECTION = "calculateCollection";
     public static final String CALCULATE_REF = "calculate-ref";
     public static final String CELL_VERSION = "cellVersion";
@@ -112,13 +120,6 @@ public class ProjectConstants {
     public static final String CREATE_DATE = "createDate";
     public static final String CREATE_USER = "createUser";
     public static final String CREATE_SESSIONID = "createSessionId";
-    public static final String CALCULATE_ON_LIST_VIEW = "calculateOnListView";
-    public static final String CALCULATE_ON_CRUD_VIEW = "calculateOnCrudView";
-    public static final String CALCULATE_ON_POST = "calculateOnPost";
-    public static final String CALCULATE_ON_SAVE = "calculateOnSave";
-    public static final String CALCULATE_AFTER_SAVE = "calculateAfterSave";
-    public static final String CALCULATE_AFTER_DELETE = "calculateAfterDelete";
-    public static final String CALCULATE_ENGINE = "calculateEngine";
     public static final String CURRENT_RENDERED = "currentRendered";
     public static final String COLLECTION_SYSTEM_MESSAGES = "appmessages"; // https://support.tspb.org.tr/issues/4603
     public static final String CUSTOM_RESOURCE_PDFTOOL = "PDFTOOL";
@@ -426,6 +427,7 @@ public class ProjectConstants {
     public static final String Y_IGREK = "Y-IGREK";
     //Z
     public static final String Z_ZET = "Z-ZET";
+    public static final String ZET_DIMENSION = "zetDimension";
     //PUNCTATION
     public static final String DIEZ = "#";
     public static final String DOLAR = "$";
@@ -433,6 +435,7 @@ public class ProjectConstants {
     public static final String DOLAR_GTE = "$gte";
     public static final String DOLAR_LTE = "$lte";
     public static final String DOLAR_IN = "$in";
+    public static final String DOLAR_NIN = "$nin";
     public static final String DOLAR_NE = "$ne";
     public static final String DOLAR_NOT = "$not";
     public static final String DOLAR_ADDTOSET = "$addToSet";
