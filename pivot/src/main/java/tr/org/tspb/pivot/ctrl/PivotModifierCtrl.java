@@ -349,12 +349,13 @@ public class PivotModifierCtrl extends PivotImpl {
     }
 
     public void valueChangeListenerZet(AjaxBehaviorEvent event) {
-        filterService.createPivotFilterCurrent();
         try {
+            filterService.createPivotFilterCurrent();
             createDimensionIksIgrek(formService.getMyForm());
             refreshPivotData();
         } catch (NullNotExpectedException | MongoOrmFailedException | MoreThenOneInListException | UserException | FormConfigException ex) {
             logger.error("error occured", ex);
+            dialogController.showPopupInfo(ex.getMessage(), MESSAGE_DIALOG);
         }
     }
 
