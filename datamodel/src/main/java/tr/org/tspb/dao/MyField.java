@@ -779,17 +779,9 @@ public class MyField {
             this.myField.fmsScriptRunner = fmsScriptRunner;
             this.myField._id = (ObjectId) docField.get(MONGO_ID);
             this.myField.code = (String) docField.get(CODE);
-            this.myField.calculate = docField.getString(CALCULATE);
-            this.myField.calculateOnSave = Boolean.TRUE.equals(docField.get(CALCULATE_ON_SAVE));
-            this.myField.calculateAfterSave = Boolean.TRUE.equals(docField.get(CALCULATE_AFTER_SAVE));
-            this.myField.calculateAfterDelete = Boolean.TRUE.equals(docField.get(CALCULATE_AFTER_DELETE));
-            this.myField.calculateOnListView = Boolean.TRUE.equals(docField.get(CALCULATE_ON_LIST_VIEW));
-            this.myField.calculateOnCrudView = Boolean.TRUE.equals(docField.get(CALCULATE_ON_CRUD_VIEW));
-            this.myField.calculateOnClient = docField.getString(CALCULATE_ON_CLIENT);
-            this.myField.converterInstance = (String) docField.get(CONVERTER_INSTANCE);
-            this.myField.converterFormat = (String) docField.get(CONVERTER_FORMAT);
-            this.myField.converterParam = (String) docField.get(CONVERTER_PARAM);
-            this.myField.calculateEngine = (String) docField.get(CALCULATE_ENGINE);//FIXME
+
+            maskCalculate(docField);
+
             this.myField.dbo = docField;
             this.myField.dateRangeControl = Boolean.TRUE.equals(docField.get(DATE_RANGE_CONTROL));
             this.myField.dateRangeValidate = Boolean.TRUE.equals(docField.get(DATE_RANGE_VALIDATE));
@@ -832,6 +824,32 @@ public class MyField {
             this.myField.visible = (String) docField.get(VISIBLE);
             this.myField.valueChangeListenerAction = docField.get(VALUE_CHANGE_LISTENER_ACTION);
             this.myField.workflow = Boolean.TRUE.equals(docField.get(WORKFLOW));
+        }
+
+        public Builder maskCalculate(Document docField) {
+
+            Document docCalc = docField.get(CALCULATE, Document.class);
+            if (docCalc != null) {
+                this.myField.calculate = docCalc.getString(CALCULATE_ACTION);
+                this.myField.calculateOnSave = Boolean.TRUE.equals(docCalc.get(CALCULATE_ON_SAVE));
+                this.myField.calculateAfterSave = Boolean.TRUE.equals(docCalc.get(CALCULATE_AFTER_SAVE));
+                this.myField.calculateAfterDelete = Boolean.TRUE.equals(docCalc.get(CALCULATE_AFTER_DELETE));
+                this.myField.calculateOnListView = Boolean.TRUE.equals(docCalc.get(CALCULATE_ON_LIST_VIEW));
+                this.myField.calculateOnCrudView = Boolean.TRUE.equals(docCalc.get(CALCULATE_ON_CRUD_VIEW));
+                this.myField.calculateOnClient = docCalc.getString(CALCULATE_ON_CLIENT);
+                this.myField.converterInstance = docCalc.getString(CONVERTER_INSTANCE);
+                this.myField.converterFormat = docCalc.getString(CONVERTER_FORMAT);
+                this.myField.converterParam = docCalc.getString(CONVERTER_PARAM);
+                this.myField.calculateEngine = docCalc.getString(CALCULATE_ENGINE);//FIXME
+            } else {
+                this.myField.calculateOnSave = false;
+                this.myField.calculateAfterSave = false;
+                this.myField.calculateAfterDelete = false;
+                this.myField.calculateOnListView = false;
+                this.myField.calculateOnCrudView = false;
+            }
+
+            return this;
         }
 
         public Builder maskId() {
@@ -1020,7 +1038,7 @@ public class MyField {
                 }
 
             } catch (Exception e) {
-                throw new FormConfigException("field : " + this.myField.key + " : error in getting field.items", e);
+                throw new FormConfigException("field : " + this.myField.key + " : error in getting field.items<br/><br/> " + e.getLocalizedMessage(), e);
             }
 
             return this;
