@@ -459,11 +459,11 @@ public class MyActions {
         }
 
         //
-        private ActionEnableResult checkControlResultSchemaVersion110(Document filter, Document event) {
+        private ActionEnableResult checkControlResultSchemaVersion110(Document filter, Document action) {
 
             ActionEnableResult controlResult = new ActionEnableResult();
 
-            Document enable = event.get(EVENT_ENABLE, Document.class);
+            Document enable = action.get(EVENT_ENABLE, Document.class);
 
             String func = enable.getString("func");
             List<Document> listOfChecks = enable.getList("list", Document.class);
@@ -481,7 +481,7 @@ public class MyActions {
             }
 
             if (controlResult.isEnable()) {
-                Object gui = event.get(GUI);
+                Object gui = action.get(GUI);
 
                 if (gui instanceof Code) {
                     Document commandResult = fmsScriptRunner.runCommand(this.myActions.myForm.getDb(), ((Code) gui).getCode(), filter, null);
@@ -496,7 +496,7 @@ public class MyActions {
                     controlResult.setCaption(guiDoc.getString("caption"));
                     controlResult.setDynamicButtonName(guiDoc.getString("caption"));
 
-                    Document objectAction = event.get(ACTION, Document.class);
+                    Document objectAction = action.get(ACTION, Document.class);
 
                     String actionFunc = objectAction.getString("func");
                     Document actionRef = objectAction.get("ref", Document.class);
