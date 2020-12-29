@@ -623,13 +623,20 @@ public class MongoDbUtilImplKeepOpen implements MongoDbUtilIntr {
         }
 
         try {
-            Document setUnset = new Document(DOLAR_SET, record);
-            if (record.containsKey(DOLAR_UNSET)) {
-                setUnset.append(DOLAR_UNSET, record.remove(DOLAR_UNSET));
-                if (((Document) setUnset.get(DOLAR_UNSET)).isEmpty()) {
-                    setUnset.remove(DOLAR_UNSET);
+
+            Document unset = (Document) record.remove(DOLAR_UNSET);
+
+            Document setUnset = new Document();
+
+            if (unset != null && !unset.isEmpty()) {
+                for (String key : unset.keySet()) {
+                    record.remove(key);
                 }
+                setUnset.append(DOLAR_UNSET, unset);
+
             }
+            setUnset.append(DOLAR_SET, record);
+
             mongoClient.getDatabase(database).getCollection(collection).updateOne(filter, setUnset);
         } catch (Exception ex) {
             throw ex;
