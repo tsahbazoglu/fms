@@ -1,6 +1,7 @@
 package tr.org.tspb.dao;
 
 import com.mongodb.MongoConfigurationException;
+import com.mongodb.client.model.Filters;
 import java.util.ArrayList;
 import java.util.Arrays;
 import static tr.org.tspb.constants.ProjectConstants.*;
@@ -525,6 +526,7 @@ public class MyItems {
                     String fmsValue = d.get("fms-value", String.class);
                     String strValue = d.get("string-value", String.class);
                     Number numberValue = d.get("number-value", Number.class);
+                    List<String> arrayValue = d.getList("array-value", String.class);
 
                     if (refValue != null) {
                         this.query.put(key, new TagItemsQueryRef(refValue, filter, fmsScriptRunner).value());
@@ -546,6 +548,8 @@ public class MyItems {
                         this.query.put(key, strValue);
                     } else if (numberValue != null) {
                         this.query.put(key, numberValue);
+                    } else if (arrayValue != null) {
+                        this.query.put(key, new Document(DOLAR_IN, arrayValue));
                     } else {
 
                         String type = d.get("type", String.class);
@@ -612,6 +616,7 @@ public class MyItems {
                 String fmsValue = d.get("fms-value", String.class);
                 String strValue = d.get("string-value", String.class);
                 Number numberValue = d.get("number-value", Number.class);
+                List<String> arrayValue = d.getList("array-value", String.class);
 
                 if (refValue != null) {
 
@@ -637,6 +642,8 @@ public class MyItems {
                     this.historyQuery.put(key, strValue);
                 } else if (numberValue != null) {
                     this.historyQuery.put(key, numberValue);
+                } else if (arrayValue != null) {
+                    this.historyQuery.put(key, new Document(DOLAR_IN, arrayValue));
                 } else {
 
                     String type = d.get("type", String.class);
