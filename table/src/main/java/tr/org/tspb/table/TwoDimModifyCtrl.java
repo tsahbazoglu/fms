@@ -1453,11 +1453,13 @@ public class TwoDimModifyCtrl extends FmsTable implements ActionListener {
                 case "render":
                     formService.getMyForm().runAjaxRender(myField, getComponentMap(), formService.getMyForm(), crudObject,
                             loginController.getRoleMap(), loginController.getLoggedUserDetail(), filterService.getTableFilterCurrent());
+                    break;
                 case "render-ref":
                     formService.getMyForm().runAjaxRenderRef(myField, getComponentMap(), formService.getMyForm(), crudObject,
                             loginController.getRoleMap(), loginController.getLoggedUserDetail(), filterService.getTableFilterCurrent());
-                default:
                     break;
+                default:
+                     ;
             }
         } catch (Exception ex) {
             addMessage(null, null, ex.getMessage(), FacesMessage.SEVERITY_ERROR);
