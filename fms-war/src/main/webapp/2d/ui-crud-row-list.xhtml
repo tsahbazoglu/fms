@@ -11,103 +11,105 @@
         <title></title>
     </h:head>
 
+    <c:if test="#{not empty filterService.quickFilters}">
+        <br/>
+        <br/>
+        <ui:include src="ui-filter-base.xhtml"/>
+        <br/>
+    </c:if> 
 
-    <h:panelGroup>
-        <h:outputText value="Güncel Dönem Verisi" style="font-size: 22px;font-weight: bolder;color: #b3b3b3;"/>
-
-        <c:if test="#{not empty filterService.quickFilters}">
-            <br/>
-            <br/>
-            <ui:include src="ui-filter-base.xhtml"/>
-            <br/>
-        </c:if> 
-
+    <p:panel
+        style="width:1300px;"
+        >
+        <h:outputText 
+            value="Güncel Dönem Verisi" 
+            style="font-size: 22px;font-weight: bolder;color: #b3b3b3;"/>
 
         <h:form 
             id="id2DCurrentObjectList" 
             rendered="#{formService.myForm.currentRendered}">  
-            <h:panelGrid width="100%">
-                <p:dataTable 
-                    id="objectsDataTable" 
-                    var="rowData" 
-                    value="#{twoDimModifyCtrl.data}" 
-                    paginator="true" 
-                    paginatorPosition="bottom"
-                    rows="10"
-                    paginatorTemplate="{RowsPerPageDropdown} {FirstPageLink} {PreviousPageLink} {CurrentPageReport} {NextPageLink} {LastPageLink}"
-                    rowsPerPageTemplate="10,20,30" 
-                    selectionMode="single" 
-                    selection="#{twoDimModifyCtrl.selectedRow}" 
-                    lazy="true"
-                    resizableColumns="true"
-                    style="width: 95%"
-                    > 
-                    <p:ajax 
-                        event="rowSelect" 
-                        listener="#{twoDimModifyCtrl.selectListener}"
-                        update="#{updateAjaxMB.twoDimRowSelect}"
-                        />
-                    <c:forEach items="#{twoDimModifyCtrl.objectsColumnDataModel}" var="columnMap">
-                        <p:column   
-                            headerText="#{columnMap.shortName}"
+            <p:dataTable 
+                id="objectsDataTable" 
+                var="rowData" 
+                value="#{twoDimModifyCtrl.data}" 
+                paginator="true" 
+                paginatorPosition="bottom"
+                rows="10"
+                paginatorTemplate="{RowsPerPageDropdown} {FirstPageLink} {PreviousPageLink} {CurrentPageReport} {NextPageLink} {LastPageLink}"
+                rowsPerPageTemplate="10,20,30" 
+                selectionMode="single" 
+                selection="#{twoDimModifyCtrl.selectedRow}" 
+                lazy="true"
+                resizableColumns="true"
+                style="width: 1600px;"
+                scrollable="true"
+                scrollWidth="1270px;"
+                > 
+                <p:ajax 
+                    event="rowSelect" 
+                    listener="#{twoDimModifyCtrl.selectListener}"
+                    update="#{updateAjaxMB.twoDimRowSelect}"
+                    />
+                <c:forEach items="#{twoDimModifyCtrl.objectsColumnDataModel}" var="columnMap">
+                    <p:column   
+                        headerText="#{columnMap.shortName}"
+                        >
+                        <h:outputText  
+                            style="#{columnMap.style}"
+                            value="#{rowData[columnMap.field]}"
+                            rendered="#{columnMap.componentType == 'inputDate'}"
+                            converter="fmsDateTimeConverterReadonly"
                             >
-                            <h:outputText  
-                                style="#{columnMap.style}"
-                                value="#{rowData[columnMap.field]}"
-                                rendered="#{columnMap.componentType == 'inputDate'}"
-                                converter="fmsDateTimeConverterReadonly"
-                                >
-                                <f:attribute name="datePattern" value="#{columnMap.datePattern}"/>
-                            </h:outputText>
-                            <h:outputText 
-                                style="#{columnMap.style}"
-                                value="#{rowData[columnMap.field]}"
-                                rendered="#{false 
-                                            or columnMap.componentType == twoDimModifyCtrl.selectOneRadio
-                                            or columnMap.componentType == twoDimModifyCtrl.selectOneMenu
-                                            or columnMap.componentType == twoDimModifyCtrl.inputTextarea
-                                            or columnMap.componentType == twoDimModifyCtrl.inputText
-                                            or columnMap.componentType == twoDimModifyCtrl.inputMask
-                                            or columnMap.componentType == twoDimModifyCtrl.autoComplete}"
-                                converter ="#{columnMap.myconverter}"     
-                                >
-                                <f:attribute name="converterInstance" value="#{columnMap.converterInstance}"/>
-                                <f:attribute name="minFractationDigits" value="#{columnMap.minFractationDigits}"/>
-                                <f:attribute name="maxFractationDigits" value="#{columnMap.maxFractationDigits}"/>
-                                <f:attribute name="divider" value="#{columnMap.divider}"/>
-                                <f:attribute name="fieldKey" value="#{columnMap.fieldKey}"/>
-                                <f:attribute name="crudObject" value="#{rowData}"/>
-                                <f:attribute name="uysformat" value="#{columnMap.uysformat}"/>
+                            <f:attribute name="datePattern" value="#{columnMap.datePattern}"/>
+                        </h:outputText>
+                        <h:outputText 
+                            style="#{columnMap.style}"
+                            value="#{rowData[columnMap.field]}"
+                            rendered="#{false 
+                                        or columnMap.componentType == twoDimModifyCtrl.selectOneRadio
+                                        or columnMap.componentType == twoDimModifyCtrl.selectOneMenu
+                                        or columnMap.componentType == twoDimModifyCtrl.inputTextarea
+                                        or columnMap.componentType == twoDimModifyCtrl.inputText
+                                        or columnMap.componentType == twoDimModifyCtrl.inputMask
+                                        or columnMap.componentType == twoDimModifyCtrl.autoComplete}"
+                            converter ="#{columnMap.myconverter}"     
+                            >
+                            <f:attribute name="converterInstance" value="#{columnMap.converterInstance}"/>
+                            <f:attribute name="minFractationDigits" value="#{columnMap.minFractationDigits}"/>
+                            <f:attribute name="maxFractationDigits" value="#{columnMap.maxFractationDigits}"/>
+                            <f:attribute name="divider" value="#{columnMap.divider}"/>
+                            <f:attribute name="fieldKey" value="#{columnMap.fieldKey}"/>
+                            <f:attribute name="crudObject" value="#{rowData}"/>
+                            <f:attribute name="uysformat" value="#{columnMap.uysformat}"/>
 
-                                <f:attribute name="viewKey" value="#{columnMap.viewKey}"/>
-                                <f:attribute name="calculateOnView" value="#{columnMap.calculateOnView}"/>
-                                <f:attribute name="myField" value="#{columnMap}"/>
-                                <f:attribute name="converterFormat" value="#{columnMap.converterFormat}"/>
-                                <f:attribute name="sessionKey" value="#{columnMap.sessionKey}"/>
-                            </h:outputText>
+                            <f:attribute name="viewKey" value="#{columnMap.viewKey}"/>
+                            <f:attribute name="calculateOnView" value="#{columnMap.calculateOnView}"/>
+                            <f:attribute name="myField" value="#{columnMap}"/>
+                            <f:attribute name="converterFormat" value="#{columnMap.converterFormat}"/>
+                            <f:attribute name="sessionKey" value="#{columnMap.sessionKey}"/>
+                        </h:outputText>
 
-                            <h:selectBooleanCheckbox 
-                                style="#{columnMap.style}"
-                                readonly="true"
-                                value="#{rowData[columnMap.field]}"
-                                rendered="#{columnMap.componentType == 'selectBooleanCheckbox'}"
-                                converter ="#{columnMap.myconverter}"
-                                >
-                            </h:selectBooleanCheckbox>
+                        <h:selectBooleanCheckbox 
+                            style="#{columnMap.style}"
+                            readonly="true"
+                            value="#{rowData[columnMap.field]}"
+                            rendered="#{columnMap.componentType == 'selectBooleanCheckbox'}"
+                            converter ="#{columnMap.myconverter}"
+                            >
+                        </h:selectBooleanCheckbox>
 
-                            <h:commandButton 
-                                value="Eylem"
-                                rendered="#{columnMap.componentType == 'inputButton'}"
-                                >
-                            </h:commandButton>
-                        </p:column>
-                    </c:forEach> 
-                    <p:column>
+                        <h:commandButton 
+                            value="Eylem"
+                            rendered="#{columnMap.componentType == 'inputButton'}"
+                            >
+                        </h:commandButton>
                     </p:column>
-                </p:dataTable>
-            </h:panelGrid>
+                </c:forEach> 
+                <p:column>
+                </p:column>
+            </p:dataTable>
         </h:form>
 
-    </h:panelGroup>
+    </p:panel>
 
 </html>
