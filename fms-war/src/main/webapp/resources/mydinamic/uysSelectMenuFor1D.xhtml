@@ -18,6 +18,10 @@
         <composite:attribute name="myvalue" required="true"/>
         <composite:attribute name="myreadonly"/>
         <composite:attribute name="myrequired"/>
+        <composite:attribute name="myField"/>
+        <composite:attribute name="myProjectKey"/>
+        <composite:attribute name="myFormKey"/>
+        <composite:attribute name="myUpperNode"/> 
         <composite:attribute name="myFieldKey"/>
         <composite:attribute name="myStyle"/>
         <composite:attribute name="isAjax"/>
@@ -39,6 +43,12 @@
             <f:attribute name="label" value="#{cc.attrs.label}"/>
             <f:attribute name="trequired" value="#{cc.attrs.myrequired}"/>
             <f:attribute name="fieldKey" value="#{cc.attrs.myFieldKey}"/>
+            <f:attribute name="myField" value="#{cc.attrs.myField}"/>
+            <f:attribute name="projectKey" value="#{cc.attrs.myProjectKey}"/>
+            <f:attribute name="upperNode" value="#{cc.attrs.myUpperNode}"/>
+            <f:attribute name="formKey" value="#{cc.attrs.myFormKey}"/>
+
+
             <p:ajax 
                 listener="#{crudOneDim.someaction}"  
                 disabled="#{not cc.attrs.isAjax}" 
