@@ -156,7 +156,7 @@ public class CrudOneDim implements ValueChangeListener, Serializable {
     private String invalidFileMessage;
     private String toBeDeletedFileID;
     private int fileLimit;
-    private boolean enableHistoryOnSave = true;
+    private final boolean enableHistoryOnSave = true;
     private final static String WRITE_TO = "GRIDFS_DB";
     private final static String DLG_DESC = "wvDescDlg";
     private MyField selectedField;
@@ -167,6 +167,10 @@ public class CrudOneDim implements ValueChangeListener, Serializable {
     @PostConstruct
     public void init() {
         crudObject = ogmCreator.getCrudObject();
+    }
+
+    public boolean isEnableHistoryOnSave() {
+        return enableHistoryOnSave;
     }
 
     public MyField getSelectedField() {
@@ -507,11 +511,15 @@ public class CrudOneDim implements ValueChangeListener, Serializable {
             }
 
             saveObject(formService.getMyForm(), loginController, crudObject);
+
             drawGUI(formService.getMyForm(), filterService.getTableFilterCurrent());
+
+            formService.getMyForm().runAjaxBulk(getComponentMap(), crudObject,
+                    loginController.getRoleMap(), loginController.getLoggedUserDetail());
 
         } catch (Exception ex) {
             logger.error("error occured", ex);
-            dialogController.showPopupError(ex.toString());
+            dialogController.showPopupError("Beklenmeyen Hata Oluştu.");
         }
         return null;
     }
