@@ -34,10 +34,10 @@
             style="#{cc.attrs.myStyle}; width: 345px !important" 
             converter="#{cc.attrs.myconverter}" 
             value="#{cc.attrs.myvalue}"
+            disabled="#{cc.attrs.myreadonly}"
             filter="true" 
             filterMatchMode="contains"   
             caseSensitive="true"
-            disabled="#{cc.attrs.myreadonly}"
             autoWidth="false" 
             >
             <f:selectItems value="#{cc.attrs.myitems}" var="item" itemValue="#{item.value}" itemLabel="#{item.label}"/>
