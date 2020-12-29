@@ -153,19 +153,23 @@ public class OgmCreatorImpl implements OgmCreatorIntr {
             return null;
         }
 
-        Object defaultValue = docField.get(DEFAULT_VALUE);
+        Document defaultValue = docField.get(DEFAULT_VALUE, Document.class);
 
-        if ("SET_SESSIONID".equals(defaultValue)) {
-            defaultValue = ((HttpSession) FacesContext.getCurrentInstance().getExternalContext().getSession(false)).getId();
-        } else if (defaultValue instanceof Code) {
+        String stringValue = defaultValue.get("string-value", String.class);
+        String funcValue = defaultValue.get("func-value", String.class);
+
+        if (stringValue != null) {
+            if ("SET_SESSIONID".equals(defaultValue)) {
+                return ((HttpSession) FacesContext.getCurrentInstance().getExternalContext().getSession(false)).getId();
+            }
+            return stringValue;
+        } else if (funcValue != null) {
 
             if (roleMap.isUserInRole(myProject.getAdminAndViewerRole())) {
-                defaultValue = "no default value is set for admin or viewer role when its a function.";
-                return null;
+                return "no default value is set for admin or viewer role when its a function.";
             }
 
-            Code defaultValueFunction = (Code) defaultValue;
-            defaultValueFunction = new Code(defaultValueFunction.getCode().replace(DIEZ, DOLAR));
+            funcValue = funcValue.replace(DIEZ, DOLAR);
 
             Map search = new HashMap(searchObject);
             search.put(FORMS, docField.get(FORMS));
@@ -177,14 +181,16 @@ public class OgmCreatorImpl implements OgmCreatorIntr {
                     throw new Exception("db tag had not been set for field with defaultValue.");
                 }
 
-                Document commandResult = mongoDbUtil.runCommand(docField.get(FORM_DB).toString(),
-                        defaultValueFunction.getCode(), search, roleMap.keySet());
+                Document commandResult = mongoDbUtil
+                        .runCommand(docField.get(FORM_DB, String.class), funcValue, search, roleMap.keySet());
 
                 Object localDefaultValue = commandResult.get(RETVAL);
 
                 if (localDefaultValue instanceof Document) {
-                    defaultValue = ((Document) localDefaultValue).getObjectId(MONGO_ID);
+                    return ((Document) localDefaultValue).getObjectId(MONGO_ID);
                 }
+
+                return localDefaultValue;
 
             } catch (Exception ex) {
                 String msg = new StringBuilder()
@@ -197,7 +203,7 @@ public class OgmCreatorImpl implements OgmCreatorIntr {
             }
         }
 
-        return defaultValue;
+        return null;
     }
 
     private boolean calcReadOnly(Document docField, Map searchObject, RoleMap roleMap) {
