@@ -66,6 +66,16 @@
             .td2{
                 width:550px;
             }
+
+            .small-font-size{
+                font-size: 10px;
+            } 
+            .medium-font-size{
+                font-size: 12px;
+            } 
+            .large-font-size{
+                font-size: 16px;
+            }
         </style>
     </h:head>
 
@@ -77,7 +87,7 @@
                 </h:form>
             </p:layoutUnit>
 
-            <p:layoutUnit id="idPFLayoutUnitWest" position="west" resizable="true" size="600" minSize="100" maxSize="700">
+            <p:layoutUnit id="idPFLayoutUnitWest" position="west" resizable="true" size="450" minSize="100" maxSize="700">
                 <h:form id="iceformLeft"> 
                     <ui:include src="/WEB-INF/view/menu.xhtml"/> 
                 </h:form> 
@@ -93,7 +103,7 @@
                     <p:tabView id="id-tab-view">
                         <p:tab 
                             id="id-tab-data-input"
-                            title="Veri Girişi" 
+                            title="Veri Girişi"                            
                             >
                             <h:panelGrid
                                 id="idContentObjectList"
@@ -127,13 +137,17 @@
                             title="E-İmzalı Bildirimler" 
                             rendered="#{formService.myForm.esignable}"
                             >
-                            <h:panelGroup id="id_eimza" >
+                            <h:panelGrid 
+                                id="id_eimza"
+                                columns="1"
+                                style="width: 100%;"
+                                >
                                 <h:panelGroup
                                     rendered="#{formService.myForm.esignable}"
                                     >
                                     <ui:insert name="esignHistory">EsignPanel</ui:insert>
                                 </h:panelGroup>
-                            </h:panelGroup>
+                            </h:panelGrid>
                         </p:tab>
                     </p:tabView>
                 </h:panelGroup>
