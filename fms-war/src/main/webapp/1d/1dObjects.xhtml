@@ -25,7 +25,10 @@
         }
     </script>
 
-    <p:toolbar rendered="#{not esignViewCtrl.preventedMultiTab}">
+    <p:toolbar 
+        rendered="#{not esignViewCtrl.preventedMultiTab}"
+        style="width: 94%"
+        >
         <f:facet name="left">
             <p:commandButton 
                 icon="ui-icon-home" 
@@ -109,6 +112,7 @@
         </f:facet>
     </p:toolbar>
 
+    <br/>
 
     <h:form id="crud1dForm">
         <p:messages
@@ -116,7 +120,7 @@
             showSummary="true" 
             closable="true" 
             />
-        
+
         <p:remoteCommand 
             name="rcOneDimSave"
             value="Kaydet" 
@@ -125,11 +129,15 @@
             update="#{updateAjaxMB.btn1dSave}"
             />
 
-        <br/>
-        <h:outputText value="Döküman Bilgisi" style="font-size: 22px;font-weight: bolder;color: #b3b3b3;"/>
-        <br/>
-        <br/>
-        <p:panel>
+        <h:outputText 
+            value="Döküman Bilgisi" 
+            style="font-size: 22px;font-weight: bolder;color: #b3b3b3;"
+            rendered="false"
+            />
+
+        <p:panel
+            style="width: 94%"
+            >
             <h:panelGrid 
                 id="ajax_fields_place"
                 columns="4"
@@ -142,14 +150,22 @@
                             value="#{myField.label}" 
                             escape="false"
                             style="#{myField.labelStyle}"
+                            styleClass="medium-font-size"
                             rendered="#{myField.rendered}"
                             >
                         </p:outputLabel>
                     </h:panelGroup>
-                    <h:panelGroup id="id-component-#{myField.key}" class="#{myField.styleClass}">
+                    <h:panelGroup 
+                        id="id-component-#{myField.key}" 
+                        class="#{myField.styleClass}"
+                        >
                         <mydynamic:uysSelectMenuFor1D
+                            myField="#{myField}"
                             myvalue="#{crudOneDim.myObject[myField.key]}"
                             myFieldKey="#{myField.key}"
+                            myProjectKey="#{formService.myForm.projectKey}"
+                            myUpperNode="#{formService.myForm.upperNode}"
+                            myFormKey="#{formService.myForm.key}"
                             label="#{myField.label}" 
                             myitems="#{myField.selectItemsCurrent}" 
                             myreadonly="#{myField.readonly}" 
@@ -245,6 +261,7 @@
                         <p:outputLabel
                             value="#{myField.description}"
                             rendered="#{myField.rendered}"
+                            styleClass="small-font-size"
                             />
                         <p:commandButton 
                             icon="fa fa-info-circle" 
@@ -253,7 +270,7 @@
                             value="Bilgi" 
                             update="#{updateAjaxMB.btnPageShowDesc}"
                             rendered="#{myField.renderPopupDesc}"
-                            style="font-size:10px"
+                            styleClass="small-font-size"
                             >
                             <f:setPropertyActionListener value="#{fieldKey}" target="#{crudOneDim.selectedField}"/>
                         </p:commandButton>
