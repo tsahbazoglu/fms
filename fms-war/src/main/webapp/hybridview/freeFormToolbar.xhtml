@@ -13,9 +13,11 @@
         columnClasses="VTopHLeftW70p,VTopHRightW30p"
         width="100%"
         >
-        <h:outputLabel value="#{formService.myForm.name}" 
-                       style="width:100%;font-size: 28px;font-weight: bolder;color: #b3b3b3;"/>
-
+        <h:outputLabel 
+            value="#{formService.myForm.name}" 
+            style="width:100%;font-size: 16px;font-weight: bolder;color: #b3b3b3;"
+            >
+        </h:outputLabel>
         <p:scrollPanel style="width:500px;height:90px;">
             <p:dataList value="#{freeDesigner.selectedFormMessages}"
                         var="mymessage"  
