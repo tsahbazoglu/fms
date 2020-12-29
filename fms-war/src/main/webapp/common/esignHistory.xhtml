@@ -4,13 +4,105 @@
       xmlns:h="http://java.sun.com/jsf/html"
       xmlns:p="http://primefaces.org/ui"          
       xmlns:f="http://java.sun.com/jsf/core"
-      xmlns:c="http://java.sun.com/jsp/jstl/core"
-
       xmlns:ui="http://xmlns.jcp.org/jsf/facelets">
 
     <h:head>
         <title></title>
     </h:head>
+
+    <h:form>
+        <p:toolbar 
+            > 
+            <f:facet name="left"> 
+                <p:button  
+                    icon="ui-icon-home" 
+                    disabled="true">
+                </p:button>
+            </f:facet>
+        </p:toolbar>
+    </h:form>
+
+    <br/>
+    <p:panel 
+        id="id_eimza_tarihce"
+        >
+        <h:outputText 
+            value="Elektronik İmzalı Bildirim Zarfı" 
+            style="font-size: 22px;font-weight: bolder;color: #b3b3b3;"/>
+
+        <p:dataTable 
+            value="#{esignController.esignedDocs22}" 
+            var="x"
+            resizableColumns="true"
+            widgetVar="imzalananlar__"
+            emptyMessage="E-İmzalı Belge Yok"
+            paginator="true" 
+            paginatorPosition="bottom"
+            rows="10"
+            paginatorTemplate="{RowsPerPageDropdown} {FirstPageLink} {PreviousPageLink} {CurrentPageReport} {NextPageLink} {LastPageLink}"
+            rowsPerPageTemplate="10,15,25,45,60" 
+            selectionMode="single" 
+            lazy="true"
+            style="width: 1600px;"
+            scrollable="true"
+            scrollWidth="1600px;"
+            >
+            <p:column 
+                headerText="Kayıt No (**)" 
+                rendered="#{roleMB[mainFrame.architectRole]}">
+                <h:outputText value="#{x._id}"/> 
+            </p:column>  
+            <p:column 
+                headerText="Form No (**)" 
+                rendered="#{roleMB[mainFrame.architectRole]}">
+                <h:outputText value="#{x.selectedFormKey}"/> 
+            </p:column>  
+            <p:column 
+                headerText="Kurum Adı">
+                <h:outputText value="#{x[esignController.selectedForm.loginFkField]}"/> 
+            </p:column>
+            <p:column 
+                headerText="Bildirim Adı">
+                <h:outputText value="#{x.fileName}"/> 
+            </p:column>
+            <p:column 
+                headerText="Tüm Alanlar(**)" 
+                rendered="#{roleMB[mainFrame.architectRole]}">
+                <h:outputText value="#{x.full_text_search}"/> 
+            </p:column>
+            <p:column 
+                headerText="">
+                <p:commandButton
+                    rendered="#{x.notifyType eq 'e-sign'}"
+                    id ="idButtonEimza"
+                    value="E-İmzalı Belgeyi Göster" 
+                    action="#{esignController.showSignedEimza}" 
+                    update="#{updateAjaxMB.btnShowEsignedDoc}"
+                    >
+                    <f:setPropertyActionListener target="#{esignController.eimzaFileID}" value="#{x._id}"/>
+                </p:commandButton>
+            </p:column>
+            <p:column 
+                rendered="#{roleMB[formService.myForm.myProject.adminAndViewerRole]}"
+                headerText="">
+                <p:commandButton
+                    id ="id-btn-show-metadata"
+                    value="MetaData Göster" 
+                    action="#{esignController.showEsignMetada}" 
+                    update="#{updateAjaxMB.btnShowMetada}"
+                    >
+                    <f:setPropertyActionListener target="#{esignController.eimzaFileID}" value="#{x._id}"/>
+                </p:commandButton>
+            </p:column>
+            <p:column/>
+        </p:dataTable>
+
+    </p:panel>   
+
+    <ui:include 
+        src="esign-metadata.xhtml"
+        rendered="#{roleMB[formService.myForm.myProject.adminAndViewerRole]}"
+        />
 
     <h:form>
         <p:poll 
@@ -43,82 +135,4 @@
 
     </h:form>
 
-    <h:panelGroup 
-        id="id_eimza_tarihce"
-        style="width: 99%"
-        >
-
-        <br/>
-        <br/>
-        <ui:include src="esign-metadata.xhtml"/>
-        <br/>
-        <br/>
-
-        <h:panelGroup>
-            <h:outputText value="Elektornik İmzalı Bildirim Zarfı" style="font-size: 22px;font-weight: bolder;color: #b3b3b3;"/>
-            <br/>
-            <br/>
-            <p:dataTable 
-                value="#{esignController.esignedDocs22}" 
-                var="x"
-                resizableColumns="true"
-                widgetVar="imzalananlar__"
-                emptyMessage="E-İmzalı Belge Yok"
-                paginator="true" 
-                paginatorPosition="bottom"
-                rows="10"
-                paginatorTemplate="{RowsPerPageDropdown} {FirstPageLink} {PreviousPageLink} {CurrentPageReport} {NextPageLink} {LastPageLink}"
-                rowsPerPageTemplate="10,15,25,45,60" 
-                selectionMode="single" 
-                lazy="true"
-                style="width: 100%"
-                scrollable="true"
-                scrollWidth="99%"
-                >
-                <p:column width="210" headerText="Kayıt No (**)" rendered="#{roleMB[mainFrame.architectRole]}">
-                    <h:outputText value="#{x._id}"/> 
-                </p:column>  
-                <p:column width="150" headerText="Form No (**)" rendered="#{roleMB[mainFrame.architectRole]}">
-                    <h:outputText value="#{x.selectedFormKey}"/> 
-                </p:column>  
-                <p:column width="350" headerText="Kurum Adı">
-                    <h:outputText value="#{x[esignController.selectedForm.loginFkField]}"/> 
-                </p:column>
-                <p:column width="400" headerText="Bildirim Adı">
-                    <h:outputText value="#{x.fileName}"/> 
-                </p:column>
-                <p:column width="350" headerText="Tüm Alanlar(**)" rendered="#{roleMB[mainFrame.architectRole]}">
-                    <h:outputText value="#{x.full_text_search}"/> 
-                </p:column>
-
-                <p:column width="%100"/>
-
-                <p:column width="180px;" headerText="">
-                    <p:commandButton
-                        rendered="#{x.notifyType eq 'e-sign'}"
-                        id ="idButtonEimza"
-                        value="E-İmzalı Belgeyi Göster" 
-                        action="#{esignController.showSignedEimza}" 
-                        update="#{updateAjaxMB.btnShowEsignedDoc}"
-                        >
-                        <f:setPropertyActionListener target="#{esignController.eimzaFileID}" value="#{x._id}"/>
-                    </p:commandButton>
-                </p:column>
-                <p:column 
-                    rendered="#{roleMB[formService.myForm.myProject.adminAndViewerRole]}"
-                    width="180px;"
-                    headerText="">
-                    <p:commandButton
-                        id ="id-btn-show-metadata"
-                        value="MetaData Göster" 
-                        action="#{esignController.showEsignMetada}" 
-                        update="#{updateAjaxMB.btnShowMetada}"
-                        >
-                        <f:setPropertyActionListener target="#{esignController.eimzaFileID}" value="#{x._id}"/>
-                    </p:commandButton>
-                </p:column>
-            </p:dataTable>
-        </h:panelGroup>
-
-    </h:panelGroup>   
 </html>
