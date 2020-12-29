@@ -611,10 +611,15 @@
                             </p:toolbar>
 
                             <h:panelGroup>
-                                <br/>
-                                <h:outputText value="Döküman Bilgisi" style="font-size: 22px;font-weight: bolder;color: #b3b3b3;"/>
-                                <br/>
-                                <h:outputText value="#{esignController.crudObjectTextViewerID}" style="font-size: 14px;color: #b3b3b3;"/>
+                                <h:outputText 
+                                    value="Döküman Bilgisi" 
+                                    style="font-size: 22px;font-weight: bolder;color: #b3b3b3;"
+                                    rendered="false"
+                                    />
+                                <h:outputText 
+                                    value="#{esignController.crudObjectTextViewerID}"
+                                    style="font-size: 14px;color: #b3b3b3;"
+                                    />
                                 <p:dataTable 
                                     value="#{esignController.signedDocContentFields}" 
                                     var="mymap"
