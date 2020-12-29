@@ -1052,7 +1052,7 @@ public class MyField {
 
             this.myField.converterValue = converterValue;
 
-            if (converterValue.getClass().getSimpleName().equalsIgnoreCase("BsonConverter")) {
+            if (converterValue.getClass().getSimpleName().equalsIgnoreCase(CONVERTER_BSON_CONVERTER)) {
                 // this.myField.createMyItemsOnSession(null, null, roleMap, this.myField.myForm.userDetail);
                 this.myField.viewKey = Arrays.asList("name");
             } else if (converterValue.getClass().getSimpleName().equalsIgnoreCase("SelectOneObjectIdConverter")) {
