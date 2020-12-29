@@ -30,6 +30,7 @@
         <p:menu 
             toggleable="true" 
             style="width: 100%;" 
+            styleClass="medium-font-size"
             >    
             <c:forEach items="#{cc.attrs.rows}" var="item">
                 <p:submenu label="#{item.name}" expanded="false">
@@ -39,7 +40,10 @@
                         update="#{updateAjaxMB.menuSelectForm}"
                         icon="ui-icon-home"
                         >
-                        <f:setPropertyActionListener target="#{cc.attrs.selectedFormInfo}" value="about,#{item.projectKey},#{item.moduleKey}"/>
+                        <f:setPropertyActionListener 
+                            target="#{cc.attrs.selectedFormInfo}" 
+                            value="about,#{item.projectKey},#{item.moduleKey}"
+                            />
                     </p:menuitem>
                     <c:forEach items="#{item.myLinks}" var="item">
                         <p:menuitem 
@@ -47,8 +51,11 @@
                             action="#{cc.attrs.myAction}"
                             update="#{updateAjaxMB.menuSelectForm}"
                             icon="ui-icon-document"
+                            styleClass="medium-font-size"
                             >
-                            <f:setPropertyActionListener target="#{cc.attrs.selectedFormInfo}" value="#{item.value}"/>
+                            <f:setPropertyActionListener 
+                                target="#{cc.attrs.selectedFormInfo}" 
+                                value="#{item.value}"/>
                         </p:menuitem>
                     </c:forEach>                   
                 </p:submenu>
