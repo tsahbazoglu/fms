@@ -32,15 +32,20 @@
         <p:menu 
             toggleable="true" 
             style="width: 100%;" 
-            styleClass="medium-font-size"
+            styleClass="large-font-size"
             >    
             <c:forEach items="#{cc.attrs.rows}" var="item">
-                <p:submenu label="#{item.name}" expanded="false">
+                <p:submenu 
+                    label="#{item.name}" 
+                    expanded="false"
+                    styleClass="medium-font-size"
+                    >
                     <p:menuitem
                         value="Hakkında ..." 
                         action="#{cc.attrs.myAction}" 
                         update="#{updateAjaxMB.menuSelectForm}"
                         icon="ui-icon-home"
+                        styleClass="medium-font-size"
                         >
                         <f:setPropertyActionListener 
                             target="#{cc.attrs.selectedFormInfo}" 
