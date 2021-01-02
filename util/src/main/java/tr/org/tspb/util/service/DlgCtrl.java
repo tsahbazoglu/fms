@@ -67,16 +67,6 @@ public class DlgCtrl implements Serializable {
         showPopup(clientSideDialogName);
     }
 
-    public void showPopupInfoWithOk(String msg, String clientSideDialogName) {
-        bulkSet(null, null, BILGILENDIRME, msg, true, true);
-        setRenderedButon(false);
-        setRenderedOkButon(true);
-        setRendered(false);
-        setStyle("font-size:13px;");
-        setTitle(BILGILENDIRME);
-        showPopup(clientSideDialogName);
-    }
-
     public void showPopupWarning(String msg, String clientSideDialogName) {
         bulkSet(null, null, "Uyarı", msg, true, true);
         setRenderedButon(false);
@@ -111,6 +101,16 @@ public class DlgCtrl implements Serializable {
         setRendered(false);
         setStyle("font-size:13px;");
         showPopup(MESSAGE_DIALOG);
+    }
+
+    public void showPopupInfoWithOk(String msg, String clientSideDialogName) {
+        bulkSet(null, null, BILGILENDIRME, msg, true, true);
+        setRenderedButon(false);
+        setRenderedOkButon(true);
+        setRendered(false);
+        setStyle("font-size:13px;");
+        setTitle(BILGILENDIRME);
+        showPopup(clientSideDialogName);
     }
 
     /**
