@@ -140,7 +140,7 @@
         <dependency>
             <groupId>org.primefaces</groupId>
             <artifactId>primefaces</artifactId>
-            <version>7.0</version>
+            <version>8.0</version>
         </dependency>
         <dependency>
             <groupId>org.primefaces.themes</groupId>
@@ -153,7 +153,7 @@
             <artifactId>esign</artifactId>
             <version>${fms.version}</version>
         </dependency>
-<!--        <dependency>
+        <!--        <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>printer</artifactId>
             <version>${fms.version}</version>
