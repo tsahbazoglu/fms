@@ -23,7 +23,7 @@
                 >              
                 <p:fileUpload 
                     value="#{crudOneDim.uploadedFile}"
-                    fileUploadListener="#{crudOneDim.upload}"
+                    listener="#{crudOneDim.upload}"
                     allowTypes="#{crudOneDim.mongoUploadFileType}"
                     invalidSizeMessage="Dosya Boyutu 4MB dan büyük olmamalı : "
                     invalidFileMessage="#{crudOneDim.invalidFileMessage}"

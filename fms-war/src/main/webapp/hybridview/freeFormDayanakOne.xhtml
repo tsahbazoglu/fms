@@ -28,7 +28,9 @@
             id="id_freeform_submit_button"
             style="display: none;"            
             value="Kaydet"
-            action="#{freeDesigner.save}">
+            action="#{freeDesigner.save}"
+            update=":idMessageDialog"
+            >
         </p:commandButton>
         <h:panelGrid 
             columns="2" 
@@ -94,7 +96,7 @@
                 <!-- 1024*1024*7 = 7340032 = 7MB -->
                 <p:fileUpload 
                     value="#{freeDesigner.myRecord.uploadedFile}"
-                    fileUploadListener="#{freeDesigner.upload}"
+                    listener="#{freeDesigner.upload}"
                     cancelLabel="Vazgeç"
                     uploadLabel="Yükle"
                     label="Seç"
