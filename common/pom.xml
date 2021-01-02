@@ -17,9 +17,9 @@
             <type>jar</type>
         </dependency>
         <dependency>
-            <groupId>org.apache.xmlgraphics</groupId>
-            <artifactId>fop</artifactId>
-            <version>2.1</version>
+            <groupId>tr.org.tspb</groupId>
+            <artifactId>notification</artifactId>
+            <version>${project.version}</version>
             <type>jar</type>
         </dependency>
         <dependency>
@@ -29,15 +29,15 @@
             <type>jar</type>
         </dependency>
         <dependency>
-            <groupId>javax.mail</groupId>
-            <artifactId>javax.mail-api</artifactId>
-            <version>1.5.1</version>
+            <groupId>org.apache.xmlgraphics</groupId>
+            <artifactId>fop</artifactId>
+            <version>2.1</version>
             <type>jar</type>
         </dependency>
         <dependency>
-            <groupId>tr.org.tspb</groupId>
-            <artifactId>notification</artifactId>
-            <version>${project.version}</version>
+            <groupId>javax.mail</groupId>
+            <artifactId>javax.mail-api</artifactId>
+            <version>1.5.1</version>
             <type>jar</type>
         </dependency>
         <dependency>
