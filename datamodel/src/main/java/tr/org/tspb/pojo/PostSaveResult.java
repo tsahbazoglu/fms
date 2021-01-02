@@ -14,8 +14,10 @@ public class PostSaveResult {
     private static PostSaveResult instance = new PostSaveResult();
     private static PostSaveResult errInstance;
 
+    public final static String MSG = "Verileriniz Kaydedildi";
+
     private PostSaveResult() {
-        this.msg = "Verileriniz Kaydedildi";
+        this.msg = MSG;
     }
 
     public PostSaveResult(boolean result, String msg, MessageGuiType messageGuiType, ErrType errType) {
