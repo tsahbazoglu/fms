@@ -33,6 +33,7 @@ import javax.inject.Inject;
 import org.bson.Document;
 import org.bson.conversions.Bson;
 import org.bson.types.ObjectId;
+import org.primefaces.model.file.UploadedFile;
 import tr.org.tspb.common.qualifier.MyLoginQualifier;
 import tr.org.tspb.common.services.AppScopeSrvCtrl;
 import tr.org.tspb.common.services.BaseService;
@@ -786,7 +787,7 @@ public class RepositoryService implements Serializable {
         metadata.put("username", loginController.getLoggedUserDetail().getUsername());
 
         GridFSInputFile gridFSInputFile = mongoDbUtil
-                .createFile(baseService.getProperties().getUploadTable(), myRecord.getUploadedFile().getInputstream());
+                .createFile(baseService.getProperties().getUploadTable(), myRecord.getUploadedFile().getInputStream());
 
         gridFSInputFile.setFilename(myRecord.getUploadedFile().getFileName());
         gridFSInputFile.setMetaData(metadata);

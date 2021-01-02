@@ -25,7 +25,7 @@ public class MenuModelCreator {
         DefaultMenuItem item = new DefaultMenuItem("External");
         item.setUrl("http://www.primefaces.org");
         item.setIcon("ui-icon-home");
-        firstSubmenu.addElement(item);
+        firstSubmenu.getElements().add(item);
 
         model.addElement(firstSubmenu);
 
@@ -36,18 +36,18 @@ public class MenuModelCreator {
         item.setIcon("ui-icon-disk");
         item.setCommand("#{menuBean.save}");
         // item.setUpdate("messages");
-        secondSubmenu.addElement(item);
+        secondSubmenu.getElements().add(item);
 
         item = new DefaultMenuItem("Delete");
         item.setIcon("ui-icon-close");
         //item.setCommand("#{menuBean.delete}");
         item.setAjax(false);
-        secondSubmenu.addElement(item);
+        secondSubmenu.getElements().add(item);
 
         item = new DefaultMenuItem("Redirect");
         item.setIcon("ui-icon-search");
         //item.setCommand("#{menuBean.redirect}");
-        secondSubmenu.addElement(item);
+        secondSubmenu.getElements().add(item);
 
         model.addElement(secondSubmenu);
     }
@@ -68,7 +68,7 @@ public class MenuModelCreator {
         DefaultMenuItem item = new DefaultMenuItem(selectItem.getLabel());
         item.setUrl("http://www.primefaces.org");
         item.setIcon("ui-icon-home");
-        submenu.addElement(item);
+        submenu.getElements().add(item);
     }
 
     public MenuModel getModel() {

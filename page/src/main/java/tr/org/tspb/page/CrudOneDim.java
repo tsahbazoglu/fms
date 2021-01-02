@@ -41,7 +41,7 @@ import org.primefaces.model.StreamedContent;
 import org.bson.Document;
 import org.bson.conversions.Bson;
 import org.primefaces.event.FileUploadEvent;
-import org.primefaces.model.UploadedFile;
+import org.primefaces.model.file.UploadedFile;
 import org.slf4j.Logger;
 import static tr.org.tspb.constants.ProjectConstants.*;
 import tr.org.tspb.util.tools.MongoDbVersion;
@@ -874,7 +874,9 @@ public class CrudOneDim implements ValueChangeListener, Serializable {
             PostSaveResult postSaveResult = repositoryService
                     .runEventPostSave(operatedObject, formService.getMyForm(), crudObject);
             //FIXME messagebundle
-            dialogController.showPopupInfo2("Bilgilendirme", "<br/>" + postSaveResult.getMsg());
+            if (postSaveResult.getMsg() != null) {
+                dialogController.showPopupInfoWithOk(postSaveResult.getMsg(), MESSAGE_DIALOG);
+            }
         } catch (Exception ex) {
             logger.error("error occured", ex);
             dialogController.showPopupError(ex.toString());
@@ -909,7 +911,8 @@ public class CrudOneDim implements ValueChangeListener, Serializable {
                     metadata.put("selectFormName", formService.getMyForm().getName());
                     metadata.put("username", loginController.getLoggedUserDetail().getUsername());
 
-                    GridFSInputFile gridFSInputFile = mongoDbUtil.createFile(baseService.getProperties().getUploadTable(), uploadedFile.getInputstream());
+                    GridFSInputFile gridFSInputFile = mongoDbUtil.createFile(baseService.getProperties().getUploadTable(),
+                            uploadedFile.getInputStream());
 
                     gridFSInputFile.setFilename(uploadedFile.getFileName());
                     gridFSInputFile.setMetaData(metadata);

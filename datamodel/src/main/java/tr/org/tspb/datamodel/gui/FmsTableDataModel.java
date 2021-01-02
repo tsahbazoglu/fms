@@ -3,6 +3,7 @@ package tr.org.tspb.datamodel.gui;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import org.primefaces.model.FilterMeta;
 import org.primefaces.model.LazyDataModel;
 import org.primefaces.model.SortMeta;
 import org.primefaces.model.SortOrder;
@@ -32,7 +33,7 @@ public class FmsTableDataModel extends LazyDataModel<Map> {
     }
 
     @Override
-    public List<Map> load(int first, int pageSize, String sortField, SortOrder sortOrder, Map<String, Object> filters) {
+    public List<Map> load(int first, int pageSize, Map<String, SortMeta> sortBy, Map<String, FilterMeta> filterBy) {
         try {
             listOfData = fmsOnFlyData.findLazyData(first, pageSize);
             return listOfData;
@@ -43,7 +44,7 @@ public class FmsTableDataModel extends LazyDataModel<Map> {
     }
 
     @Override
-    public List<Map> load(int first, int pageSize, List<SortMeta> multiSortMeta, Map<String, Object> filters) {
+    public List<Map> load(int first, int pageSize, String sortField, SortOrder sortOrder, Map<String, FilterMeta> filterBy) {
         try {
             return fmsOnFlyData.findLazyData(first, pageSize);
         } catch (Exception ex) {

@@ -47,7 +47,7 @@ import org.bson.Document;
 import org.bson.types.Code;
 import org.bson.types.ObjectId;
 import org.primefaces.event.FileUploadEvent;
-import org.primefaces.model.UploadedFile;
+import org.primefaces.model.file.UploadedFile;
 import com.mongodb.client.model.Filters;
 import tr.org.tspb.exceptions.FormConfigException;
 import tr.org.tspb.exceptions.LdapException;
@@ -303,7 +303,7 @@ public abstract class FmsTable extends FmsTableView {
                     metadata.put("username", loginController.getLoggedUserDetail().getUsername());
 
                     GridFSInputFile gridFSInputFile = mongoDbUtil
-                            .createFile(baseService.getProperties().getUploadTable(), uploadedFile.getInputstream());
+                            .createFile(baseService.getProperties().getUploadTable(), uploadedFile.getInputStream());
 
                     gridFSInputFile.setFilename(uploadedFile.getFileName());
                     gridFSInputFile.setMetaData(metadata);
@@ -341,7 +341,7 @@ public abstract class FmsTable extends FmsTableView {
                 return;
             }
 
-            InputStream is = uploadedFileKpbDb.getInputstream();
+            InputStream is = uploadedFileKpbDb.getInputStream();
 
             XSSFWorkbook xssfWorkbook = new XSSFWorkbook(is);
             XSSFSheet sheet = xssfWorkbook.getSheetAt(0);

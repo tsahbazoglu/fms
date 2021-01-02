@@ -7,7 +7,7 @@ import java.util.List;
 import java.util.Map;
 import org.bson.Document;
 import org.bson.types.ObjectId;
-import org.primefaces.model.UploadedFile;
+import org.primefaces.model.file.UploadedFile;
 import tr.org.tspb.dao.MyField;
 import tr.org.tspb.dao.MyForm;
 import tr.org.tspb.pojo.RoleMap;

@@ -8,6 +8,7 @@ import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.inject.Inject;
+import org.primefaces.model.FilterMeta;
 import org.primefaces.model.LazyDataModel;
 import org.primefaces.model.SortMeta;
 import org.primefaces.model.SortOrder;
@@ -42,13 +43,12 @@ public class SimplePivotCtrlAdmin implements Serializable {
         pivotRecords = new LazyDataModel<PivotRecord>() {
 
             @Override
-            public List<PivotRecord> load(int first, int pageSize, String sortField, SortOrder sortOrder, Map<String, Object> filters) {
-
+            public List<PivotRecord> load(int first, int pageSize, Map<String, SortMeta> sortBy, Map<String, FilterMeta> filterBy) {
                 return SimplePivotCtrlAdmin.this.load(null, false, first, pageSize, myForm);
             }
 
             @Override
-            public List<PivotRecord> load(int first, int pageSize, List<SortMeta> multiSortMeta, Map<String, Object> filters) {
+            public List<PivotRecord> load(int first, int pageSize, String sortField, SortOrder sortOrder, Map<String, FilterMeta> filterBy) {
                 return SimplePivotCtrlAdmin.this.load(null, false, first, pageSize, myForm);
             }
 

@@ -15,7 +15,7 @@ import org.apache.poi.xssf.usermodel.XSSFRow;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.primefaces.event.FileUploadEvent;
-import org.primefaces.model.UploadedFile;
+import org.primefaces.model.file.UploadedFile;
 import tr.org.tspb.service.RepositoryService;
 import tr.org.tspb.datamodel.custom.TuikData;
 import tr.org.tspb.util.stereotype.MyController;
@@ -50,7 +50,7 @@ public class ImporController implements Serializable {
 
         try {
 
-            InputStream is = uploadedFile.getInputstream();
+            InputStream is = uploadedFile.getInputStream();
 
             XSSFWorkbook xssfWorkbook = new XSSFWorkbook(is);
             XSSFSheet sheet = xssfWorkbook.getSheetAt(0);

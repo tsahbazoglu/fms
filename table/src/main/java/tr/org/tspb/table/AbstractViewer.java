@@ -20,6 +20,7 @@ import javax.inject.Inject;
 import javax.naming.Reference;
 import org.bson.Document;
 import org.bson.types.ObjectId;
+import org.primefaces.model.FilterMeta;
 import org.primefaces.model.LazyDataModel;
 import org.primefaces.model.SortMeta;
 import org.primefaces.model.SortOrder;
@@ -113,7 +114,7 @@ public abstract class AbstractViewer implements FmsOnFlyData, Serializable {
             int rowCount;
 
             @Override
-            public List<Map> load(int first, int pageSize, String sortField, SortOrder sortOrder, Map<String, Object> filters) {
+            public List<Map> load(int first, int pageSize, Map<String, SortMeta> sortBy, Map<String, FilterMeta> filterBy) {
                 List<Map> randomCars = new ArrayList<>();
                 for (Object obj : list) {
                     try {
@@ -126,7 +127,7 @@ public abstract class AbstractViewer implements FmsOnFlyData, Serializable {
             }
 
             @Override
-            public List<Map> load(int first, int pageSize, List<SortMeta> multiSortMeta, Map<String, Object> filters) {
+            public List<Map> load(int first, int pageSize, String sortField, SortOrder sortOrder, Map<String, FilterMeta> filterBy) {
                 List<Map> randomCars = new ArrayList<>();
                 for (Object obj : list) {
                     try {

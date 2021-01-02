@@ -25,6 +25,7 @@ import javax.inject.Inject;
 import javax.servlet.http.HttpSession;
 import org.bson.Document;
 import org.primefaces.event.FileUploadEvent;
+import org.primefaces.model.FilterMeta;
 import org.primefaces.model.LazyDataModel;
 import org.primefaces.model.SortMeta;
 import org.primefaces.model.SortOrder;
@@ -38,6 +39,7 @@ import tr.org.tspb.dao.MyBaseRecord;
 import tr.org.tspb.dao.refs.PlainRecord;
 import tr.org.tspb.dp.nullobj.PlainRecordData;
 import tr.org.tspb.outsider.EsignDoor;
+import tr.org.tspb.pojo.PostSaveResult;
 import tr.org.tspb.util.tools.DocumentRecursive;
 import tr.org.tspb.uys.freedesign.MyLicense;
 import tr.org.tspb.uys.freedesign.MyRecord;
@@ -175,13 +177,12 @@ public class FreeDesigner implements Serializable {
         myRecords = new LazyDataModel<MyRecord>() {
 
             @Override
-            public List<MyRecord> load(int first, int pageSize, String sortField, SortOrder sortOrder, Map<String, Object> filters) {
-
+            public List<MyRecord> load(int first, int pageSize, Map<String, SortMeta> sortBy, Map<String, FilterMeta> filterBy) {
                 return FreeDesigner.this.load(null, false, first, pageSize, selectedForm);
             }
 
             @Override
-            public List<MyRecord> load(int first, int pageSize, List<SortMeta> multiSortMeta, Map<String, Object> filters) {
+            public List<MyRecord> load(int first, int pageSize, String sortField, SortOrder sortOrder, Map<String, FilterMeta> filterBy) {
                 return FreeDesigner.this.load(null, false, first, pageSize, selectedForm);
             }
 
@@ -292,6 +293,7 @@ public class FreeDesigner implements Serializable {
     public String save() {
         saveAsLoggedUser(myRecord);
         refreshUploadedFileList();
+        dialogController.showPopupInfoWithOk(PostSaveResult.MSG, MESSAGE_DIALOG);
         return null;
     }
 
