@@ -517,6 +517,9 @@ public class CrudOneDim implements ValueChangeListener, Serializable {
             formService.getMyForm().runAjaxBulk(getComponentMap(), crudObject,
                     loginController.getRoleMap(), loginController.getLoggedUserDetail());
 
+        } catch (UserException ex) {
+            logger.error("error occured", ex);
+            dialogController.showPopupError(ex.getMessage());
         } catch (Exception ex) {
             logger.error("error occured", ex);
             dialogController.showPopupError("Beklenmeyen Hata Oluştu.");
@@ -702,7 +705,7 @@ public class CrudOneDim implements ValueChangeListener, Serializable {
     }
 
     private ObjectId saveOneDimensionObject(Document operatedObject, String username, MyForm myForm, String ip, String sessionId)
-            throws MessagingException, NullNotExpectedException, LdapException, FormConfigException {
+            throws MessagingException, NullNotExpectedException, LdapException, FormConfigException, UserException {
 
         MyForm inode = (MyForm) operatedObject.get(INODE);
         operatedObject.remove(INODE);//just to sutisfy the icefaces
@@ -720,7 +723,7 @@ public class CrudOneDim implements ValueChangeListener, Serializable {
                             MessageFormat.format("[{0}] {1}", field.getShortName(), MessageBundleLoaderv1.getMessage("requiredMessage")),//
                             "*");
                     FacesContext.getCurrentInstance().addMessage(null, facesMessageRequired);
-                    return operatedObject.getObjectId(MONGO_ID);
+                    throw new UserException("<br/><br/> Dosya Eksik. 'Ekli Dosyalar' sekmesinden talep edilen belge(leri) ekleyiniz");
                 }
             }
         }
