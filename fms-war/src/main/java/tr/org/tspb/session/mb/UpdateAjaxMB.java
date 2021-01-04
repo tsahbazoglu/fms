@@ -41,7 +41,7 @@ public class UpdateAjaxMB implements Serializable {
     private static final String ID_1D_INPUT_FILE_FORM = "";//ID_TAB_VIEW.concat(":").concat("idInputFileForm1D");
     private static final String ID_VERSION_TABLE = "";// "idVersionTable";
     private static final String ID_1D_FRM = "";//ID_TAB_VIEW.concat(":").concat("crud1dForm");
-    private static final String ID_1D_PNL_UPL_FILE = "";//ID_TAB_VIEW.concat(":").concat("idPanelUploadFile1D");
+    private static final String ID_1D_PNL_UPL_FILE = "";
     private static final String ID_CURRENT_MYGRID_EDITABLE = ID_TAB_VIEW.concat(":").concat("idCurrentMyGrid");
     private static final String ID_CURRENT_MYGRID_READONLY = ID_TAB_VIEW.concat(":").concat("currentMyGridReadOnly");
     private static final String ID_HISTORY_MYGRID_READONLY = ID_TAB_VIEW.concat(":").concat("historyMyGridReadOnly");
