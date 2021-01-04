@@ -11,8 +11,12 @@
         <title></title>
     </h:head>
 
-    <h:panelGroup id="idPanelUploadFile1D">
-        <h:panelGroup rendered="#{formService.myForm.hasAttachedFiles}">
+
+    <h:panelGroup 
+        id="id-page-pnl-up-file"
+        >
+        <br/>
+        <p:panel>
             <h:outputText value="Dosya Yükleme Aracı" style="font-size: 22px;font-weight: bolder;color: #b3b3b3;"/>
             <br/>
             <br/> 
@@ -36,68 +40,68 @@
                     label="Seç"
                     />  
             </h:form>
-
+        </p:panel>
+        <br/> 
+        <p:panel 
+            id="id-uploaded-files"
+            >
+            <h:outputText value="Ekli Dosyalar" style="font-size: 22px;font-weight: bolder;color: #b3b3b3;"/>
+            <br/>
             <br/> 
-            <br/> 
-            <h:panelGroup id="idUploadedFiles">
-                <h:outputText value="Ekli Dosyalar" style="font-size: 22px;font-weight: bolder;color: #b3b3b3;"/>
-                <br/>
-                <br/> 
-                <p:dataTable 
-                    value="#{crudOneDim.listFileData}" 
-                    var="x"
-                    >
-                    <p:column>
-                        <f:facet name="header">
-                            <h:outputText value="Dosya Adı"/> 
-                        </f:facet>
-                        <h:outputText value="#{x.fileName}"/> 
-                    </p:column>
-                    <p:column>
-                        <f:facet name="header">
-                            <h:outputText value="Dosya Boyutu"/>
-                        </f:facet>
-                        <h:outputText value="#{x.fileSize}"/> 
+            <p:dataTable 
+                value="#{crudOneDim.listFileData}" 
+                var="x"
+                >
+                <p:column>
+                    <f:facet name="header">
+                        <h:outputText value="Dosya Adı"/> 
+                    </f:facet>
+                    <h:outputText value="#{x.fileName}"/> 
+                </p:column>
+                <p:column>
+                    <f:facet name="header">
+                        <h:outputText value="Dosya Boyutu"/>
+                    </f:facet>
+                    <h:outputText value="#{x.fileSize}"/> 
 
-                    </p:column>
-                    <p:column>
-                        <f:facet name="header">
-                            <h:outputText value="Durum"/>
-                        </f:facet>
-                        <h:outputText value="#{x.fileState}" style="background: #{x.fileColor}"/> 
-                    </p:column>
+                </p:column>
+                <p:column>
+                    <f:facet name="header">
+                        <h:outputText value="Durum"/>
+                    </f:facet>
+                    <h:outputText value="#{x.fileState}" style="background: #{x.fileColor}"/> 
+                </p:column>
 
-                    <p:column>
-                        <f:facet name="header">
-                            <h:outputText value="Sil"/> 
-                        </f:facet>
-                        <p:commandButton 
-                            value="sil" 
-                            action="#{crudOneDim.deleteFile}" 
-                            rendered="#{formService.myForm.myActions.delete}"
-                            update="#{updateAjaxMB.btn1dRemoveFile}"
-                            >
-                            <f:setPropertyActionListener  target="#{crudOneDim.toBeDeletedFileID}" value="#{x.fileID}"/>
-                        </p:commandButton>
-                    </p:column>
-                    <p:column>
-                        <f:facet name="header">
-                            <h:outputText value="İndir"/>  
-                        </f:facet>
-                        <h:outputLink 
-                            value="#{application.contextPath}/myDownloadServlet/#{x.fileID}"
-                            style="
-                            text-decoration:none;
-                            font-size: 14px;
-                            color:#112978;
-                            font-weight:bold;"
-                            >
-                            <h:outputText value="indir" />
-                        </h:outputLink>  
-                    </p:column>
-                </p:dataTable>
-            </h:panelGroup>
-        </h:panelGroup>
+                <p:column>
+                    <f:facet name="header">
+                        <h:outputText value="Sil"/> 
+                    </f:facet>
+                    <p:commandButton 
+                        value="sil" 
+                        action="#{crudOneDim.deleteFile}" 
+                        rendered="#{formService.myForm.myActions.delete}"
+                        update="#{updateAjaxMB.btn1dRemoveFile}"
+                        >
+                        <f:setPropertyActionListener  target="#{crudOneDim.toBeDeletedFileID}" value="#{x.fileID}"/>
+                    </p:commandButton>
+                </p:column>
+                <p:column>
+                    <f:facet name="header">
+                        <h:outputText value="İndir"/>  
+                    </f:facet>
+                    <h:outputLink 
+                        value="#{application.contextPath}/myDownloadServlet/#{x.fileID}"
+                        style="
+                        text-decoration:none;
+                        font-size: 14px;
+                        color:#112978;
+                        font-weight:bold;"
+                        >
+                        <h:outputText value="indir" />
+                    </h:outputLink>  
+                </p:column>
+            </p:dataTable>
+        </p:panel>
     </h:panelGroup>
 
 
