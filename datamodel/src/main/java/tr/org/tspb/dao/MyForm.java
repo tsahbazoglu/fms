@@ -20,6 +20,7 @@ import org.bson.types.Code;
 import org.bson.types.ObjectId;
 import tr.org.tspb.datamodel.expected.FmsRunMongoCmd;
 import tr.org.tspb.datamodel.expected.FmsScriptRunner;
+import tr.org.tspb.pojo.ComponentType;
 import tr.org.tspb.pojo.UserDetail;
 
 /**
@@ -118,6 +119,7 @@ public class MyForm implements MyFormXs {
     private List<ChildFilter> childs;
     private String restApi;
     private boolean jsonViewer;
+    private static final String BR = "<br/>";
 
     /*
      some fields include on fly calculation. 
@@ -128,6 +130,10 @@ public class MyForm implements MyFormXs {
     private List< MyField> fieldsAsList;
     private Map<String, MyField> fieldsRow;
     private MyMerge uploadMerge;
+    private List<String> fieldsRowKeys;
+
+    public MyForm() {
+    }
 
     public String getSchemaVersion() {
         return schemaVersion;
@@ -139,11 +145,6 @@ public class MyForm implements MyFormXs {
 
     public boolean isWorkFlowActive() {
         return workflowSteps != null && !workflowSteps.isEmpty();
-    }
-
-    private List<String> fieldsRowKeys;
-
-    public MyForm() {
     }
 
     public MyNotifies getMyNotifies() {
@@ -575,6 +576,8 @@ public class MyForm implements MyFormXs {
 
         }
 
+        resolveAttachedFile();
+
     }
 
     public void initActions(MyActions myActions) {
@@ -690,7 +693,6 @@ public class MyForm implements MyFormXs {
         return html;
 
     }
-    private static final String BR = "<br/>";
 
     public String getControlCollection() {
         return controlCollection;
@@ -704,6 +706,7 @@ public class MyForm implements MyFormXs {
         return hasWorkflowRelation;
     }
 
+    @Override
     public List<String> getZetDimension() {
         return zetDimension;
     }
@@ -734,6 +737,15 @@ public class MyForm implements MyFormXs {
 
     public String getPageName() {
         return pageName;
+    }
+
+    public void resolveAttachedFile() {
+        this.hasAttachedFiles = false;
+        for (MyField myField : this.fields.values()) {
+            if (myField.isRendered() && INPUT_FILE.equals(myField.getComponentType())) {
+                this.hasAttachedFiles = true;
+            }
+        }
     }
 
     private static class OrderedKey {
@@ -1512,13 +1524,22 @@ public class MyForm implements MyFormXs {
 
         public Builder maskAjax() {
             for (MyField myField : this.myForm.fields.values()) {
-                if (myField.getAjaxEffectedKeys() != null && !myField.getAjaxEffectedKeys().isEmpty()) {
+
+                List<String> ajaxEffectedKeys = myField.getAjaxEffectedKeys();
+
+                if (ajaxEffectedKeys != null && !ajaxEffectedKeys.isEmpty()) {
                     StringBuilder jsfAjaxUpdateValue = new StringBuilder();
-                    for (String ajaxKey : myField.getAjaxEffectedKeys()) {
-                        MyField relatedField = this.myForm.getField(ajaxKey);
-                        if (relatedField != null) {
-                            String styleClass = "id-class-".concat(ajaxKey);
-                            relatedField.setStyleClass(styleClass);
+                    for (String effectedKey : ajaxEffectedKeys) {
+                        MyField efectedField = this.myForm.getField(effectedKey);
+
+                        if (efectedField != null) {
+
+                            if (efectedField.getComponentType().equals(ComponentType.inputFile.name())) {
+                                myField.setHasAjaxEffectedInputFileField(true);
+                            }
+
+                            String styleClass = "id-class-".concat(effectedKey);
+                            efectedField.setStyleClass(styleClass);
                             jsfAjaxUpdateValue.append(String.format("@(.%s),", styleClass));
                         }
                     }
@@ -1536,6 +1557,11 @@ public class MyForm implements MyFormXs {
             return this;
         }
 
+        public Builder maskInputFile() {
+            this.myForm.resolveAttachedFile();
+            return this;
+        }
+
         public Builder maskFields(Map<String, MyField> fields) {
 
             this.myForm.fields = fields;
@@ -1544,14 +1570,13 @@ public class MyForm implements MyFormXs {
 
                 myField.setMyForm(this.myForm);
 
-                if (INPUT_FILE.equals(myField.getComponentType())) {
-                    myForm.hasAttachedFiles = true;
-                }
-
                 if (myField.isAjax()) {
                     myForm.ajaxFields.add(myField.getKey());
                 }
             }
+
+            this.myForm.resolveAttachedFile();
+
             return this;
         }
 
