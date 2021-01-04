@@ -60,7 +60,7 @@
             <p:ajax 
                 listener="#{crudOneDim.someaction}"  
                 disabled="#{not cc.attrs.isAjax}" 
-                update="#{cc.attrs.ajax_update}"
+                update="#{cc.attrs.ajax_update}#{cc.attrs.hasAjaxEffectedInputFileField?',:id-tab-view':''}"
                 />
         </p:selectOneMenu>
     </composite:implementation>
