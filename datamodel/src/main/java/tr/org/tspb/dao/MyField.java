@@ -46,6 +46,7 @@ public class MyField {
     private Boolean searchAccess;
     private Boolean quickFilter;
     private Boolean autoset;
+    private Boolean hasAjaxEffectedInputFileField;
     private String ajaxAction;
     private String ajaxShowHide;
     private String ajaxUpdate;
@@ -757,6 +758,14 @@ public class MyField {
 
     public TagAjaxRef getTagAjaxRef() {
         return tagAjaxRef;
+    }
+
+    public Boolean getHasAjaxEffectedInputFileField() {
+        return hasAjaxEffectedInputFileField;
+    }
+
+    public void setHasAjaxEffectedInputFileField(Boolean hasAjaxEffectedInputFileField) {
+        this.hasAjaxEffectedInputFileField = hasAjaxEffectedInputFileField;
     }
 
     public static class Builder {
