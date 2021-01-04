@@ -37,7 +37,7 @@ public class UpdateAjaxMB implements Serializable {
     private static final String ID_PNL_ESIGN_HISTORY = "";//ID_TAB_VIEW.concat(":").concat("id_eimza_tarihce");
     private static final String ID_2D_DATA_TABLE = ID_TAB_VIEW.concat(":").concat("objectsDataTable");
     private static final String ID_ESIGN = "";//ID_TAB_VIEW.concat(":").concat("id_eimza");
-    private static final String ID_UPLOADED_FILES = ID_TAB_VIEW.concat(":").concat("idUploadedFiles");
+    private static final String ID_UPLOADED_FILES = ID_TAB_VIEW.concat(":").concat("id-uploaded-files");
     private static final String ID_1D_INPUT_FILE_FORM = "";//ID_TAB_VIEW.concat(":").concat("idInputFileForm1D");
     private static final String ID_VERSION_TABLE = "";// "idVersionTable";
     private static final String ID_1D_FRM = "";//ID_TAB_VIEW.concat(":").concat("crud1dForm");
