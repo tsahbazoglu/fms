@@ -624,9 +624,12 @@ public class TwoDimModifyCtrl extends FmsTable implements ActionListener {
             ((FmsTableDataModel) getData()).initRowCount(findDataCount());
             ((FmsTableDataModel) getData()).emptyListOfData();
             resetActions();
+        } catch (UserException ex) {
+            logger.error("error occured", ex);
+            dialogController.showPopupError(ex.getMessage());
         } catch (FormConfigException | LdapException | MongoOrmFailedException
                 | MoreThenOneInListException | NullNotExpectedException
-                | RecursiveLimitExceedException | UserException
+                | RecursiveLimitExceedException
                 | NoSuchMethodException | ParseException | MessagingException | ScriptException | net.sourceforge.jeval.EvaluationException ex) {
             logger.error(ex.getMessage());
             dialogController.showPopupError(ex.toString());

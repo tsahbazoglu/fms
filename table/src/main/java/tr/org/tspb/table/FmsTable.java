@@ -845,7 +845,7 @@ public abstract class FmsTable extends FmsTableView {
     }
 
     private ObjectId saveOneDimensionObject(Document operatedObject, String username, MyForm myForm, String ip, String sessionId)
-            throws MessagingException, NullNotExpectedException, LdapException, FormConfigException, MongoOrmFailedException {
+            throws MessagingException, NullNotExpectedException, LdapException, FormConfigException, MongoOrmFailedException, UserException {
 
         MyForm inode = (MyForm) operatedObject.get(INODE);
         operatedObject.remove(INODE);//just to sutisfy the icefaces
@@ -863,7 +863,7 @@ public abstract class FmsTable extends FmsTableView {
                             MessageFormat.format("[{0}] {1}", field.getShortName(), MessageBundleLoaderv1.getMessage("requiredMessage")),//
                             "*");
                     FacesContext.getCurrentInstance().addMessage(null, facesMessageRequired);
-                    return operatedObject.getObjectId(MONGO_ID);
+                    throw new UserException("<br/><br/> Dosya Eksik. 'Ekli Dosyalar' sekmesinden talep edilen belge(leri) ekleyiniz");
                 }
             }
         }
