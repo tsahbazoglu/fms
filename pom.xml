@@ -26,7 +26,6 @@
         <module>logger</module>
         <module>table</module>
         <module>page</module>
-        <module>architect</module>
     </modules>
     
     <properties>

@@ -5,7 +5,6 @@
         <artifactId>fms</artifactId>
         <groupId>tr.org.tspb</groupId>
         <version>1.0.0</version>
-        <relativePath>../pom.xml</relativePath>
     </parent>
     <groupId>tr.org.tspb</groupId>
     <artifactId>architect</artifactId>

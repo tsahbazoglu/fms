@@ -146,23 +146,23 @@
             <groupId>org.primefaces.themes</groupId>
             <artifactId>all-themes</artifactId>
             <version>1.0.10</version>
-        </dependency>
-               
+        </dependency>                      
+        <!--       
         <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>esign</artifactId>
             <version>${fms.version}</version>
         </dependency>
-        <!--        <dependency>
+        <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>printer</artifactId>
             <version>${fms.version}</version>
-        </dependency>-->
+        </dependency> 
         <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>webclient</artifactId>
             <version>${fms.version}</version>
         </dependency>
-        
+        -->
     </dependencies>
 </project>
