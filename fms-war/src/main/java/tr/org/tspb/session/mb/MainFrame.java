@@ -354,7 +354,7 @@ public class MainFrame implements Serializable {
         List<FormItem> formItems = repositoryService.findModuleForms(moduleItem);
 
         formItems.addAll(repositoryService.findModuleFormsSchemaVersion110(moduleItem));
-        
+
         Collections.sort(formItems, new Comparator<FormItem>() {
             Collator myCollator = Collator.getInstance();
 
@@ -815,7 +815,7 @@ public class MainFrame implements Serializable {
         myFormLarge.initActions(repositoryService.getAndCacheMyAction(myFormLarge));
 
         formService.setMyForm(myFormLarge);
-        
+
         filterService.initQuickFilters();
 
         twoDimModifyCtrl.drawGUI(myFormLarge);
