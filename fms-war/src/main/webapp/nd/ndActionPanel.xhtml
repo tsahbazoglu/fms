@@ -59,10 +59,14 @@
                 </p:panel>
             </h:panelGrid>
 
-            <p:dataList value="#{pivotModifierCtrl.selectedFormMessages}" var="mymessage"  type="ordered"
-                        itemStyleClass="itemStyleClass"
-                        itemType="none"
-                        >
+            <p:dataList 
+                value="#{pivotModifierCtrl.selectedFormMessages}" 
+                var="mymessage"  
+                type="ordered"
+                itemStyleClass="itemStyleClass"
+                itemType="none"
+                emptyMessage="#{fmsLabels.messages.getString('no_description')}"
+                >
                 <f:facet name="header">
                     açıklamalar
                 </f:facet>
