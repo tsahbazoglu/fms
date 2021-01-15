@@ -1,8 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package tr.org.tspb.session.mb;
 
 import java.io.Serializable;
@@ -13,7 +8,7 @@ import tr.org.tspb.util.stereotype.MyController;
 
 /**
  *
- * @author telman
+ * @author Telman Şahbazoğlu
  */
 @MyController
 public class FmsLabels implements Serializable {
