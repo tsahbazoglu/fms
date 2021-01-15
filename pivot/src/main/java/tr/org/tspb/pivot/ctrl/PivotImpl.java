@@ -45,6 +45,7 @@ import tr.org.tspb.util.qualifier.KeepOpenQualifier;
 import tr.org.tspb.util.tools.MongoDbUtilIntr;
 import tr.org.tspb.factory.cp.OgmCreatorIntr;
 import tr.org.tspb.factory.qualifier.OgmCreatorQualifier;
+import tr.org.tspb.service.FeatureService;
 
 /**
  *
@@ -82,7 +83,7 @@ public abstract class PivotImpl implements Serializable, PivotApi {
     protected DataService dataService;
 
     @Inject
-    protected EsignDoor esignDoor;
+    protected FeatureService featureService;
 
     @Inject
     @MyQualifier(myEnum = ViewerController.viewerPivot)
