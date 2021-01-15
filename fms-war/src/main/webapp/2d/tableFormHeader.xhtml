@@ -20,12 +20,14 @@
             >
         </h:outputLabel>
         <p:scrollPanel style="width:500px;height:90px;">
-            <p:dataList value="#{twoDimModifyCtrl.selectedFormMessages}"
-                        var="mymessage"  
-                        type="ordered"
-                        itemStyleClass="itemStyleClass"
-                        itemType="none"
-                        >
+            <p:dataList 
+                value="#{twoDimModifyCtrl.selectedFormMessages}"
+                var="mymessage"  
+                type="ordered"
+                itemStyleClass="itemStyleClass"
+                itemType="none"
+                emptyMessage="#{fmsLabels.messages.getString('no_description')}"
+                >
                 <h:outputText value="#{mymessage}" escape="false"/>
             </p:dataList>
         </p:scrollPanel>
