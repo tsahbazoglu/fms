@@ -84,6 +84,7 @@ import tr.org.tspb.util.tools.MongoDbUtilIntr;
 import tr.org.tspb.factory.cp.OgmCreatorIntr;
 import tr.org.tspb.outsider.qualifier.MyWorkFlowQualifier;
 import tr.org.tspb.pojo.DatabaseUser;
+import tr.org.tspb.service.FeatureService;
 
 /*
  * @author Telman Şahbazoğlu
@@ -104,7 +105,7 @@ public class TwoDimModifyCtrl extends FmsTable implements ActionListener {
     private FmsWorkFlow fmsFlowCtrl;
 
     @Inject
-    private EsignDoor esignDoor;
+    private FeatureService featureService;
 
     @Inject
     @DefaultPaymentDoor
@@ -234,7 +235,7 @@ public class TwoDimModifyCtrl extends FmsTable implements ActionListener {
         List<Map> list = new ArrayList();
         list.add(new Document(crudObject));
 
-        esignDoor.initAndShowEsignDlg(list, formService.getMyForm(), "widgetVarToBeSignedDialog", MULTIPLE);
+        featureService.getEsignDoor().initAndShowEsignDlg(list, formService.getMyForm(), "widgetVarToBeSignedDialog", MULTIPLE);
 
         return null;
     }
@@ -285,7 +286,7 @@ public class TwoDimModifyCtrl extends FmsTable implements ActionListener {
             throw new NullNotExpectedException("İmzalanacak Kayıtlı Veriniz Tespit Edilemedi.");
         }
 
-        esignDoor.initAndShowEsignDlg(list, formService.getMyForm(), "widgetVarToBeSignedDialog", MULTIPLE);
+        featureService.getEsignDoor().initAndShowEsignDlg(list, formService.getMyForm(), "widgetVarToBeSignedDialog", MULTIPLE);
 
     }
 
@@ -774,7 +775,7 @@ public class TwoDimModifyCtrl extends FmsTable implements ActionListener {
         List<Map> listOfCruds = new ArrayList();
         listOfCruds.add(new Document(crudObject));
 
-        esignDoor.initEsignCtrl(formService.getMyForm(), listOfCruds, null, UNIQUE);
+        featureService.getEsignDoor().initEsignCtrl(formService.getMyForm(), listOfCruds, null, UNIQUE);
 
         //FIXME  : make this snippet selectedForm dependable
         HttpSession httpSession = (HttpSession) FacesContext.getCurrentInstance()
