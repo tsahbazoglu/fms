@@ -86,6 +86,7 @@ import tr.org.tspb.pojo.DatabaseUser;
 import tr.org.tspb.pojo.PostSaveResult;
 import tr.org.tspb.pojo.PreSaveResult;
 import tr.org.tspb.service.CalcService;
+import tr.org.tspb.service.FeatureService;
 
 /**
  *
@@ -96,7 +97,7 @@ import tr.org.tspb.service.CalcService;
 public class CrudOneDim implements ValueChangeListener, Serializable {
 
     @Inject
-    private EsignDoor esignDoor;
+    private FeatureService featureService;
 
     @Inject
     @DefaultReportDoor
@@ -262,7 +263,7 @@ public class CrudOneDim implements ValueChangeListener, Serializable {
             //FIXME messagebundle
             dialogController.showPopupWarning("İmzalanacak Kayıtlı Veriniz Tespit Edilemedi.", MESSAGE_DIALOG);
         } else {
-            esignDoor.iniAndShowEsignDlgV1(new TreeMap<Integer, String>(), listOfCruds, formService.getMyForm(), "widgetVarToBeSignedDialog", UNIQUE);
+            featureService.getEsignDoor().iniAndShowEsignDlgV1(new TreeMap<Integer, String>(), listOfCruds, formService.getMyForm(), "widgetVarToBeSignedDialog", UNIQUE);
         }
 
         return null;
@@ -485,7 +486,7 @@ public class CrudOneDim implements ValueChangeListener, Serializable {
         List<Map> listOfCruds = new ArrayList();
         listOfCruds.add(new Document(crudObject));
 
-        esignDoor.initAndFindEsignsV1(formService.getMyForm(), null, listOfCruds, UNIQUE);
+        featureService.getEsignDoor().initAndFindEsignsV1(formService.getMyForm(), null, listOfCruds, UNIQUE);
 
     }
 
@@ -507,7 +508,7 @@ public class CrudOneDim implements ValueChangeListener, Serializable {
                     .runEventPreSave(filterService.getTableFilterCurrent(), formService.getMyForm(), crudObject);
 
             if (preSaveResult.isResult()) {
-                throw new Exception(preSaveResult.getMsg());
+                throw new UserException(preSaveResult.getMsg());
             }
 
             saveObject(formService.getMyForm(), loginController, crudObject);
@@ -769,8 +770,8 @@ public class CrudOneDim implements ValueChangeListener, Serializable {
         }
 
         for (String fieldKey : myForm.getFieldsKeySet()) {
-            MyField fieldStriucture = myForm.getField(fieldKey);
-            if (fieldStriucture.getCalculateOnSave()) {
+            MyField fieldStructure = myForm.getField(fieldKey);
+            if (fieldStructure.getCalculateOnSave()) {
                 operatedObject.put(fieldKey, calcService.calculateValue(operatedObject, fieldKey, FacesContext.getCurrentInstance()));
             }
         }
@@ -968,9 +969,11 @@ public class CrudOneDim implements ValueChangeListener, Serializable {
                 case "render":
                     formService.getMyForm().runAjaxRender(myField, componentMap, formService.getMyForm(), crudObject,
                             loginController.getRoleMap(), loginController.getLoggedUserDetail(), filterService.getTableFilterCurrent());
+                    break;
                 case "render-ref":
                     formService.getMyForm().runAjaxRenderRef(myField, componentMap, formService.getMyForm(), crudObject,
                             loginController.getRoleMap(), loginController.getLoggedUserDetail(), filterService.getTableFilterCurrent());
+                    break;
                 default:
                     break;
             }
