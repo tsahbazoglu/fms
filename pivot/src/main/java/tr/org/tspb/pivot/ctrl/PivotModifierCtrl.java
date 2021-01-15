@@ -335,7 +335,7 @@ public class PivotModifierCtrl extends PivotImpl {
                 }
             });
 
-            esignDoor.initAndShowEsignDlg(list, formService.getMyForm(), "eimzaDialogND", null);
+            featureService.getEsignDoor().initAndShowEsignDlg(list, formService.getMyForm(), "eimzaDialogND", null);
 
         }
 
