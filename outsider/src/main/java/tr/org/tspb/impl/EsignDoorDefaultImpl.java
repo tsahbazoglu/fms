@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import java.util.TreeMap;
+import javax.enterprise.inject.Alternative;
 import tr.org.tspb.dao.MyForm;
 import tr.org.tspb.outsider.EsignDoor;
 
@@ -11,6 +12,7 @@ import tr.org.tspb.outsider.EsignDoor;
  *
  * @author Telman Şahbazoğlu
  */
+@Alternative
 public class EsignDoorDefaultImpl implements EsignDoor {
 
     @Override
