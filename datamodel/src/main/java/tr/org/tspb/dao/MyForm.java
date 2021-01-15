@@ -533,9 +533,11 @@ public class MyForm implements MyFormXs {
                         myField1.setRendered(true);
                         myField1.createSelectItems(filter, crudObject, roleMap, userDetail, true);
                     } else {
-                        crudObject.remove(key);
-                        crudObject.addUnSetKey(key);
                         myField1.setRendered(false);
+                        if (myField1.isAjaxRemoveNonRenderdFieldOnRecord()) {
+                            crudObject.remove(key);
+                            crudObject.addUnSetKey(key);
+                        }
                     }
                 }
             }
@@ -568,9 +570,11 @@ public class MyForm implements MyFormXs {
                     myField1.setRendered(true);
                     myField1.createSelectItems(filter, crudObject, roleMap, userDetail, true);
                 } else {
-                    crudObject.remove(fieldKey);
-                    crudObject.addUnSetKey(fieldKey);
                     myField1.setRendered(false);
+                    if (myField1.isAjaxRemoveNonRenderdFieldOnRecord()) {
+                        crudObject.remove(fieldKey);
+                        crudObject.addUnSetKey(fieldKey);
+                    }
                 }
             }
 
