@@ -125,6 +125,7 @@ public class ProjectConstants {
     public static final String CUSTOM_RESOURCE_PDFTOOL = "PDFTOOL";
     public static final String CONTROL_COLLECTION = "controlCollection";
     public static final String COLUMN_LIST = "columList";
+    public static final String CRUD_OBJECT_ID = "crud_object_id";
     //D
     public static final String DESCRIPTION = "description";
     public static final String POPUP_DESCRIPTION = "popupDesc";
@@ -267,6 +268,8 @@ public class ProjectConstants {
     public static final String MEMBER = "member";
     public static final String MEMBER_ID = "memberID";
     public static final String METADATA = "metadata";
+    public static final String METADATA_CRUD_OBJECT_ID = METADATA.concat(DOT).concat(CRUD_OBJECT_ID);
+
     public static final String MENU_ORDER = "menuOrder";
     public static final String MEASURE = "MEASURE";
     public static final String MEMBER_TYPE = "memberType";
