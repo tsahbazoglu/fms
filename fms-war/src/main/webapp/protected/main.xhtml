@@ -608,6 +608,14 @@
                                         >
                                     </p:commandButton>
                                 </f:facet>
+
+                                <f:facet name="right">
+                                    <p:button 
+                                        value="Eimza Kurulumu"
+                                        onclick="PF('wv-esign-install-info').show();return;"
+                                        >
+                                    </p:button>
+                                </f:facet>
                             </p:toolbar>
 
                             <h:panelGroup>
@@ -665,44 +673,83 @@
                                 update=":idMessageDialog"
                                 />
                         </h:form>
+                    </p:dialog>
 
-                        <br/>
-                        <h:outputText value="Kurulum" style="font-size: 22px;font-weight: bolder;color: #b3b3b3;"/>
-                        <br/>
-                        <p:panel>
+
+                    <p:dialog 
+                        id="id-esign-install-info"
+                        widgetVar="wv-esign-install-info"
+                        showHeader="true"
+                        header="Eimza Kurulumu"
+                        closeOnEscape="true"
+                        position="center"
+                        width="50%"
+                        height="500"
+                        resizable="false"
+                        >
+                        <style>
+                            .ahref{
+                                font-weight: bold;
+                            }
+                            .ahref:link {
+                                text-decoration: none;
+                            }
+                            .ahref:visited {
+                                color:green;
+                            }
+                            .ahref:active {
+                                text-decoration: underline;
+                            } 
+                            .ahref:hover {
+                                color:red;
+                                text-decoration: underline;
+                            }
+                        </style> 
+
+                        <p:panel>       
+                            <b>Mühürdar</b> eimza uygulama kurulumu:
                             <ul>
                                 <li>
-                                    "Mühürdar" eimza uygulama kurulumu yapılmadıysa aşağıdaki adımları uygulayınız:
-                                    <ul>
-                                        <li>
-                                            İmzalama işlemi için aşağıdaki yazılımlara ihtiyacınız olacak.
-                                        </li>
-                                        <li>
-                                            java.com sayfasından bilgisayarınıza java uygulamasını kurunuz.
-                                        </li>
-                                        <li>
-                                            <a href="https://uys.tspb.org.tr/1d/Muhurdar.zip">Muhurdar.zip</a> dosyasını indirdikten sonra C:\ sürücünüze unzip ediniz (çıkartınız).
-                                        </li>
-                                        <li>
-                                            Kurulum işlemleri için Muhurdar klasörü içindeki README.txt dosyasında belirtilen adımları uygulayınız.
-                                        </li>
-                                        <li>
-                                            Unzip (çıkarma) işlemi mutlaka C:\ sürücüsü altında yapılmalı
-                                        </li>
-                                        <li>
-                                            İletişim için : Aslı İmamoğlu - aimamoglu@tspb.org.tr
-                                        </li>
-                                    </ul>
+                                    <a href="http://java.com" 
+                                       target="_blank"
+                                       class="ahref"
+                                       >
+                                        http://java.com
+                                    </a> 
+                                    sayfası üzeriden bilgisayarınıza <b>Java</b> uygulamasını kurunuz
                                 </li>
                                 <li>
-                                    'İmzala' düğmesine basıldığında imzalanmak üzere '*.muhurdar' uzantılı bir dosya bilgisayarınıza indirilecek
+                                    Eski Java sürümlerine <a href="https://www.oracle.com/java/technologies/javase/javase8u211-later-archive-downloads.html" 
+                                       target="_blank"
+                                       class="ahref"
+                                       >Java SE 8 Archive Downloads (JDK 8u211 and later)</a> bağlantısı üzerinden erişebilrsiniz
                                 </li>
                                 <li>
-                                    İndirilen dosya 'C:\' sürücüsü altında 'Muhurdar' klasörü içine konumlandırılmış olan 'muhurdar.bat' programı ile açılmalıdır.
+                                    <a 
+                                        href="https://uys.tspb.org.tr/1d/Muhurdar.zip" 
+                                        class="ahref"
+                                        >
+                                        https://uys.tspb.org.tr/1d/Muhurdar.zip
+                                    </a> 
+                                    bağlantısı üzerinden indirilen <b>Muhurdar.zip</b> dosyasını <b>C:\</b> sürücünüze çıkartınız
                                 </li>
-
                                 <li>
-                                    Bu aşamadan sonra Akkılı Kartınızı kullanarak dosyayı imzalayıp tarafımıza gönderebilirsiniz.
+                                    Kurulum işlemleri için <b>C:\Muhurdar</b> klasörü içindeki <b>README.txt</b> dosyasında belirtilen adımları uygulayınız.
+                                </li>                                
+                            </ul>
+                            İmzalama İşlemi
+                            <ul>
+                                <li>
+                                    Eimza Kartınızın takılı olduğundan emin olunuz
+                                </li>
+                                <li>
+                                    <b>İmzala</b> düğmesine basıldığında imzalanmak üzere <b>*.muhurdar</b> uzantılı bir dosya bilgisayarınıza indirilecek
+                                </li>
+                                <li>
+                                    İndirilen dosya üzerine tıklayınız
+                                </li>
+                                <li>
+                                    Bu aşamadan sonra Akıllı Kartınızı kullanarak dosyayı imzalayıp tarafımıza gönderebilirsiniz
                                 </li>
                             </ul> 
                         </p:panel>

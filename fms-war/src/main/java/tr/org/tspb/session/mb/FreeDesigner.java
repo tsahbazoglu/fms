@@ -412,11 +412,11 @@ public class FreeDesigner implements Serializable {
         Map dbo = repositoryService.one(selectedForm.getDb(), selectedForm.getTable(), searchForUpdate);
 
         Map searchMap = new HashMap();
-        searchMap.put("metadata.crud_object_id", null);
+        searchMap.put(METADATA_CRUD_OBJECT_ID, null);
         searchMap.put("metadata.username", memberUserName);
 
         Map updateMap = new HashMap();
-        updateMap.put("metadata.crud_object_id", dbo.get(MONGO_ID));
+        updateMap.put(METADATA_CRUD_OBJECT_ID, dbo.get(MONGO_ID));
         updateMap.put(JOIN_ID, joinId);
 
         repositoryService
