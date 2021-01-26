@@ -94,13 +94,33 @@
             </p:layoutUnit>
 
             <p:layoutUnit id="idPFLayoutUnitCenter" position="center">
-                <p:panel id="idCenterTop">
-                    <h:panelGroup>
+                <p:panel 
+                    id="idCenterTop"
+                    > 
+                    <h:panelGroup 
+                        rendered="#{mainFrame.centerPage eq 'welcome'}"
+                        >
+                        <h:outputText escape="false" value="#{loginController.welcomeContent}"/>
+                    </h:panelGroup>
+                    <h:panelGroup 
+                        rendered="#{mainFrame.centerPage eq 'about'}"
+                        >
+                        <h:outputText value="#{mainFrame.aboutContent}" escape="false"/>
+                    </h:panelGroup>
+                    <h:panelGroup
+                        rendered="#{mainFrame.centerPage eq 'template'}"
+                        >
                         <ui:insert name="actionPanel">ActionPanel</ui:insert>
                     </h:panelGroup>
                 </p:panel>
-                <h:panelGroup id="idCenterCenter">
-                    <p:tabView id="id-tab-view">
+                <br/>
+                <h:panelGroup 
+                    id="idCenterCenter"
+                    >  
+                    <p:tabView 
+                        id="id-tab-view"
+                        rendered="#{mainFrame.centerPage eq 'template'}"
+                        >
                         <p:tab 
                             id="id-tab-data-input"
                             title="Veri Girişi"                            
