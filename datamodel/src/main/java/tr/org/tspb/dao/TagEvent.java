@@ -50,7 +50,7 @@ public class TagEvent {
                     tagEvent.type = TagEventType.showWarnErrPopup;
                     break;
                 default:
-                    throw new RuntimeException(type.concat(" is not supported"));
+                    throw new RuntimeException(type.concat(" is not supported event type"));
             }
         } else {
             tagEvent.type = TagEventType.nothing;
