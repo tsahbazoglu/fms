@@ -201,7 +201,7 @@ public class TwoDimModifyCtrl extends FmsTable implements ActionListener {
 
             String xmlFileName = baseService.getProperties().getTmpDownloadPath().concat(fileName).concat(".xml");
 
-            try (FileWriter fw = new FileWriter(xmlFileName)) {
+            try ( FileWriter fw = new FileWriter(xmlFileName)) {
                 fw.write(stringWriter.toString());
             }
 
@@ -511,7 +511,8 @@ public class TwoDimModifyCtrl extends FmsTable implements ActionListener {
 
     public String getSelectedFormFuncNote() {
         if (formService.getMyForm().getName() != null && formService.getMyForm().getFuncNote() != null) {
-            Document commandResult = mongoDbUtil.findOne(formService.getMyForm().getDb(), formService.getMyForm().getFuncNote(), filterService.getTableFilterCurrent());
+            Document commandResult = mongoDbUtil
+                    .findOne(formService.getMyForm().getDb(), formService.getMyForm().getFuncNote(), filterService.getTableFilterCurrent());
             return commandResult.getString(RETVAL);
         } else {
             return null;

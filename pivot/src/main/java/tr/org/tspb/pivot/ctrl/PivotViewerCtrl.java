@@ -32,7 +32,7 @@ public class PivotViewerCtrl extends PivotImpl {
     private MapConverter myMapConverter;
     private String calculateFormulaId;
     private PivotDataModel pivotDataModel;
-    protected Map<CellMultiDimensionKey, List<CustomOlapHashMap>> pivotData;
+    private Map<CellMultiDimensionKey, List<CustomOlapHashMap>> pivotData;
 
     public String getCalculateFormulaId() {
         return calculateFormulaId;
@@ -122,6 +122,10 @@ public class PivotViewerCtrl extends PivotImpl {
     @Override
     public Document getFilter() {
         return filterService.getPivotFilterHistory();
+    }
+
+    public Map<CellMultiDimensionKey, List<CustomOlapHashMap>> getPivotData() {
+        return pivotData;
     }
 
 }

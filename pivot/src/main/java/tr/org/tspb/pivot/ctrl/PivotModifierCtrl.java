@@ -24,7 +24,6 @@ import org.bson.types.ObjectId;
 import tr.org.tspb.util.stereotype.MyController;
 import org.bson.Document;
 import org.bson.conversions.Bson;
-import org.bson.types.Code;
 import tr.org.tspb.common.pojo.CellMultiDimensionKey;
 import tr.org.tspb.common.services.LoginController;
 import static tr.org.tspb.constants.ProjectConstants.DIEZ;
@@ -39,7 +38,6 @@ import static tr.org.tspb.constants.ProjectConstants.ON_USER_ROLE;
 import static tr.org.tspb.constants.ProjectConstants.OPERATOR_LDAP_UID;
 import static tr.org.tspb.constants.ProjectConstants.RESULT;
 import static tr.org.tspb.constants.ProjectConstants.RETVAL;
-import static tr.org.tspb.constants.ProjectConstants.TYPE;
 import static tr.org.tspb.constants.ProjectConstants.UPSERT_DATE;
 import static tr.org.tspb.constants.ProjectConstants.VALUE;
 import tr.org.tspb.converter.base.MoneyConverter;
@@ -54,7 +52,7 @@ import tr.org.tspb.exceptions.MongoOrmFailedException;
 import tr.org.tspb.exceptions.MoreThenOneInListException;
 import tr.org.tspb.exceptions.UserException;
 import tr.org.tspb.pojo.MyConstraintFormula;
-import tr.org.tspb.pojo.PostSaveResult;
+import tr.org.tspb.service.DownloadService;
 
 /**
  *
@@ -81,6 +79,9 @@ public class PivotModifierCtrl extends PivotImpl {
 
     @Inject
     private RepositoryService repositoryService;
+
+    @Inject
+    private DownloadService downloadService;
 
     private String saveObject() throws Exception {
 
@@ -461,8 +462,8 @@ public class PivotModifierCtrl extends PivotImpl {
     }
 
     public String downloadCsvFile() {
-//        downloadService.downloadCsvFilePivot(getIksDimension(), getIgrekDimension(),
-//                mapMultiDimension, pivotViewerController.mapMultiDimension);
+        downloadService
+                .downloadCsvFilePivot(getIksDimension(), getIgrekDimension(), pivotData, pivotViewerController.getPivotData());
         return null;
     }
 
