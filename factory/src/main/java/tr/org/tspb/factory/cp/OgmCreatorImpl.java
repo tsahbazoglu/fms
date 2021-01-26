@@ -157,12 +157,15 @@ public class OgmCreatorImpl implements OgmCreatorIntr {
 
         String stringValue = defaultValue.get("string-value", String.class);
         String funcValue = defaultValue.get("func-value", String.class);
+        List<String> listValue = defaultValue.getList("list-value", String.class);
 
         if (stringValue != null) {
             if ("SET_SESSIONID".equals(defaultValue)) {
                 return ((HttpSession) FacesContext.getCurrentInstance().getExternalContext().getSession(false)).getId();
             }
             return stringValue;
+        } else if (listValue != null) {
+            return listValue;
         } else if (funcValue != null) {
 
             if (roleMap.isUserInRole(myProject.getAdminAndViewerRole())) {
