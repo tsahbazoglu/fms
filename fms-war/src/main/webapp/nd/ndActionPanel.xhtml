@@ -11,67 +11,30 @@
 
     <h:form id="ndActionPanelForm">
         <h:panelGrid 
-            columns="3"
-            columnClasses="VTopHLeftW50pNowrap,VTopHLeftW50pNowrap"
+            columns="2"
+            columnClasses="VTopHLeftW70p,VTopHRightW30p"
             width="100%"
             >
-            <h:panelGrid width="100%">
-                <p:toolbar rendered="#{not esignViewCtrl.preventedMultiTab}">
-                    <f:facet name="left">
-                        <p:button  
-                            icon="ui-icon-home" 
-                            disabled="true">
-                        </p:button>
-                        <p:commandButton 
-                            value="Bu sayfa ile ilgili açıklamalar için tıklayınız" 
-                            action="#{pivotModifierCtrl.showAllNote}" 
-                            style="color: red;font-weight: bold;white-space: nowrap;"
-                            rendered="#{pivotModifierCtrl.selectedFormUserNote}"
-                            update=":idMessageDialog"
-                            />
-                        <p:commandButton 
-                            value="Excele Aktar" 
-                            rendered="#{formSevice.myform.myActions.download}"
-                            action="#{pivotModifierCtrl.downloadCsvFile}" 
-                            style="white-space: nowrap;"
-                            />
-                        <p:commandButton 
-                            value="Kaydet"
-                            rendered="#{formService.myForm.myActions.save}"
-                            style="width: 150px;"
-                            action="#{pivotModifierCtrl.provideCrossCheck}"
-                            update="#{updateAjaxMB.btnNdSave}"
-                            />
-                        <p:commandButton 
-                            value="E-İmza Süreci" 
-                            action="#{pivotModifierCtrl.showEimza22}" 
-                            rendered="#{formService.myForm.myActions.eimza2D}"
-                            update=":idMessageDialog,:id_nd_esign_dialog"
-                            />  
-                        <h:inputHidden
-                            id="hiddenTextJsonDataToModel" 
-                            value="#{pivotModifierCtrl.pivotDataModelEdit.jsonDataToModel}"
-                            />
-                    </f:facet>
-                </p:toolbar>
-                <p:panel style="text-align: center;">
-                    <h:outputLabel value="#{formService.myForm.name}" style="font-size: 28px;font-weight: bolder;color: #b3b3b3;"/>
-                </p:panel>
-            </h:panelGrid>
-
-            <p:dataList 
-                value="#{pivotModifierCtrl.selectedFormMessages}" 
-                var="mymessage"  
-                type="ordered"
-                itemStyleClass="itemStyleClass"
-                itemType="none"
-                emptyMessage="#{fmsLabels.messages.getString('no_description')}"
+            <h:outputLabel 
+                value="#{formService.myForm.name}" 
+                style="width:100%;font-size: 16px;font-weight: bolder;color: #b3b3b3;"
                 >
-                <f:facet name="header">
-                    açıklamalar
-                </f:facet>
-                <h:outputText value="#{mymessage}" escape="false"/>
-            </p:dataList>
+            </h:outputLabel>
+            <p:scrollPanel style="width:500px;height:90px;">
+                <p:dataList 
+                    value="#{pivotModifierCtrl.selectedFormMessages}" 
+                    var="mymessage"  
+                    type="ordered"
+                    itemStyleClass="itemStyleClass"
+                    itemType="none"
+                    emptyMessage="#{fmsLabels.messages.getString('no_description')}"
+                    >
+                    <f:facet name="header">
+                        #{fmsLabels.messages.getString('descriptions')}
+                    </f:facet>
+                    <h:outputText value="#{mymessage}" escape="false"/>
+                </p:dataList>
+            </p:scrollPanel>
         </h:panelGrid>
     </h:form> 
 </html>

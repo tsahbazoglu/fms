@@ -2,7 +2,8 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml"
       xmlns:h="http://java.sun.com/jsf/html"
-      xmlns:p="http://primefaces.org/ui"          
+      xmlns:p="http://primefaces.org/ui"       
+      xmlns:f="http://java.sun.com/jsf/core"
       >
 
     <h:head>
@@ -28,6 +29,9 @@
                 itemType="none"
                 emptyMessage="#{fmsLabels.messages.getString('no_description')}"
                 >
+                <f:facet name="header">
+                    #{fmsLabels.messages.getString('descriptions')}
+                </f:facet>
                 <h:outputText value="#{mymessage}" escape="false"/>
             </p:dataList>
         </p:scrollPanel>

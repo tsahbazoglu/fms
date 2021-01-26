@@ -26,6 +26,13 @@
                     />
             </ui:define>
             <ui:define name="historyObjectsList">
+                <h:panelGroup
+                    rendered="#{mainFrame.position eq 2}"
+                    >
+                    <br/>
+                    <br/>
+                    <br/>
+                </h:panelGroup>
                 <ui:include 
                     src="#{mainFrame.currEnumPage.pageHistoryObjectListPath}"
                     rendered="#{mainFrame.renderedDesktop}"
@@ -720,9 +727,9 @@
                                 </li>
                                 <li>
                                     Eski Java sürümlerine <a href="https://www.oracle.com/java/technologies/javase/javase8u211-later-archive-downloads.html" 
-                                       target="_blank"
-                                       class="ahref"
-                                       >Java SE 8 Archive Downloads (JDK 8u211 and later)</a> bağlantısı üzerinden erişebilrsiniz
+                                                             target="_blank"
+                                                             class="ahref"
+                                                             >Java SE 8 Archive Downloads (JDK 8u211 and later)</a> bağlantısı üzerinden erişebilrsiniz
                                 </li>
                                 <li>
                                     <a 
