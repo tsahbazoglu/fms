@@ -12,6 +12,8 @@
     </h:head>
 
     <mydinamic:myaccordion 
+        id="id-fms-accordion"
+        fmsupdate="#{updateAjaxMB.menuSelectForm} iceformLeft"
         rows="#{mainFrame.accordionItems}" 
         selectedFormInfo="#{mainFrame.selectedFormInfo}"
         myAction="#{mainFrame.selectForm}"
