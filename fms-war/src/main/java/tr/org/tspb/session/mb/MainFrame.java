@@ -73,6 +73,16 @@ import tr.org.tspb.service.FeatureService;
 @MyController
 public class MainFrame implements Serializable {
 
+    public CenterPage getCenterPage() {
+        return centerPage;
+    }
+
+    enum CenterPage {
+        welcome,
+        about,
+        template
+    }
+
     private static final String PATH = "path";
 
     private static final String INDEX = "index";
@@ -105,6 +115,7 @@ public class MainFrame implements Serializable {
     protected Map mapPattern = null;
     private MenuModel menuModel;
     private String aboutContent;
+    private CenterPage centerPage = CenterPage.welcome;
 
     @Inject
     private RepositoryService repositoryService;
@@ -613,11 +624,14 @@ public class MainFrame implements Serializable {
         String[] selectedFormInfos = selectedFormInfo.split("[,]");
 
         if ("about".equals(selectedFormInfos[0])) {
+            centerPage = CenterPage.about;
             String projectKey = selectedFormInfos[1];
             String moduleKey = selectedFormInfos[2];
             figureOutProject(projectKey, moduleKey);
             return;
         }
+
+        centerPage = CenterPage.template;
 
         String formKey = selectedFormInfos[0];
         String projectKey = selectedFormInfos[1];
