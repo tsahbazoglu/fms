@@ -525,7 +525,11 @@ public class DownloadService extends CommonSrv {
 
         Reader reader = new StringReader(sw.toString());
 
-        String excelFormat = getExcelFormatPath(formService.getMyForm().getKey(), template == null ? "" : template.get(VALUE).toString());
+        String excelFormat = null;
+
+        if (formService.getMyForm().getExcelFormat() != null) {
+            excelFormat = formService.getMyForm().getExcelFormat().getString("template");
+        }
 
         HttpSession httpSession = (HttpSession) FacesContext.getCurrentInstance()
                 .getExternalContext().getSession(false);
@@ -551,19 +555,6 @@ public class DownloadService extends CommonSrv {
         }
 
         return null;
-    }
-
-    private Map<String, String> excelformat;
-
-    public String getExcelFormatPath(String selectedFormKey, String templateValue) {
-        if (excelformat == null) {
-            excelformat = new HashMap();
-            excelformat.put("UFRS-201306__balanceAbstract", "/home/telman/ufrs_201306_balance_abstract_sablon.xls");
-            excelformat.put("UFRS-201306__balanceDetail", "/home/telman/ufrs_201306_balance_detail_sablon.xls");
-            excelformat.put("UFRS-201306__incomeAbstract", "/home/telman/ufrs_201306_income_abstract_sablon.xls");
-            excelformat.put("UFRS-201306__incomeDetail", "/home/telman/ufrs_201306_income_detail_sablon.xls");
-        }
-        return excelformat.get(templateValue.concat("__").concat(selectedFormKey));
     }
 
 }
