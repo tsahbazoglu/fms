@@ -94,6 +94,17 @@ public class DownloadService extends CommonSrv {
     private final Map<ObjectId, String> tempCache = new HashMap<>();
     private final Map<String, String> tempCacheBsonconverter = new HashMap<>();
 
+    public DownloadService() {
+    }
+
+    public DownloadService(List<MyField> columns, MyForm myForm, Map searchMap) {
+        this.objectsColumnDataModel = columns;
+        this.selectedForm = myForm;
+        this.searchedMap = searchMap;
+        //
+        init();
+    }
+
     private String getTempCacheBsonconverter(String keyValue, MyField myField) {
         String mapKey = myField.getKey() + ":" + keyValue;
         String value = tempCacheBsonconverter.get(mapKey);
@@ -106,17 +117,6 @@ public class DownloadService extends CommonSrv {
             tempCacheBsonconverter.put(mapKey, value);
         }
         return value;
-    }
-
-    private DownloadService() {
-    }
-
-    public DownloadService(List<MyField> columns, MyForm myForm, Map searchMap) {
-        this.objectsColumnDataModel = columns;
-        this.selectedForm = myForm;
-        this.searchedMap = searchMap;
-        //
-        init();
     }
 
     private void init() {
@@ -166,7 +166,7 @@ public class DownloadService extends CommonSrv {
         cursor = mongoDbUtil.find(formService.getMyForm().getDb(), formService.getMyForm().getTable(),
                 filterService.getTableFilterCurrent(), sort, limit);
 
-        try (XSSFWorkbook xssfWorkbook = new XSSFWorkbook()) {
+        try ( XSSFWorkbook xssfWorkbook = new XSSFWorkbook()) {
 
             XSSFSheet sheet = xssfWorkbook.createSheet();
 
@@ -261,8 +261,7 @@ public class DownloadService extends CommonSrv {
             ec.setResponseContentType("application/vnd.ms-excel"); // Check http://www.iana.org/assignments/media-types for all types. Use if necessary ExternalContext#getMimeType() for auto-detection based on filename.
             // ec.setResponseContentLength(contentLength); // Set it with the file size. This header is optional. It will work if it's omitted, but the download progress will be unknown.
             ec.setResponseHeader("Content-Disposition", "attachment; filename=\"" + formService.getMyForm().getName().concat(EXTENSION_XLSX) + "\""); // The Save As popup magic is done here. You can give it any file name you want, this only won't work in MSIE, it will use current request URL as file name instead.
-            try (OutputStream responceOutput = ec.getResponseOutputStream();
-                    FileInputStream fileInputStream = new FileInputStream(baseService.getProperties().getTmpDownloadPath().concat(fileName).concat(EXTENSION_XLSX));) {
+            try ( OutputStream responceOutput = ec.getResponseOutputStream();  FileInputStream fileInputStream = new FileInputStream(baseService.getProperties().getTmpDownloadPath().concat(fileName).concat(EXTENSION_XLSX));) {
                 IOUtils.copy(fileInputStream, responceOutput);
             } catch (IOException ex) {
                 logger.error("error occured", ex);
@@ -388,8 +387,8 @@ public class DownloadService extends CommonSrv {
 
     public String downloadCsvFilePivot(List<MyField> iksDimension, List<MyField> igrekDimension,
             Map<CellMultiDimensionKey, List<CustomOlapHashMap>> mapMultiDimension,
-            Map<CellMultiDimensionKey, List<CustomOlapHashMap>> mapMultiDimensionHistory
-    ) {
+            Map<CellMultiDimensionKey, List<CustomOlapHashMap>> mapMultiDimensionHistory) {
+
         StringWriter sw = new StringWriter();
 
         Document period = mongoDbUtil.findOne(formService.getMyForm().getDb(),
@@ -526,7 +525,11 @@ public class DownloadService extends CommonSrv {
 
         Reader reader = new StringReader(sw.toString());
 
-        String excelFormat = getExcelFormatPath(formService.getMyForm().getKey(), template == null ? "" : template.get(VALUE).toString());
+        String excelFormat = null;
+
+        if (formService.getMyForm().getExcelFormat() != null) {
+            excelFormat = formService.getMyForm().getExcelFormat().getString("template");
+        }
 
         HttpSession httpSession = (HttpSession) FacesContext.getCurrentInstance()
                 .getExternalContext().getSession(false);
@@ -552,19 +555,6 @@ public class DownloadService extends CommonSrv {
         }
 
         return null;
-    }
-
-    private Map<String, String> excelformat;
-
-    public String getExcelFormatPath(String selectedFormKey, String templateValue) {
-        if (excelformat == null) {
-            excelformat = new HashMap();
-            excelformat.put("UFRS-201306__balanceAbstract", "/home/telman/ufrs_201306_balance_abstract_sablon.xls");
-            excelformat.put("UFRS-201306__balanceDetail", "/home/telman/ufrs_201306_balance_detail_sablon.xls");
-            excelformat.put("UFRS-201306__incomeAbstract", "/home/telman/ufrs_201306_income_abstract_sablon.xls");
-            excelformat.put("UFRS-201306__incomeDetail", "/home/telman/ufrs_201306_income_detail_sablon.xls");
-        }
-        return excelformat.get(templateValue.concat("__").concat(selectedFormKey));
     }
 
 }

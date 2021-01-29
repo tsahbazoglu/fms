@@ -10,17 +10,10 @@
 
     <h:head>
         <title></title>
-        <style>
-            /*           
-            ul.ui-menu-child {
-              white-space: nowrap;
-              width: auto !important;
-            }
-            */
-        </style>
     </h:head>
 
     <composite:interface>
+        <composite:attribute name="fmsupdate" required="true"/>
         <composite:attribute name="rows" required="true"/>
         <composite:attribute name="selectedFormInfo"/>
         <composite:attribute name="myAction" method-signature="java.lang.String myAction()" />
@@ -29,6 +22,13 @@
     </composite:interface>
 
     <composite:implementation>
+        <style>
+            .fms-highlight{
+                background-color: rgb(23, 209, 230);
+                font-size: 16px!important;
+                font-weight: bold!important;
+            }
+        </style>
         <p:menu 
             toggleable="true" 
             style="width: 100%;" 
@@ -43,7 +43,7 @@
                     <p:menuitem
                         value="Hakkında ..." 
                         action="#{cc.attrs.myAction}" 
-                        update="#{updateAjaxMB.menuSelectForm}"
+                        update="#{cc.attrs.fmsupdate}"
                         icon="ui-icon-home"
                         styleClass="medium-font-size"
                         >
@@ -56,9 +56,9 @@
                         <p:menuitem 
                             value="#{item.label}"
                             action="#{cc.attrs.myAction}"
-                            update="#{updateAjaxMB.menuSelectForm}"
+                            update="#{cc.attrs.fmsupdate}"
                             icon="ui-icon-document"
-                            styleClass="medium-font-size"
+                            styleClass="#{item.value eq cc.attrs.selectedFormInfo?'fms-highlight':''} medium-font-size"
                             >
                             <f:setPropertyActionListener 
                                 target="#{cc.attrs.selectedFormInfo}" 

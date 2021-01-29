@@ -821,8 +821,6 @@ public class CtrlService extends CommonSrv {
         return all;
     }
 
-
-  
     private class CheckConstraintTask implements Callable {
 
         private final MyConstraintFormula myConstraintFormula;
@@ -960,10 +958,6 @@ public class CtrlService extends CommonSrv {
 
         Map cellControl = new HashMap();
 
-        if (true) {
-            return cellControl;
-        }
-
         if (formService.getMyForm().getControlCollection() != null) {
             List<Document> cursor;
 
@@ -980,7 +974,7 @@ public class CtrlService extends CommonSrv {
             cursor = mongoDbUtil.find(formService.getMyForm().getDb(), formService.getMyForm().getControlCollection(), controlSearch);
 
             for (Document dBObject : cursor) {
-                Document resultType = (Document) dBObject.get(RESULT_TYPE);
+                String resultType = dBObject.get(RESULT_TYPE, String.class);
                 Document variables = (Document) dBObject.get(VARIABLES);
                 for (String key : variables.keySet()) {
                     Document cell = (Document) variables.get(key);
@@ -989,7 +983,7 @@ public class CtrlService extends CommonSrv {
                     map.put(X_CODE, cell.get(X_CODE));
                     map.put(Y_CODE, cell.get(Y_CODE));
                     Map control = new HashMap();
-                    control.put(COLOR, "000".equals(resultType.get(CODE)) ? "red" : "yellow");
+                    control.put(COLOR, "000".equals(resultType) ? "red" : "yellow");
                     control.put(MONGO_ID, dBObject.get(MONGO_ID));
                     control.put(DESCRIPTION, dBObject.get(DESCRIPTION));
                     cellControl.put(map, control);
@@ -1005,7 +999,7 @@ public class CtrlService extends CommonSrv {
             cursor = mongoDbUtil.find(formService.getMyForm().getDb(), formService.getMyForm().getControlCollection(), controlSearch);
 
             for (Document dBObject : cursor) {
-                Document resultType = (Document) dBObject.get(RESULT_TYPE);
+                String resultType = dBObject.get(RESULT_TYPE, String.class);
                 Document variables = (Document) dBObject.get(VARIABLES);
                 for (String key : variables.keySet()) {
                     //check the state when value is retrieved
@@ -1017,7 +1011,7 @@ public class CtrlService extends CommonSrv {
                         map.put(X_CODE, cell.get(X_CODE));
                         map.put(Y_CODE, cell.get(Y_CODE));
                         Map control = new HashMap();
-                        control.put(COLOR, "000".equals(resultType.get(CODE)) ? "red" : "yellow");
+                        control.put(COLOR, "000".equals(resultType) ? "red" : "yellow");
                         control.put(MONGO_ID, dBObject.get(MONGO_ID));
                         control.put(DESCRIPTION, dBObject.get(DESCRIPTION));
                         cellControl.put(map, control);

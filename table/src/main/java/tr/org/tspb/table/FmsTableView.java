@@ -9,13 +9,12 @@ import javax.inject.Inject;
 import org.bson.Document;
 import static tr.org.tspb.constants.ProjectConstants.*;
 import tr.org.tspb.converter.base.SelectOneStringConverter;
-import tr.org.tspb.dao.MyActions;
 import tr.org.tspb.dao.MyField;
 import tr.org.tspb.dao.MyFieldReportComparator;
 import tr.org.tspb.dao.MyForm;
 import tr.org.tspb.factory.qualifier.OgmCreatorQualifier;
-import tr.org.tspb.outsider.EsignDoor;
 import tr.org.tspb.factory.cp.OgmCreatorIntr;
+import tr.org.tspb.service.FeatureService;
 
 /**
  *
@@ -24,7 +23,7 @@ import tr.org.tspb.factory.cp.OgmCreatorIntr;
 public abstract class FmsTableView extends AbstractViewer {
 
     @Inject
-    private EsignDoor esignDoor;
+    private FeatureService featureService;
 
     @Inject
     @OgmCreatorQualifier
@@ -86,7 +85,7 @@ public abstract class FmsTableView extends AbstractViewer {
 
         setData(new FmsTableDataModel(this));
 
-        esignDoor.initEsignCtrlV2(formService.getMyForm(), null, MULTIPLE);
+        featureService.getEsignDoor().initEsignCtrlV2(formService.getMyForm(), null, MULTIPLE);
 
     }
 

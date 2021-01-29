@@ -533,9 +533,11 @@ public class MyForm implements MyFormXs {
                         myField1.setRendered(true);
                         myField1.createSelectItems(filter, crudObject, roleMap, userDetail, true);
                     } else {
-                        crudObject.remove(key);
-                        crudObject.addUnSetKey(key);
                         myField1.setRendered(false);
+                        if (myField1.isAjaxRemoveNonRenderdFieldOnRecord()) {
+                            crudObject.remove(key);
+                            crudObject.addUnSetKey(key);
+                        }
                     }
                 }
             }
@@ -568,9 +570,11 @@ public class MyForm implements MyFormXs {
                     myField1.setRendered(true);
                     myField1.createSelectItems(filter, crudObject, roleMap, userDetail, true);
                 } else {
-                    crudObject.remove(fieldKey);
-                    crudObject.addUnSetKey(fieldKey);
                     myField1.setRendered(false);
+                    if (myField1.isAjaxRemoveNonRenderdFieldOnRecord()) {
+                        crudObject.remove(fieldKey);
+                        crudObject.addUnSetKey(fieldKey);
+                    }
                 }
             }
 
@@ -840,17 +844,41 @@ public class MyForm implements MyFormXs {
         }
 
         public Builder maskUserNote() {
-            Object userNoteObject = dbObjectForm.get(USER_NOTE);
-            if (userNoteObject instanceof String) {
-                this.myForm.userNote = (String) userNoteObject;
-            } else if (userNoteObject instanceof Code) {
-                Code code = (Code) userNoteObject;
-                code = new Code(code.getCode().replace(DIEZ, DOLAR));
-                Document commandResult = this.myForm.fmsScriptRunner
-                        .runCommand("configdb", code.getCode(), searchObject, this.myForm.roleMap.keySet());
-                this.myForm.userNote = (String) commandResult.get(RETVAL);
+
+            Object obj = dbObjectForm.get(USER_NOTE);
+
+            String funVal = null;
+            String strVal = null;
+
+            if (obj instanceof Document) {
+                funVal = ((Document) obj).getString("fnctn-val");
+                strVal = ((Document) obj).getString("strng-val");
+            } else if (obj instanceof String) {
+                funVal = obj.toString();
             }
+
+            if (funVal != null) {
+                this.myForm.userNote = executeFunc(funVal);
+            } else if (strVal != null) {
+                this.myForm.userNote = strVal;
+            }
+
+            this.myForm.funcNote = dbObjectForm.getString(FUNC_NOTE);
+
             return this;
+        }
+
+        private String executeFunc(String functionString) {
+
+            if (functionString == null || functionString.isEmpty()) {
+                return null;
+            }
+
+            functionString = functionString.replace(DIEZ, DOLAR);
+            Document commandResult = this.myForm.fmsScriptRunner
+                    .runCommand("test", functionString, searchObject, this.myForm.roleMap.keySet());
+            return commandResult.getString(RETVAL);
+
         }
 
         public Builder maskZetDimension() throws Exception {
@@ -1486,7 +1514,6 @@ public class MyForm implements MyFormXs {
 
             // code properties
             this.myForm.esignEmailToRecipients = dbObjectForm.getString(ESIGN_EMAIL_TO_RECIPIENTS);
-            this.myForm.funcNote = dbObjectForm.getString(FUNC_NOTE);
 
             // number properties
             if (dbObjectForm.get(COLUMN_COUNT) instanceof Number) {

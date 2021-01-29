@@ -485,7 +485,11 @@
                             rendered="true"
                             update="#{updateAjaxMB.btnMergeTbb}"
                             />
-                        <p:dataList value="#{tbbService.warnings}" var="x" id="idWarningList">
+                        <p:dataList 
+                            value="#{tbbService.warnings}" 
+                            var="x" 
+                            id="idWarningList"
+                            >
                             <h:outputText value="#{x}"/>
                         </p:dataList>
                     </p:panel>

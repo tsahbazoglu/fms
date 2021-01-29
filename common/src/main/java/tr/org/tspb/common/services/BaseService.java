@@ -1,5 +1,6 @@
 package tr.org.tspb.common.services;
 
+import htmlflow.StaticHtml;
 import tr.org.tspb.constants.ProjectConstants;
 import static tr.org.tspb.constants.ProjectConstants.FORM_KEY;
 import static tr.org.tspb.constants.ProjectConstants.PATH_PDF_TOOLS;
@@ -13,6 +14,8 @@ import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
 import javax.faces.context.FacesContext;
 import org.bson.Document;
+import org.xmlet.htmlapifaster.EnumContenteditableType;
+import org.xmlet.htmlapifaster.EnumTypeContentType;
 import tr.org.tspb.dao.TagLogin;
 
 /**
@@ -95,6 +98,48 @@ public class BaseService extends AbstractSrv {
         return webContext;
     }
 
+    public String getWelcomePage() {
+        return StaticHtml
+                .view()
+                .html()
+                .head()
+                .style().attrType(EnumTypeContentType.TEXT_CSS)
+                .text(""
+                        //.concat(".div-center {margin: auto;width: 50%;border: 3px solid green;padding: 10px;text-align:center}")
+                        .concat(".div-center {margin: auto;width: 50%;text-align:center;padding-top: 180px;}")
+                        .concat(".p-class{font-size:34px;font-weight:bold;}")
+                )
+                .__() //style
+                .__() //head
+                .body()
+                .div().attrClass("div-center")
+                .img()
+                .addAttr("src", "/images/tspb_logo_large.png")
+                .addAttr("width", "400px")
+                .__() //img
+                .p().attrClass("p-class").text(appProperties.getWelcomePageContent())
+                .__() //p
+                .__() //div
+                .br().__()
+                .br().__()
+                .br().__()
+                .br().__()
+                .br().__()
+                .br().__()
+                .br().__()
+                .br().__()
+                .br().__()
+                .br().__()
+                .br().__()
+                .br().__()
+                .br().__()
+                .br().__()
+                .br().__()
+                .__() //body
+                .__() //html
+                .render();
+    }
+
     public class ReportProperties {
 
         public final String loginFormKey = "member";
@@ -102,6 +147,7 @@ public class BaseService extends AbstractSrv {
 
     public class AppProperties {
 
+        private String welcomePageContent;
         private String pdfTool;
         private String googleRecaptchaSecret;
         private final String mainProjectCode;
@@ -149,6 +195,7 @@ public class BaseService extends AbstractSrv {
             delegatedMemberFieldName = document.getProperty(ProjectConstants.DELEGATED_MEMBER_FIELD_NAME);
             delegatingMemberFieldName = document.getProperty(ProjectConstants.DELEGATING_MEMBER_FIELD_NAME);
             delegatingFormFieldName = document.getProperty(ProjectConstants.DELEGATING_FORM_FIELD_NAME);
+            welcomePageContent = document.getProperty("WELCOME_PAGE");
             //
             delegateDbName = document.getProperty(ProjectConstants.DELEGATE_DB_NAME, "iondb");
             delegateTableName = document.getProperty(ProjectConstants.DELEGATE_TABLE_NAME, "member_eimza_info");
@@ -267,6 +314,10 @@ public class BaseService extends AbstractSrv {
 
         public String getUploadTable() {
             return "ion_uploaded_files";
+        }
+
+        public String getWelcomePageContent() {
+            return welcomePageContent;
         }
     }
 

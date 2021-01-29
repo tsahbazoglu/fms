@@ -91,7 +91,6 @@ public class RepositoryService implements Serializable {
     @Inject
     private BaseService baseService;
 
-    private static final String CRUD_OBJECT_ID = "crud_object_id";
     private final Map<String, MyForm> cacheMyFormLarge = new HashMap<>();
 
     Gson gsonConverter = new Gson();
@@ -284,7 +283,7 @@ public class RepositoryService implements Serializable {
         if (myCommonRecordID != null) {
 
             List<GridFSDBFile> files = mongoDbUtil.findFiles(baseService.getProperties().getUploadTable(), new BasicDBObject()
-                    .append(METADATA.concat(DOT).concat(CRUD_OBJECT_ID), myCommonRecordID));
+                    .append(METADATA_CRUD_OBJECT_ID, myCommonRecordID));
             for (GridFSDBFile gridFSDBFile : files) {
                 Map<String, String> fileInfoPresent = new HashMap<>();
                 fileInfoPresent.put(FILE_ID, gridFSDBFile.getId().toString());
@@ -295,7 +294,7 @@ public class RepositoryService implements Serializable {
         }
 
         List<GridFSDBFile> files = mongoDbUtil.findFiles(baseService.getProperties().getUploadTable(), new BasicDBObject()//
-                .append(METADATA.concat(DOT).concat(CRUD_OBJECT_ID), null)//
+                .append(METADATA_CRUD_OBJECT_ID, null)//
                 .append(METADATA.concat(DOT).concat("username"), loginController.getLoggedUserDetail().getUsername()));
 
         for (GridFSDBFile gridFSDBFile : files) {
@@ -465,7 +464,7 @@ public class RepositoryService implements Serializable {
         
         mongofiles -d=welcomedb delete UNDER_CONSTRUCTION_WELCOME_PAGE
         mongofiles -d=welcomedb put UNDER_CONSTRUCTION_WELCOME_PAGE
-  
+          
         
         mongofiles -d=welcomedb delete welcome-anket-masak-2
         mongofiles -d=welcomedb put welcome-anket-masak-2
@@ -478,7 +477,7 @@ public class RepositoryService implements Serializable {
 
             StringBuilder textBuilder = new StringBuilder();
 
-            try (Reader reader = new BufferedReader(new InputStreamReader(attachmentStream, Charset.forName(StandardCharsets.UTF_8.name())))) {
+            try ( Reader reader = new BufferedReader(new InputStreamReader(attachmentStream, Charset.forName(StandardCharsets.UTF_8.name())))) {
                 int c = 0;
                 while ((c = reader.read()) != -1) {
                     textBuilder.append((char) c);
@@ -781,7 +780,7 @@ public class RepositoryService implements Serializable {
         DBObject metadata = new BasicDBObject();
         // null points to the fact that this record(file) is not related yet.
         // we will use this NULL state during the search over all other forms
-        metadata.put("crud_object_id", null);
+        metadata.put(CRUD_OBJECT_ID, null);
         metadata.put("selectFormKey", selectedForm.getKey());
         metadata.put("selectFormName", selectedForm.getName());
         metadata.put("username", loginController.getLoggedUserDetail().getUsername());

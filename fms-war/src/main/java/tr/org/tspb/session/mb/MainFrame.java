@@ -59,12 +59,12 @@ import tr.org.tspb.pivot.ctrl.PivotViewerCtrl;
 import tr.org.tspb.exceptions.MongoOrmFailedException;
 import tr.org.tspb.exceptions.NullNotExpectedException;
 import tr.org.tspb.helper.MenuModelCreator;
-import tr.org.tspb.outsider.EsignDoor;
 import tr.org.tspb.pivot.simple.ctrl.SimplePivotCtrl;
 import tr.org.tspb.util.stereotype.MyController;
 import tr.org.tspb.service.FilterService;
 import tr.org.tspb.service.FormService;
 import tr.org.tspb.pojo.DatabaseUser;
+import tr.org.tspb.service.FeatureService;
 
 /**
  *
@@ -72,6 +72,16 @@ import tr.org.tspb.pojo.DatabaseUser;
  */
 @MyController
 public class MainFrame implements Serializable {
+
+    public CenterPage getCenterPage() {
+        return centerPage;
+    }
+
+    enum CenterPage {
+        welcome,
+        about,
+        template
+    }
 
     private static final String PATH = "path";
 
@@ -105,6 +115,7 @@ public class MainFrame implements Serializable {
     protected Map mapPattern = null;
     private MenuModel menuModel;
     private String aboutContent;
+    private CenterPage centerPage = CenterPage.welcome;
 
     @Inject
     private RepositoryService repositoryService;
@@ -164,7 +175,7 @@ public class MainFrame implements Serializable {
     private Logger logger;
 
     @Inject
-    private EsignDoor esignDoor;
+    private FeatureService featureService;
 
     @Inject
     AppScopeSrvCtrl appScopeSrvCtrl;
@@ -179,7 +190,7 @@ public class MainFrame implements Serializable {
     @PostConstruct
     public void init() {
 
-        esignDoor.eimzaContextInstance(baseService.getEsignProperties());
+        featureService.getEsignDoor().eimzaContextInstance(baseService.getEsignProperties());
 
         currEnumPage = EnumPage.WELCOME_PAGE;
 
@@ -354,7 +365,7 @@ public class MainFrame implements Serializable {
         List<FormItem> formItems = repositoryService.findModuleForms(moduleItem);
 
         formItems.addAll(repositoryService.findModuleFormsSchemaVersion110(moduleItem));
-        
+
         Collections.sort(formItems, new Comparator<FormItem>() {
             Collator myCollator = Collator.getInstance();
 
@@ -613,11 +624,14 @@ public class MainFrame implements Serializable {
         String[] selectedFormInfos = selectedFormInfo.split("[,]");
 
         if ("about".equals(selectedFormInfos[0])) {
+            centerPage = CenterPage.about;
             String projectKey = selectedFormInfos[1];
             String moduleKey = selectedFormInfos[2];
             figureOutProject(projectKey, moduleKey);
             return;
         }
+
+        centerPage = CenterPage.template;
 
         String formKey = selectedFormInfos[0];
         String projectKey = selectedFormInfos[1];
@@ -691,7 +705,7 @@ public class MainFrame implements Serializable {
             filterService.createBaseFilter(myFormXs);
 
             MyForm myFormLarge = repositoryService
-                    .getMyFormLargeWithTableFilter(myProject, formKey);
+                    .getMyFormLargeWithBaseFilter(myProject, formKey);
 
             if (loginController.isUserInRole(myFormLarge.getMyProject().getAdminAndViewerRole())) {
                 currEnumPage = EnumPage.FMS_PIVOT_2D;
@@ -705,47 +719,10 @@ public class MainFrame implements Serializable {
         }
 
         if ("YetkiBelgeleri.java".equals(myFormXs.getFormType())) {
-            filterService.createBaseFilter(myFormXs);
-
-            MyForm myFormLarge = repositoryService
-                    .getMyFormLargeWithTableFilter(myProject, formKey);
-
-            myFormLarge.initActions(repositoryService.getAndCacheMyAction(myFormLarge));
-
-            if (loginController.isUserInRole(formService.getMyForm().getMyProject().getAdminAndViewerRole())) {
-                currEnumPage = EnumPage.FREE_FORM_2D;
-            } else if (loginController.isUserInRole(formService.getMyForm().getMyProject().getUserRole())) {
-                currEnumPage = EnumPage.FREE_FORM_1D;
-            } else {
-                return;
-            }
-            freeDesigner.init(myFormLarge);
-
-            formService.setMyForm(myFormLarge);
-
-            return;
-        }
-
-        if ("DayanakVarliklari.java".equals(myFormXs.getFormType())) {
-            filterService.createBaseFilter(myFormXs);
-
-            MyForm myFormLarge = repositoryService
-                    .getMyFormLargeWithTableFilter(myProject, formKey);
-
-            myFormLarge.initActions(repositoryService.getAndCacheMyAction(myFormLarge));
-
-            if (loginController.isUserInRole(formService.getMyForm().getMyProject().getAdminAndViewerRole())) {
-                currEnumPage = EnumPage.FREE_FORM_DAYANAK_VARLILARI_2D;
-            } else if (loginController.isUserInRole(formService.getMyForm().getMyProject().getUserRole())) {
-                currEnumPage = EnumPage.FREE_FORM_DAYANAK_VARLILARI_1D;
-            } else {
-                return;
-            }
-            freeDesigner.init(myFormLarge);
-            return;
-        }
-
-        if (detectedDimension == 0) {
+            createFreeForm(myFormXs, formKey);
+        } else if ("DayanakVarliklari.java".equals(myFormXs.getFormType())) {
+            createFreeForm2(myFormXs, formKey);
+        } else if (detectedDimension == 0) {
             createPageForm(myFormXs);
         } else if (detectedDimension == 1) {
             createTableForm(myFormXs);
@@ -755,12 +732,48 @@ public class MainFrame implements Serializable {
 
     }
 
+    private void createFreeForm2(MyFormXs myFormXs, String formKey) throws MongoOrmFailedException, NullNotExpectedException {
+        filterService.createBaseFilter(myFormXs);
+        MyForm myFormLarge = repositoryService
+                .getMyFormLargeWithBaseFilter(myProject, formKey);
+        myFormLarge.initActions(repositoryService.getAndCacheMyAction(myFormLarge));
+        if (loginController.isUserInRole(formService.getMyForm().getMyProject().getAdminAndViewerRole())) {
+            currEnumPage = EnumPage.FREE_FORM_DAYANAK_VARLILARI_2D;
+        } else if (loginController.isUserInRole(formService.getMyForm().getMyProject().getUserRole())) {
+            currEnumPage = EnumPage.FREE_FORM_DAYANAK_VARLILARI_1D;
+        } else {
+            return;
+        }
+        freeDesigner.init(myFormLarge);
+    }
+
+    private void createFreeForm(MyFormXs myFormXs, String formKey) throws NullNotExpectedException, MongoOrmFailedException {
+
+        filterService.createBaseFilter(myFormXs);
+
+        MyForm myFormLarge = repositoryService
+                .getMyFormLargeWithBaseFilter(myProject, formKey);
+
+        myFormLarge.initActions(repositoryService.getAndCacheMyAction(myFormLarge));
+
+        if (loginController.isUserInRole(myFormLarge.getMyProject().getAdminAndViewerRole())) {
+            currEnumPage = EnumPage.FREE_FORM_2D;
+        } else if (loginController.isUserInRole(myFormLarge.getMyProject().getUserRole())) {
+            currEnumPage = EnumPage.FREE_FORM_1D;
+        } else {
+            return;
+        }
+        freeDesigner.init(myFormLarge);
+        formService.setMyForm(myFormLarge);
+    }
+
     private void createPageForm(MyFormXs myFormXs) throws MongoOrmFailedException,
             NullNotExpectedException, MongoOrmFailedException, Exception {
 
         filterService.createBaseFilter(myFormXs);
 
-        MyForm myFormLarge = repositoryService.getMyFormLargeWithBaseFilter(myProject, myFormXs.getKey());
+        MyForm myFormLarge = repositoryService
+                .getMyFormLargeWithBaseFilter(myProject, myFormXs.getKey());
 
         myFormLarge.initActions(repositoryService.getAndCacheMyAction(myFormLarge));
 
@@ -787,7 +800,7 @@ public class MainFrame implements Serializable {
 
         // check and activate esign
         if (myFormLarge.getMyActions().isEsign()) {
-            esignDoor.initEsignCtrlV3(myFormLarge);
+            featureService.getEsignDoor().initEsignCtrlV3(myFormLarge);
         }
 
         figureOutHistoryPositionStyle();
@@ -815,7 +828,7 @@ public class MainFrame implements Serializable {
         myFormLarge.initActions(repositoryService.getAndCacheMyAction(myFormLarge));
 
         formService.setMyForm(myFormLarge);
-        
+
         filterService.initQuickFilters();
 
         twoDimModifyCtrl.drawGUI(myFormLarge);
@@ -841,7 +854,7 @@ public class MainFrame implements Serializable {
 
         // check and create esign
         if (myFormLarge.getMyActions().isEsign()) {
-            esignDoor.initEsignCtrlV3(myFormLarge);
+            featureService.getEsignDoor().initEsignCtrlV3(myFormLarge);
         }
 
         twoDimModifyCtrl.refreshUploadedFileListAll();
@@ -869,7 +882,7 @@ public class MainFrame implements Serializable {
 
         // check and activate esign
         if (myFormLarge.getMyActions().isEsign()) {
-            esignDoor.initEsignCtrlV3(myFormLarge);
+            featureService.getEsignDoor().initEsignCtrlV3(myFormLarge);
         }
 
         // check and activate history
@@ -925,8 +938,8 @@ public class MainFrame implements Serializable {
      * @return CARD | PFX
      */
     public String getImzaType() {
-        esignDoor.eimzaContextInstance(baseService.getEsignProperties());
-        return esignDoor.getSignType();
+        featureService.getEsignDoor().eimzaContextInstance(baseService.getEsignProperties());
+        return featureService.getEsignDoor().getSignType();
     }
 
     /**
@@ -935,8 +948,8 @@ public class MainFrame implements Serializable {
      * @return
      */
     public String getImzaTest() {
-        esignDoor.eimzaContextInstance(baseService.getEsignProperties());
-        return esignDoor.isTest() ? "TRUE" : "FALSE";
+        featureService.getEsignDoor().eimzaContextInstance(baseService.getEsignProperties());
+        return featureService.getEsignDoor().isTest() ? "TRUE" : "FALSE";
     }
 
     public String getSelectedFormInfo() {

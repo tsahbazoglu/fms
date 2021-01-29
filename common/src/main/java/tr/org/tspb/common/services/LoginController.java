@@ -185,10 +185,13 @@ public class LoginController implements Serializable {
     public String getWelcomeContent() {
         StringBuilder sb = new StringBuilder();
 
-        String company = "TSPB2";// TDUB
+        String company = "DB";// TDUB
         String html = "";
 
         switch (company) {
+            case "DB":
+                html = baseService.getWelcomePage();
+                break;
             case "TSPB":
                 html = StaticHtml
                         .view()

@@ -47,18 +47,29 @@
                 title="#{loginController.loggedUserDetail.username} - #{loginController.loggedUserDetail.commonName}"
                 update="#{updateAjaxMB.btnDetay}"
                 />
-            <h:outputText value="SPK İlk Bildirim Tarihi"
-                          rendered="#{roleMB['uysdesigner']}"/>
-            <h:outputText value=":"
-                          rendered="#{roleMB['uysdesigner']}"/>
+
+            <h:outputText 
+                value="SPK İlk Bildirim Tarihi"
+                rendered="#{roleMB['uysdesigner']}"
+                />
+
+            <h:outputText 
+                value=":"
+                rendered="#{roleMB['uysdesigner']}"
+                />
+
             <h:panelGroup rendered="#{not empty loginController.loggedUserDetail and  roleMB['uysdesigner']}">
-                <h:outputText value="Belirtilmemiş"
-                              rendered="#{empty loginController.loggedUserDetail.mapProjectInfo}"/>
-                <h:outputText value="#{loginController.loggedUserDetail.mapProjectInfo['spk_notifacation_date']}"
-                              rendered="#{not empty loginController.loggedUserDetail.mapProjectInfo}">
+                <h:outputText 
+                    value="Belirtilmemiş"
+                    rendered="#{empty loginController.loggedUserDetail.mapProjectInfo}"/>
+                <h:outputText 
+                    value="#{loginController.loggedUserDetail.mapProjectInfo['spk_notifacation_date']}"
+                    rendered="#{not empty loginController.loggedUserDetail.mapProjectInfo}"
+                    >
                     <f:convertDateTime pattern="yyyy.MM.dd" timeZone="#{twoDimModifyCtrl.timeZone}"/>
                 </h:outputText>
             </h:panelGroup> 
+
             <p:commandButton 
                 value="Şifre Değiştirme"
                 immediate="true"
@@ -81,10 +92,10 @@
         </h:panelGrid>
     </h:panelGrid>
 
-
     <ui:remove>
         dgsfgngfsnf
     </ui:remove>
+
     <span jsfc="ui:remove">
         This won't be compiled either <h:outputText value="#{mainFrame.myStyle}"/>
     </span>

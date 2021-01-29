@@ -52,6 +52,7 @@ public class MyField {
     private String ajaxUpdate;
     private List<String> ajaxEffectedKeys = new ArrayList<>();
     private boolean ajax;
+    private boolean ajaxRemoveNonRenderdFieldOnRecord = true;
     private TagAjaxRef tagAjaxRef;
     // C
     private String code;//this is the case for nd
@@ -768,6 +769,10 @@ public class MyField {
         this.hasAjaxEffectedInputFileField = hasAjaxEffectedInputFileField;
     }
 
+    public boolean isAjaxRemoveNonRenderdFieldOnRecord() {
+        return ajaxRemoveNonRenderdFieldOnRecord;
+    }
+
     public static class Builder {
 
         private final MyField myField;
@@ -1155,6 +1160,7 @@ public class MyField {
             }
 
             this.myField.ajax = Boolean.TRUE.equals(ajax.getBoolean("enable"));
+            this.myField.ajaxRemoveNonRenderdFieldOnRecord = ajax.getBoolean("remove-non-rendered-field-on-record", false);
             this.myField.ajaxShowHide = ajax.getString("show-hide");
             this.myField.ajaxAction = ajax.getString(AJAX_ACTION);
             this.myField.ajaxEffectedKeys = ajax.getList(AJAX_EFFECTED_KEYS, String.class);

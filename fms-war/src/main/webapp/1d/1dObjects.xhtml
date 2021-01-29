@@ -6,12 +6,12 @@
       xmlns:mygrid="http://java.sun.com/jsf/composite/telmangrid"
       xmlns:mydynamic="http://java.sun.com/jsf/composite/mydinamic"
       xmlns:c="http://java.sun.com/jsp/jstl/core"
-      xmlns:f="http://xmlns.jcp.org/jsf/core">
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets">
 
     <h:head>
         <title></title>
     </h:head>
-
 
     <script>
         function yes1dDoDelete() {
@@ -24,6 +24,28 @@
             return false;
         }
     </script>
+
+    <style>
+        .textareastyled {
+            overflow:hidden;
+            padding:0px;
+            margin:0px;
+            display:block;
+
+            resize: none;
+            font-size:10px;
+            width: 340px;
+            height: auto;
+            border: none;
+            padding: 0px;
+            font-family: Tahoma, sans-serif;
+            background-image: url(bg.gif);
+            background-position: bottom right;
+            background-repeat: no-repeat;
+            background-color : transparent;
+            color:grey;
+        }
+    </style>
 
     <p:toolbar 
         rendered="#{not esignViewCtrl.preventedMultiTab}"
@@ -146,14 +168,13 @@
                 >
                 <c:forEach items="#{formService.myForm.fieldsAsList}" var="myField">
                     <h:panelGroup id="id-label-#{myField.key}" class="#{myField.styleClass}">
-                        <p:outputLabel
+                        <h:inputTextarea
                             value="#{myField.label}" 
-                            escape="false"
+                            styleClass="textareastyled"
                             style="#{myField.labelStyle}"
-                            styleClass="medium-font-size"
                             rendered="#{myField.rendered}"
-                            >
-                        </p:outputLabel>
+                            readonly="true"
+                            />
                     </h:panelGroup>
                     <h:panelGroup 
                         id="id-component-#{myField.key}" 
@@ -256,6 +277,48 @@
                             rendered="#{crudOneDim.selectBooleanCheckbox eq  myField.componentType and myField.rendered}"
                             myconverter="#{myField.myconverter}"
                             />
+                        <p:panelGrid 
+                            columns="2"
+                            rendered="#{crudOneDim.inputFile eq  myField.componentType and myField.rendered}"
+                            >
+                            <p:button 
+                                value="Dosya Yükleme"
+                                onclick="PF('widget-var-page-file-upload').chooseButton.click();return;"                                
+                                >
+                            </p:button>
+                            <p:dataTable 
+                                value="#{crudOneDim.listFileData}" 
+                                var="x"
+                                emptyMessage="eklenen dosya yok"
+                                class="class-data-table-inline-up-files"
+                                >
+                                <p:column>
+                                    <h:outputText value="#{x.fileName}"/>
+                                </p:column>
+                                <p:column>
+                                    <p:commandButton 
+                                        value="sil" 
+                                        action="#{crudOneDim.deleteFile}" 
+                                        rendered="#{formService.myForm.myActions.delete}"
+                                        update="@(.class-data-table-inline-up-files)"
+                                        >
+                                        <f:setPropertyActionListener  target="#{crudOneDim.toBeDeletedFileID}" value="#{x.fileID}"/>
+                                    </p:commandButton>
+                                </p:column>
+                                <p:column>
+                                    <h:outputLink 
+                                        value="#{application.contextPath}/myDownloadServlet/#{x.fileID}"
+                                        style="
+                                        text-decoration:none;
+                                        font-size: 14px;
+                                        color:#112978;
+                                        font-weight:bold;"
+                                        >
+                                        <h:outputText value="indir" />
+                                    </h:outputLink>  
+                                </p:column>
+                            </p:dataTable>
+                        </p:panelGrid>
                     </h:panelGroup>
 
                     <h:panelGroup id="id-desc-#{myField.key}" class="#{myField.styleClass}">
@@ -284,6 +347,31 @@
         </p:panel>
     </h:form>
 
+    <h:form 
+        enctype="multipart/form-data"
+        >
+        <p:fileUpload 
+            id="id-up-file"
+            value="#{crudOneDim.uploadedFile}"
+            listener="#{crudOneDim.upload}"
+            allowTypes="#{crudOneDim.mongoUploadFileType}"
+            invalidSizeMessage="Dosya Boyutu 4MB dan büyük olmamalı : "
+            invalidFileMessage="#{crudOneDim.invalidFileMessage}"
+            fileLimitMessage="En fazla #{crudOneDim.fileLimit} dosya eklenebilir."
+            fileLimit="10"
+            sizeLimit="15728640"
+            cancelLabel="Vazgeç"
+            uploadLabel="Yükle"
+            label="Seç"
+            auto="true"
+            widgetVar="widget-var-page-file-upload"
+            style="display:none;"
+            update="@(.class-data-table-inline-up-files)"
+            />
+    </h:form>
+
+
+
     <p:dialog 
         id="id-desc-dlg"
         header="açıklama"
@@ -305,6 +393,7 @@
             <b>açıklama: </b> <p:outputLabel value="#{crudOneDim.selectedField.popupDescription}" escape="false"/>
         </p:panel>
     </p:dialog>
+
 
     <br/>
 

@@ -23,6 +23,7 @@ public class DlgCtrl implements Serializable {
     private boolean renderedOkButon;
     private boolean rendered;
     private boolean visible;
+    private boolean esignInstallNote = true;
 
     public DlgCtrl() {
     }
@@ -213,6 +214,14 @@ public class DlgCtrl implements Serializable {
 
     public void setPosition(String position) {
         this.position = position;
+    }
+
+    public boolean isEsignInstallNote() {
+        return esignInstallNote;
+    }
+
+    public void setEsignInstallNote(boolean esignInstallNote) {
+        this.esignInstallNote = esignInstallNote;
     }
 
 }

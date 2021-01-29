@@ -38,8 +38,8 @@ import tr.org.tspb.common.services.BaseService;
 import tr.org.tspb.dao.MyBaseRecord;
 import tr.org.tspb.dao.refs.PlainRecord;
 import tr.org.tspb.dp.nullobj.PlainRecordData;
-import tr.org.tspb.outsider.EsignDoor;
 import tr.org.tspb.pojo.PostSaveResult;
+import tr.org.tspb.service.FeatureService;
 import tr.org.tspb.util.tools.DocumentRecursive;
 import tr.org.tspb.uys.freedesign.MyLicense;
 import tr.org.tspb.uys.freedesign.MyRecord;
@@ -66,7 +66,7 @@ public class FreeDesigner implements Serializable {
     private AppScopeSrvCtrl appScopeSrvCtrl;
 
     @Inject
-    private EsignDoor esignDoor;
+    private FeatureService featureService;
 
     @Inject
     private BaseService baseService;
@@ -229,7 +229,7 @@ public class FreeDesigner implements Serializable {
             this.actionsMap.put("esign", Boolean.TRUE);
         }
 
-        esignDoor.initAndFindEsigns(selectedForm, null);
+        featureService.getEsignDoor().initAndFindEsigns(selectedForm, null);
 
     }
 
@@ -241,7 +241,7 @@ public class FreeDesigner implements Serializable {
             dialogController.showPopup("Uyarı", "İmzalanacak Kayıtlı Veriniz Tespit Edilemedi.", MESSAGE_DIALOG);
         } else {
 
-            esignDoor.iniAndShowEsignDlgV1(new TreeMap<Integer, String>(), listOfCruds, selectedForm, "widgetVarToBeSignedDialog", UNIQUE);
+            featureService.getEsignDoor().iniAndShowEsignDlgV1(new TreeMap<Integer, String>(), listOfCruds, selectedForm, "widgetVarToBeSignedDialog", UNIQUE);
 
         }
 
@@ -412,11 +412,11 @@ public class FreeDesigner implements Serializable {
         Map dbo = repositoryService.one(selectedForm.getDb(), selectedForm.getTable(), searchForUpdate);
 
         Map searchMap = new HashMap();
-        searchMap.put("metadata.crud_object_id", null);
+        searchMap.put(METADATA_CRUD_OBJECT_ID, null);
         searchMap.put("metadata.username", memberUserName);
 
         Map updateMap = new HashMap();
-        updateMap.put("metadata.crud_object_id", dbo.get(MONGO_ID));
+        updateMap.put(METADATA_CRUD_OBJECT_ID, dbo.get(MONGO_ID));
         updateMap.put(JOIN_ID, joinId);
 
         repositoryService

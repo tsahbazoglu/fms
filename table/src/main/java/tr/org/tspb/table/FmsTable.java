@@ -297,7 +297,7 @@ public abstract class FmsTable extends FmsTableView {
                     BasicDBObject metadata = new BasicDBObject();
                     // null points to the fact that this record(file) is not related yet.
                     // we will use this NULL state during the search over all other forms
-                    metadata.put("crud_object_id", null);
+                    metadata.put(CRUD_OBJECT_ID, null);
                     metadata.put("selectFormKey", formService.getMyForm().getKey());
                     metadata.put("selectFormName", formService.getMyForm().getName());
                     metadata.put("username", loginController.getLoggedUserDetail().getUsername());
@@ -997,7 +997,7 @@ public abstract class FmsTable extends FmsTableView {
 
             mongoDbUtil.updateMany(baseService.getProperties().getUploadTable(), "fs.files",
                     new Document(MONGO_ID, new Document(DOLAR_IN, listOfFileIDs)),
-                    new Document("metadata.crud_object_id", result.get(MONGO_ID)));
+                    new Document(METADATA_CRUD_OBJECT_ID, result.get(MONGO_ID)));
 
             if ("iondb".equals(myForm.getDb()) && !myForm.isHasAttachedFiles()) {
                 /*
@@ -1007,7 +1007,8 @@ public abstract class FmsTable extends FmsTableView {
                  */
 
                 mongoDbUtil.removeFile(baseService.getProperties().getUploadTable(),
-                        new BasicDBObject().append("metadata.crud_object_id", result.get(MONGO_ID))//
+                        new BasicDBObject()
+                                .append(METADATA_CRUD_OBJECT_ID, result.get(MONGO_ID))
                                 .append("metadata.username", username));
             }
         }

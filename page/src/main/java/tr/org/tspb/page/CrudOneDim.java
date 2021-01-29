@@ -69,7 +69,6 @@ import tr.org.tspb.exceptions.LdapException;
 import tr.org.tspb.exceptions.NullNotExpectedException;
 import tr.org.tspb.exceptions.UserException;
 import tr.org.tspb.factory.qualifier.OgmCreatorQualifier;
-import tr.org.tspb.outsider.EsignDoor;
 import tr.org.tspb.outsider.ReportDoor;
 import tr.org.tspb.outsider.qualifier.DefaultReportDoor;
 import tr.org.tspb.pojo.ComponentType;
@@ -86,6 +85,7 @@ import tr.org.tspb.pojo.DatabaseUser;
 import tr.org.tspb.pojo.PostSaveResult;
 import tr.org.tspb.pojo.PreSaveResult;
 import tr.org.tspb.service.CalcService;
+import tr.org.tspb.service.FeatureService;
 
 /**
  *
@@ -96,7 +96,7 @@ import tr.org.tspb.service.CalcService;
 public class CrudOneDim implements ValueChangeListener, Serializable {
 
     @Inject
-    private EsignDoor esignDoor;
+    private FeatureService featureService;
 
     @Inject
     @DefaultReportDoor
@@ -246,6 +246,22 @@ public class CrudOneDim implements ValueChangeListener, Serializable {
 
     public String showEimza() {
 
+        try {
+            showEimzaInternal();
+        } catch (UserException ue) {
+            logger.error("error occured", ue);
+            dialogController.showPopupError(ue.getMessage());
+        } catch (Exception ex) {
+            logger.error("error occured", ex);
+        }
+
+        return null;
+    }
+
+    private void showEimzaInternal() throws UserException {
+
+        chekAttachedFiles(formService.getMyForm());
+
         Document dBObject = new Document();
         dBObject.put(FORMS, formService.getMyForm().getForm());
         dBObject.put(formService.getMyForm().getLoginFkField(), filterService.getTableFilterCurrent()
@@ -262,10 +278,9 @@ public class CrudOneDim implements ValueChangeListener, Serializable {
             //FIXME messagebundle
             dialogController.showPopupWarning("İmzalanacak Kayıtlı Veriniz Tespit Edilemedi.", MESSAGE_DIALOG);
         } else {
-            esignDoor.iniAndShowEsignDlgV1(new TreeMap<Integer, String>(), listOfCruds, formService.getMyForm(), "widgetVarToBeSignedDialog", UNIQUE);
+            featureService.getEsignDoor().iniAndShowEsignDlgV1(new TreeMap<Integer, String>(), listOfCruds, formService.getMyForm(), "widgetVarToBeSignedDialog", UNIQUE);
         }
 
-        return null;
     }
 
     public String getSelectedFormConstantNote() {
@@ -485,7 +500,7 @@ public class CrudOneDim implements ValueChangeListener, Serializable {
         List<Map> listOfCruds = new ArrayList();
         listOfCruds.add(new Document(crudObject));
 
-        esignDoor.initAndFindEsignsV1(formService.getMyForm(), null, listOfCruds, UNIQUE);
+        featureService.getEsignDoor().initAndFindEsignsV1(formService.getMyForm(), null, listOfCruds, UNIQUE);
 
     }
 
@@ -507,7 +522,7 @@ public class CrudOneDim implements ValueChangeListener, Serializable {
                     .runEventPreSave(filterService.getTableFilterCurrent(), formService.getMyForm(), crudObject);
 
             if (preSaveResult.isResult()) {
-                throw new Exception(preSaveResult.getMsg());
+                throw new UserException(preSaveResult.getMsg());
             }
 
             saveObject(formService.getMyForm(), loginController, crudObject);
@@ -715,18 +730,7 @@ public class CrudOneDim implements ValueChangeListener, Serializable {
 
         ctrlService.checkRecordConverterValueType(operatedObject, myForm);
 
-        if (myForm.isHasAttachedFiles() && (listFileData == null || listFileData.isEmpty())) {
-            for (MyField field : myForm.getFields().values()) {
-                if (field.isRequired() && ComponentType.inputFile.name().equals(field.getComponentType())) {
-                    FacesMessage facesMessageRequired = new FacesMessage(//
-                            FacesMessage.SEVERITY_ERROR, //
-                            MessageFormat.format("[{0}] {1}", field.getShortName(), MessageBundleLoaderv1.getMessage("requiredMessage")),//
-                            "*");
-                    FacesContext.getCurrentInstance().addMessage(null, facesMessageRequired);
-                    throw new UserException("<br/><br/> Dosya Eksik. 'Ekli Dosyalar' sekmesinden talep edilen belge(leri) ekleyiniz");
-                }
-            }
-        }
+        chekAttachedFiles(myForm);
 
         operatedObject = repositoryService.expandCrudObject(myForm, operatedObject);
 
@@ -769,8 +773,8 @@ public class CrudOneDim implements ValueChangeListener, Serializable {
         }
 
         for (String fieldKey : myForm.getFieldsKeySet()) {
-            MyField fieldStriucture = myForm.getField(fieldKey);
-            if (fieldStriucture.getCalculateOnSave()) {
+            MyField fieldStructure = myForm.getField(fieldKey);
+            if (fieldStructure.getCalculateOnSave()) {
                 operatedObject.put(fieldKey, calcService.calculateValue(operatedObject, fieldKey, FacesContext.getCurrentInstance()));
             }
         }
@@ -851,13 +855,13 @@ public class CrudOneDim implements ValueChangeListener, Serializable {
         if (!listFileData.isEmpty()) {
             List<ObjectId> listOfFileIDs = new ArrayList<>();
 
-            for (Map map : listFileData) {
-                listOfFileIDs.add(new ObjectId((String) map.get(FILE_ID)));
+            for (Map fileMetaData : listFileData) {
+                listOfFileIDs.add(new ObjectId((String) fileMetaData.get(FILE_ID)));
             }
 
             mongoDbUtil.updateMany(baseService.getProperties().getUploadTable(), "fs.files",
                     new Document(MONGO_ID, new Document(DOLAR_IN, listOfFileIDs)),
-                    new Document("metadata.crud_object_id", result.get(MONGO_ID)));
+                    new Document(METADATA_CRUD_OBJECT_ID, result.get(MONGO_ID)));
 
             if ("iondb".equals(myForm.getDb()) && !myForm.isHasAttachedFiles()) {
                 /*
@@ -867,7 +871,7 @@ public class CrudOneDim implements ValueChangeListener, Serializable {
                  */
 
                 mongoDbUtil.removeFile(baseService.getProperties().getUploadTable(),
-                        new BasicDBObject().append("metadata.crud_object_id", result.get(MONGO_ID))//
+                        new BasicDBObject().append(METADATA_CRUD_OBJECT_ID, result.get(MONGO_ID))//
                                 .append("metadata.username", username));
             }
         }
@@ -900,6 +904,21 @@ public class CrudOneDim implements ValueChangeListener, Serializable {
         return (ObjectId) result.get(MONGO_ID);
     }
 
+    private void chekAttachedFiles(MyForm myForm) throws UserException {
+        if (myForm.isHasAttachedFiles() && (listFileData == null || listFileData.isEmpty())) {
+            for (MyField field : myForm.getFields().values()) {
+                if (field.isRequired() && ComponentType.inputFile.name().equals(field.getComponentType())) {
+                    FacesMessage facesMessageRequired = new FacesMessage(//
+                            FacesMessage.SEVERITY_ERROR, //
+                            MessageFormat.format("[{0}] {1}", field.getShortName(), MessageBundleLoaderv1.getMessage("requiredMessage")),//
+                            "*");
+                    FacesContext.getCurrentInstance().addMessage(null, facesMessageRequired);
+                    throw new UserException("<br/><br/> Dosya Eksik. 'Ekli Dosyalar' sekmesinden talep edilen belge(leri) ekleyiniz");
+                }
+            }
+        }
+    }
+
     public void upload(FileUploadEvent event) {
         uploadedFile = event.getFile();
 
@@ -909,7 +928,11 @@ public class CrudOneDim implements ValueChangeListener, Serializable {
                     BasicDBObject metadata = new BasicDBObject();
                     // null points to the fact that this record(file) is not related yet.
                     // we will use this NULL state during the search over all other forms
-                    metadata.put("crud_object_id", null);
+                    ObjectId crudObjectId = null;
+                    if (crudObject.get(MONGO_ID) instanceof ObjectId) {
+                        crudObjectId = (ObjectId) crudObject.get(MONGO_ID);
+                    }
+                    metadata.put(CRUD_OBJECT_ID, crudObjectId);
                     metadata.put("selectFormKey", formService.getMyForm().getKey());
                     metadata.put("selectFormName", formService.getMyForm().getName());
                     metadata.put("username", loginController.getLoggedUserDetail().getUsername());
@@ -968,9 +991,11 @@ public class CrudOneDim implements ValueChangeListener, Serializable {
                 case "render":
                     formService.getMyForm().runAjaxRender(myField, componentMap, formService.getMyForm(), crudObject,
                             loginController.getRoleMap(), loginController.getLoggedUserDetail(), filterService.getTableFilterCurrent());
+                    break;
                 case "render-ref":
                     formService.getMyForm().runAjaxRenderRef(myField, componentMap, formService.getMyForm(), crudObject,
                             loginController.getRoleMap(), loginController.getLoggedUserDetail(), filterService.getTableFilterCurrent());
+                    break;
                 default:
                     break;
             }
