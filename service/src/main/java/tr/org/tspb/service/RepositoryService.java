@@ -280,9 +280,11 @@ public class RepositoryService implements Serializable {
     public List<Map<String, String>> findGridFsFileList(ObjectId myCommonRecordID) {
         List<Map<String, String>> returnList = new ArrayList<>();
 
+        List<GridFSDBFile> files;
+
         if (myCommonRecordID != null) {
 
-            List<GridFSDBFile> files = mongoDbUtil.findFiles(baseService.getProperties().getUploadTable(), new BasicDBObject()
+            files = mongoDbUtil.findFiles(baseService.getProperties().getUploadTable(), new BasicDBObject()
                     .append(METADATA_CRUD_OBJECT_ID, myCommonRecordID));
             for (GridFSDBFile gridFSDBFile : files) {
                 Map<String, String> fileInfoPresent = new HashMap<>();
@@ -293,9 +295,9 @@ public class RepositoryService implements Serializable {
             }
         }
 
-        List<GridFSDBFile> files = mongoDbUtil.findFiles(baseService.getProperties().getUploadTable(), new BasicDBObject()//
+        files = mongoDbUtil.findFiles(baseService.getProperties().getUploadTable(), new BasicDBObject()//
                 .append(METADATA_CRUD_OBJECT_ID, null)//
-                .append(METADATA.concat(DOT).concat("username"), loginController.getLoggedUserDetail().getUsername()));
+                .append(METADATA_USERNAME, loginController.getLoggedUserDetail().getUsername()));
 
         for (GridFSDBFile gridFSDBFile : files) {
             Map<String, String> fileInfoPresent = new HashMap<>();
@@ -303,7 +305,7 @@ public class RepositoryService implements Serializable {
             fileInfoPresent.put(FILE_NAME, gridFSDBFile.getFilename());
             fileInfoPresent.put(FILE_SIZE, String.valueOf(gridFSDBFile.getLength()));
             //FIXME messagebundle
-            fileInfoPresent.put(FILE_STATE, "Bu ek henüz ilişkilendirilmemiş. Günlük Sistem Bakımında otomotik silinecek. İlişkilendirmek için ilgili formda 'Kaydet' tuşuna basınız");
+            fileInfoPresent.put(FILE_STATE, "Bu ek henüz ilişkilendirilmemiş. Günlük Sistem Bakımında otomotik silinecek. İlişkilendirmek için 'Kaydet' tuşuna basınız");
             fileInfoPresent.put(FILE_COLOR, "#ECA0A0");
             returnList.add(fileInfoPresent);
         }
@@ -314,17 +316,28 @@ public class RepositoryService implements Serializable {
 
         List<Map<String, String>> returnList = new ArrayList<>();
 
-        List<GridFSDBFile> files = mongoDbUtil.findFiles(baseService.getProperties().getUploadTable(), new BasicDBObject()//
-                .append(METADATA.concat(DOT).concat("selectFormKey"), myForm.getKey())//
-                .append(METADATA.concat(DOT).concat("username"), loginController.getLoggedUserDetail().getUsername()));
+        List<GridFSDBFile> files = new ArrayList<>();
+
+        if (loginController.getRoleMap().isUserInRole(myForm.getMyProject().getAdminRole())) {
+            files = mongoDbUtil.findFiles(baseService.getProperties().getUploadTable(), new BasicDBObject()//
+                    .append(METADATA_SELECTED_FORM_KEY, myForm.getKey()));
+        } else {
+            files = mongoDbUtil.findFiles(baseService.getProperties().getUploadTable(), new BasicDBObject()//
+                    .append(METADATA_SELECTED_FORM_KEY, myForm.getKey())//
+                    .append(METADATA_USERNAME, loginController.getLoggedUserDetail().getUsername()));
+        }
 
         for (GridFSDBFile gridFSDBFile : files) {
             Map<String, String> fileInfoPresent = new HashMap<>();
 
             fileInfoPresent.put(FILE_ID, gridFSDBFile.getId().toString());
+            fileInfoPresent.put("METADA_USERNAME", (String) gridFSDBFile.getMetaData().get("username"));
             fileInfoPresent.put(FILE_NAME, gridFSDBFile.getFilename());
             fileInfoPresent.put(FILE_SIZE, String.valueOf(gridFSDBFile.getLength()));
-            fileInfoPresent.put(FILE_STATE, gridFSDBFile.getMetaData().get(CRUD_OBJECT_ID) != null ? "" : "Bu ek henüz ilişkilendirilmemiş. Günlük Sistem Bakımında otomotik silinecek. İlişkilendirmek için ilgili formda 'Kaydet' tuşuna basınız");
+            fileInfoPresent.put(FILE_STATE,
+                    gridFSDBFile.getMetaData().get(CRUD_OBJECT_ID) != null
+                    ? ""
+                    : "Bu ek hiçbir kayıt ile ilişkilendirilmemiş. Günlük Sistem Bakımında otomotik silinecek");
             fileInfoPresent.put(FILE_COLOR, "#ECA0A0");
             returnList.add(fileInfoPresent);
         }
@@ -477,7 +490,7 @@ public class RepositoryService implements Serializable {
 
             StringBuilder textBuilder = new StringBuilder();
 
-            try ( Reader reader = new BufferedReader(new InputStreamReader(attachmentStream, Charset.forName(StandardCharsets.UTF_8.name())))) {
+            try (Reader reader = new BufferedReader(new InputStreamReader(attachmentStream, Charset.forName(StandardCharsets.UTF_8.name())))) {
                 int c = 0;
                 while ((c = reader.read()) != -1) {
                     textBuilder.append((char) c);
