@@ -78,6 +78,7 @@ public class MyForm implements MyFormXs {
     private TagEvent eventPostDelete;
     private TagEvent eventPreDelete;
     private TagEvent eventFormSelection;
+    private TagMultiUpload multiUpload;
     private Document accessControlLevelTwo;
     private Document myNamedQueries;
     private Document excelFormat;
@@ -534,7 +535,7 @@ public class MyForm implements MyFormXs {
                         myField1.createSelectItems(filter, crudObject, roleMap, userDetail, true);
                     } else {
                         myField1.setRendered(false);
-                        if (myField1.isAjaxRemoveNonRenderdFieldOnRecord()) {
+                        if (myField.isAjaxRemoveNonRenderdFieldOnRecord()) {
                             crudObject.remove(key);
                             crudObject.addUnSetKey(key);
                         }
@@ -571,7 +572,7 @@ public class MyForm implements MyFormXs {
                     myField1.createSelectItems(filter, crudObject, roleMap, userDetail, true);
                 } else {
                     myField1.setRendered(false);
-                    if (myField1.isAjaxRemoveNonRenderdFieldOnRecord()) {
+                    if (myField.isAjaxRemoveNonRenderdFieldOnRecord()) {
                         crudObject.remove(fieldKey);
                         crudObject.addUnSetKey(fieldKey);
                     }
@@ -750,6 +751,10 @@ public class MyForm implements MyFormXs {
                 this.hasAttachedFiles = true;
             }
         }
+    }
+
+    public TagMultiUpload getMultiUpload() {
+        return multiUpload;
     }
 
     private static class OrderedKey {
@@ -1259,6 +1264,24 @@ public class MyForm implements MyFormXs {
                 maskAutosetFieldsSchemaVersion110();
             } else {
                 maskAutosetFieldsNoSchema();
+            }
+            return this;
+        }
+
+        public Builder maskMultiUpload() throws Exception {
+
+            Document multiupload = dbObjectForm.get("multiupload", Document.class);
+
+            this.myForm.multiUpload = new TagMultiUpload(true, true, true, true, true);
+
+            if (multiupload != null) {
+                this.myForm.multiUpload = new TagMultiUpload(
+                        multiupload.getBoolean("enable"),
+                        multiupload.getBoolean("upload"),
+                        multiupload.getBoolean("delete"),
+                        multiupload.getBoolean("download"),
+                        multiupload.getBoolean("list")
+                );
             }
             return this;
         }
