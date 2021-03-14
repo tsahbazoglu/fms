@@ -31,10 +31,9 @@
             padding:0px;
             margin:0px;
             display:block;
-
             resize: none;
             font-size:10px;
-            width: 340px;
+            width: 380px;
             height: auto;
             border: none;
             padding: 0px;
@@ -57,8 +56,7 @@
                 disabled="true">
             </p:commandButton>
             <p:commandButton 
-                onclick="PF('widget_1d_delete_confirmation').show();
-                        return false;"
+                onclick="PF('widget_1d_delete_confirmation').show();return false;"
                 value="Sil" 
                 transient="true"
                 rendered="#{formService.myForm.myActions.delete}"
@@ -96,7 +94,8 @@
             <h:outputText 
                 value="Tarihçe Etkin(siz)leştir" 
                 style="white-space: nowrap;" 
-                rendered="#{mainFrame.adminRole}"/>
+                rendered="#{mainFrame.adminRole}"
+                />
             <h:selectBooleanCheckbox  
                 value="#{crudOneDim.enableHistoryOnSave}" 
                 rendered="#{mainFrame.adminRole}"
@@ -299,7 +298,6 @@
                                     <p:commandButton 
                                         value="sil" 
                                         action="#{crudOneDim.deleteFile}" 
-                                        rendered="#{formService.myForm.myActions.delete}"
                                         update="@(.class-data-table-inline-up-files)"
                                         >
                                         <f:setPropertyActionListener  target="#{crudOneDim.toBeDeletedFileID}" value="#{x.fileID}"/>
@@ -370,8 +368,6 @@
             />
     </h:form>
 
-
-
     <p:dialog 
         id="id-desc-dlg"
         header="açıklama"
@@ -393,7 +389,6 @@
             <b>açıklama: </b> <p:outputLabel value="#{crudOneDim.selectedField.popupDescription}" escape="false"/>
         </p:panel>
     </p:dialog>
-
 
     <br/>
 
