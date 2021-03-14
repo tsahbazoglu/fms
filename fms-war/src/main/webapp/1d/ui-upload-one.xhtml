@@ -14,9 +14,12 @@
 
     <h:panelGroup 
         id="id-page-pnl-up-file"
+        rendered="#{formService.myForm.multiUpload.enable}"
         >
         <br/>
-        <p:panel>
+        <p:panel
+            rendered="#{formService.myForm.multiUpload.upload}"
+            >
             <h:outputText value="Dosya Yükleme Aracı" style="font-size: 22px;font-weight: bolder;color: #b3b3b3;"/>
             <br/>
             <br/> 
@@ -44,6 +47,7 @@
         <br/> 
         <p:panel 
             id="id-uploaded-files"
+            rendered="#{formService.myForm.multiUpload.list}"
             >
             <h:outputText value="Ekli Dosyalar" style="font-size: 22px;font-weight: bolder;color: #b3b3b3;"/>
             <br/>
@@ -72,20 +76,24 @@
                     <h:outputText value="#{x.fileState}" style="background: #{x.fileColor}"/> 
                 </p:column>
 
-                <p:column>
+                <p:column
+                    rendered="#{formService.myForm.multiUpload.delete}"
+                    >
                     <f:facet name="header">
                         <h:outputText value="Sil"/> 
                     </f:facet>
                     <p:commandButton 
                         value="sil" 
                         action="#{crudOneDim.deleteFile}" 
-                        rendered="#{formService.myForm.myActions.delete}"
-                        update="#{updateAjaxMB.btn1dRemoveFile}"
+                        rendered="#{formService.myForm.multiUpload.delete}"
+                        update="#{updateAjaxMB.btn1dRemoveFile},:id-tab-view:crud1dForm"
                         >
                         <f:setPropertyActionListener  target="#{crudOneDim.toBeDeletedFileID}" value="#{x.fileID}"/>
                     </p:commandButton>
                 </p:column>
-                <p:column>
+                <p:column
+                    rendered="#{formService.myForm.multiUpload.download}"
+                    >
                     <f:facet name="header">
                         <h:outputText value="İndir"/>  
                     </f:facet>
