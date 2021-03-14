@@ -147,7 +147,7 @@
 
             <h:form id="crud2dForm">
                 <p:remoteCommand                
-                    name="rcDelete"
+                    name="rc_2d_delete"
                     value="Sormadan Sil"
                     action="#{twoDimModifyCtrl.deleteObject}" 
                     rendered="#{mainFrame.isTwoDim and formService.myForm.myActions.delete}"
@@ -159,7 +159,7 @@
                     value="Kaydet" 
                     action="#{twoDimModifyCtrl.saveObject}" 
                     rendered="#{mainFrame.isTwoDim and formService.myForm.myActions.save}"
-                    update="#{updateAjaxMB.btn2dSave},:idTwoDlgTabView"
+                    update="#{updateAjaxMB.btn2dSave},:idTwoDlgTabView,id-tab-view:id-table-file-list"
                     />
                 <br/>
                 <h:panelGrid 
@@ -314,6 +314,51 @@
                                 rendered="#{twoDimModifyCtrl.selectBooleanCheckbox eq  myField.componentType and myField.rendered}"
                                 myconverter="#{myField.myconverter}"
                                 />
+
+
+                            <p:panelGrid 
+                                columns="2"
+                                rendered="#{twoDimModifyCtrl.inputFile eq  myField.componentType and myField.rendered}"
+                                >
+                                <p:button 
+                                    value="Dosya Yükleme"
+                                    onclick="PF('widget-var-page-file-upload').chooseButton.click();return;"                                
+                                    >
+                                </p:button>
+                                <p:dataTable 
+                                    value="#{twoDimModifyCtrl.listFileData}" 
+                                    var="x"
+                                    emptyMessage="eklenen dosya yok"
+                                    class="class-data-table-inline-up-files"
+                                    >
+                                    <p:column>
+                                        <h:outputText value="#{x.fileName}"/>
+                                    </p:column>
+                                    <p:column>
+                                        <p:commandButton 
+                                            value="sil" 
+                                            action="#{twoDimModifyCtrl.deleteFile}" 
+                                            update="@(.class-data-table-inline-up-files),idTwoDlgTabView:id-table-crud-dlg-tab-attachments,id-tab-view:id-table-file-list"
+                                            >
+                                            <f:setPropertyActionListener  target="#{twoDimModifyCtrl.toBeDeletedFileID}" value="#{x.fileID}"/>
+                                        </p:commandButton>
+                                    </p:column>
+                                    <p:column>
+                                        <h:outputLink 
+                                            value="#{application.contextPath}/myDownloadServlet/#{x.fileID}"
+                                            style="
+                                            text-decoration:none;
+                                            font-size: 14px;
+                                            color:#112978;
+                                            font-weight:bold;"
+                                            >
+                                            <h:outputText value="indir" />
+                                        </h:outputLink>  
+                                    </p:column>
+                                </p:dataTable>
+                            </p:panelGrid>
+
+
                         </h:panelGroup>
 
                         <h:panelGroup id="id-desc-#{myField.key}" class="#{myField.styleClass}">
@@ -346,6 +391,36 @@
         </p:scrollPanel>
 
     </h:panelGroup>
+
+
+    <h:form 
+        enctype="multipart/form-data"
+        >
+        <p:fileUpload 
+            id="id-up-file"
+            value="#{twoDimModifyCtrl.uploadedFile}"
+            listener="#{twoDimModifyCtrl.upload}"
+            allowTypes="#{twoDimModifyCtrl.mongoUploadFileType}"
+            invalidSizeMessage="Dosya Boyutu 4MB dan büyük olmamalı : "
+            invalidFileMessage="#{twoDimModifyCtrl.invalidFileMessage}"
+            fileLimitMessage="En fazla #{twoDimModifyCtrl.fileLimit} dosya eklenebilir."
+            fileLimit="10"
+            sizeLimit="15728640"
+            cancelLabel="Vazgeç"
+            uploadLabel="Yükle"
+            label="Seç"
+            auto="true"
+            widgetVar="widget-var-page-file-upload"
+            style="display:none;"
+            update="@(.class-data-table-inline-up-files),idTwoDlgTabView:id-table-crud-dlg-tab-attachments,id-tab-view:id-table-file-list"
+            />
+    </h:form>
+
+
+
+
+
+
 
 
 </html>
