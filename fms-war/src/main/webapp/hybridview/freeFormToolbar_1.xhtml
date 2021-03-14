@@ -13,11 +13,12 @@
 
     <p:toolbar>
         <f:facet name="left">
-            <mydynamic:mySimpleButton 
+            <p:button 
                 id="id_mySaveButton"
-                myValue="Kaydet"
-                myOnClickID="id_freeform:id_freeform_submit_button"
-                />  
+                onclick="rcHybridFormSave();return false;"
+                value="Kaydet"
+                rendered="#{formService.myForm.myActions.save}"
+                /> 
             <p:commandButton
                 id ="buttonEimza"
                 value="E-İmza Süreci" 

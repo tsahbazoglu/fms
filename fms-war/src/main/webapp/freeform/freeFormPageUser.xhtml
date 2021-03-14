@@ -5,7 +5,9 @@
       xmlns:p="http://primefaces.org/ui"          
       xmlns:f="http://java.sun.com/jsf/core"
       xmlns:c="http://java.sun.com/jsp/jstl/core"
-      xmlns:ui="http://xmlns.jcp.org/jsf/facelets">
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:mydynamic="http://java.sun.com/jsf/composite/mydinamic"
+      >
 
     <h:head>
         <title></title>
@@ -29,12 +31,12 @@
     <h:form id="id_freeform">
         <p:remoteCommand 
             name="rcHybridFormSave"
-            id="id_freeform_submit_button"
             value="Kaydet"
             action="#{freeDesigner.save}"
             update=":idMessageDialog"
             >
         </p:remoteCommand>
+
         <h:panelGrid 
             columns="2" 
             style="border: 0px solid #A6C9E2;border-collapse: collapse;width: 90%;vertical-align: top;"
@@ -58,11 +60,13 @@
                         rendered="#{'inputTextarea' eq freeDesigner.myRecord.crudFieldMap[x].componentType}"
                         style="width: 100%;"
                         />
-                    <p:calendar 
-                        value="#{freeDesigner.myRecord.crudMap[x]}" 
-                        readonly="#{freeDesigner.myRecord.crudFieldMap[x].readonly}"
+                    <mydynamic:uysDateTimeEntry 
+                        myvalue="#{freeDesigner.myRecord.crudMap[x]}" 
                         rendered="#{'inputDate' eq freeDesigner.myRecord.crudFieldMap[x].componentType}"
-                        style="width: 95%;"
+                        label="#{freeDesigner.myRecord.crudFieldMap[x].name}" 
+                        dateChange="#{freeDesigner.dateChange}"
+                        myconverter="null"
+                        mypattern="yyyy.MM.dd HH:mm"
                         />
                     <p:selectOneMenu
                         value="#{freeDesigner.myRecord.crudMap[x]}" 

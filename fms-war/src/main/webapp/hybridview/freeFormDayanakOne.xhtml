@@ -24,14 +24,14 @@
     </style>
 
     <h:form id="id_freeform">
-        <p:commandButton 
-            id="id_freeform_submit_button"
-            style="display: none;"            
-            value="Kaydet"
+        <p:remoteCommand 
+            name="rcOneFreeFormSave"
+            value="Kaydet" 
             action="#{freeDesigner.save}"
+            rendered="#{formService.myForm.myActions.save}"
             update=":idMessageDialog"
-            >
-        </p:commandButton>
+            />
+
         <h:panelGrid 
             columns="2" 
             style="border: 0px solid #A6C9E2;border-collapse: collapse;width: 90%;vertical-align: top;"
