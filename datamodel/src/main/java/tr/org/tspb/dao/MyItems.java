@@ -1,7 +1,5 @@
 package tr.org.tspb.dao;
 
-import com.mongodb.MongoConfigurationException;
-import com.mongodb.client.model.Filters;
 import java.util.ArrayList;
 import java.util.Arrays;
 import static tr.org.tspb.constants.ProjectConstants.*;
