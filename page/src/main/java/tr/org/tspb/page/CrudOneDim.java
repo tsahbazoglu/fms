@@ -215,10 +215,8 @@ public class CrudOneDim implements ValueChangeListener, Serializable {
     }
 
     public String deleteFile() {
-        if (formService.getMyForm().getMyActions().isDelete()) {
-            mongoDbUtil.removeFile(baseService.getProperties().getUploadTable(), new ObjectId(toBeDeletedFileID));
-            refreshUploadedFileList();
-        }
+        mongoDbUtil.removeFile(baseService.getProperties().getUploadTable(), new ObjectId(toBeDeletedFileID));
+        refreshUploadedFileList();
         return null;
     }
 
@@ -807,17 +805,6 @@ public class CrudOneDim implements ValueChangeListener, Serializable {
             Document record = new Document(operatedObject).append(UYS_EASY_FIND_KEY, toBeRetrivedValue);
 
             try {
-
-                for (String key : record.keySet()) {
-                    if (record.get(key) instanceof Object[]) {
-                        Object[] multiValues = (Object[]) record.get(key);
-                        List<String> list = new ArrayList<>();
-                        for (Object obj : multiValues) {
-                            list.add(obj.toString());
-                        }
-                        record.put(key, list);
-                    }
-                }
                 mongoDbUtil.insertOne(inode.getDb(), inode.getTable(), record);
             } catch (MongoWriteException ex) {
                 throw new FormConfigException(ex.getMessage(), ex);
@@ -913,7 +900,7 @@ public class CrudOneDim implements ValueChangeListener, Serializable {
                             MessageFormat.format("[{0}] {1}", field.getShortName(), MessageBundleLoaderv1.getMessage("requiredMessage")),//
                             "*");
                     FacesContext.getCurrentInstance().addMessage(null, facesMessageRequired);
-                    throw new UserException("<br/><br/> Dosya Eksik. 'Ekli Dosyalar' sekmesinden talep edilen belge(leri) ekleyiniz");
+                    throw new UserException("Dosya Eksik, Lütfen Dosya Yükleyiniz.");
                 }
             }
         }
