@@ -79,9 +79,7 @@ public class DlgCtrl implements Serializable {
     }
 
     public void showPopupError(String msg) {
-        bulkSet(null, null, "Hata",
-                new StringBuilder("class :" + this.getClass().getSimpleName() + "<br/>").append("hata mesajı : ").append(msg).toString(),
-                true, true);
+        bulkSet(null, null, "Hata", new StringBuilder("<br/><br/>").append(msg).toString(), true, true);
         setRenderedButon(false);
         setRenderedOkButon(false);
         setRendered(false);
