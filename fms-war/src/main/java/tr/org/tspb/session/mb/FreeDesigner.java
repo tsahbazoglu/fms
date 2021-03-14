@@ -25,6 +25,7 @@ import javax.inject.Inject;
 import javax.servlet.http.HttpSession;
 import org.bson.Document;
 import org.primefaces.event.FileUploadEvent;
+import org.primefaces.event.SelectEvent;
 import org.primefaces.model.FilterMeta;
 import org.primefaces.model.LazyDataModel;
 import org.primefaces.model.SortMeta;
@@ -36,6 +37,7 @@ import tr.org.tspb.dao.MyForm;
 import tr.org.tspb.common.services.AppScopeSrvCtrl;
 import tr.org.tspb.common.services.BaseService;
 import tr.org.tspb.dao.MyBaseRecord;
+import tr.org.tspb.dao.MyField;
 import tr.org.tspb.dao.refs.PlainRecord;
 import tr.org.tspb.dp.nullobj.PlainRecordData;
 import tr.org.tspb.pojo.PostSaveResult;
@@ -93,6 +95,9 @@ public class FreeDesigner implements Serializable {
     private MyRecord selectedRow;
 
     private LazyDataModel<MyRecord> myRecords;
+
+    public void dateChange(SelectEvent event) {
+    }
 
     public String search() {
 
