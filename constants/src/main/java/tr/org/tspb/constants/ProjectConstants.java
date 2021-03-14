@@ -269,6 +269,8 @@ public class ProjectConstants {
     public static final String MEMBER_ID = "memberID";
     public static final String METADATA = "metadata";
     public static final String METADATA_CRUD_OBJECT_ID = METADATA.concat(DOT).concat(CRUD_OBJECT_ID);
+    public static final String METADATA_USERNAME = METADATA.concat(DOT).concat("username");
+    public static final String METADATA_SELECTED_FORM_KEY = METADATA.concat(DOT).concat("selectFormKey");
 
     public static final String MENU_ORDER = "menuOrder";
     public static final String MEASURE = "MEASURE";
