@@ -139,13 +139,13 @@ public enum EnumPage {
             "Ana Sayfa",//
             "Ana Sayfa"),
     FREE_FORM_1D(
-            "/hybridview/freeFormPageUser.xhtml",
-            "/hybridview/freeFormPageUser.xhtml",
+            "/freeform/freeFormPageUser.xhtml",
+            "/freeform/freeFormPageUser.xhtml",
             "Admin",
             "İşlemler | Dönem",
             null,
             null,
-            "/hybridview/freeFormToolbar.xhtml",
+            "/freeform/freeFormToolbar.xhtml",
             "/common/esignHistory.xhtml"
     ),
     FREE_FORM_2D(
