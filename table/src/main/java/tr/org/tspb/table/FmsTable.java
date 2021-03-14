@@ -127,7 +127,7 @@ public abstract class FmsTable extends FmsTableView {
     private String mongoUploadFileType = "/(\\.|\\/)(pdf)$/";
     private String invalidFileMessage = "Geçersiz Dosya Tipi (Sadece PDF dosyalar eklenebilir) : ";
     private List<Document> listOfToBeUpsert = new ArrayList<>();
-    private String toBeDeletedFileID;
+    protected String toBeDeletedFileID;
     private boolean enableHistoryOnSave = true;
     private String headerTitle;
     protected List<Map<String, String>> listFileData = new ArrayList<>();
@@ -295,9 +295,15 @@ public abstract class FmsTable extends FmsTableView {
             switch (WRITE_TO) {
                 case "GRIDFS_DB":
                     BasicDBObject metadata = new BasicDBObject();
-                    // null points to the fact that this record(file) is not related yet.
-                    // we will use this NULL state during the search over all other forms
-                    metadata.put(CRUD_OBJECT_ID, null);
+
+                    if (crudObject.get("_id") instanceof ObjectId) {
+                        metadata.put(CRUD_OBJECT_ID, (ObjectId) crudObject.get("_id"));
+                    } else {
+                        // null points to the fact that this record(file) is not related yet.
+                        // we will use this NULL state during the search over all other forms
+                        metadata.put(CRUD_OBJECT_ID, null);
+                    }
+
                     metadata.put("selectFormKey", formService.getMyForm().getKey());
                     metadata.put("selectFormName", formService.getMyForm().getName());
                     metadata.put("username", loginController.getLoggedUserDetail().getUsername());
@@ -555,8 +561,13 @@ public abstract class FmsTable extends FmsTableView {
     }
 
     public String deleteFile() {
+        deleteFile(toBeDeletedFileID);
+        return null;
+    }
+
+    private String deleteFile(String objectId) {
         if (formService.getMyForm().getMyActions().isDelete()) {
-            mongoDbUtil.removeFile(baseService.getProperties().getUploadTable(), new ObjectId(toBeDeletedFileID));
+            mongoDbUtil.removeFile(baseService.getProperties().getUploadTable(), new ObjectId(objectId));
             refreshUploadedFileList();
         }
         return null;
@@ -573,6 +584,10 @@ public abstract class FmsTable extends FmsTableView {
 
         listFileData = repositoryService.findGridFsFileList(objectId);
         refreshUploadedFileListAll();
+    }
+
+    public List<Map<String, String>> getListFileData() {
+        return listFileData;
     }
 
     public void refreshUploadedFileListAll() {
@@ -863,7 +878,7 @@ public abstract class FmsTable extends FmsTableView {
                             MessageFormat.format("[{0}] {1}", field.getShortName(), MessageBundleLoaderv1.getMessage("requiredMessage")),//
                             "*");
                     FacesContext.getCurrentInstance().addMessage(null, facesMessageRequired);
-                    throw new UserException("<br/><br/> Dosya Eksik. 'Ekli Dosyalar' sekmesinden talep edilen belge(leri) ekleyiniz");
+                    throw new UserException("<br/><br/> Dosya Eksik");
                 }
             }
         }
@@ -1058,6 +1073,10 @@ public abstract class FmsTable extends FmsTableView {
             mongoDbUtil.deleteMany(myForm.getDb(), collection, new Document(MONGO_ID, objectID));
 
             mongoDbUtil.trigger(repositoryService.expandCrudObject(myForm, new Document(crudObject)), myForm.getEventPostDelete(), loginController.getRolesAsList());
+
+            for (Map entry : listFileData) {
+                deleteFile(entry.get("fileID").toString());
+            }
 
             crudObject = ogmCreator.getCrudObject();
 
