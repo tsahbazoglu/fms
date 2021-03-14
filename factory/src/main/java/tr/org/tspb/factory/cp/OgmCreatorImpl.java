@@ -250,6 +250,7 @@ public class OgmCreatorImpl implements OgmCreatorIntr {
 
             return new MyForm.Builder(myProject, dboForm, searchObject, roleMap, userDetail, fmsScriptRunner, fmsRunMongoCmd)
                     .withOthers()
+                    .maskMultiUpload()
                     .maskFilter()
                     .maskAccesscontrol()
                     .maskReadOnlyNote()
@@ -336,6 +337,7 @@ public class OgmCreatorImpl implements OgmCreatorIntr {
 
             return new MyForm.Builder(myProject, dboForm, searchObject, roleMap, userDetail, fmsScriptRunner, fmsRunMongoCmd)
                     .withOthers()
+                    .maskMultiUpload()
                     .maskFilter()
                     .maskFields(fieldsSmall)
                     .withFieldsAsList(fieldsAsList)
@@ -387,6 +389,7 @@ public class OgmCreatorImpl implements OgmCreatorIntr {
 
             return new MyForm.Builder(myProject, dboForm, filter, roleMap, userDetail, fmsScriptRunner, fmsRunMongoCmd)
                     .withOthers()
+                    .maskMultiUpload()
                     .maskFilter()
                     .maskZetDimension()
                     .maskAccesscontrol()
