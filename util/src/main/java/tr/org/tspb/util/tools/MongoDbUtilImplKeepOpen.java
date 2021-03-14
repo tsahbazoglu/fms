@@ -604,15 +604,49 @@ public class MongoDbUtilImplKeepOpen implements MongoDbUtilIntr {
         }
     }
 
+    public void insertOne(String database, String collection, Document record) {
+
+        for (String key : record.keySet()) {
+            if (record.get(key) instanceof Object[]) {
+                Object[] multiValues = (Object[]) record.get(key);
+                List list = new ArrayList<>();
+                for (Object obj : multiValues) {
+                    if (obj instanceof ObjectId) {
+                        list.add(obj);
+                    } else {
+                        list.add(obj.toString());
+                    }
+                }
+                record.put(key, list);
+            } else if (record.get(key) instanceof String) {
+                record.put(key, ((String) record.get(key)).replaceAll("<", "").replaceAll(">", ""));
+            }
+        }
+
+        Document setUnset = new Document(DOLAR_SET, record);
+        if (record.containsKey(DOLAR_UNSET)) {
+            setUnset.append(DOLAR_UNSET, record.remove(DOLAR_UNSET));
+            if (((Document) setUnset.get(DOLAR_UNSET)).isEmpty()) {
+                setUnset.remove(DOLAR_UNSET);
+            }
+        }
+
+        mongoClient.getDatabase(database).getCollection(collection).insertOne(record);
+    }
+
     @Override
     public void updateOne(String database, String collection, Bson filter, Document record) {
 
         for (String key : record.keySet()) {
             if (record.get(key) instanceof Object[]) {
                 Object[] multiValues = (Object[]) record.get(key);
-                List<String> list = new ArrayList<>();
+                List list = new ArrayList<>();
                 for (Object obj : multiValues) {
-                    list.add(obj.toString());
+                    if (obj instanceof ObjectId) {
+                        list.add(obj);
+                    } else {
+                        list.add(obj.toString());
+                    }
                 }
                 record.put(key, list);
             } else if (record.get(key) instanceof String) {
@@ -701,25 +735,6 @@ public class MongoDbUtilImplKeepOpen implements MongoDbUtilIntr {
                 }
             }
         }
-    }
-
-    public void insertOne(String database, String collection, Document record) {
-
-        for (String key : record.keySet()) {
-            if (record.get(key) instanceof String) {
-                record.put(key, ((String) record.get(key)).replaceAll("<", "").replaceAll(">", ""));
-            }
-        }
-
-        Document setUnset = new Document(DOLAR_SET, record);
-        if (record.containsKey(DOLAR_UNSET)) {
-            setUnset.append(DOLAR_UNSET, record.remove(DOLAR_UNSET));
-            if (((Document) setUnset.get(DOLAR_UNSET)).isEmpty()) {
-                setUnset.remove(DOLAR_UNSET);
-            }
-        }
-
-        mongoClient.getDatabase(database).getCollection(collection).insertOne(record);
     }
 
     public void deleteMany(String database, String collection, Document document) {
