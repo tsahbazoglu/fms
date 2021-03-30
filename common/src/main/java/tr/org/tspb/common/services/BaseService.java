@@ -195,7 +195,7 @@ public class BaseService extends AbstractSrv {
             delegatedMemberFieldName = document.getProperty(ProjectConstants.DELEGATED_MEMBER_FIELD_NAME);
             delegatingMemberFieldName = document.getProperty(ProjectConstants.DELEGATING_MEMBER_FIELD_NAME);
             delegatingFormFieldName = document.getProperty(ProjectConstants.DELEGATING_FORM_FIELD_NAME);
-            welcomePageContent = document.getProperty("WELCOME_PAGE");
+            welcomePageContent = document.getProperty("WELCOME_PAGE", "");
             //
             delegateDbName = document.getProperty(ProjectConstants.DELEGATE_DB_NAME, "iondb");
             delegateTableName = document.getProperty(ProjectConstants.DELEGATE_TABLE_NAME, "member_eimza_info");
