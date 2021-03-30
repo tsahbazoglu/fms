@@ -794,7 +794,7 @@ public class RepositoryService implements Serializable {
         // null points to the fact that this record(file) is not related yet.
         // we will use this NULL state during the search over all other forms
         metadata.put(CRUD_OBJECT_ID, null);
-        metadata.put("selectFormKey", selectedForm.getKey());
+        metadata.put(SELECT_FORM_KEY, selectedForm.getKey());
         metadata.put("selectFormName", selectedForm.getName());
         metadata.put("username", loginController.getLoggedUserDetail().getUsername());
 
