@@ -23,6 +23,38 @@
     </h:form>
 
     <br/>
+
+    <h:form
+        rendered="#{esignController.admin}"
+        >
+
+        <h:panelGrid columns="4">
+
+            <h:inputText value="#{esignController.fullTextSearch}"/>
+
+            <p:commandButton 
+                value="Kurum Adına Göre Ara" 
+                action="#{esignController.searchByMemberName}" 
+                update="#{updateAjaxMB.pnlEsignHistory}"
+                />
+
+            <p:commandButton 
+                value="Tüm Alanlara Göre Ara" 
+                action="#{esignController.makeFullTExtSearch}" 
+                update="#{updateAjaxMB.pnlEsignHistory}"
+                />
+
+            <p:commandButton 
+                value="Tüm Kayıtlar" 
+                action="#{esignController.cleanFullTextSearch}" 
+                update="#{updateAjaxMB.pnlEsignHistory}"
+                />
+            
+        </h:panelGrid>
+    </h:form>
+
+    <br/>
+
     <p:panel 
         id="id_eimza_tarihce"
         >
@@ -116,23 +148,6 @@
         </p:poll>
     </h:form>
 
-    <h:form
-        rendered="#{roleMB[esignController.selectedForm.myProject.adminAndViewerRole]}"
-        >
-        <h:inputText value="#{esignController.fullTextSearch}"/>
-        <p:commandButton value="Kurum Adına Göre Ara" 
-                         action="#{esignController.searchByMemberName}" 
-                         update="#{updateAjaxMB.pnlEsignHistory}"
-                         />
-        <p:commandButton value="Tüm Alanlara Göre Ara" 
-                         action="#{esignController.makeFullTExtSearch}" 
-                         update="#{updateAjaxMB.pnlEsignHistory}"
-                         />
-        <p:commandButton value="Tüm Kayıtlar" 
-                         action="#{esignController.cleanFullTextSearch}" 
-                         update="#{updateAjaxMB.pnlEsignHistory}"
-                         />
 
-    </h:form>
 
 </html>
