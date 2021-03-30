@@ -68,6 +68,7 @@ public class ProjectConstants {
     public static final String ATTRIBUTES = "attributes";
     public static final String AUTOSET = "autoset";
     public static final String ACCESS_CONTROL_LEVEL_TWO = "accessControlLevelTwo";
+
     //B
     //C
     public static final String CALCULATE_ON_LIST_VIEW = "on-list-view";
@@ -126,6 +127,7 @@ public class ProjectConstants {
     public static final String CONTROL_COLLECTION = "controlCollection";
     public static final String COLUMN_LIST = "columList";
     public static final String CRUD_OBJECT_ID = "crud_object_id";
+
     //D
     public static final String DESCRIPTION = "description";
     public static final String POPUP_DESCRIPTION = "popupDesc";
@@ -133,13 +135,11 @@ public class ProjectConstants {
     public static final String DEFAULT_VALUE = "defaultValue";
     public static final String DEFAULT_QUERY = "defaultQuery";
     public static final String DEBUG_MODE = "DEBUG_MODE";
-
     public static final String DELEGATE_DB_NAME = "DELEGATE_DB_NAME";
     public static final String DELEGATE_TABLE_NAME = "DELEGATE_TABLE_NAME";
     public static final String DELEGATING_FORM_FIELD_NAME = "DELEGATING_FORM_FIELD_NAME";
     public static final String DELEGATING_MEMBER_FIELD_NAME = "DELEGATING_MEMBER_FIELD_NAME";
     public static final String DELEGATED_MEMBER_FIELD_NAME = "DELEGATED_MEMBER_FIELD_NAME";
-
     public static final String FORM_DIMENSION = "DIMENSION";
     public static final String DIMENSION_LOWER_CASE = "dimension";
     public static final String DEFAULT_CURRENT_QUERY = "defaultCurrentQuery";
@@ -157,6 +157,7 @@ public class ProjectConstants {
     public static final String DATE_RANGE_END_KEY = "dateRangeEndKey";
     public static final String DATE_RANGE_VALIDATE = "dateRangeValidate";
     public static final String DIVIDER = "divider";
+
     //E
     public static final String ERROR = "Hata";
     public static final String EDIT_RECORD_TYPE = "Kayıt Tipi Güncelleme";
@@ -216,6 +217,7 @@ public class ProjectConstants {
     public static final String GUI = "gui";
     public static final String GUI_X = "x";
     public static final String GUI_Y = "y";
+
     //H
     public static final String HAYIR = "HAYIR"; //
     public static final String HTTP_SCHEME = "http"; //
@@ -227,6 +229,7 @@ public class ProjectConstants {
     public static final String HANDSON_ROW_HEADER_WIDTH = "handsonRowHeaderWidth";
     public static final String HANDSON_COL_WIDTH = "handsonColWidths";
     public static final String HTTP_SESSION_ATTR_MAP_REQURED_CONTROL = "mapRequiredControl";
+
     //I
     public static final String INPUT = "input";
     public static final String INPUT_FILE = "inputFile";
@@ -236,11 +239,14 @@ public class ProjectConstants {
     public static final String IMPORT_TEXT_FROMAT = "importTextFormat";
     public static final String INODE = "inode";
     public static final String INCLUDE = "include";
+
     //J
     public static final String JSF_ATTR_PATTERNNAME = "patternName";
     public static final String JEVAL_RETURN_TYPE = "jevalRetunType";
+
     //K
     public static final String FORM_KEY = "key";
+
     //L
     public static final String LDAP_UID = "uid";
     public static final String LABEL = "label";
@@ -268,10 +274,6 @@ public class ProjectConstants {
     public static final String MEMBER = "member";
     public static final String MEMBER_ID = "memberID";
     public static final String METADATA = "metadata";
-    public static final String METADATA_CRUD_OBJECT_ID = METADATA.concat(DOT).concat(CRUD_OBJECT_ID);
-    public static final String METADATA_USERNAME = METADATA.concat(DOT).concat("username");
-    public static final String METADATA_SELECTED_FORM_KEY = METADATA.concat(DOT).concat("selectFormKey");
-
     public static final String MENU_ORDER = "menuOrder";
     public static final String MEASURE = "MEASURE";
     public static final String MEMBER_TYPE = "memberType";
@@ -306,12 +308,14 @@ public class ProjectConstants {
     public static final String ND_FUNCTION = "ndFunction";
     public static final String ND_FUNCTION_SET = "ndFunctionSet";
     public static final String NOT_ON_USER_ROLE = "notOnUserRole";//see ON_USER_ROLE
+
     //O
     public static final String OBSERVABLE = "observable";
     public static final String OBSERVER = "observer";
     public static final String ON_USER_ROLE = "onUserRole";//see NOT_ON_USER_ROLE
     public static final String ORDER = "order";
     public static final String OPERATOR_LDAP_UID = "operatorLdapUID";
+
     //P
     public static final String PPOLICY = "ppolicy";
     public static final String PARENT = "parent";
@@ -345,6 +349,7 @@ public class ProjectConstants {
     public static final String RETURN_KEY = "returnKey";
     public static final String REF_COLLECTION = "refCollection";
     public static final String ROW_LIST = "rowList";
+    public static final String REGISTRED_FUNC_NAME = "registred-func-name";
     //S
 
     public static final String ACTION_CHECK_ALL = "checkAll";
@@ -357,6 +362,7 @@ public class ProjectConstants {
     public static final String SELECT_PLEASE = "Lütfen Seçiniz";
     public static final String SELF = "self";
     public static final String SELECTED_FORM_KEY = "selectedFormKey";
+    public static final String SELECT_FORM_KEY = "selectFormKey";
     public static final String SELECTED_FIELD_KEY = "selectedFieldKey";
     public static final String SEARCH_FORM = "searchForm";
     public static final String FORM_FILTER = "filter";
@@ -455,13 +461,6 @@ public class ProjectConstants {
     public static final String DOLAR_LANGUAGE = "$language";
     public static final String MONGO_ID = "_id";
     public static final String MONGO_UNIQUE = "unique";
-    //
-    public static final String MSG_FORMAT_CONTROL_FORMULA = "".concat("<table>")
-            .concat("<tr><td>kontrol kodu</td><td>:</td><td>{0}</td></tr>")
-            .concat("<tr><td>ad</td><td>:</td><td>{1}</td></tr>")
-            .concat("<tr><td>işlemci</td><td>:</td><td>{2}</td></tr>")
-            .concat("</table>");
-
     public final static String UYS_SELECTED_FROM = "uysSelectedForm";
     public final static String UYS_DOWNLOAD_READER = "uysDownloadReader";
     public final static String EXCEL_FORMAT_PATH = "excelFormatPath";
@@ -472,5 +471,18 @@ public class ProjectConstants {
     public final static String JAVALANG_STRING = "java.lang.String";
     public final static String JAVALANG_DATE = "java.lang.Date";
     public final static String JAVAUTIL_DATE = "java.util.Date";
+
+    // CONCATS
+    public static final String METADATA_SELECTED_FORM_KEY = METADATA.concat(DOT).concat(SELECT_FORM_KEY);
+    public static final String METADATA__SELECTED_FORM_KEY = METADATA.concat(DOT).concat(SELECTED_FORM_KEY);
+    public static final String METADATA_CRUD_OBJECT_ID = METADATA.concat(DOT).concat(CRUD_OBJECT_ID);
+    public static final String METADATA_USERNAME = METADATA.concat(DOT).concat("username");
+    public static final String METADATA__MEMBER_NAME = METADATA.concat(DOT).concat(MEMBER_NAME);
+    public static final String METADATA__SOURCE_TEXT = METADATA.concat(DOT).concat("sort_text");
+    public static final String MSG_FORMAT_CONTROL_FORMULA = "".concat("<table>")
+            .concat("<tr><td>kontrol kodu</td><td>:</td><td>{0}</td></tr>")
+            .concat("<tr><td>ad</td><td>:</td><td>{1}</td></tr>")
+            .concat("<tr><td>işlemci</td><td>:</td><td>{2}</td></tr>")
+            .concat("</table>");
 
 }
