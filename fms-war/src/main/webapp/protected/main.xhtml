@@ -598,7 +598,7 @@
                             <p:toolbar>
                                 <f:facet name="left">
                                     <p:linkButton
-                                        href="muhurdar?mhr=1&amp;contentId=#{esignController.crudObjectTextViewerID}&amp;viewId=#{esignViewCtrl.viewId}&amp;subject=TSPB E-Imza"
+                                        href="muhurdar?mhr=1&amp;base64=true&amp;contentId=#{esignController.crudObjectTextViewerID}&amp;viewId=#{esignViewCtrl.viewId}&amp;subject=TSPB E-Imza"
                                         onclick="PF('poll').start();"
                                         style="font-size: 20px;"
                                         value="İmzala"
@@ -715,16 +715,7 @@
 
                         <p:panel>       
                             <b>Mühürdar</b> eimza uygulama kurulumu:
-                            <ul>
-                                <li>
-                                    <a href="http://java.com" 
-                                       target="_blank"
-                                       class="ahref"
-                                       >
-                                        http://java.com
-                                    </a> 
-                                    sayfası üzeriden bilgisayarınıza <b>Java</b> uygulamasını kurunuz
-                                </li>
+                            <ul style="display: none;">
                                 <li>
                                     Eski Java sürümlerine <a href="https://www.oracle.com/java/technologies/javase/javase8u211-later-archive-downloads.html" 
                                                              target="_blank"
@@ -742,15 +733,40 @@
                                 </li>
                                 <li>
                                     Kurulum işlemleri için <b>C:\Muhurdar</b> klasörü içindeki <b>README.txt</b> dosyasında belirtilen adımları uygulayınız.
-                                </li>                                
+                                </li>  
                             </ul>
+
+                            <ul>
+                                <li>
+                                    <a href="http://java.com" 
+                                       target="_blank"
+                                       class="ahref"
+                                       >
+                                        http://java.com
+                                    </a> 
+                                    sayfası üzeriden bilgisayarınıza <b>Java 8 update 291</b> sürümünü kurunuz
+                                </li>
+                                <li>
+                                    <a 
+                                        href="/public/muhurdar-agent-2.0.0-BETA3-installer.jar" 
+                                        class="ahref"
+                                        >
+                                        <b>Müdürdar</b>
+                                    </a> 
+                                    bağlantısı üzerinden indirilen <b>muhurdar-agent-2.0.0-BETA3-installer.jar</b> kurulum dosyasını çalıştırınız
+                                </li>
+
+                            </ul>
+
+                            <br/>
+
                             İmzalama İşlemi
                             <ul>
                                 <li>
                                     Eimza Kartınızın takılı olduğundan emin olunuz
                                 </li>
                                 <li>
-                                    <b>İmzala</b> düğmesine basıldığında imzalanmak üzere <b>*.muhurdar</b> uzantılı bir dosya bilgisayarınıza indirilecek
+                                    <b>İmzala</b> düğmesine basıldığında imzalanmak üzere <b>*.mhr</b> uzantılı bir dosya bilgisayarınıza indirilecek
                                 </li>
                                 <li>
                                     İndirilen dosya üzerine tıklayınız
