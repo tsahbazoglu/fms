@@ -304,7 +304,7 @@ public abstract class FmsTable extends FmsTableView {
                         metadata.put(CRUD_OBJECT_ID, null);
                     }
 
-                    metadata.put("selectFormKey", formService.getMyForm().getKey());
+                    metadata.put(SELECT_FORM_KEY, formService.getMyForm().getKey());
                     metadata.put("selectFormName", formService.getMyForm().getName());
                     metadata.put("username", loginController.getLoggedUserDetail().getUsername());
 
