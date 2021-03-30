@@ -34,7 +34,7 @@ public class UpdateAjaxMB implements Serializable {
     private static final String ID_TWO_DIM_DLG_PNL = "";//"crud2dForm:crud_2d_dlg_panel";
     private static final String ID_DATATABLE_WF_HISTORY = "idTwoDlgTabView:id-dt-wf";
     private static final String ID_CONTENT = "";//ID_TAB_VIEW.concat(":").concat("idContentObjectList");
-    private static final String ID_PNL_ESIGN_HISTORY = "";//ID_TAB_VIEW.concat(":").concat("id_eimza_tarihce");
+    private static final String ID_PNL_ESIGN_HISTORY = ID_TAB_VIEW.concat(":").concat("id_eimza_tarihce");
     private static final String ID_2D_DATA_TABLE = ID_TAB_VIEW.concat(":").concat("objectsDataTable");
     private static final String ID_ESIGN = "";//ID_TAB_VIEW.concat(":").concat("id_eimza");
     private static final String ID_UPLOADED_FILES = ID_TAB_VIEW.concat(":").concat("id-uploaded-files");
