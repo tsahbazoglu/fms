@@ -920,7 +920,7 @@ public class CrudOneDim implements ValueChangeListener, Serializable {
                         crudObjectId = (ObjectId) crudObject.get(MONGO_ID);
                     }
                     metadata.put(CRUD_OBJECT_ID, crudObjectId);
-                    metadata.put("selectFormKey", formService.getMyForm().getKey());
+                    metadata.put(SELECT_FORM_KEY, formService.getMyForm().getKey());
                     metadata.put("selectFormName", formService.getMyForm().getName());
                     metadata.put("username", loginController.getLoggedUserDetail().getUsername());
 
