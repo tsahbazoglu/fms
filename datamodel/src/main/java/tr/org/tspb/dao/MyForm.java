@@ -1536,7 +1536,7 @@ public class MyForm implements MyFormXs {
             }
 
             // code properties
-            this.myForm.esignEmailToRecipients = dbObjectForm.getString(ESIGN_EMAIL_TO_RECIPIENTS);
+            maskEsignEmailToRecipients();
 
             // number properties
             if (dbObjectForm.get(COLUMN_COUNT) instanceof Number) {
@@ -1557,6 +1557,21 @@ public class MyForm implements MyFormXs {
             }
             if (dbObjectForm.get(UNIQUE_INDEX_LIST) instanceof List) {
                 this.myForm.uniqueIndexList = (List) dbObjectForm.get(UNIQUE_INDEX_LIST);
+            }
+
+            return this;
+        }
+
+        public Builder maskEsignEmailToRecipients() {
+            Document esignEmailToRecipients = dbObjectForm.get(ESIGN_EMAIL_TO_RECIPIENTS, Document.class);
+
+            String func = esignEmailToRecipients.getString("func");
+
+            if (func != null) {
+                this.myForm.esignEmailToRecipients = func;
+            } else {
+                String registredFuncName = esignEmailToRecipients.getString(REGISTRED_FUNC_NAME);
+                this.myForm.esignEmailToRecipients = this.myProject.getRegistredFunctions().getString(registredFuncName);
             }
 
             return this;
