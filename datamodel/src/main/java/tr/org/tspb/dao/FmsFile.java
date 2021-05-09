@@ -1,6 +1,6 @@
 package tr.org.tspb.dao;
 
-import com.mongodb.BasicDBObject;
+import org.bson.Document;
 
 /**
  *
@@ -20,7 +20,7 @@ public interface FmsFile {
 
     public String getContent();
 
-    public BasicDBObject getMetadata();
+    public Document getMetadata();
 
     public String getUploadDateAsString();
 
