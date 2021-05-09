@@ -5,6 +5,7 @@
  */
 package tr.org.tspb.dao;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -17,7 +18,35 @@ import tr.org.tspb.wf.MyRule;
  *
  * @author telman
  */
-public interface FmsForm extends MyFormXs {
+public interface FmsForm {
+
+    public static final String SCHEMA_VERSION_100 = "1.0.0";
+    public static final String SCHEMA_VERSION_110 = "1.1.0";
+    public static final String SCHEMA_VERSION_111 = "1.1.1";
+    public static final String SCHEMA_VERSION = "schemaVersion";
+    public static final String ION_SETTING_ACTIVITY_STATUS = "ion_setting_activity_status";
+
+    public String getKey();
+
+    public String getLoginFkField();
+
+    public String printToConfigAnalyze(String fieldKey);
+
+    public String getName();
+
+    public Number getHistoryPosition();
+
+    public Number getDimension();
+
+    public String getFormType();
+
+    public HashMap<String, Object> getDefaultCurrentQuery();
+
+    public HashMap<String, Object> getDefaultHistoryQuery();
+
+    public List<String> getZetDimension();
+
+    public MyProject getMyProject();
 
     public String getDb();
 
