@@ -15,9 +15,14 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import javax.script.Invocable;
+import javax.script.ScriptEngine;
+import javax.script.ScriptEngineManager;
+import jdk.nashorn.api.scripting.ScriptObjectMirror;
 import org.bson.Document;
 import org.bson.types.Code;
 import org.bson.types.ObjectId;
+import tr.org.tspb.constants.ProjectConstants;
 import tr.org.tspb.datamodel.expected.FmsRunMongoCmd;
 import tr.org.tspb.datamodel.expected.FmsScriptRunner;
 import tr.org.tspb.pojo.ComponentType;
@@ -27,17 +32,21 @@ import tr.org.tspb.pojo.UserDetail;
  *
  * @author Telman Şahbazoğlu
  */
-public class MyForm implements MyFormXs {
+public class MyForm extends FmsFormAbstract {
 
     public static final String SCHEMA_VERSION_100 = "1.0.0";
     public static final String SCHEMA_VERSION_110 = "1.1.0";
+    public static final String SCHEMA_VERSION_111 = "1.1.1";
     public static final String SCHEMA_VERSION = "schemaVersion";
 
     public static final String ION_SETTING_ACTIVITY_STATUS = "ion_setting_activity_status";
 
+    private final ScriptEngineManager mgr = new ScriptEngineManager();
+    private final ScriptEngine jsEngine = mgr.getEngineByName("JavaScript");
+
     //
-    public RoleMap roleMap;
-    public UserDetail userDetail;
+    private RoleMap roleMap;
+    private UserDetail userDetail;
     public Map searchObject;
     private String loginFkField;
     //    
@@ -492,7 +501,7 @@ public class MyForm implements MyFormXs {
 
     public void runAjaxRender(MyField myField,
             Map<String, MyField> componentMap,
-            final MyForm selectedForm,
+            final FmsForm selectedForm,
             MyMap crudObject,
             RoleMap roleMap,
             UserDetail userDetail,
@@ -505,10 +514,29 @@ public class MyForm implements MyFormXs {
         Document crudObjAsDoc = new Document(crudObject);
         crudObjAsDoc.remove(INODE);
 
-        Document commandResult = fmsScriptRunner.runCommand(selectedForm.getDb(),
-                myField.getAjaxShowHide(), crudObject.get(myField.getKey()), crudObjAsDoc, roleMap);
+        Object result = null;
 
-        Object result = commandResult.get(RETVAL);
+        if (FmsForm.SCHEMA_VERSION_111.equals(selectedForm.getSchemaVersion())) {
+            try {
+                String jsScriptString = myField.getAjaxShowHide().replace(DIEZ, DOLAR);
+                jsScriptString = "calculate=" + jsScriptString;
+                jsEngine.eval(jsScriptString);
+                Invocable inv = (Invocable) jsEngine;
+                Object obj = inv.invokeFunction("calculate", crudObject.get(myField.getKey()));
+                if (obj instanceof ScriptObjectMirror) {
+                    ScriptObjectMirror scriptObjectMirror = (ScriptObjectMirror) obj;
+                    result = new Document();
+                    for (String key : scriptObjectMirror.keySet()) {
+                        ((Document) result).put(key, scriptObjectMirror.get(key));
+                    }
+                }
+            } catch (Exception e) {
+            }
+        } else {
+            Document commandResult = fmsScriptRunner.runCommand(selectedForm.getDb(),
+                    myField.getAjaxShowHide(), crudObject.get(myField.getKey()), crudObjAsDoc, roleMap);
+            result = commandResult.get(RETVAL);
+        }
 
         if (result instanceof Boolean) {
             if (Boolean.TRUE.equals(result)) {
@@ -547,7 +575,7 @@ public class MyForm implements MyFormXs {
 
     public void runAjaxRenderRef(MyField myField,
             Map<String, MyField> componentMap,
-            final MyForm selectedForm,
+            final FmsForm selectedForm,
             MyMap crudObject,
             RoleMap roleMap,
             UserDetail userDetail,
@@ -592,7 +620,8 @@ public class MyForm implements MyFormXs {
 
     public void arrangeActions(RoleMap roleMap, Document searchObject, MyMap crudObject) {
 
-        if (MyForm.SCHEMA_VERSION_110.equals(this.getSchemaVersion())) {
+        if (FmsForm.SCHEMA_VERSION_110.equals(this.getSchemaVersion())
+                || FmsForm.SCHEMA_VERSION_111.equals(this.getSchemaVersion())) {
             this.myActions = new MyActions.Build(this.getMyProject().getViewerRole(), this.getDb(),
                     roleMap, searchObject, actions, fmsScriptRunner, userDetail)
                     .maskMyForm(this)
@@ -848,31 +877,6 @@ public class MyForm implements MyFormXs {
             return this;
         }
 
-        public Builder maskUserNote() {
-
-            Object obj = dbObjectForm.get(USER_NOTE);
-
-            String funVal = null;
-            String strVal = null;
-
-            if (obj instanceof Document) {
-                funVal = ((Document) obj).getString("fnctn-val");
-                strVal = ((Document) obj).getString("strng-val");
-            } else if (obj instanceof String) {
-                funVal = obj.toString();
-            }
-
-            if (funVal != null) {
-                this.myForm.userNote = executeFunc(funVal);
-            } else if (strVal != null) {
-                this.myForm.userNote = strVal;
-            }
-
-            this.myForm.funcNote = dbObjectForm.getString(FUNC_NOTE);
-
-            return this;
-        }
-
         private String executeFunc(String functionString) {
 
             if (functionString == null || functionString.isEmpty()) {
@@ -965,6 +969,31 @@ public class MyForm implements MyFormXs {
             ALL
         }
 
+        public Builder maskUserNote() {
+
+            Object obj = dbObjectForm.get(USER_NOTE);
+
+            String funVal = null;
+            String strVal = null;
+
+            if (obj instanceof Document) {
+                funVal = ((Document) obj).getString("fnctn-val");
+                strVal = ((Document) obj).getString("strng-val");
+            } else if (obj instanceof String) {
+                funVal = obj.toString();
+            }
+
+            if (funVal != null) {
+                this.myForm.userNote = executeFunc(funVal);
+            } else if (strVal != null) {
+                this.myForm.userNote = strVal;
+            }
+
+            this.myForm.funcNote = dbObjectForm.getString(FUNC_NOTE);
+
+            return this;
+        }
+
         public Builder maskNotes() {
 
             Document objUserConstantNote = dbObjectForm.get(USER_CONSTANT_NOTE, Document.class);
@@ -1038,7 +1067,8 @@ public class MyForm implements MyFormXs {
         }
 
         public Builder maskUpperNode() throws Exception {
-            if (MyForm.SCHEMA_VERSION_110.equals(dbObjectForm.get(MyForm.SCHEMA_VERSION))) {
+            if (FmsForm.SCHEMA_VERSION_110.equals(dbObjectForm.getString(FmsForm.SCHEMA_VERSION))
+                    || FmsForm.SCHEMA_VERSION_111.equals(dbObjectForm.getString(FmsForm.SCHEMA_VERSION))) {
                 this.myForm.upperNode = ((List<String>) dbObjectForm.get(UPPER_NODES)).get(0);
             } else {
                 this.myForm.upperNode = ((Document) dbObjectForm.get(UPPER_NODES)).keySet().iterator().next().toString();
@@ -1062,7 +1092,8 @@ public class MyForm implements MyFormXs {
         }
 
         public Builder maskDimension() throws Exception {
-            if (SCHEMA_VERSION_110.equals(dbObjectForm.get(SCHEMA_VERSION))) {
+            if (FmsForm.SCHEMA_VERSION_110.equals(dbObjectForm.getString(SCHEMA_VERSION))
+                    || FmsForm.SCHEMA_VERSION_111.equals(dbObjectForm.getString(SCHEMA_VERSION))) {
                 maskDimensionSchemaVersion110();
             } else {
                 maskDimensionNoSchema();
@@ -1178,7 +1209,7 @@ public class MyForm implements MyFormXs {
         public Builder maskMyNotifies() {
             Object obj = dbObjectForm.get(MyNotifies.MONGO_KEY);
             if (obj instanceof List) {
-                this.myForm.myNotifies = new MyNotifies.Builder((List) obj, this.myForm.fmsScriptRunner, this.myForm.roleMap.keySet())
+                this.myForm.myNotifies = new MyNotifies.Builder((List) obj, this.myForm.fmsScriptRunner, this.myForm.getRoleMap().keySet())
                         .build();
             }
             return this;
@@ -1186,7 +1217,58 @@ public class MyForm implements MyFormXs {
 
         public Builder maskDefaultQueries() {
 
-            if (SCHEMA_VERSION_110.equals(dbObjectForm.get(SCHEMA_VERSION))) {
+            if (SCHEMA_VERSION_111.equals(dbObjectForm.getString(SCHEMA_VERSION))) {
+                List<Document> dfcq = dbObjectForm.getList(DEFAULT_CURRENT_QUERY, Document.class);
+                List<Document> dfhq = dbObjectForm.getList(DEFAULT_HISTORY_QUERY, Document.class);
+
+                this.myForm.defaultCurrentQuery = new HashMap();
+                this.myForm.defaultHistoryQuery = new HashMap();
+
+                if (dfcq != null) {
+                    for (Document x : dfcq) {
+                        String key = x.getString("key");
+                        String fmsValue = x.getString("fms-value");
+                        if (fmsValue != null) {
+                            switch (fmsValue) {
+                                case ProjectConstants.REPLACEABLE_KEY_WORD_FOR_FUNCTONS_FILTER_PERIOD:
+                                    this.myForm.defaultCurrentQuery.put(key, this.myForm.searchObject.get("period") == null ? "no result" : this.myForm.searchObject.get("period"));
+                                    break;
+                                case ProjectConstants.REPLACEABLE_KEY_WORD_FOR_FUNCTONS_FILTER_TEMPLATE:
+                                    this.myForm.defaultCurrentQuery.put(key, this.myForm.searchObject.get("template") == null ? "no result" : this.myForm.searchObject.get("template"));
+                                    break;
+                                case ProjectConstants.REPLACEABLE_KEY_WORD_FOR_FUNCTONS_LOGIN_MEMBER_ID:
+                                    this.myForm.defaultCurrentQuery.put(key, myForm.getUserDetail().getDbo().getObjectId() == null ? "no result" : myForm.getUserDetail().getDbo().getObjectId());
+                                    break;
+                                default:
+                                    throw new RuntimeException("could not find replaceble word");
+                            }
+                        }
+                    }
+                }
+
+                if (dfhq != null) {
+                    for (Document x : dfhq) {
+                        String key = x.getString("key");
+                        String fmsValue = x.getString("fms-value");
+                        if (fmsValue != null) {
+                            switch (fmsValue) {
+                                case ProjectConstants.REPLACEABLE_KEY_WORD_FOR_FUNCTONS_FILTER_PERIOD:
+                                    this.myForm.defaultHistoryQuery.put(key, this.myForm.searchObject.get("period") == null ? "no result" : this.myForm.searchObject.get("period"));
+                                    break;
+                                case ProjectConstants.REPLACEABLE_KEY_WORD_FOR_FUNCTONS_FILTER_TEMPLATE:
+                                    this.myForm.defaultHistoryQuery.put(key, this.myForm.searchObject.get("template") == null ? "no result" : this.myForm.searchObject.get("template"));
+                                    break;
+                                case ProjectConstants.REPLACEABLE_KEY_WORD_FOR_FUNCTONS_LOGIN_MEMBER_ID:
+                                    this.myForm.defaultHistoryQuery.put(key, myForm.getUserDetail().getDbo().getObjectId() == null ? "no result" : myForm.getUserDetail().getDbo().getObjectId());
+                                    break;
+                                default:
+                                    throw new RuntimeException("could not find replaceble word");
+                            }
+                        }
+                    }
+                }
+
+            } else if (FmsForm.SCHEMA_VERSION_110.equals(dbObjectForm.getString(SCHEMA_VERSION))) {
                 String dfcq = (String) dbObjectForm.get(DEFAULT_CURRENT_QUERY);
                 String dfhq = (String) dbObjectForm.get(DEFAULT_HISTORY_QUERY);
 
@@ -1260,7 +1342,8 @@ public class MyForm implements MyFormXs {
 
         public Builder maskAutosetFields() throws Exception {
 
-            if (MyForm.SCHEMA_VERSION_110.equals(this.myForm.getSchemaVersion())) {
+            if (FmsForm.SCHEMA_VERSION_110.equals(this.myForm.getSchemaVersion())
+                    || FmsForm.SCHEMA_VERSION_111.equals(this.myForm.getSchemaVersion())) {
                 maskAutosetFieldsSchemaVersion110();
             } else {
                 maskAutosetFieldsNoSchema();
@@ -1494,7 +1577,7 @@ public class MyForm implements MyFormXs {
             this.myForm.group = (String) dbObjectForm.get(GROUP);
             this.myForm.name = (String) dbObjectForm.get(NAME);
             this.myForm.key = (String) dbObjectForm.get(FORM_KEY);
-            this.myForm.schemaVersion = (String) dbObjectForm.get(SCHEMA_VERSION);
+            this.myForm.schemaVersion = dbObjectForm.getString(SCHEMA_VERSION);
             this.myForm.shortName = (String) dbObjectForm.get(SHORT_NAME);
             this.myForm.pageName = (String) dbObjectForm.get(PAGE_NAME);
             this.myForm.projectKey = (String) dbObjectForm.get(PROJECT_KEY);
@@ -1564,6 +1647,10 @@ public class MyForm implements MyFormXs {
 
         public Builder maskEsignEmailToRecipients() {
             Document esignEmailToRecipients = dbObjectForm.get(ESIGN_EMAIL_TO_RECIPIENTS, Document.class);
+
+            if (esignEmailToRecipients == null) {
+                return this;
+            }
 
             String func = esignEmailToRecipients.getString("func");
 
@@ -1654,6 +1741,20 @@ public class MyForm implements MyFormXs {
             return this.myForm;
         }
 
+    }
+
+    /**
+     * @return the roleMap
+     */
+    public RoleMap getRoleMap() {
+        return roleMap;
+    }
+
+    /**
+     * @return the userDetail
+     */
+    public UserDetail getUserDetail() {
+        return userDetail;
     }
 
 }
