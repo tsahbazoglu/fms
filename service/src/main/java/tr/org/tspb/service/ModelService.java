@@ -6,7 +6,7 @@ import tr.org.tspb.util.stereotype.MyServices;
 import javax.inject.Inject;
 import org.bson.Document;
 import static tr.org.tspb.constants.ProjectConstants.FORM_KEY;
-import tr.org.tspb.dao.MyForm;
+import tr.org.tspb.dao.FmsForm;
 import tr.org.tspb.dao.MyProject;
 import tr.org.tspb.exceptions.MongoOrmFailedException;
 import tr.org.tspb.exceptions.NullNotExpectedException;
@@ -39,9 +39,9 @@ public class ModelService extends CommonSrv {
 
     private String projectAndFormKey;
 
-    private MyForm selectedForm;
+    private FmsForm selectedForm;
 
-    public MyForm createForm(String projectAndFormKey) throws NullNotExpectedException, MongoOrmFailedException, FormConfigException {
+    public FmsForm createForm(String projectAndFormKey) throws NullNotExpectedException, MongoOrmFailedException, FormConfigException {
 
         String[] selectedFormInfos = projectAndFormKey.split("[,]");
         String formKey = selectedFormInfos[0];
@@ -52,7 +52,7 @@ public class ModelService extends CommonSrv {
                         .findOne(ProjectConstants.CONFIG_DB, CFG_TABLE_PROJECT, Filters.eq(FORM_KEY, projectKey)),
                         baseService.getTagLogin());
 
-        MyForm myForm = ogmCreator
+        FmsForm myForm = ogmCreator
                 .getMyFormLarge(myProject, myProject.getConfigTable(), new Document(FORM_KEY, formKey), new Document(),
                         loginController.getRoleMap(), loginController.getLoggedUserDetail());
 
@@ -64,11 +64,11 @@ public class ModelService extends CommonSrv {
         return myForm;
     }
 
-    public MyForm getSelectedForm() {
+    public FmsForm getSelectedForm() {
         return selectedForm;
     }
 
-    public void setSelectedForm(MyForm selectedForm) {
+    public void setSelectedForm(FmsForm selectedForm) {
         this.selectedForm = selectedForm;
     }
 
