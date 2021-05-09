@@ -13,7 +13,7 @@ import static tr.org.tspb.constants.ProjectConstants.DOLAR;
 import static tr.org.tspb.constants.ProjectConstants.INCLUDE;
 import static tr.org.tspb.constants.ProjectConstants.MONGO_LDAP_UID;
 import static tr.org.tspb.constants.ProjectConstants.RETVAL;
-import tr.org.tspb.dao.MyForm;
+import tr.org.tspb.dao.FmsForm;
 import tr.org.tspb.exceptions.NullNotExpectedException;
 import tr.org.tspb.pojo.RoleMap;
 import tr.org.tspb.pojo.UserDetail;
@@ -27,7 +27,7 @@ public class FmsNamedQueries {
 
     private final Document filter;
 
-    public FmsNamedQueries(MyForm myForm, RoleMap roleMap, UserDetail userDetail, MongoDbUtilIntr mongoDbUtil) throws NullNotExpectedException {
+    public FmsNamedQueries(FmsForm myForm, RoleMap roleMap, UserDetail userDetail, MongoDbUtilIntr mongoDbUtil) throws NullNotExpectedException {
 
         Document myNamedQueries = myForm.getMyNamedQueries();
 
@@ -45,7 +45,7 @@ public class FmsNamedQueries {
 
     }
 
-    private void runLoopBreak(List<Document> includeQuery, RoleMap roleMap, UserDetail userDetail, MyForm myForm, MongoDbUtilIntr mongoDbUtil) throws RuntimeException {
+    private void runLoopBreak(List<Document> includeQuery, RoleMap roleMap, UserDetail userDetail, FmsForm myForm, MongoDbUtilIntr mongoDbUtil) throws RuntimeException {
 
         Document noRolesDoc = null;
         boolean noRole = true;
@@ -68,7 +68,7 @@ public class FmsNamedQueries {
 
     }
 
-    private void applyQuery(Document doc, UserDetail userDetail, MyForm myForm, MongoDbUtilIntr mongoDbUtil, RoleMap roleMap) throws RuntimeException {
+    private void applyQuery(Document doc, UserDetail userDetail, FmsForm myForm, MongoDbUtilIntr mongoDbUtil, RoleMap roleMap) throws RuntimeException {
         Document queryDoc = doc.get("query", Document.class);
 
         List<Document> list = queryDoc.get("list", List.class);
