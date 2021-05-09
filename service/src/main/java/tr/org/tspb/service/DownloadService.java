@@ -47,12 +47,11 @@ import static tr.org.tspb.constants.ProjectConstants.UYS_DOWNLOAD_READER;
 import static tr.org.tspb.constants.ProjectConstants.UYS_DOWNLOAD_ROLES;
 import static tr.org.tspb.constants.ProjectConstants.UYS_ND_ROW_SIZE;
 import static tr.org.tspb.constants.ProjectConstants.UYS_SELECTED_FROM;
-import static tr.org.tspb.constants.ProjectConstants.VALUE;
 import tr.org.tspb.converter.base.BsonConverter;
 import tr.org.tspb.converter.base.MoneyConverter;
 import tr.org.tspb.converter.base.SelectOneObjectIdConverter;
 import tr.org.tspb.dao.MyField;
-import tr.org.tspb.dao.MyForm;
+import tr.org.tspb.dao.FmsForm;
 import tr.org.tspb.util.stereotype.MyServices;
 import tr.org.tspb.util.tools.DocumentRecursive;
 
@@ -84,7 +83,7 @@ public class DownloadService extends CommonSrv {
     private static final String DATA_BANK_TEMPLATE = "dataBankTemplate";
 
     private List<MyField> objectsColumnDataModel;
-    private MyForm selectedForm;
+    private FmsForm selectedForm;
     private Map<String, Object> searchedMap;
     private static final String PARENT_VALUE = "parentValue";
 
@@ -97,7 +96,7 @@ public class DownloadService extends CommonSrv {
     public DownloadService() {
     }
 
-    public DownloadService(List<MyField> columns, MyForm myForm, Map searchMap) {
+    public DownloadService(List<MyField> columns, FmsForm myForm, Map searchMap) {
         this.objectsColumnDataModel = columns;
         this.selectedForm = myForm;
         this.searchedMap = searchMap;
@@ -166,7 +165,7 @@ public class DownloadService extends CommonSrv {
         cursor = mongoDbUtil.find(formService.getMyForm().getDb(), formService.getMyForm().getTable(),
                 filterService.getTableFilterCurrent(), sort, limit);
 
-        try ( XSSFWorkbook xssfWorkbook = new XSSFWorkbook()) {
+        try (XSSFWorkbook xssfWorkbook = new XSSFWorkbook()) {
 
             XSSFSheet sheet = xssfWorkbook.createSheet();
 
@@ -261,7 +260,7 @@ public class DownloadService extends CommonSrv {
             ec.setResponseContentType("application/vnd.ms-excel"); // Check http://www.iana.org/assignments/media-types for all types. Use if necessary ExternalContext#getMimeType() for auto-detection based on filename.
             // ec.setResponseContentLength(contentLength); // Set it with the file size. This header is optional. It will work if it's omitted, but the download progress will be unknown.
             ec.setResponseHeader("Content-Disposition", "attachment; filename=\"" + formService.getMyForm().getName().concat(EXTENSION_XLSX) + "\""); // The Save As popup magic is done here. You can give it any file name you want, this only won't work in MSIE, it will use current request URL as file name instead.
-            try ( OutputStream responceOutput = ec.getResponseOutputStream();  FileInputStream fileInputStream = new FileInputStream(baseService.getProperties().getTmpDownloadPath().concat(fileName).concat(EXTENSION_XLSX));) {
+            try (OutputStream responceOutput = ec.getResponseOutputStream(); FileInputStream fileInputStream = new FileInputStream(baseService.getProperties().getTmpDownloadPath().concat(fileName).concat(EXTENSION_XLSX));) {
                 IOUtils.copy(fileInputStream, responceOutput);
             } catch (IOException ex) {
                 logger.error("error occured", ex);
