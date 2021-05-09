@@ -48,7 +48,7 @@ import org.slf4j.Logger;
 import tr.org.tspb.common.services.AppScopeSrvCtrl;
 import tr.org.tspb.service.RepositoryService;
 import tr.org.tspb.constants.ProjectConstants;
-import tr.org.tspb.dao.MyForm;
+import tr.org.tspb.dao.FmsForm;
 import tr.org.tspb.dao.MyFormXs;
 import tr.org.tspb.dao.MyProject;
 import tr.org.tspb.datamodel.gui.FormItem;
@@ -562,7 +562,7 @@ public class MainFrame implements Serializable {
 
         try {
 
-            MyForm myForm = repositoryService.getMyFormLarge(myProject, formKey);
+            FmsForm myForm = repositoryService.getMyFormLarge(myProject, formKey);
 
             Map record = repositoryService.getRecord(myForm.getDb(), myForm.getTable(), showDetailObject);
 
@@ -704,7 +704,7 @@ public class MainFrame implements Serializable {
         if ("simplePivot".equals(myFormXs.getFormType())) {
             filterService.createBaseFilter(myFormXs);
 
-            MyForm myFormLarge = repositoryService
+            FmsForm myFormLarge = repositoryService
                     .getMyFormLargeWithBaseFilter(myProject, formKey);
 
             if (loginController.isUserInRole(myFormLarge.getMyProject().getAdminAndViewerRole())) {
@@ -734,7 +734,7 @@ public class MainFrame implements Serializable {
 
     private void createFreeForm2(MyFormXs myFormXs, String formKey) throws MongoOrmFailedException, NullNotExpectedException {
         filterService.createBaseFilter(myFormXs);
-        MyForm myFormLarge = repositoryService
+        FmsForm myFormLarge = repositoryService
                 .getMyFormLargeWithBaseFilter(myProject, formKey);
         myFormLarge.initActions(repositoryService.getAndCacheMyAction(myFormLarge));
         if (loginController.isUserInRole(formService.getMyForm().getMyProject().getAdminAndViewerRole())) {
@@ -751,7 +751,7 @@ public class MainFrame implements Serializable {
 
         filterService.createBaseFilter(myFormXs);
 
-        MyForm myFormLarge = repositoryService
+        FmsForm myFormLarge = repositoryService
                 .getMyFormLargeWithBaseFilter(myProject, formKey);
 
         myFormLarge.initActions(repositoryService.getAndCacheMyAction(myFormLarge));
@@ -772,7 +772,7 @@ public class MainFrame implements Serializable {
 
         filterService.createBaseFilter(myFormXs);
 
-        MyForm myFormLarge = repositoryService
+        FmsForm myFormLarge = repositoryService
                 .getMyFormLargeWithBaseFilter(myProject, myFormXs.getKey());
 
         myFormLarge.initActions(repositoryService.getAndCacheMyAction(myFormLarge));
@@ -823,7 +823,7 @@ public class MainFrame implements Serializable {
 
         filterService.createBaseFilter(myFormXs);
 
-        MyForm myFormLarge = repositoryService.getMyFormLargeWithBaseFilter(myProject, myFormXs.getKey());
+        FmsForm myFormLarge = repositoryService.getMyFormLargeWithBaseFilter(myProject, myFormXs.getKey());
 
         myFormLarge.initActions(repositoryService.getAndCacheMyAction(myFormLarge));
 
@@ -866,7 +866,7 @@ public class MainFrame implements Serializable {
 
         filterService.createBaseFilter(myFormXs);
 
-        MyForm myFormLarge = repositoryService.getMyFormLargeWithBaseFilter(myProject, myFormXs.getKey());
+        FmsForm myFormLarge = repositoryService.getMyFormLargeWithBaseFilter(myProject, myFormXs.getKey());
 
         myFormLarge.initActions(repositoryService.getAndCacheMyAction(myFormLarge));
 
