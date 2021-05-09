@@ -21,7 +21,7 @@ import tr.org.tspb.pojo.UserDetail;
  */
 public class MyActions {
 
-    private MyForm myForm;
+    private FmsForm myForm;
 
     private boolean create;
     private boolean delete;
@@ -442,8 +442,8 @@ public class MyActions {
             return this;
         }
 
-        public Build maskMyForm(MyForm myForm) {
-            this.myActions.myForm = myForm;
+        public Build maskMyForm(FmsForm myForm) {
+            this.myActions.myForm = (FmsForm) myForm;
             return this;
         }
 
