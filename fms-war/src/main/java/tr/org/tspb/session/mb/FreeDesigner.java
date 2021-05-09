@@ -33,11 +33,10 @@ import org.primefaces.model.SortOrder;
 import tr.org.tspb.util.stereotype.MyController;
 import tr.org.tspb.common.qualifier.MyLoginQualifier;
 import tr.org.tspb.service.RepositoryService;
-import tr.org.tspb.dao.MyForm;
+import tr.org.tspb.dao.FmsForm;
 import tr.org.tspb.common.services.AppScopeSrvCtrl;
 import tr.org.tspb.common.services.BaseService;
 import tr.org.tspb.dao.MyBaseRecord;
-import tr.org.tspb.dao.MyField;
 import tr.org.tspb.dao.refs.PlainRecord;
 import tr.org.tspb.dp.nullobj.PlainRecordData;
 import tr.org.tspb.pojo.PostSaveResult;
@@ -84,7 +83,7 @@ public class FreeDesigner implements Serializable {
     public static final String FIELD_GROUP = "field_group";
     public final static String FIELD_GROUP_COMMON = "common";
     public static final String FIELD_GROUP_LICENSE = "license";
-    protected MyForm selectedForm;
+    protected FmsForm selectedForm;
     private MyRecord myRecord;
     private Map<String, Boolean> actionsMap;
     protected List<Map<String, String>> listFileData;
@@ -134,7 +133,8 @@ public class FreeDesigner implements Serializable {
 
     Map searchedMap = new HashMap();
 
-    public List load(String sortColumnName, boolean sortAscending, int startRow, int maxResults, MyForm myForm) {
+    public List load(String sortColumnName, boolean sortAscending,
+            int startRow, int maxResults, FmsForm myForm) {
 
         searchedMap.put(FIELD_GROUP, FIELD_GROUP_COMMON);
 
@@ -207,7 +207,7 @@ public class FreeDesigner implements Serializable {
 
     }
 
-    public void init(MyForm selectedForm) {
+    public void init(FmsForm selectedForm) {
         this.selectedForm = selectedForm;
         this.roles = loginController.getRolesAsSet();
 
@@ -310,11 +310,11 @@ public class FreeDesigner implements Serializable {
         this.loginController = loginMB;
     }
 
-    public MyForm getSelectedForm() {
+    public FmsForm getSelectedForm() {
         return selectedForm;
     }
 
-    public void setSelectedForm(MyForm selectedForm) {
+    public void setSelectedForm(FmsForm selectedForm) {
         this.selectedForm = selectedForm;
     }
 
