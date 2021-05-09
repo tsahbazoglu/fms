@@ -31,7 +31,7 @@ public class MyField {
     private static final String DEFAULT_HISTORY_VALUE = "defaultHistoryValue";
 
     private ObjectId loginMemberId;
-    private MyForm myForm;
+    private FmsForm myForm;
 
 // <editor-fold defaultstate="collapsed" desc="encapsulated fields">
 
@@ -617,10 +617,10 @@ public class MyField {
         this.rendered = localRendered;
     }
 
-    public void createDefaultCurrentValue(MyForm myForm) {
+    public void createDefaultCurrentValue(FmsForm myForm) {
         Code defaultCurrentValueCode = (Code) this.dbo.get(DEFAULT_CURRENT_VALUE);
 
-        if (myForm.roleMap.isUserInRole(myForm.getMyProject().getAdminAndViewerRole())) {
+        if (myForm.getRoleMap().isUserInRole(myForm.getMyProject().getAdminAndViewerRole())) {
             defaultCurrentValueCode = (Code) this.dbo.get("adminFunc");
         }
 
@@ -640,16 +640,16 @@ public class MyField {
         }
 
         if (this.defaultCurrentValue == null && this.key.equals(myForm.getLoginFkField())) {
-            List<ObjectId> list = (List<ObjectId>) myForm.userDetail.getLoginFkSearchMapInListOfValues().get(DOLAR_IN);
+            List<ObjectId> list = (List<ObjectId>) myForm.getUserDetail().getLoginFkSearchMapInListOfValues().get(DOLAR_IN);
             this.defaultCurrentValue = list.get(0);
         }
 
     }
 
-    public void createDefaultHistoryValue(MyForm myForm) {
+    public void createDefaultHistoryValue(FmsForm myForm) {
         Code defaultHistoryValueCode = (Code) this.dbo.get(DEFAULT_HISTORY_VALUE);
 
-        if (myForm.roleMap.isUserInRole(myForm.getMyProject().getAdminAndViewerRole())) {
+        if (myForm.getRoleMap().isUserInRole(myForm.getMyProject().getAdminAndViewerRole())) {
             defaultHistoryValueCode = (Code) this.dbo.get("adminFunc");
         }
 
@@ -669,7 +669,7 @@ public class MyField {
         }
 
         if (this.defaultHistoryValue == null && this.key.equals(myForm.getLoginFkField())) {
-            List<ObjectId> list = (List<ObjectId>) myForm.userDetail.getLoginFkSearchMapInListOfValues().get(DOLAR_IN);
+            List<ObjectId> list = (List<ObjectId>) myForm.getUserDetail().getLoginFkSearchMapInListOfValues().get(DOLAR_IN);
             this.defaultHistoryValue = list.get(0);
         }
     }
@@ -749,11 +749,11 @@ public class MyField {
         return quickFilter;
     }
 
-    public MyForm getMyForm() {
+    public FmsForm getMyForm() {
         return myForm;
     }
 
-    public void setMyForm(MyForm myForm) {
+    public void setMyForm(FmsForm myForm) {
         this.myForm = myForm;
     }
 
@@ -1058,7 +1058,7 @@ public class MyField {
             return this;
         }
 
-        public Builder withConverter(Converter converterValue, MyForm myForm) {
+        public Builder withConverter(Converter converterValue, FmsForm myForm) {
 
             if (converterValue == null) {
                 return this;
@@ -1195,10 +1195,19 @@ public class MyField {
         }
 
         public Builder maskAutoset(String schemaVersion, RoleMap roleMap) {
-            if (MyForm.SCHEMA_VERSION_110.equals(schemaVersion)) {
-                maskAutosetSchemaVersion110(roleMap);
-            } else {
+
+            if (schemaVersion == null) {
                 maskAutosetNoSchema();
+                return this;
+            }
+
+            switch (schemaVersion) {
+                case FmsForm.SCHEMA_VERSION_110:
+                case FmsForm.SCHEMA_VERSION_111:
+                    maskAutosetSchemaVersion110(roleMap);
+                    break;
+                default:
+                    maskAutosetNoSchema();
             }
             return this;
         }
