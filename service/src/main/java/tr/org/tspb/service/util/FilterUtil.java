@@ -36,7 +36,7 @@ import tr.org.tspb.converter.base.SelectOneStringConverter;
 import tr.org.tspb.converter.base.TelmanStringConverter;
 import tr.org.tspb.dao.MyField;
 import tr.org.tspb.dao.MyFieldReportComparator;
-import tr.org.tspb.dao.MyForm;
+import tr.org.tspb.dao.FmsForm;
 import tr.org.tspb.dao.MyItems;
 import tr.org.tspb.dao.refs.PlainRecord;
 import tr.org.tspb.exceptions.NullNotExpectedException;
@@ -62,7 +62,7 @@ public class FilterUtil {
     private MongoDbUtilIntr mongoDbUtil;
     private OgmCreatorIntr ogmCreator;
 
-    public List<MyField> createCurrentQuickFilters(MyForm myForm, RoleMap roleMap, UserDetail userDetail, Document filter) {
+    public List<MyField> createCurrentQuickFilters(FmsForm myForm, RoleMap roleMap, UserDetail userDetail, Document filter) {
 
         List<MyField> filterFields = new ArrayList<>();
 
@@ -96,7 +96,7 @@ public class FilterUtil {
 
     }
 
-    public List<MyField> createCurrentFilters(MyForm myForm, RoleMap roleMap, UserDetail userDetail, Document filter) {
+    public List<MyField> createCurrentFilters(FmsForm myForm, RoleMap roleMap, UserDetail userDetail, Document filter) {
 
         List<MyField> filterFields = new ArrayList<>();
 
@@ -130,7 +130,7 @@ public class FilterUtil {
 
     }
 
-    public Document createTableHistory(MyForm selectedForm, Map<String, Object> baseCurrent, Map<String, Object> guiHistory,
+    public Document createTableHistory(FmsForm selectedForm, Map<String, Object> baseCurrent, Map<String, Object> guiHistory,
             boolean admin, UserDetail userDetail, RoleMap roleMap)
             throws NullNotExpectedException {
 
@@ -328,7 +328,7 @@ public class FilterUtil {
 
     }
 
-    public Document createTableHistoryScemaVersion110(MyForm selectedForm, Map<String, Object> baseCurrent, Map<String, Object> guiHistory,
+    public Document createTableHistoryScemaVersion110(FmsForm selectedForm, Map<String, Object> baseCurrent, Map<String, Object> guiHistory,
             boolean admin, UserDetail userDetail, RoleMap roleMap)
             throws NullNotExpectedException {
 
@@ -474,8 +474,9 @@ public class FilterUtil {
 
     }
 
-    public Document createTableFilter(MyForm myForm, Document baseCurrent, Map<String, Object> guiCurrent,
-            boolean admin, UserDetail userDetail, RoleMap roleMap) throws NullNotExpectedException {
+    public Document createTableFilter(FmsForm myForm, Document baseCurrent, Map<String, Object> guiCurrent,
+            boolean admin, UserDetail userDetail, RoleMap roleMap)
+            throws NullNotExpectedException {
 
         Document filter = new Document();
 
@@ -697,8 +698,9 @@ public class FilterUtil {
 
     }
 
-    public Document createTableFilterSchemaVersion110(MyForm myForm, Document baseCurrent, Map<String, Object> guiCurrent,
-            boolean admin, UserDetail userDetail, RoleMap roleMap) throws NullNotExpectedException {
+    public Document createTableFilterSchemaVersion110(FmsForm myForm, Document baseCurrent, Map<String, Object> guiCurrent,
+            boolean admin, UserDetail userDetail, RoleMap roleMap)
+            throws NullNotExpectedException {
 
         Document filter = new Document();
 
@@ -860,7 +862,8 @@ public class FilterUtil {
 
     }
 
-    private Document resolveAutosetValue(MyItems myItems, MyForm selectedForm, Map<String, Object> filter, boolean history) {
+    private Document resolveAutosetValue(MyItems myItems, FmsForm selectedForm,
+            Map<String, Object> filter, boolean history) {
         String collectionName = myItems.getTable();
         String database = myItems.getDb();
 
