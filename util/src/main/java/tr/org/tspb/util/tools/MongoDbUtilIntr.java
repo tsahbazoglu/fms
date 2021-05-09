@@ -17,7 +17,7 @@ import org.bson.Document;
 import org.bson.conversions.Bson;
 import org.bson.types.ObjectId;
 import tr.org.tspb.dao.MyFile;
-import tr.org.tspb.dao.MyForm;
+import tr.org.tspb.dao.FmsForm;
 import tr.org.tspb.dao.MyItems;
 import tr.org.tspb.dao.MyLookup;
 import tr.org.tspb.pojo.RoleMap;
@@ -40,11 +40,11 @@ public interface MongoDbUtilIntr extends Serializable {
 
     public void createIndex(MyItems myItems);
 
-    public void createIndex(MyForm myForm, Document indexObject);
+    public void createIndex(FmsForm myForm, Document indexObject);
 
     public void createIndex(String db, String collectionName, Document indexObject);
 
-    public void createIndexUnique(MyForm myForm, Document indexObject);
+    public void createIndexUnique(FmsForm myForm, Document indexObject);
 
     public void createIndexUnique(String db, String collectionName, Document indexObject);
 
@@ -64,7 +64,7 @@ public interface MongoDbUtilIntr extends Serializable {
 
     public GridFSDBFile findFile(String db, DBObject filter) throws RuntimeException;
 
-    public List<Map<String, Object>> find(MyForm myForm, String collectionName,
+    public List<Map<String, Object>> find(FmsForm myForm, String collectionName,
             Map<String, Object> searchMap,
             Map<String, Object> returnMap,
             int skip,
@@ -72,7 +72,7 @@ public interface MongoDbUtilIntr extends Serializable {
             Map<String, Object> sortMap,
             String searchPrefix) throws NullNotExpectedException;
 
-    public DocumentRecursive wrapIt(MyForm myForm, Document dBObject) throws NullNotExpectedException;
+    public DocumentRecursive wrapIt(FmsForm myForm, Document dBObject) throws NullNotExpectedException;
 
     public boolean insertIntoMongo(String db, String collectionName, List<Map> mongoListOfMap);
 
@@ -106,16 +106,16 @@ public interface MongoDbUtilIntr extends Serializable {
 
     public void upsertOne(String database, String collection, Bson filter, Document record);
 
-    public void updateMany(MyForm myForm, Bson filter, Document record, UpdateOptions uo);
+    public void updateMany(FmsForm myForm, Bson filter, Document record, UpdateOptions uo);
 
     public void updateMany(String database, String collection, Bson filter, Document record, UpdateOptions uo);
 
-    public void updateMany(MyForm myForm, Bson filter, Document record);
+    public void updateMany(FmsForm myForm, Bson filter, Document record);
 
     public void updateMany(String database, String collection, Bson filter, Document record);
 
     public List<DocumentRecursive> findListAsName(String myFormDb, String myFormTable,
-            MyForm myForm, Document searcheDBObject, Integer limit);
+            FmsForm myForm, Document searcheDBObject, Integer limit);
 
     public void insertOne(String database, String collection, Document record);
 
