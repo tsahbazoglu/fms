@@ -54,6 +54,8 @@ import static tr.org.tspb.constants.ProjectConstants.PROJECT_KEY;
 import static tr.org.tspb.constants.ProjectConstants.QUERY;
 import static tr.org.tspb.constants.ProjectConstants.READONLY;
 import static tr.org.tspb.constants.ProjectConstants.RENDERED;
+import static tr.org.tspb.constants.ProjectConstants.REPLACEABLE_KEY_WORD_FOR_FUNCTONS_LOGIN_MEMBER_TYPE;
+import static tr.org.tspb.constants.ProjectConstants.REPLACEABLE_KEY_WORD_FOR_THIS_FORM;
 import static tr.org.tspb.constants.ProjectConstants.RETURN_KEY;
 import static tr.org.tspb.constants.ProjectConstants.RETVAL;
 import static tr.org.tspb.constants.ProjectConstants.UYSDB;
@@ -66,6 +68,7 @@ import tr.org.tspb.converter.base.SelectOneStringConverter;
 import tr.org.tspb.converter.base.TelmanStringConverter;
 import tr.org.tspb.dao.ChildFilter;
 import tr.org.tspb.dao.FmsAutoComplete;
+import tr.org.tspb.dao.FmsForm;
 import tr.org.tspb.dao.MyActions;
 import tr.org.tspb.dao.MyMap;
 import tr.org.tspb.datamodel.expected.FmsRunMongoCmd;
@@ -147,7 +150,9 @@ public class OgmCreatorImpl implements OgmCreatorIntr {
     }
 
     private Object calcDefaultValue(MyProject myProject, Document docForm, Document docField, RoleMap roleMap, Map searchObject,
-            ObjectId loginDataBaseUserId) {
+            UserDetail userDetail) {
+
+        ObjectId loginDataBaseUserId = (userDetail == null) ? null : userDetail.getDbo().getObjectId();
 
         if (docField.get(DEFAULT_VALUE) == null) {
             return null;
@@ -166,47 +171,115 @@ public class OgmCreatorImpl implements OgmCreatorIntr {
             return stringValue;
         } else if (listValue != null) {
             return listValue;
-        } else if (funcValue != null) {
+        }
 
-            if (roleMap.isUserInRole(myProject.getAdminAndViewerRole())) {
-                return "no default value is set for admin or viewer role when its a function.";
-            }
+        if (!FmsForm.SCHEMA_VERSION_111.equals(docForm.getString(FmsForm.SCHEMA_VERSION))) {
+            if (funcValue != null) {
 
-            funcValue = funcValue.replace(DIEZ, DOLAR);
-
-            Map search = new HashMap(searchObject);
-            search.put(FORMS, docField.get(FORMS));
-            search.put((String) docForm.get(LOGIN_FK), loginDataBaseUserId);
-
-            try {
-
-                if (docField.get(FORM_DB) == null) {
-                    throw new Exception("db tag had not been set for field with defaultValue.");
+                if (roleMap.isUserInRole(myProject.getAdminAndViewerRole())) {
+                    return "no default value is set for admin or viewer role when its a function.";
                 }
 
-                Document commandResult = mongoDbUtil
-                        .runCommand(docField.get(FORM_DB, String.class), funcValue, search, roleMap.keySet());
+                funcValue = funcValue.replace(DIEZ, DOLAR);
 
-                Object localDefaultValue = commandResult.get(RETVAL);
+                Map search = new HashMap(searchObject);
+                search.put(FORMS, docField.get(FORMS));
+                search.put((String) docForm.get(LOGIN_FK), loginDataBaseUserId);
 
-                if (localDefaultValue instanceof Document) {
-                    return ((Document) localDefaultValue).getObjectId(MONGO_ID);
+                try {
+
+                    if (docField.get(FORM_DB) == null) {
+                        throw new Exception("db tag had not been set for field with defaultValue.");
+                    }
+
+                    Document commandResult = mongoDbUtil
+                            .runCommand(docField.get(FORM_DB, String.class), funcValue, search, roleMap.keySet());
+
+                    Object localDefaultValue = commandResult.get(RETVAL);
+
+                    if (localDefaultValue instanceof Document) {
+                        return ((Document) localDefaultValue).getObjectId(MONGO_ID);
+                    }
+
+                    return localDefaultValue;
+
+                } catch (Exception ex) {
+                    String msg = new StringBuilder()
+                            .append(docForm.get(FORM_KEY))
+                            .append(":")
+                            .append(docField.get("key"))
+                            .append(ex.getMessage())
+                            .toString();
+                    throw new RuntimeException(msg);
                 }
-
-                return localDefaultValue;
-
-            } catch (Exception ex) {
-                String msg = new StringBuilder()
-                        .append(docForm.get(FORM_KEY))
-                        .append(":")
-                        .append(docField.get("key"))
-                        .append(ex.getMessage())
-                        .toString();
-                throw new RuntimeException(msg);
             }
+        } else {
+
+            List<Document> listOfRoleBasedValues = defaultValue.getList("list-of-role-based-values", Document.class);
+
+            String value = null;
+
+            Document noRoleDoc = null;
+            boolean noRole = true;
+
+            for (Document docRoleValue : listOfRoleBasedValues) {
+                List<String> roles = docRoleValue.get("roles", List.class);
+                if (roles == null) {
+                    noRoleDoc = docRoleValue;
+                } else if (roleMap.isUserInRole(roles)) {
+                    noRole = false;
+                    value = resolveValue(docRoleValue, userDetail, docForm);
+                }
+            }
+
+            if (noRole && noRoleDoc != null) {
+                value = resolveValue(noRoleDoc, userDetail, docForm);
+            }
+
+            return value;
+
         }
 
         return null;
+    }
+
+    private String resolveValue(Document docRoleValue, UserDetail userDetail, Document docForm) {
+
+        Document refValue = docRoleValue.get("ref-value", Document.class);
+
+        if (refValue != null) {
+            String db = refValue.getString("db");
+            String table = refValue.getString("table");
+            String projection = refValue.getString("projection");
+            List<Document> queryList = refValue.getList("query", Document.class);
+
+            Document filter = new Document();
+            for (Document doc : queryList) {
+                String key = doc.getString("key");
+                String fmsValue = doc.getString("fms-value");
+                String strValue = doc.getString("string-value");
+                if (fmsValue != null) {
+                    switch (fmsValue) {
+                        case REPLACEABLE_KEY_WORD_FOR_FUNCTONS_LOGIN_MEMBER_TYPE:
+                            filter.append(key, userDetail.getDbo().getMemberType());
+                            break;
+                        case REPLACEABLE_KEY_WORD_FOR_THIS_FORM:
+                            filter.append(key, docForm.getString("form"));
+                            break;
+                        default:
+                            throw new RuntimeException("not supported value type");
+                    }
+                } else if (strValue != null) {
+                    filter.append(key, strValue);
+                }
+            }
+
+            return mongoDbUtil.findOne(db, table, filter).getString(projection);
+
+        }
+
+        return null;
+
     }
 
     private boolean calcReadOnly(Document docField, Map searchObject, RoleMap roleMap) {
@@ -225,7 +298,7 @@ public class OgmCreatorImpl implements OgmCreatorIntr {
     }
 
     @Override
-    public MyForm getMyFormExternal(MyProject myProject, String collection, Map formSearch, Map searchObject,
+    public FmsForm getMyFormExternal(MyProject myProject, String collection, Map formSearch, Map searchObject,
             RoleMap roleMap, UserDetail userDetail)
             throws NullNotExpectedException, MongoOrmFailedException {
 
@@ -248,32 +321,147 @@ public class OgmCreatorImpl implements OgmCreatorIntr {
 
             Map<String, MyField> rowFields = createRowFields(myProject, dboForm, searchObject, roleMap, userDetail);
 
-            return new MyForm.Builder(myProject, dboForm, searchObject, roleMap, userDetail, fmsScriptRunner, fmsRunMongoCmd)
-                    .withOthers()
-                    .maskMultiUpload()
-                    .maskFilter()
-                    .maskAccesscontrol()
-                    .maskReadOnlyNote()
-                    .maskUserNote()
-                    .maskFields(fields)
-                    .withFieldsAsList(fieldsAsList)
-                    .maskRowFields(rowFields)
-                    .maskFieldsKeySet()
-                    .maskCurrentRendered()
-                    .maskNotes()
-                    .maskUpperNode()
-                    .maskDimension()
-                    .maskVersionFields()
-                    .maskRequiredFields()
-                    .maskAutosetFields()
-                    .maskUploadMerge()
-                    .maskMyRules()
-                    .maskMyNotifies()
-                    .validateForm()
-                    .maskAjax()
-                    .validateFields()
-                    .maskWorkflowRelation()
-                    .build();
+            String schemaVersion = dboForm.getString(FmsForm.SCHEMA_VERSION);
+
+            if (schemaVersion == null) {
+                return new MyForm.Builder(myProject, dboForm, searchObject, roleMap, userDetail, fmsScriptRunner, fmsRunMongoCmd)
+                        .withOthers()
+                        .maskMultiUpload()
+                        .maskFilter()
+                        .maskAccesscontrol()
+                        .maskReadOnlyNote()
+                        .maskUserNote()
+                        .maskFields(fields)
+                        .withFieldsAsList(fieldsAsList)
+                        .maskRowFields(rowFields)
+                        .maskFieldsKeySet()
+                        .maskCurrentRendered()
+                        .maskNotes()
+                        .maskUpperNode()
+                        .maskDimension()
+                        .maskVersionFields()
+                        .maskRequiredFields()
+                        .maskAutosetFields()
+                        .maskUploadMerge()
+                        .maskMyRules()
+                        .maskMyNotifies()
+                        .validateForm()
+                        .maskAjax()
+                        .validateFields()
+                        .maskWorkflowRelation()
+                        .build();
+            } else {
+                switch (schemaVersion) {
+                    case FmsForm.SCHEMA_VERSION_100:
+                        return new MyForm.Builder(myProject, dboForm, searchObject, roleMap, userDetail, fmsScriptRunner, fmsRunMongoCmd)
+                                .withOthers()
+                                .maskMultiUpload()
+                                .maskFilter()
+                                .maskAccesscontrol()
+                                .maskReadOnlyNote()
+                                .maskUserNote()
+                                .maskFields(fields)
+                                .withFieldsAsList(fieldsAsList)
+                                .maskRowFields(rowFields)
+                                .maskFieldsKeySet()
+                                .maskCurrentRendered()
+                                .maskNotes()
+                                .maskUpperNode()
+                                .maskDimension()
+                                .maskVersionFields()
+                                .maskRequiredFields()
+                                .maskAutosetFields()
+                                .maskUploadMerge()
+                                .maskMyRules()
+                                .maskMyNotifies()
+                                .validateForm()
+                                .maskAjax()
+                                .validateFields()
+                                .maskWorkflowRelation()
+                                .build();
+                    case FmsForm.SCHEMA_VERSION_110:
+                        return new MyForm.Builder(myProject, dboForm, searchObject, roleMap, userDetail, fmsScriptRunner, fmsRunMongoCmd)
+                                .withOthers()
+                                .maskMultiUpload()
+                                .maskFilter()
+                                .maskAccesscontrol()
+                                .maskReadOnlyNote()
+                                .maskUserNote()
+                                .maskFields(fields)
+                                .withFieldsAsList(fieldsAsList)
+                                .maskRowFields(rowFields)
+                                .maskFieldsKeySet()
+                                .maskCurrentRendered()
+                                .maskNotes()
+                                .maskUpperNode()
+                                .maskDimension()
+                                .maskVersionFields()
+                                .maskRequiredFields()
+                                .maskAutosetFields()
+                                .maskUploadMerge()
+                                .maskMyRules()
+                                .maskMyNotifies()
+                                .validateForm()
+                                .maskAjax()
+                                .validateFields()
+                                .maskWorkflowRelation()
+                                .build();
+                    case FmsForm.SCHEMA_VERSION_111:
+                        return new MyForm.Builder(myProject, dboForm, searchObject, roleMap, userDetail, fmsScriptRunner, fmsRunMongoCmd)
+                                .withOthers()
+                                .maskMultiUpload()
+                                .maskFilter()
+                                .maskAccesscontrol()
+                                .maskReadOnlyNote()
+                                .maskUserNote()
+                                .maskFields(fields)
+                                .withFieldsAsList(fieldsAsList)
+                                .maskRowFields(rowFields)
+                                .maskFieldsKeySet()
+                                .maskCurrentRendered()
+                                .maskNotes()
+                                .maskUpperNode()
+                                .maskDimension()
+                                .maskVersionFields()
+                                .maskRequiredFields()
+                                .maskAutosetFields()
+                                .maskUploadMerge()
+                                .maskMyRules()
+                                .maskMyNotifies()
+                                .validateForm()
+                                .maskAjax()
+                                .validateFields()
+                                .maskWorkflowRelation()
+                                .build();
+                    default:
+                        return new MyForm.Builder(myProject, dboForm, searchObject, roleMap, userDetail, fmsScriptRunner, fmsRunMongoCmd)
+                                .withOthers()
+                                .maskMultiUpload()
+                                .maskFilter()
+                                .maskAccesscontrol()
+                                .maskReadOnlyNote()
+                                .maskUserNote()
+                                .maskFields(fields)
+                                .withFieldsAsList(fieldsAsList)
+                                .maskRowFields(rowFields)
+                                .maskFieldsKeySet()
+                                .maskCurrentRendered()
+                                .maskNotes()
+                                .maskUpperNode()
+                                .maskDimension()
+                                .maskVersionFields()
+                                .maskRequiredFields()
+                                .maskAutosetFields()
+                                .maskUploadMerge()
+                                .maskMyRules()
+                                .maskMyNotifies()
+                                .validateForm()
+                                .maskAjax()
+                                .validateFields()
+                                .maskWorkflowRelation()
+                                .build();
+                }
+            }
 
         } catch (Exception ex) {
             throw new MongoOrmFailedException(ex);
@@ -282,38 +470,113 @@ public class OgmCreatorImpl implements OgmCreatorIntr {
     }
 
     @Override
-    public MyForm getMyFormXsmall(MyProject myProject, Map searchObject,
+    public FmsForm getMyFormXsmall(MyProject myProject, Map searchObject,
             RoleMap roleMap, UserDetail userDetail) throws NullNotExpectedException, MongoOrmFailedException {
         try {
 
             Document dboForm = cacheAndGetForm(myProject, myProject.getConfigTable(), searchObject);
 
-            return new MyForm.Builder(myProject, dboForm, searchObject, roleMap, userDetail, fmsScriptRunner, fmsRunMongoCmd)
-                    .maskKey()
-                    .maskLoginFkField()
-                    .maskFilter()
-                    .maskDefaultQueries()
-                    .maskDimension()
-                    .maskFormType()
-                    .build();
+            String schemaVersion = dboForm.getString(FmsForm.SCHEMA_VERSION);
+
+            if (schemaVersion == null) {
+                return new MyForm.Builder(myProject, dboForm, searchObject, roleMap, userDetail, fmsScriptRunner, fmsRunMongoCmd)
+                        .maskKey()
+                        .maskLoginFkField()
+                        .maskFilter()
+                        .maskDefaultQueries()
+                        .maskDimension()
+                        .maskFormType()
+                        .build();
+            } else {
+                switch (schemaVersion) {
+                    case FmsForm.SCHEMA_VERSION_100:
+                        return new MyForm.Builder(myProject, dboForm, searchObject, roleMap, userDetail, fmsScriptRunner, fmsRunMongoCmd)
+                                .maskKey()
+                                .maskLoginFkField()
+                                .maskFilter()
+                                .maskDefaultQueries()
+                                .maskDimension()
+                                .maskFormType()
+                                .build();
+                    case FmsForm.SCHEMA_VERSION_110:
+                        return new MyForm.Builder(myProject, dboForm, searchObject, roleMap, userDetail, fmsScriptRunner, fmsRunMongoCmd)
+                                .maskKey()
+                                .maskLoginFkField()
+                                .maskFilter()
+                                .maskDefaultQueries()
+                                .maskDimension()
+                                .maskFormType()
+                                .build();
+                    case FmsForm.SCHEMA_VERSION_111:
+                        return new MyForm.Builder(myProject, dboForm, searchObject, roleMap, userDetail, fmsScriptRunner, fmsRunMongoCmd)
+                                .maskKey()
+                                .maskLoginFkField()
+                                .maskFilter()
+                                .maskDefaultQueries()
+                                .maskDimension()
+                                .maskFormType()
+                                .build();
+                    default:
+                        return new MyForm.Builder(myProject, dboForm, searchObject, roleMap, userDetail, fmsScriptRunner, fmsRunMongoCmd)
+                                .maskKey()
+                                .maskLoginFkField()
+                                .maskFilter()
+                                .maskDefaultQueries()
+                                .maskDimension()
+                                .maskFormType()
+                                .build();
+                }
+            }
+
         } catch (Exception ex) {
             throw new MongoOrmFailedException(ex);
         }
     }
 
     @Override
-    public MyForm getMyFormSmall(MyProject myProject, Document dboForm, Map searchObject,
+    public FmsForm getMyFormSmall(MyProject myProject, Document dboForm, Map searchObject,
             RoleMap roleMap, UserDetail userDetail) throws NullNotExpectedException, MongoOrmFailedException {
 
         try {
 
             Map<String, MyField> fieldsSmall = createFields(myProject, dboForm, searchObject, roleMap, userDetail);
 
-            return new MyForm.Builder(myProject, dboForm, searchObject, roleMap, userDetail, fmsScriptRunner, fmsRunMongoCmd)
-                    .withOthers()
-                    .maskFilter()
-                    .maskFields(fieldsSmall)
-                    .build();
+            String schemaVersion = dboForm.getString(FmsForm.SCHEMA_VERSION);
+
+            if (schemaVersion == null) {
+                return new MyForm.Builder(myProject, dboForm, searchObject, roleMap, userDetail, fmsScriptRunner, fmsRunMongoCmd)
+                        .withOthers()
+                        .maskFilter()
+                        .maskFields(fieldsSmall)
+                        .build();
+            } else {
+                switch (schemaVersion) {
+                    case FmsForm.SCHEMA_VERSION_100:
+                        return new MyForm.Builder(myProject, dboForm, searchObject, roleMap, userDetail, fmsScriptRunner, fmsRunMongoCmd)
+                                .withOthers()
+                                .maskFilter()
+                                .maskFields(fieldsSmall)
+                                .build();
+                    case FmsForm.SCHEMA_VERSION_110:
+                        return new MyForm.Builder(myProject, dboForm, searchObject, roleMap, userDetail, fmsScriptRunner, fmsRunMongoCmd)
+                                .withOthers()
+                                .maskFilter()
+                                .maskFields(fieldsSmall)
+                                .build();
+                    case FmsForm.SCHEMA_VERSION_111:
+                        return new MyForm.Builder(myProject, dboForm, searchObject, roleMap, userDetail, fmsScriptRunner, fmsRunMongoCmd)
+                                .withOthers()
+                                .maskFilter()
+                                .maskFields(fieldsSmall)
+                                .build();
+                    default:
+                        return new MyForm.Builder(myProject, dboForm, searchObject, roleMap, userDetail, fmsScriptRunner, fmsRunMongoCmd)
+                                .withOthers()
+                                .maskFilter()
+                                .maskFields(fieldsSmall)
+                                .build();
+                }
+            }
 
         } catch (Exception ex) {
             throw new MongoOrmFailedException(ex);
@@ -321,7 +584,7 @@ public class OgmCreatorImpl implements OgmCreatorIntr {
     }
 
     @Override
-    public MyForm getMyFormMedium(MyProject myProject, Document dboForm, Map searchObject,
+    public FmsForm getMyFormMedium(MyProject myProject, Document dboForm, Map searchObject,
             RoleMap roleMap, UserDetail userDetail)
             throws NullNotExpectedException, MongoOrmFailedException {
         try {
@@ -335,17 +598,72 @@ public class OgmCreatorImpl implements OgmCreatorIntr {
             }
             Collections.sort(fieldsAsList, new MyFieldComparator());
 
-            return new MyForm.Builder(myProject, dboForm, searchObject, roleMap, userDetail, fmsScriptRunner, fmsRunMongoCmd)
-                    .withOthers()
-                    .maskMultiUpload()
-                    .maskFilter()
-                    .maskFields(fieldsSmall)
-                    .withFieldsAsList(fieldsAsList)
-                    .maskDimension()
-                    .maskAutosetFields()
-                    .validateFields()
-                    .maskFieldsDefaultValues()
-                    .build();
+            String schemaVersion = dboForm.getString(FmsForm.SCHEMA_VERSION);
+
+            if (schemaVersion == null) {
+                return new MyForm.Builder(myProject, dboForm, searchObject, roleMap, userDetail, fmsScriptRunner, fmsRunMongoCmd)
+                        .withOthers()
+                        .maskMultiUpload()
+                        .maskFilter()
+                        .maskFields(fieldsSmall)
+                        .withFieldsAsList(fieldsAsList)
+                        .maskDimension()
+                        .maskAutosetFields()
+                        .validateFields()
+                        .maskFieldsDefaultValues()
+                        .build();
+            } else {
+                switch (schemaVersion) {
+                    case FmsForm.SCHEMA_VERSION_100:
+                        return new MyForm.Builder(myProject, dboForm, searchObject, roleMap, userDetail, fmsScriptRunner, fmsRunMongoCmd)
+                                .withOthers()
+                                .maskMultiUpload()
+                                .maskFilter()
+                                .maskFields(fieldsSmall)
+                                .withFieldsAsList(fieldsAsList)
+                                .maskDimension()
+                                .maskAutosetFields()
+                                .validateFields()
+                                .maskFieldsDefaultValues()
+                                .build();
+                    case FmsForm.SCHEMA_VERSION_110:
+                        return new MyForm.Builder(myProject, dboForm, searchObject, roleMap, userDetail, fmsScriptRunner, fmsRunMongoCmd)
+                                .withOthers()
+                                .maskMultiUpload()
+                                .maskFilter()
+                                .maskFields(fieldsSmall)
+                                .withFieldsAsList(fieldsAsList)
+                                .maskDimension()
+                                .maskAutosetFields()
+                                .validateFields()
+                                .maskFieldsDefaultValues()
+                                .build();
+                    case FmsForm.SCHEMA_VERSION_111:
+                        return new MyForm.Builder(myProject, dboForm, searchObject, roleMap, userDetail, fmsScriptRunner, fmsRunMongoCmd)
+                                .withOthers()
+                                .maskMultiUpload()
+                                .maskFilter()
+                                .maskFields(fieldsSmall)
+                                .withFieldsAsList(fieldsAsList)
+                                .maskDimension()
+                                .maskAutosetFields()
+                                .validateFields()
+                                .maskFieldsDefaultValues()
+                                .build();
+                    default:
+                        return new MyForm.Builder(myProject, dboForm, searchObject, roleMap, userDetail, fmsScriptRunner, fmsRunMongoCmd)
+                                .withOthers()
+                                .maskMultiUpload()
+                                .maskFilter()
+                                .maskFields(fieldsSmall)
+                                .withFieldsAsList(fieldsAsList)
+                                .maskDimension()
+                                .maskAutosetFields()
+                                .validateFields()
+                                .maskFieldsDefaultValues()
+                                .build();
+                }
+            }
 
         } catch (Exception ex) {
             throw new MongoOrmFailedException(ex);
@@ -353,7 +671,7 @@ public class OgmCreatorImpl implements OgmCreatorIntr {
     }
 
     @Override
-    public MyForm getMyFormLarge(MyProject myProject, String collection, Map formSearch, Map filter,
+    public FmsForm getMyFormLarge(MyProject myProject, String collection, Map formSearch, Map filter,
             RoleMap roleMap, UserDetail userDetail)
             throws NullNotExpectedException, MongoOrmFailedException {
 
@@ -387,36 +705,168 @@ public class OgmCreatorImpl implements OgmCreatorIntr {
                 }
             }
 
-            return new MyForm.Builder(myProject, dboForm, filter, roleMap, userDetail, fmsScriptRunner, fmsRunMongoCmd)
-                    .withOthers()
-                    .maskMultiUpload()
-                    .maskFilter()
-                    .maskZetDimension()
-                    .maskAccesscontrol()
-                    .maskReadOnlyNote()
-                    .maskUserNote()
-                    .maskFields(fields)
-                    .withFieldsAsList(fieldsAsList)
-                    .maskRowFields(rowFields)
-                    .maskFieldsKeySet()
-                    .maskRowFieldsKeySet()
-                    .maskCurrentRendered()
-                    .maskNotes()
-                    .maskUpperNode()
-                    .maskDimension()
-                    .maskVersionFields()
-                    .maskRequiredFields()
-                    .maskAutosetFields()
-                    .maskUploadMerge()
-                    .maskMyRules()
-                    .maskMyNotifies()
-                    .validateForm()
-                    .maskAjax()
-                    .validateFields()
-                    .maskWorkflowRelation()
-                    .maskChilds(childs)
-                    .validate()
-                    .build();
+            String schemaVersion = dboForm.getString(FmsForm.SCHEMA_VERSION);
+
+            if (schemaVersion == null) {
+                return new MyForm.Builder(myProject, dboForm, filter, roleMap, userDetail, fmsScriptRunner, fmsRunMongoCmd)
+                        .withOthers()
+                        .maskMultiUpload()
+                        .maskFilter()
+                        .maskZetDimension()
+                        .maskAccesscontrol()
+                        .maskReadOnlyNote()
+                        .maskUserNote()
+                        .maskFields(fields)
+                        .withFieldsAsList(fieldsAsList)
+                        .maskRowFields(rowFields)
+                        .maskFieldsKeySet()
+                        .maskRowFieldsKeySet()
+                        .maskCurrentRendered()
+                        .maskNotes()
+                        .maskUpperNode()
+                        .maskDimension()
+                        .maskVersionFields()
+                        .maskRequiredFields()
+                        .maskAutosetFields()
+                        .maskUploadMerge()
+                        .maskMyRules()
+                        .maskMyNotifies()
+                        .validateForm()
+                        .maskAjax()
+                        .validateFields()
+                        .maskWorkflowRelation()
+                        .maskChilds(childs)
+                        .validate()
+                        .build();
+            } else {
+                switch (schemaVersion) {
+                    case FmsForm.SCHEMA_VERSION_100:
+                        return new MyForm.Builder(myProject, dboForm, filter, roleMap, userDetail, fmsScriptRunner, fmsRunMongoCmd)
+                                .withOthers()
+                                .maskMultiUpload()
+                                .maskFilter()
+                                .maskZetDimension()
+                                .maskAccesscontrol()
+                                .maskReadOnlyNote()
+                                .maskUserNote()
+                                .maskFields(fields)
+                                .withFieldsAsList(fieldsAsList)
+                                .maskRowFields(rowFields)
+                                .maskFieldsKeySet()
+                                .maskRowFieldsKeySet()
+                                .maskCurrentRendered()
+                                .maskNotes()
+                                .maskUpperNode()
+                                .maskDimension()
+                                .maskVersionFields()
+                                .maskRequiredFields()
+                                .maskAutosetFields()
+                                .maskUploadMerge()
+                                .maskMyRules()
+                                .maskMyNotifies()
+                                .validateForm()
+                                .maskAjax()
+                                .validateFields()
+                                .maskWorkflowRelation()
+                                .maskChilds(childs)
+                                .validate()
+                                .build();
+                    case FmsForm.SCHEMA_VERSION_110:
+                        return new MyForm.Builder(myProject, dboForm, filter, roleMap, userDetail, fmsScriptRunner, fmsRunMongoCmd)
+                                .withOthers()
+                                .maskMultiUpload()
+                                .maskFilter()
+                                .maskZetDimension()
+                                .maskAccesscontrol()
+                                .maskReadOnlyNote()
+                                .maskUserNote()
+                                .maskFields(fields)
+                                .withFieldsAsList(fieldsAsList)
+                                .maskRowFields(rowFields)
+                                .maskFieldsKeySet()
+                                .maskRowFieldsKeySet()
+                                .maskCurrentRendered()
+                                .maskNotes()
+                                .maskUpperNode()
+                                .maskDimension()
+                                .maskVersionFields()
+                                .maskRequiredFields()
+                                .maskAutosetFields()
+                                .maskUploadMerge()
+                                .maskMyRules()
+                                .maskMyNotifies()
+                                .validateForm()
+                                .maskAjax()
+                                .validateFields()
+                                .maskWorkflowRelation()
+                                .maskChilds(childs)
+                                .validate()
+                                .build();
+                    case FmsForm.SCHEMA_VERSION_111:
+                        return new MyForm.Builder(myProject, dboForm, filter, roleMap, userDetail, fmsScriptRunner, fmsRunMongoCmd)
+                                .withOthers()
+                                .maskMultiUpload()
+                                .maskFilter()
+                                .maskZetDimension()
+                                .maskAccesscontrol()
+                                .maskReadOnlyNote()
+                                .maskUserNote()
+                                .maskFields(fields)
+                                .withFieldsAsList(fieldsAsList)
+                                .maskRowFields(rowFields)
+                                .maskFieldsKeySet()
+                                .maskRowFieldsKeySet()
+                                .maskCurrentRendered()
+                                .maskNotes()
+                                .maskUpperNode()
+                                .maskDimension()
+                                .maskVersionFields()
+                                .maskRequiredFields()
+                                .maskAutosetFields()
+                                .maskUploadMerge()
+                                .maskMyRules()
+                                .maskMyNotifies()
+                                .validateForm()
+                                .maskAjax()
+                                .validateFields()
+                                .maskWorkflowRelation()
+                                .maskChilds(childs)
+                                .validate()
+                                .build();
+                    default:
+                        return new MyForm.Builder(myProject, dboForm, filter, roleMap, userDetail, fmsScriptRunner, fmsRunMongoCmd)
+                                .withOthers()
+                                .maskMultiUpload()
+                                .maskFilter()
+                                .maskZetDimension()
+                                .maskAccesscontrol()
+                                .maskReadOnlyNote()
+                                .maskUserNote()
+                                .maskFields(fields)
+                                .withFieldsAsList(fieldsAsList)
+                                .maskRowFields(rowFields)
+                                .maskFieldsKeySet()
+                                .maskRowFieldsKeySet()
+                                .maskCurrentRendered()
+                                .maskNotes()
+                                .maskUpperNode()
+                                .maskDimension()
+                                .maskVersionFields()
+                                .maskRequiredFields()
+                                .maskAutosetFields()
+                                .maskUploadMerge()
+                                .maskMyRules()
+                                .maskMyNotifies()
+                                .validateForm()
+                                .maskAjax()
+                                .validateFields()
+                                .maskWorkflowRelation()
+                                .maskChilds(childs)
+                                .validate()
+                                .build();
+
+                }
+            }
 
         } catch (Exception ex) {
             throw new MongoOrmFailedException(ex);
@@ -483,20 +933,22 @@ public class OgmCreatorImpl implements OgmCreatorIntr {
 
         Map<String, MyField> fields = new HashMap<>();
 
-        if (MyForm.SCHEMA_VERSION_110.equals(docForm.get(MyForm.SCHEMA_VERSION))) {
+        if (FmsForm.SCHEMA_VERSION_110.equals(docForm.getString(FmsForm.SCHEMA_VERSION))
+                || FmsForm.SCHEMA_VERSION_111.equals(docForm.getString(FmsForm.SCHEMA_VERSION))) {
+
             for (Document docField : (List<Document>) docForm.get(FORMFIELDS)) {
 
                 Converter converter = createConverter(docForm, docField);
 
                 MyField myField = new MyField.Builder(userDetail.getDbo().getObjectId(), myProject, docField, fmsScriptRunner)
-                        .maskAutoset((String) docForm.get(MyForm.SCHEMA_VERSION), roleMap)
+                        .maskAutoset((String) docForm.get(FmsForm.SCHEMA_VERSION), roleMap)
                         .maskShortName()
                         .maskCode()
                         .withRendered(calcRendered(roleMap, docField, filter, userDetail))
                         .withReadonly(calcReadOnly(docField, filter, roleMap))
                         .maskAccesscontrol()
                         .maskNdTypeAndNdAxis()
-                        .withDefaultValue(calcDefaultValue(myProject, docForm, docField, roleMap, filter, userDetail == null ? null : userDetail.getDbo().getObjectId()))
+                        .withDefaultValue(calcDefaultValue(myProject, docForm, docField, roleMap, filter, userDetail))
                         .maskComponentType()
                         .maskItemsAsMyItems((String) docForm.get(MyForm.SCHEMA_VERSION), filter, roleMap.isUserInRole(myProject.getAdminRole()), roleMap.keySet())
                         .withConverter(converter, null)
@@ -536,16 +988,16 @@ public class OgmCreatorImpl implements OgmCreatorIntr {
                 Converter converter = createConverter(docForm, docField);
 
                 MyField myField = new MyField.Builder(userDetail.getDbo().getObjectId(), myProject, docField, fmsScriptRunner)
-                        .maskAutoset((String) docForm.get(MyForm.SCHEMA_VERSION), roleMap)
+                        .maskAutoset(docForm.getString(FmsForm.SCHEMA_VERSION), roleMap)
                         .maskShortName()
                         .maskCode()
                         .withRendered(calcRendered(roleMap, docField, filter, userDetail))
                         .withReadonly(calcReadOnly(docField, filter, roleMap))
                         .maskAccesscontrol()
                         .maskNdTypeAndNdAxis()
-                        .withDefaultValue(calcDefaultValue(myProject, docForm, docField, roleMap, filter, userDetail == null ? null : userDetail.getDbo().getObjectId()))
+                        .withDefaultValue(calcDefaultValue(myProject, docForm, docField, roleMap, filter, userDetail))
                         .maskComponentType()
-                        .maskItemsAsMyItems((String) docForm.get(MyForm.SCHEMA_VERSION), filter, roleMap.isUserInRole(myProject.getAdminRole()), roleMap.keySet())
+                        .maskItemsAsMyItems(docForm.getString(FmsForm.SCHEMA_VERSION), filter, roleMap.isUserInRole(myProject.getAdminRole()), roleMap.keySet())
                         .withConverter(converter, null)
                         .maskRestOfThem()
                         .maskDescription()
@@ -590,7 +1042,7 @@ public class OgmCreatorImpl implements OgmCreatorIntr {
                         .withReadonly(calcReadOnly(docField, filter, roleMap))
                         .maskAccesscontrol()
                         .maskNdTypeAndNdAxis()
-                        .withDefaultValue(calcDefaultValue(myProject, docForm, docField, roleMap, filter, userDetail.getDbo().getObjectId()))
+                        .withDefaultValue(calcDefaultValue(myProject, docForm, docField, roleMap, filter, userDetail))
                         .maskComponentType()
                         .maskItemsAsMyItems((String) docForm.get(MyForm.SCHEMA_VERSION), filter, roleMap.isUserInRole(myProject.getAdminRole()), roleMap.keySet())
                         .withConverter(converter, null)
@@ -695,7 +1147,7 @@ public class OgmCreatorImpl implements OgmCreatorIntr {
     }
 
     @Override
-    public MyField getMyField(MyForm myForm, Document docField, Map filter,
+    public MyField getMyField(FmsForm myForm, Document docField, Map filter,
             RoleMap roleMap, UserDetail userDetail) throws FormConfigException {
 
         Converter converter = createConverter(myForm.getDbo(), docField);
@@ -724,7 +1176,7 @@ public class OgmCreatorImpl implements OgmCreatorIntr {
     }
 
     @Override
-    public MyField getMyFieldPivot(MyForm myForm, Document docField, Map filter, RoleMap roleMap, UserDetail userDetail)
+    public MyField getMyFieldPivot(FmsForm myForm, Document docField, Map filter, RoleMap roleMap, UserDetail userDetail)
             throws FormConfigException {
         Converter converter = createConverter(myForm.getDbo(), docField);
 
@@ -760,10 +1212,11 @@ public class OgmCreatorImpl implements OgmCreatorIntr {
      * @return
      */
     @Override
-    public MyActions getMyActions(MyForm myFormLarge, RoleMap roleMap, Document filter, UserDetail userDetail) {
+    public MyActions getMyActions(FmsForm myFormLarge, RoleMap roleMap, Document filter, UserDetail userDetail) {
 
-        if (MyForm.SCHEMA_VERSION_100.equals(myFormLarge.getSchemaVersion())
-                || MyForm.SCHEMA_VERSION_110.equals(myFormLarge.getSchemaVersion())) {
+        if (FmsForm.SCHEMA_VERSION_100.equals(myFormLarge.getSchemaVersion())
+                || FmsForm.SCHEMA_VERSION_110.equals(myFormLarge.getSchemaVersion())
+                || FmsForm.SCHEMA_VERSION_111.equals(myFormLarge.getSchemaVersion())) {
             return new MyActions.Build(myFormLarge.getMyProject().getViewerRole(), myFormLarge.getDb(),
                     roleMap, filter, myFormLarge.getActions(), fmsScriptRunner, userDetail)
                     .maskMyForm(myFormLarge)
