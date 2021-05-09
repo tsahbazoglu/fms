@@ -18,7 +18,7 @@ import static tr.org.tspb.constants.ProjectConstants.DIEZ;
 import static tr.org.tspb.constants.ProjectConstants.DOLAR;
 import static tr.org.tspb.constants.ProjectConstants.RETVAL;
 import tr.org.tspb.dao.MyField;
-import tr.org.tspb.dao.MyForm;
+import tr.org.tspb.dao.FmsForm;
 import tr.org.tspb.dao.MyItems;
 import tr.org.tspb.exceptions.NullNotExpectedException;
 import tr.org.tspb.common.qualifier.MyLoginQualifier;
@@ -132,7 +132,7 @@ public class FilterService extends CommonSrv {
         createPivotFilterHistory();
     }
 
-    public void createTableCurrentAndHistoryFilters(MyForm myForm) throws NullNotExpectedException {
+    public void createTableCurrentAndHistoryFilters(FmsForm myForm) throws NullNotExpectedException {
         createTableFilterCurrent(myForm);
         createTableFilterHistory(myForm);
     }
@@ -140,7 +140,7 @@ public class FilterService extends CommonSrv {
     public void createPivotFilterCurrent() throws FormConfigException {
 
         pivotFilterCurrent = new Document();
-        MyForm myForm = formService.getMyForm();
+        FmsForm myForm = formService.getMyForm();
 
         if (myForm.getZetDimension() == null) {
             throw new FormConfigException(ZET_DIMENSION.concat(" is resolved to null"));
@@ -167,7 +167,7 @@ public class FilterService extends CommonSrv {
 
     public void createPivotFilterHistory() {
         pivotFilterHistory = new Document();
-        MyForm myForm = formService.getMyForm();
+        FmsForm myForm = formService.getMyForm();
         for (String key : formService.getMyForm().getZetDimension()) {
             String fieldName = myForm.getField(key).getField();
             if (guiFiltersHistory.get(fieldName) != null) {
@@ -191,7 +191,8 @@ public class FilterService extends CommonSrv {
         this.tableFilterCurrent = new Document(searchMap);
     }
 
-    public void initSearchMap(ObjectId memberID, ObjectId periodID, ObjectId templateID, MyForm myForm) {
+    public void initSearchMap(ObjectId memberID, ObjectId periodID,
+            ObjectId templateID, FmsForm myForm) {
         tableFilterCurrent = new Document();
         tableFilterCurrent.put(myForm.getLoginFkField(), memberID);
         tableFilterCurrent.put(PERIOD, periodID);
@@ -203,44 +204,78 @@ public class FilterService extends CommonSrv {
         return Filters.eq(FORM_KEY, formKey);
     }
 
-    public void createTableFilterCurrent(MyForm myForm) throws NullNotExpectedException {
-        if (MyForm.SCHEMA_VERSION_110.equals(myForm.getSchemaVersion())) {
-            this.tableFilterCurrent = FilterUtil.instance(mongoDbUtil, ogmCreatorIntr).createTableFilterSchemaVersion110(myForm,
-                    baseFilterCurrent,
-                    guiFiltersCurrent,
-                    loginController.isUserInRole(formService.getMyForm().getMyProject().getAdminAndViewerRole()),
-                    loginController.getLoggedUserDetail(),
-                    loginController.getRoleMap());
-        } else {
-            this.tableFilterCurrent = FilterUtil.instance(mongoDbUtil, ogmCreatorIntr).createTableFilter(myForm,
-                    baseFilterCurrent,
-                    guiFiltersCurrent,
-                    loginController.isUserInRole(formService.getMyForm().getMyProject().getAdminAndViewerRole()),
-                    loginController.getLoggedUserDetail(),
-                    loginController.getRoleMap());
+    public void createTableFilterCurrent(FmsForm myForm)
+            throws NullNotExpectedException {
+
+        if (myForm.getSchemaVersion() == null) {
+            this.tableFilterCurrent = FilterUtil.instance(mongoDbUtil, ogmCreatorIntr)
+                    .createTableFilter(myForm,
+                            baseFilterCurrent,
+                            guiFiltersCurrent,
+                            loginController.isUserInRole(formService.getMyForm().getMyProject().getAdminAndViewerRole()),
+                            loginController.getLoggedUserDetail(),
+                            loginController.getRoleMap());
+            return;
+        }
+
+        switch (myForm.getSchemaVersion()) {
+            case FmsForm.SCHEMA_VERSION_110:
+            case FmsForm.SCHEMA_VERSION_111:
+                this.tableFilterCurrent = FilterUtil.instance(mongoDbUtil, ogmCreatorIntr)
+                        .createTableFilterSchemaVersion110(myForm,
+                                baseFilterCurrent,
+                                guiFiltersCurrent,
+                                loginController.isUserInRole(formService.getMyForm().getMyProject().getAdminAndViewerRole()),
+                                loginController.getLoggedUserDetail(),
+                                loginController.getRoleMap());
+                break;
+            default:
+                this.tableFilterCurrent = FilterUtil.instance(mongoDbUtil, ogmCreatorIntr)
+                        .createTableFilter(myForm,
+                                baseFilterCurrent,
+                                guiFiltersCurrent,
+                                loginController.isUserInRole(formService.getMyForm().getMyProject().getAdminAndViewerRole()),
+                                loginController.getLoggedUserDetail(),
+                                loginController.getRoleMap());
         }
     }
 
-    public void createTableFilterHistory(MyForm myForm) throws NullNotExpectedException {
+    public void createTableFilterHistory(FmsForm myForm) throws NullNotExpectedException {
 
-        if (MyForm.SCHEMA_VERSION_110.equals(myForm.getSchemaVersion())) {
-            this.tableFilterHistory = FilterUtil.instance(mongoDbUtil, ogmCreatorIntr).createTableHistoryScemaVersion110(myForm,
-                    baseFilterHistory,
-                    guiFiltersHistory,
-                    loginController.isUserInRole(formService.getMyForm().getMyProject().getAdminAndViewerRole()),
-                    loginController.getLoggedUserDetail(),
-                    loginController.getRoleMap());
-        } else {
-            this.tableFilterHistory = FilterUtil.instance(mongoDbUtil, ogmCreatorIntr).createTableHistory(myForm,
-                    baseFilterHistory,
-                    guiFiltersHistory,
-                    loginController.isUserInRole(formService.getMyForm().getMyProject().getAdminAndViewerRole()),
-                    loginController.getLoggedUserDetail(),
-                    loginController.getRoleMap());
+        if (myForm.getSchemaVersion() == null) {
+            this.tableFilterHistory = FilterUtil.instance(mongoDbUtil, ogmCreatorIntr)
+                    .createTableHistory(myForm,
+                            baseFilterHistory,
+                            guiFiltersHistory,
+                            loginController.isUserInRole(formService.getMyForm().getMyProject().getAdminAndViewerRole()),
+                            loginController.getLoggedUserDetail(),
+                            loginController.getRoleMap());
+            return this;
+        }
+
+        switch (myForm.getSchemaVersion()) {
+            case FmsForm.SCHEMA_VERSION_110:
+            case FmsForm.SCHEMA_VERSION_111:
+                this.tableFilterHistory = FilterUtil.instance(mongoDbUtil, ogmCreatorIntr)
+                        .createTableHistoryScemaVersion110(myForm,
+                                baseFilterHistory,
+                                guiFiltersHistory,
+                                loginController.isUserInRole(formService.getMyForm().getMyProject().getAdminAndViewerRole()),
+                                loginController.getLoggedUserDetail(),
+                                loginController.getRoleMap());
+                break;
+            default:
+                this.tableFilterHistory = FilterUtil.instance(mongoDbUtil, ogmCreatorIntr)
+                        .createTableHistory(myForm,
+                                baseFilterHistory,
+                                guiFiltersHistory,
+                                loginController.isUserInRole(formService.getMyForm().getMyProject().getAdminAndViewerRole()),
+                                loginController.getLoggedUserDetail(),
+                                loginController.getRoleMap());
         }
     }
 
-    public List<Document> createDocuments(MyItems myItems, MyForm selectedForm, Map<String, Object> filter, boolean history) {
+    public List<Document> createDocuments(MyItems myItems, FmsForm selectedForm, Map<String, Object> filter, boolean history) {
         String collectionName = myItems.getTable();
         String database = myItems.getDb();
 
