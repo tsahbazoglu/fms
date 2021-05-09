@@ -12,7 +12,7 @@ import org.primefaces.model.FilterMeta;
 import org.primefaces.model.LazyDataModel;
 import org.primefaces.model.SortMeta;
 import org.primefaces.model.SortOrder;
-import tr.org.tspb.dao.MyForm;
+import tr.org.tspb.dao.FmsForm;
 import tr.org.tspb.pivot.simple.datamodel.ItemProvider;
 import tr.org.tspb.pivot.simple.datamodel.PivotRecord;
 import tr.org.tspb.service.RepositoryService;
@@ -26,7 +26,7 @@ public class SimplePivotCtrlAdmin implements Serializable {
     @Inject
     protected RepositoryService repositoryService;
 
-    protected MyForm myForm;
+    protected FmsForm myForm;
     protected ItemProvider itemProvider;
     private LazyDataModel<PivotRecord> pivotRecords;
 
@@ -68,7 +68,8 @@ public class SimplePivotCtrlAdmin implements Serializable {
 
     }
 
-    public List load(String sortColumnName, boolean sortAscending, int startRow, int maxResults, MyForm myForm) {
+    public List load(String sortColumnName, boolean sortAscending, int startRow,
+            int maxResults, FmsForm myForm) {
 
         Map searchedMap = new HashMap();
 
