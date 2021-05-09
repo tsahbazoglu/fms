@@ -24,7 +24,6 @@ import java.io.InputStream;
 import static tr.org.tspb.constants.ProjectConstants.COLLECTION_NAME;
 import static tr.org.tspb.constants.ProjectConstants.DOLAR_SET;
 import static tr.org.tspb.constants.ProjectConstants.FORM_DB;
-import static tr.org.tspb.constants.ProjectConstants.ITEMS;
 import static tr.org.tspb.constants.ProjectConstants.MONGO_ID;
 import tr.org.tspb.exceptions.NullNotExpectedException;
 import java.util.ArrayList;
@@ -40,20 +39,18 @@ import org.bson.Document;
 import org.bson.codecs.configuration.CodecRegistries;
 import org.bson.codecs.configuration.CodecRegistry;
 import org.bson.conversions.Bson;
-import org.bson.types.Code;
 import org.bson.types.ObjectId;
 import org.slf4j.Logger;
 import tr.org.tspb.codec.MyBaseRecordCodec;
 import tr.org.tspb.dao.MyBaseRecord;
 import tr.org.tspb.dao.MyField;
 import tr.org.tspb.dao.MyFile;
-import tr.org.tspb.dao.MyFileNoContent;
-import tr.org.tspb.dao.MyForm;
-import tr.org.tspb.dao.MyItems;
+ import tr.org.tspb.dao.MyItems;
 import tr.org.tspb.dao.MyLookup;
 import tr.org.tspb.dao.refs.PlainRecord;
 import tr.org.tspb.pojo.RoleMap;
 import tr.org.tspb.dao.FmsFile;
+import tr.org.tspb.dao.FmsForm;
 import tr.org.tspb.dao.TagEvent;
 
 /**
@@ -181,7 +178,7 @@ public class MongoDbUtilImplOpenClose implements MongoDbUtilIntr {
         createIndex(myItems.getDb(), myItems.getTable(), myItems.getSort());
     }
 
-    public void createIndex(MyForm myForm, Document indexObject) {
+    public void createIndex(FmsForm myForm, Document indexObject) {
         createIndex(myForm.getDb(), myForm.getTable(), indexObject);
     }
 
@@ -191,7 +188,7 @@ public class MongoDbUtilImplOpenClose implements MongoDbUtilIntr {
         close(mongoClient);
     }
 
-    public void createIndexUnique(MyForm myForm, Document indexObject) {
+    public void createIndexUnique(FmsForm myForm, Document indexObject) {
         createIndexUnique(myForm.getDb(), myForm.getTable(), indexObject);
     }
 
@@ -229,9 +226,8 @@ public class MongoDbUtilImplOpenClose implements MongoDbUtilIntr {
     public MyFile findFileAsMyFile(String db, ObjectId objectId) throws IOException {
         MongoClient mongoClient = connect();
         GridFSDBFile gridFSDBFile = new GridFS(mongoClient.getDB(db)).find(objectId);
-        MyFile myFile = new MyFile(gridFSDBFile).withBytes();
         close(mongoClient);
-        return myFile;
+        return null;
     }
 
     public void copyFiles(String fromDb, String toDb, DBObject fromSearch) throws IOException {
@@ -254,7 +250,7 @@ public class MongoDbUtilImplOpenClose implements MongoDbUtilIntr {
         return gridFSDBFile;
     }
 
-    public List<Map<String, Object>> find(MyForm myForm, String collectionName,
+    public List<Map<String, Object>> find(FmsForm myForm, String collectionName,
             Map<String, Object> searchMap,
             Map<String, Object> returnMap,
             int skip,
@@ -288,7 +284,7 @@ public class MongoDbUtilImplOpenClose implements MongoDbUtilIntr {
         return listMaps;
     }
 
-    public DocumentRecursive wrapIt(MyForm myForm, Document dBObject) throws NullNotExpectedException {
+    public DocumentRecursive wrapIt(FmsForm myForm, Document dBObject) throws NullNotExpectedException {
         Map manualDbRefs = new HashMap();
 
         for (String key : dBObject.keySet()) {
@@ -554,12 +550,12 @@ public class MongoDbUtilImplOpenClose implements MongoDbUtilIntr {
         }
     }
 
-    public void updateMany(MyForm myForm, Bson filter, Document record) {
+    public void updateMany(FmsForm myForm, Bson filter, Document record) {
         updateMany(myForm.getDb(), myForm.getTable(), filter, record);
     }
 
     @Override
-    public void updateMany(MyForm myForm, Bson filter, Document record, UpdateOptions uo) {
+    public void updateMany(FmsForm myForm, Bson filter, Document record, UpdateOptions uo) {
         updateMany(myForm.getDb(), myForm.getTable(), filter, record, uo);
     }
 
@@ -577,12 +573,12 @@ public class MongoDbUtilImplOpenClose implements MongoDbUtilIntr {
         close(mongoClient);
     }
 
-    public List<DocumentRecursive> findListAsName(String myFormDb, String myFormTable, MyForm myForm, Document searcheDBObject, Integer limit) {
+    public List<DocumentRecursive> findListAsName(String myFormDb, String myFormTable, FmsForm myForm, Document searcheDBObject, Integer limit) {
         List<Document> cursor = createCursor(myFormDb, myFormTable, searcheDBObject, limit);
         return cursorToListAsName(cursor, myForm);
     }
 
-    private List<DocumentRecursive> cursorToListAsName(List<Document> cursor, MyForm myForm) {
+    private List<DocumentRecursive> cursorToListAsName(List<Document> cursor, FmsForm myForm) {
         List<DocumentRecursive> list = new ArrayList<>();
 
         for (Document document : cursor) {
@@ -593,7 +589,7 @@ public class MongoDbUtilImplOpenClose implements MongoDbUtilIntr {
         return list;
     }
 
-    private static void armBsonRefs(Document document, MyForm myForm, Map manualDbRefs) {
+    private static void armBsonRefs(Document document, FmsForm myForm, Map manualDbRefs) {
         Set<String> keySet = new HashSet<>(document.keySet());
         for (String key : keySet) {
             Object keyValue = document.get(key);
@@ -641,11 +637,6 @@ public class MongoDbUtilImplOpenClose implements MongoDbUtilIntr {
         MongoClient mongoClient = connect();
 
         List<MyFile> listOfMyFile = new ArrayList<>();
-        List<GridFSDBFile> list = new GridFS(mongoClient.getDB(db)).find(filter);
-
-        for (GridFSDBFile gridFSDBFile : list) {
-            listOfMyFile.add(new MyFile(gridFSDBFile));
-        }
 
         close(mongoClient);
         return listOfMyFile;
@@ -666,13 +657,7 @@ public class MongoDbUtilImplOpenClose implements MongoDbUtilIntr {
         cursor.limit(limit);
 
         List<FmsFile> listOut = new ArrayList<>();
-        for (DBObject document : cursor) {
-            try {
-                listOut.add(new MyFileNoContent((GridFSDBFile) document));
-            } catch (IOException ex) {
-                logger.error("error occured", ex);
-            }
-        }
+
         close(mongoClient);
         return listOut;
     }
@@ -685,13 +670,7 @@ public class MongoDbUtilImplOpenClose implements MongoDbUtilIntr {
         cursor.limit(limit);
 
         List<MyFile> listOut = new ArrayList<>();
-        for (DBObject document : cursor) {
-            try {
-                listOut.add(new MyFile((GridFSDBFile) document));
-            } catch (IOException ex) {
-                logger.error("error occured", ex);
-            }
-        }
+
         close(mongoClient);
         return listOut;
     }
