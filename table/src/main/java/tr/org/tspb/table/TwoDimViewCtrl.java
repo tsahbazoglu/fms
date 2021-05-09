@@ -12,7 +12,7 @@ import static tr.org.tspb.constants.ProjectConstants.PERIOD;
 import static tr.org.tspb.constants.ProjectConstants.SHARE_AMOUNT;
 import static tr.org.tspb.constants.ProjectConstants.STYLE;
 import tr.org.tspb.converter.base.MapConverter;
-import tr.org.tspb.dao.MyForm;
+import tr.org.tspb.dao.FmsForm;
 import tr.org.tspb.exceptions.NullNotExpectedException;
 
 /**
@@ -125,7 +125,7 @@ public class TwoDimViewCtrl extends FmsTableView {
     @Override
     public List<Map> findLazyData(int startRow, int maxResults) throws NullNotExpectedException {
 
-        MyForm myForm = formService.getMyForm();
+        FmsForm myForm = formService.getMyForm();
         if (myForm == null || myForm.getKey() == null) {
             return Collections.emptyList();
         }
