@@ -9,7 +9,6 @@ import static tr.org.tspb.constants.ProjectConstants.MEMBER;
 import static tr.org.tspb.constants.ProjectConstants.OPERATOR_LDAP_UID;
 import static tr.org.tspb.constants.ProjectConstants.PERIOD;
 import static tr.org.tspb.constants.ProjectConstants.TEMPLATE;
-import static tr.org.tspb.constants.ProjectConstants.TYPE;
 import static tr.org.tspb.constants.ProjectConstants.UPSERT_DATE;
 import static tr.org.tspb.constants.ProjectConstants.VALUE;
 import com.mongodb.BasicDBList;
@@ -33,7 +32,7 @@ import org.bson.types.ObjectId;
 import tr.org.tspb.common.pojo.CellMultiDimensionKey;
 import tr.org.tspb.converter.base.SelectOneObjectIdConverter;
 import tr.org.tspb.dao.MyField;
-import tr.org.tspb.dao.MyForm;
+import tr.org.tspb.dao.FmsForm;
 import tr.org.tspb.constants.ProjectConstants;
 import static tr.org.tspb.constants.ProjectConstants.COMMON;
 import static tr.org.tspb.constants.ProjectConstants.DOLAR_NE;
@@ -198,7 +197,7 @@ public class PivotResave extends PivotImpl {
 
         for (String form : forms) {
             //FIXME remove hard coded "graph"
-            MyForm myForm = ogmCreator
+            FmsForm myForm = ogmCreator
                     .getMyFormLarge(null, "graph", new Document(FORM, form), getFilter(), loginController.getRoleMap(), loginController.getLoggedUserDetail());
 
             BasicDBList statusList = new BasicDBList();
