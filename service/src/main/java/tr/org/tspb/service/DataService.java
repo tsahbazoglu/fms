@@ -20,7 +20,7 @@ import tr.org.tspb.converter.base.MoneyConverter;
 import tr.org.tspb.converter.base.NumberConverter;
 import tr.org.tspb.converter.base.UysStringConverter;
 import tr.org.tspb.dao.MyField;
-import tr.org.tspb.dao.MyForm;
+import tr.org.tspb.dao.FmsForm;
 import tr.org.tspb.dao.MyMap;
 import tr.org.tspb.exceptions.FormConfigException;
 import tr.org.tspb.exceptions.MongoOrmFailedException;
@@ -79,7 +79,7 @@ public class DataService implements Serializable {
      * @throws FormConfigException
      */
     public Map<CellMultiDimensionKey, List<CustomOlapHashMap>> createPivotData(
-            MyForm myForm,
+            FmsForm myForm,
             Map filter,
             List<MyField> iksDimension,
             List<MyField> igrekDimension,
@@ -95,7 +95,7 @@ public class DataService implements Serializable {
     }
 
     public Map<CellMultiDimensionKey, List<CustomOlapHashMap>> createPivotDataSnapshot(
-            MyForm myForm,
+            FmsForm myForm,
             Map filter,
             List<MyField> iksDimension,
             List<MyField> igrekDimension,
@@ -115,7 +115,7 @@ public class DataService implements Serializable {
         mapReduceCache.remove(filter);
     }
 
-    public Map cacheAndGetPivotData(Map filter, MyForm myForm)
+    public Map cacheAndGetPivotData(Map filter, FmsForm myForm)
             throws NullNotExpectedException, MongoOrmFailedException, MoreThenOneInListException, FormConfigException {
         Map map = mapReduceCache.get(filter);
         if (map == null) {
@@ -127,13 +127,15 @@ public class DataService implements Serializable {
 
     }
 
-    private void applyPersistentData(Map<CellMultiDimensionKey, List<CustomOlapHashMap>> pivotData, MyForm myForm, Map filter)
+    private void applyPersistentData(Map<CellMultiDimensionKey, List<CustomOlapHashMap>> pivotData, 
+            FmsForm myForm, Map filter)
             throws NullNotExpectedException, MongoOrmFailedException, MoreThenOneInListException, FormConfigException {
         mapReduceService.init(filter, myForm);
         armCellsWithData(pivotData, cacheAndGetPivotData(filter, myForm));
     }
 
-    private void applySnapshotPersistenceData(Map<CellMultiDimensionKey, List<CustomOlapHashMap>> mapMultiDimension, MyForm myForm, Map filter)
+    private void applySnapshotPersistenceData(Map<CellMultiDimensionKey, List<CustomOlapHashMap>> mapMultiDimension,
+            FmsForm myForm, Map filter)
             throws NullNotExpectedException, MongoOrmFailedException, MoreThenOneInListException, FormConfigException {
 
         mapReduceService.init(filter, myForm);
