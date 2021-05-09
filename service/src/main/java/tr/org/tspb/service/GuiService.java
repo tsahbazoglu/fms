@@ -11,7 +11,7 @@ import java.util.Map;
 import javax.inject.Inject;
 import org.slf4j.Logger;
 import tr.org.tspb.dao.MyField;
-import tr.org.tspb.dao.MyForm;
+import tr.org.tspb.dao.FmsForm;
 import tr.org.tspb.dao.MyMap;
 import tr.org.tspb.exceptions.MongoOrmFailedException;
 import tr.org.tspb.exceptions.NullNotExpectedException;
@@ -42,7 +42,7 @@ public class GuiService implements Serializable {
 
     private String projectAndFormKey;
     private TwoDimDlgUi twoDimDlgUi;
-    private MyForm selectedForm;
+    private FmsForm selectedForm;
 
     public String createAndView() throws FormConfigException {
         try {
@@ -57,7 +57,7 @@ public class GuiService implements Serializable {
         return null;
     }
 
-    private TwoDimDlgUi createTwoDimUi(MyForm myForm) {
+    private TwoDimDlgUi createTwoDimUi(FmsForm myForm) {
 
         TwoDimDlgUi twoDimDlgUi = new TwoDimDlgUi();
 
@@ -120,11 +120,11 @@ public class GuiService implements Serializable {
         this.twoDimDlgUi = twoDimDlgUi;
     }
 
-    public MyForm getSelectedForm() {
+    public FmsForm getSelectedForm() {
         return selectedForm;
     }
 
-    public void setSelectedForm(MyForm selectedForm) {
+    public void setSelectedForm(FmsForm selectedForm) {
         this.selectedForm = selectedForm;
     }
 
