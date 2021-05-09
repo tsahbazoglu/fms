@@ -2,7 +2,7 @@ package tr.org.tspb.common.util;
 
 import java.util.ArrayList;
 import java.util.List;
-import tr.org.tspb.dao.MyForm;
+import tr.org.tspb.dao.FmsForm;
 
 /**
  *
@@ -29,15 +29,15 @@ public abstract class DataSource {
     }
 
     public abstract List findPageData(//
-            String sortColumnName, boolean sortAscending, int startRow, int maxResults, MyForm form);
+            String sortColumnName, boolean sortAscending, int startRow, int maxResults, FmsForm form);
 
-    public abstract Long findTotalNumber(MyForm form);
+    public abstract Long findTotalNumber(FmsForm form);
 
     /**
      * This is where the Customer data is retrieved from the database and
      * returned as a list of CustomerBean objects for display in the UI.
      */
-    protected DataPage getDataPage(int startRow, int pageSize, int dimesion, MyForm form) {
+    protected DataPage getDataPage(int startRow, int pageSize, int dimesion, FmsForm form) {
         // Retrieve the total number of customers from the database.  This
         // number is required by the DataPage object so the paginator will know
         // the relative location of the page data.
