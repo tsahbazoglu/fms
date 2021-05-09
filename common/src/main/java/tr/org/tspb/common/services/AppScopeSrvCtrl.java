@@ -44,7 +44,7 @@ import tr.org.tspb.common.jmx.MyJmxMonitor;
 import tr.org.tspb.common.qualifier.MyLoginQualifier;
 import tr.org.tspb.dao.MyActions;
 import tr.org.tspb.dao.MyField;
-import tr.org.tspb.dao.MyForm;
+import tr.org.tspb.dao.FmsForm;
 import tr.org.tspb.dao.MyProject;
 import tr.org.tspb.exceptions.FormConfigException;
 import tr.org.tspb.factory.qualifier.OgmCreatorQualifier;
@@ -83,11 +83,10 @@ public class AppScopeSrvCtrl {
     private static Map<String, ObjectId> cacheIdByKpbMemberName;
     private static Map<String, ObjectId> cacheIdByLdapUid;
     private static Map<String, String> cacheIonSettingNotifyType;
-    private static Map<String, String> cacheIonSettingActivityStatus;
     private static Map<String, MyFopFactory> mapOfPdfFactory = new HashMap<>();
     private final Map<String, List<SelectItem>> cacheZetDimensionItems = new HashMap<>();
     private final Map<String, List<MyField>> cacheDimensionItems = new HashMap<>();
-    private final Map<String, MyForm> cacheForm = new HashMap<>();
+    private final Map<String, FmsForm> cacheForm = new HashMap<>();
     private final Map<String, MyActions> cacheActions = new HashMap<>();
 
     public MyActions getCacheActions(String key) {
@@ -98,11 +97,11 @@ public class AppScopeSrvCtrl {
         cacheActions.put(key, myActions);
     }
 
-    public MyForm getCacheForm(String key) {
+    public FmsForm getCacheForm(String key) {
         return cacheForm.get(key);
     }
 
-    public void putCacheForm(String key, MyForm myForm) {
+    public void putCacheForm(String key, FmsForm myForm) {
         cacheForm.put(key, myForm);
     }
 
@@ -138,7 +137,7 @@ public class AppScopeSrvCtrl {
     private static final String ION_SETTING_ACTIVITY_STATUS_001 = "ion_setting_activity_status_001";
 
     List<Document> listOfPeriods;
-    private Map<String, MyForm> mapForms = new HashMap<>();
+    private Map<String, FmsForm> mapForms = new HashMap<>();
     Map<Map, List<Document>> sessionSearchCacheMap = new HashMap<>();
     Map<Map, List<Document>> applicationSearchResults = new HashMap<>();
     Map<Map, Document> calculateFormula = new HashMap();
@@ -248,7 +247,7 @@ public class AppScopeSrvCtrl {
         //FIXME generalize  and remove this function
         if (activityStatusHayir == null) {
             activityStatusHayir = (ObjectId) mongoDbUtil
-                    .findOne("iondb", MyForm.ION_SETTING_ACTIVITY_STATUS, new Document(CODE, ION_SETTING_ACTIVITY_STATUS_001))
+                    .findOne("iondb", FmsForm.ION_SETTING_ACTIVITY_STATUS, new Document(CODE, ION_SETTING_ACTIVITY_STATUS_001))
                     .get(MONGO_ID);
         }
         return activityStatusHayir;
@@ -648,7 +647,7 @@ public class AppScopeSrvCtrl {
         return null;
     }
 
-    public MyForm getFormDefinitionByForm(String configCollection, String form, Map searchObject)
+    public FmsForm getFormDefinitionByForm(String configCollection, String form, Map searchObject)
             throws NullNotExpectedException, MongoOrmFailedException, FormConfigException {
         String cacheKey = configCollection.concat(":").concat(form);
         if (mapForms.get(cacheKey) == null) {
@@ -664,7 +663,7 @@ public class AppScopeSrvCtrl {
         return mapForms.get(cacheKey);
     }
 
-    public MyForm getFormDefinitionByKey(String configCollection, String collectionKey, Map searchObject)
+    public FmsForm getFormDefinitionByKey(String configCollection, String collectionKey, Map searchObject)
             throws NullNotExpectedException, MongoOrmFailedException, FormConfigException {
         /**
          * Burada esas amaç herhangi bir session mb yi elde etmek cunku
