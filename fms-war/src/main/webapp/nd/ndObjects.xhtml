@@ -12,48 +12,50 @@
         <title></title>
     </h:head>
 
-    <p:toolbar 
-        rendered="#{not esignViewCtrl.preventedMultiTab}"
-        style="width: 94%"
-        >
-        <f:facet name="left">
-            <p:button  
-                icon="ui-icon-home" 
-                disabled="true">
-            </p:button> 
-            <p:commandButton 
-                value="Kaydet"
-                rendered="#{formService.myForm.myActions.save}"
-                style="width: 150px;"
-                action="#{pivotModifierCtrl.provideCrossCheck}"
-                update="#{updateAjaxMB.btnNdSave}"
-                />
-            <p:commandButton 
-                value="Bu sayfa ile ilgili açıklamalar için tıklayınız" 
-                action="#{pivotModifierCtrl.showAllNote}" 
-                style="color: red;font-weight: bold;white-space: nowrap;"
-                rendered="#{pivotModifierCtrl.selectedFormUserNote}"
-                update=":idMessageDialog"
-                />
-            <p:commandButton 
-                value="Excele Aktar" 
-                rendered="#{formService.myForm.myActions.download}"
-                action="#{pivotModifierCtrl.downloadCsvFile}" 
-                style="white-space: nowrap;"
-                />
+    <h:form id="nd-form">
+        <p:toolbar 
+            rendered="#{not esignViewCtrl.preventedMultiTab}"
+            style="width: 94%"
+            >
+            <f:facet name="left">
+                <p:button  
+                    icon="ui-icon-home" 
+                    disabled="true">
+                </p:button> 
+                <p:commandButton 
+                    value="Kaydet"
+                    rendered="#{formService.myForm.myActions.save}"
+                    style="width: 150px;"
+                    action="#{pivotModifierCtrl.provideCrossCheck}"
+                    update="#{updateAjaxMB.btnNdSave}"
+                    />
+                <p:commandButton 
+                    value="Bu sayfa ile ilgili açıklamalar için tıklayınız" 
+                    action="#{pivotModifierCtrl.showAllNote}" 
+                    style="color: red;font-weight: bold;white-space: nowrap;"
+                    rendered="#{pivotModifierCtrl.selectedFormUserNote}"
+                    update=":idMessageDialog"
+                    />
+                <p:commandButton 
+                    value="Excele Aktar" 
+                    rendered="#{formService.myForm.myActions.download}"
+                    action="#{pivotModifierCtrl.downloadCsvFile}" 
+                    style="white-space: nowrap;"
+                    />
 
-            <p:commandButton 
-                value="E-İmza Süreci" 
-                action="#{pivotModifierCtrl.showEimza22}" 
-                rendered="#{formService.myForm.myActions.eimza2D}"
-                update=":idMessageDialog,:id_nd_esign_dialog"
-                />  
-            <h:inputHidden
-                id="hiddenTextJsonDataToModel" 
-                value="#{pivotModifierCtrl.pivotDataModelEdit.jsonDataToModel}"
-                />
-        </f:facet>
-    </p:toolbar>
+                <p:commandButton 
+                    value="E-İmza Süreci" 
+                    action="#{pivotModifierCtrl.showEimza22}" 
+                    rendered="#{formService.myForm.myActions.eimza2D}"
+                    update=":idMessageDialog,:id_nd_esign_dialog"
+                    />  
+                <h:inputHidden
+                    id="id-hidden-text-json-data-to-model" 
+                    value="#{pivotModifierCtrl.pivotDataModelEdit.jsonDataToModel}"
+                    />
+            </f:facet>
+        </p:toolbar>
+    </h:form> 
 
     <br/>
 
