@@ -3,7 +3,7 @@ package tr.org.tspb.pojo;
 import org.bson.Document;
 import org.bson.types.Code;
 import tr.org.tspb.dao.MyField;
-import tr.org.tspb.dao.MyForm;
+import tr.org.tspb.dao.FmsForm;
 
 /**
  *
@@ -18,7 +18,7 @@ public class ExcellColumnDef {
     private final Code converter;
     private final MyField toMyField;
 
-    public ExcellColumnDef(MyForm myForm, String mapKey, Document dbo) {
+    public ExcellColumnDef(FmsForm myForm, String mapKey, Document dbo) {
         this.key = mapKey;
         this.type = (String) dbo.get("type");
         this.cache = Boolean.TRUE.equals(dbo.get("cache"));
