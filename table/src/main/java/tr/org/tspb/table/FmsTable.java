@@ -58,7 +58,7 @@ import org.bson.conversions.Bson;
 import tr.org.tspb.converter.props.MessageBundleLoaderv1;
 import tr.org.tspb.converter.base.BsonConverter;
 import tr.org.tspb.dao.MyField;
-import tr.org.tspb.dao.MyForm;
+import tr.org.tspb.dao.FmsForm;
 import tr.org.tspb.dao.MyItems;
 import tr.org.tspb.dao.MyMap;
 import tr.org.tspb.dao.MyMerge;
@@ -852,17 +852,18 @@ public abstract class FmsTable extends FmsTableView {
         return Collections.unmodifiableList(fileListAll);
     }
 
-    public ObjectId saveObjectFromPaymentService(Document operatedObject, String username, MyForm myForm, String ip) throws Exception {
+    public ObjectId saveObjectFromPaymentService(Document operatedObject, String username,
+            FmsForm myForm, String ip) throws Exception {
         if (!"payment-service-user".equals(username)) {
             throw new RuntimeException("Upsss ...");
         }
         return saveOneDimensionObject(operatedObject, username, myForm, ip, "payment-service-no-session");
     }
 
-    private ObjectId saveOneDimensionObject(Document operatedObject, String username, MyForm myForm, String ip, String sessionId)
+    private ObjectId saveOneDimensionObject(Document operatedObject, String username, FmsForm myForm, String ip, String sessionId)
             throws MessagingException, NullNotExpectedException, LdapException, FormConfigException, MongoOrmFailedException, UserException {
 
-        MyForm inode = (MyForm) operatedObject.get(INODE);
+        FmsForm inode = (FmsForm) operatedObject.get(INODE);
         operatedObject.remove(INODE);//just to sutisfy the icefaces
         if (inode == null) {
             inode = myForm;
@@ -1050,7 +1051,7 @@ public abstract class FmsTable extends FmsTableView {
         return (ObjectId) result.get(MONGO_ID);
     }
 
-    protected String deleteObject(LoginController loginMB, MyForm myForm, MyMap crudObject) throws Exception {
+    protected String deleteObject(LoginController loginMB, FmsForm myForm, MyMap crudObject) throws Exception {
         String collection = myForm.getTable();
 
         ObjectId objectID = (ObjectId) crudObject.get(MONGO_ID);
@@ -1086,7 +1087,7 @@ public abstract class FmsTable extends FmsTableView {
         return null;
     }
 
-    public String copyObject(MyForm myForm, LoginController loginMB, MyMap crudObject) throws Exception {
+    public String copyObject(FmsForm myForm, LoginController loginMB, MyMap crudObject) throws Exception {
 
         Document operatedObject = new Document(crudObject);
 
@@ -1108,7 +1109,7 @@ public abstract class FmsTable extends FmsTableView {
         return null;
     }
 
-    public ObjectId saveObject(MyForm myForm, LoginController loginMB, MyMap crudObject)
+    public ObjectId saveObject(FmsForm myForm, LoginController loginMB, MyMap crudObject)
             throws UserException, MessagingException, NullNotExpectedException, LdapException, FormConfigException, MongoOrmFailedException {
 
         Object loginFkFieldValue = crudObject.get(formService.getMyForm().getLoginFkField());
