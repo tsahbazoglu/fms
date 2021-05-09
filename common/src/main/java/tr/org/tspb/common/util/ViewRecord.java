@@ -5,7 +5,7 @@ import java.util.Map;
 import org.bson.Document;
 import org.bson.types.BasicBSONList;
 import tr.org.tspb.dao.MyField;
-import tr.org.tspb.dao.MyForm;
+import tr.org.tspb.dao.FmsForm;
 
 /**
  *
@@ -20,9 +20,9 @@ public class ViewRecord {
 
         private StringBuilder sb;
         private Map<String, Object> map;
-        private MyForm myForm;
+        private FmsForm myForm;
 
-        public Builder(Map dbo, MyForm myForm) {
+        public Builder(Map dbo, FmsForm myForm) {
             this.sb = new StringBuilder();
             this.myForm = myForm;
             this.map = dbo;
