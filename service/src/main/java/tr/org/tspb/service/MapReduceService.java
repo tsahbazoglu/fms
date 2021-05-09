@@ -19,7 +19,7 @@ import org.bson.conversions.Bson;
 import org.slf4j.Logger;
 import tr.org.tspb.common.services.AppScopeSrvCtrl;
 import tr.org.tspb.dao.MyField;
-import tr.org.tspb.dao.MyForm;
+import tr.org.tspb.dao.FmsForm;
 import tr.org.tspb.exceptions.FormConfigException;
 import tr.org.tspb.util.qualifier.KeepOpenQualifier;
 import tr.org.tspb.util.tools.MongoDbUtilIntr;
@@ -50,13 +50,13 @@ public class MapReduceService implements Serializable {
     private String configCollection;
     private String db;
 
-    public void init(Map<String, Object> filter, MyForm myForm) {
+    public void init(Map<String, Object> filter, FmsForm myForm) {
         this.filter = filter;
         this.configCollection = myForm.getMyProject().getConfigTable();
         this.db = myForm.getDb();
     }
 
-    public void cacheSnapshotKey(Map key, MyForm myForm)
+    public void cacheSnapshotKey(Map key, FmsForm myForm)
             throws NullNotExpectedException, MongoOrmFailedException, MoreThenOneInListException, FormConfigException {
         if (snapshotMapReduceCache.get(key) == null) {
             snapshotMapReduceCache.put(key, mapReduceSnapshot(key, myForm));
@@ -67,7 +67,7 @@ public class MapReduceService implements Serializable {
         return snapshotMapReduceCache.get(key);
     }
 
-    public Map<Map, Serializable> mapReduceSnapshot(Map cashedKey, MyForm myForm)
+    public Map<Map, Serializable> mapReduceSnapshot(Map cashedKey, FmsForm myForm)
             throws NullNotExpectedException, MongoOrmFailedException, MoreThenOneInListException, FormConfigException {
 
         for (String key : myForm.getZetDimension()) {
@@ -80,7 +80,7 @@ public class MapReduceService implements Serializable {
         return mapReduce(cashedKey, myForm.getSnapshotCollection());
     }
 
-    public Map<Map, Serializable> mapReduce(Map cashedKey, MyForm myForm)
+    public Map<Map, Serializable> mapReduce(Map cashedKey, FmsForm myForm)
             throws NullNotExpectedException, MongoOrmFailedException, MoreThenOneInListException, FormConfigException {
 
         for (String key : myForm.getZetDimension()) {
@@ -98,7 +98,7 @@ public class MapReduceService implements Serializable {
 
         String collectionKey = (String) cashedKey.get(FORMS);
 
-        MyForm myForm = appScopeSrvCtrl.getFormDefinitionByKey(configCollection, collectionKey, filter);
+        FmsForm myForm = appScopeSrvCtrl.getFormDefinitionByKey(configCollection, collectionKey, filter);
 
         Bson concluededQuery = Filters.and(new Document(cashedKey), Filters.eq(FORMS, myForm.getKey()));
 
