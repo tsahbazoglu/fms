@@ -28,8 +28,7 @@ import org.apache.poi.ss.usermodel.Workbook;
 import org.slf4j.Logger;
 import tr.org.tspb.constants.ProjectConstants;
 import static tr.org.tspb.constants.ProjectConstants.*;
-
-import tr.org.tspb.dao.MyForm;
+import tr.org.tspb.dao.FmsForm;
 
 /**
  *
@@ -72,7 +71,7 @@ public class DownloadDynamicContentServlet extends HttpServlet {
 
         /* Get inputs from session */
         Reader reader = (Reader) request.getSession().getAttribute(UYS_DOWNLOAD_READER);
-        MyForm selectedForm = (MyForm) request.getSession().getAttribute(UYS_SELECTED_FROM);
+        FmsForm selectedForm = (FmsForm) request.getSession().getAttribute(UYS_SELECTED_FROM);
         String excelFormatPath = (String) request.getSession().getAttribute(EXCEL_FORMAT_PATH);
         String excelLibraryPoi = (String) request.getSession().getAttribute(EXCEL_LIBRARY_POI);
         Set uysDownloadRoles = (Set) request.getSession().getAttribute(UYS_DOWNLOAD_ROLES);
