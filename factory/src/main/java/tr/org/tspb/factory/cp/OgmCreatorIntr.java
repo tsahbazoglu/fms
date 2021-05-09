@@ -4,7 +4,7 @@ import java.io.Serializable;
 import tr.org.tspb.exceptions.MongoOrmFailedException;
 import tr.org.tspb.exceptions.NullNotExpectedException;
 import tr.org.tspb.dao.MyField;
-import tr.org.tspb.dao.MyForm;
+import tr.org.tspb.dao.FmsForm;
 import tr.org.tspb.dao.MyProject;
 import tr.org.tspb.pojo.RoleMap;
 import java.util.Map;
@@ -25,32 +25,32 @@ public interface OgmCreatorIntr extends Serializable {
 
     MyProject getMyProject(String projectKey, TagLogin login) throws NullNotExpectedException, FormConfigException;
 
-    MyForm getMyFormExternal(MyProject myProject, String configCollection, Map formSearch, Map searchObject,
+    FmsForm getMyFormExternal(MyProject myProject, String configCollection, Map formSearch, Map searchObject,
             RoleMap loginController, UserDetail userDetail)
             throws NullNotExpectedException, MongoOrmFailedException;
 
-    MyForm getMyFormXsmall(MyProject myProject, Map searchObject,
+    FmsForm getMyFormXsmall(MyProject myProject, Map searchObject,
             RoleMap loginController, UserDetail userDetail)
             throws NullNotExpectedException, MongoOrmFailedException;
 
-    MyForm getMyFormSmall(MyProject myProject, Document dboForm, Map searchObject,
+    FmsForm getMyFormSmall(MyProject myProject, Document dboForm, Map searchObject,
             RoleMap loginController, UserDetail userDetail)
             throws NullNotExpectedException, MongoOrmFailedException;
 
-    MyForm getMyFormMedium(MyProject myProject, Document dboForm, Map searchObject,
+    FmsForm getMyFormMedium(MyProject myProject, Document dboForm, Map searchObject,
             RoleMap loginController, UserDetail userDetail)
             throws NullNotExpectedException, MongoOrmFailedException;
 
-    MyForm getMyFormLarge(MyProject myProject, String configCollection, Map formSearch, Map searchObject,
+    FmsForm getMyFormLarge(MyProject myProject, String configCollection, Map formSearch, Map searchObject,
             RoleMap loginController, UserDetail userDetail)
             throws NullNotExpectedException, MongoOrmFailedException;
 
-    MyField getMyField(MyForm myForm, Document docField, Map searchObject, RoleMap roleMap, UserDetail userDetail) throws FormConfigException;
+    MyField getMyField(FmsForm myForm, Document docField, Map searchObject, RoleMap roleMap, UserDetail userDetail) throws FormConfigException;
 
-    MyField getMyFieldPivot(MyForm myForm, Document docField, Map searchObject, RoleMap roleMap, UserDetail userDetail) throws FormConfigException;
+    MyField getMyFieldPivot(FmsForm myForm, Document docField, Map searchObject, RoleMap roleMap, UserDetail userDetail) throws FormConfigException;
 
     public MyMap getCrudObject();
 
-    public MyActions getMyActions(MyForm myFormLarge, RoleMap roleMap, Document filter, UserDetail userDetail);
+    public MyActions getMyActions(FmsForm myFormLarge, RoleMap roleMap, Document filter, UserDetail userDetail);
 
 }
