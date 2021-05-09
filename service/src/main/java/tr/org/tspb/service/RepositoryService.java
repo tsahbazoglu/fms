@@ -41,7 +41,6 @@ import tr.org.tspb.dao.MyActions;
 import tr.org.tspb.dao.MyField;
 import tr.org.tspb.dao.MyFile;
 import tr.org.tspb.dao.FmsForm;
-import tr.org.tspb.dao.MyFormXs;
 import tr.org.tspb.dao.MyMap;
 import tr.org.tspb.dao.MyProject;
 import tr.org.tspb.dao.TagEvent;
@@ -524,7 +523,7 @@ public class RepositoryService implements Serializable {
 
     }
 
-    public MyFormXs getMyFormXs(MyProject myProject, String formKey)
+    public FmsForm getMyFormXs(MyProject myProject, String formKey)
             throws NullNotExpectedException, MongoOrmFailedException {
 
         StringBuilder sb = new StringBuilder();
