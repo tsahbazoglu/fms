@@ -18,7 +18,7 @@ import org.bson.Document;
 import org.bson.types.ObjectId;
 import tr.org.tspb.util.stereotype.MyController;
 import tr.org.tspb.common.qualifier.MyLoginQualifier;
-import tr.org.tspb.dao.MyForm;
+import tr.org.tspb.dao.FmsForm;
 import tr.org.tspb.common.services.AppScopeSrvCtrl;
 import tr.org.tspb.pivot.simple.datamodel.ItemProvider;
 import tr.org.tspb.pivot.simple.datamodel.PivotRecord;
@@ -56,7 +56,7 @@ public class SimplePivotCtrl extends SimplePivotCtrlAdmin {
     protected Set<String> roles;
     private PivotRecord pivotRecord;
 
-    public void init(MyForm myForm) {
+    public void init(FmsForm myForm) {
 
         String role = "lmalskdvm";
 
@@ -130,11 +130,11 @@ public class SimplePivotCtrl extends SimplePivotCtrlAdmin {
         this.loginController = loginMB;
     }
 
-    public MyForm getSelectedForm() {
+    public FmsForm getSelectedForm() {
         return myForm;
     }
 
-    public void setSelectedForm(MyForm selectedForm) {
+    public void setSelectedForm(FmsForm selectedForm) {
         this.myForm = selectedForm;
     }
 
@@ -189,7 +189,7 @@ public class SimplePivotCtrl extends SimplePivotCtrlAdmin {
         return itemProvider;
     }
 
-    public List<String> createFormMsg(MyForm myForm) {
+    public List<String> createFormMsg(FmsForm myForm) {
         List<String> msgs = new ArrayList<>();
 
         if (myForm.getConstantNote() != null && !myForm.getConstantNote().isEmpty()) {
