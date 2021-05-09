@@ -26,7 +26,7 @@ import tr.org.tspb.converter.base.SelectOneObjectIdConverter;
 import tr.org.tspb.converter.base.SelectOneStringConverter;
 import tr.org.tspb.converter.base.TelmanStringConverter;
 import tr.org.tspb.dao.MyField;
-import tr.org.tspb.dao.MyForm;
+import tr.org.tspb.dao.FmsForm;
 import tr.org.tspb.dao.MyItems;
 import tr.org.tspb.dao.MyMap;
 import tr.org.tspb.common.qualifier.MyLoginQualifier;
@@ -35,7 +35,6 @@ import tr.org.tspb.common.services.BaseService;
 import tr.org.tspb.service.FilterService;
 import tr.org.tspb.common.services.LoginController;
 import tr.org.tspb.exceptions.MongoOrmFailedException;
-import tr.org.tspb.outsider.EsignDoor;
 import tr.org.tspb.service.DataService;
 import tr.org.tspb.service.FormService;
 import tr.org.tspb.util.service.DlgCtrl;
@@ -129,7 +128,7 @@ public abstract class PivotImpl implements Serializable, PivotApi {
      * @return
      * @throws Exception
      */
-    private List<MyField> createDimensionFieldItems(MyForm myForm, MyField myField) throws MongoOrmFailedException {
+    private List<MyField> createDimensionFieldItems(FmsForm myForm, MyField myField) throws MongoOrmFailedException {
 
         StringBuilder sb = new StringBuilder();
         sb.append(myForm.getKey());
@@ -230,7 +229,7 @@ public abstract class PivotImpl implements Serializable, PivotApi {
      * @param myForm
      */
     /*   DONT REMOVE  */
-    public void refreshRowData(MyForm myForm) {
+    public void refreshRowData(FmsForm myForm) {
 
         Document dbo = mongoDbUtil.findOne(myForm.getDb(), myForm.getTable(), new Document(getFilter()).append(FORMS, FIELDS_ROW));
 
@@ -276,7 +275,7 @@ public abstract class PivotImpl implements Serializable, PivotApi {
      *
      * @param inodeMyForm
      */
-    public void prepareJsfComponentMap(MyForm inodeMyForm) {
+    public void prepareJsfComponentMap(FmsForm inodeMyForm) {
 
         componentMap = new HashMap();
 
@@ -358,7 +357,7 @@ public abstract class PivotImpl implements Serializable, PivotApi {
      * @param myForm
      * @throws tr.org.tspb.exceptions.MongoOrmFailedException
      */
-    protected void createDimensionIksIgrek(MyForm myForm) throws MongoOrmFailedException {
+    protected void createDimensionIksIgrek(FmsForm myForm) throws MongoOrmFailedException {
 
         mapOfMeasureField = new HashMap<>();
         /**
@@ -406,7 +405,7 @@ public abstract class PivotImpl implements Serializable, PivotApi {
      *
      * @param myForm
      */
-    protected void createDimensionZet(MyForm myForm) throws FormConfigException {
+    protected void createDimensionZet(FmsForm myForm) throws FormConfigException {
 
         dimensionZet = new ArrayList<>();
 
