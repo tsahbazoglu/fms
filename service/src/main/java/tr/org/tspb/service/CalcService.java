@@ -22,7 +22,7 @@ import tr.org.tspb.common.util.CustomOlapHashMap;
 import tr.org.tspb.converter.base.MoneyConverter;
 import tr.org.tspb.converter.base.NumberConverter;
 import tr.org.tspb.dao.MyField;
-import tr.org.tspb.dao.MyForm;
+import tr.org.tspb.dao.FmsForm;
 import tr.org.tspb.exceptions.FormConfigException;
 import tr.org.tspb.exceptions.MongoOrmFailedException;
 import tr.org.tspb.exceptions.MoreThenOneInListException;
@@ -73,7 +73,7 @@ public class CalcService extends CommonSrv {
     }
 
     public void createPivotCalcData(Map<CellMultiDimensionKey, List<CustomOlapHashMap>> inputMap,
-            boolean calculate, boolean mark, MyForm myForm, Map filter) throws UserException, EvaluationException, FormConfigException {
+            boolean calculate, boolean mark, FmsForm myForm, Map filter) throws UserException, EvaluationException, FormConfigException {
 
         for (String key : myForm.getZetDimension()) {
             if (!filter.containsKey(key)) {
@@ -196,7 +196,7 @@ public class CalcService extends CommonSrv {
     }
 
     public void applyCalcCoordinates(Map<CellMultiDimensionKey, List<CustomOlapHashMap>> inputMap,
-            MyForm myForm, Map filter) throws UserException {
+            FmsForm myForm, Map filter) throws UserException {
 
         for (String key : myForm.getZetDimension()) {
             if (!filter.containsKey(key)) {
@@ -290,7 +290,7 @@ public class CalcService extends CommonSrv {
     public void provideSnapshotCalculatedValues(
             Map<CellMultiDimensionKey, List<CustomOlapHashMap>> inputMap,
             Map<CellMultiDimensionKey, List<CustomOlapHashMap>> mapMultiDimension,
-            MyForm myForm, Map filter)
+            FmsForm myForm, Map filter)
             throws UserException {
 
         if (true) {
@@ -424,7 +424,7 @@ public class CalcService extends CommonSrv {
             return null;
         }
 
-        MyForm myFrom = (MyForm) context.getExternalContext().getSessionMap().get(SESSION_ATTR_SELECTED_FORM);
+        FmsForm myFrom = (FmsForm) context.getExternalContext().getSessionMap().get(SESSION_ATTR_SELECTED_FORM);
 
         MyField field = myFrom.getField(fieldKey);
 
