@@ -2,7 +2,7 @@ package tr.org.tspb.service;
 
 import tr.org.tspb.util.stereotype.MyServices;
 import java.io.Serializable;
-import tr.org.tspb.dao.MyForm;
+import tr.org.tspb.dao.FmsForm;
 
 /**
  *
@@ -11,13 +11,13 @@ import tr.org.tspb.dao.MyForm;
 @MyServices
 public class FormService implements Serializable {
 
-    private MyForm myForm;
+    private FmsForm myForm;
 
-    public MyForm getMyForm() {
+    public FmsForm getMyForm() {
         return myForm;
     }
 
-    public void setMyForm(MyForm myForm) {
+    public void setMyForm(FmsForm myForm) {
         this.myForm = myForm;
     }
 
