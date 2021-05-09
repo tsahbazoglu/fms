@@ -9,8 +9,8 @@ import java.util.Map;
 import org.bson.BsonDocument;
 import org.bson.Document;
 import org.bson.types.ObjectId;
-import tr.org.tspb.dao.MyForm;
-
+import tr.org.tspb.dao.FmsForm;
+ 
 /**
  *
  * @author Telman Şahbazoğlu
@@ -111,7 +111,7 @@ public class MongoDbVersion {
         mongoDbUtil.insertOne(versionDatabase, versionCollection, history);
     }
 
-    public Map<String, List> fetch(MyForm myForm, String versionDB, String versionCollection, ObjectId recordID, List<String> importantFields) {
+    public Map<String, List> fetch(FmsForm myForm, String versionDB, String versionCollection, ObjectId recordID, List<String> importantFields) {
 
         List<DocumentRecursive> rowList = mongoDbUtil.findListAsName(versionDB, versionCollection,
                 myForm, new Document(MASTER_RECORD.concat(DOT).concat(_ID), recordID), null);
