@@ -38,7 +38,6 @@ import javax.script.ScriptException;
 import net.sourceforge.jeval.EvaluationException;
 import net.sourceforge.jeval.Evaluator;
 import org.bson.Document;
-import org.bson.types.Code;
 import org.bson.types.ObjectId;
 import tr.org.tspb.common.qualifier.MyLoginQualifier;
 import tr.org.tspb.common.services.AppScopeSrvCtrl;
@@ -50,7 +49,7 @@ import tr.org.tspb.converter.base.SelectOneObjectIdConverter;
 import tr.org.tspb.converter.base.TelmanStringConverter;
 import tr.org.tspb.converter.base.UysStringConverter;
 import tr.org.tspb.dao.MyField;
-import tr.org.tspb.dao.MyForm;
+import tr.org.tspb.dao.FmsForm;
 
 /**
  *
@@ -265,7 +264,7 @@ public class CtrlService extends CommonSrv {
             }
         }
 
-        MyForm formDef = appScopeSrvCtrl.getFormDefinitionByForm(configCollection, form, filter);
+        FmsForm formDef = appScopeSrvCtrl.getFormDefinitionByForm(configCollection, form, filter);
         MyField fieldDef = formDef.getField(valueKey);
 
         if (fieldDef == null) {
@@ -352,7 +351,7 @@ public class CtrlService extends CommonSrv {
             value = Double.valueOf(sum);
         } else if (recalculate && calculateDefinition != null && elementDefinedPeriod == null) {
 
-            MyForm formulaRelatedFormDef = appScopeSrvCtrl
+            FmsForm formulaRelatedFormDef = appScopeSrvCtrl
                     .getFormDefinitionByForm(configCollection, calculateDefinition.getRelations(), filter);
 
             Map search = new HashMap();
@@ -450,10 +449,10 @@ public class CtrlService extends CommonSrv {
     public Map jevalCalculateAndStore(Map searchedMap, MyCalcDef myCalcDef,
             String initForm, int recursiveDeepSizeLimit, boolean isInternalCheck,
             Map<CellMultiDimensionKey, List<CustomOlapHashMap>> mapMultiDimension,
-            MyForm selectedForm, String configCollection, Map searchObject, String db)
+            FmsForm selectedForm, String configCollection, Map searchObject, String db)
             throws NullNotExpectedException, MongoOrmFailedException, RecursiveLimitExceedException, MoreThenOneInListException, EvaluationException, FormConfigException {
 
-        MyForm initMyForm = appScopeSrvCtrl.getFormDefinitionByForm(configCollection, initForm, searchObject);
+        FmsForm initMyForm = appScopeSrvCtrl.getFormDefinitionByForm(configCollection, initForm, searchObject);
 
         recursiveDeepSizeLimit++;
         // to prevent wrong circles
@@ -539,7 +538,7 @@ public class CtrlService extends CommonSrv {
                         return resultMap;
                     }
 
-                    MyForm elementFormDef = appScopeSrvCtrl.getFormDefinitionByForm(configCollection, elementForm, searchObject);
+                    FmsForm elementFormDef = appScopeSrvCtrl.getFormDefinitionByForm(configCollection, elementForm, searchObject);
 
                     String collectionKey = elementFormDef.getKey();
 
@@ -744,7 +743,7 @@ public class CtrlService extends CommonSrv {
 
         List<Map<String, Object>> all = new ArrayList<>();
 
-        MyForm constraintFormDef = appScopeSrvCtrl.getFormDefinitionByKey(configCollection, "constraint", filter);
+        FmsForm constraintFormDef = appScopeSrvCtrl.getFormDefinitionByKey(configCollection, "constraint", filter);
 
         String overAllCheck = constraintFormDef.getMyNamedQueries().get("overAllCheck", String.class);
 
@@ -1024,7 +1023,7 @@ public class CtrlService extends CommonSrv {
         return cellControl;
     }
 
-    public void checkRecordConverterValueType(Document mm, MyForm mf) throws FormConfigException {
+    public void checkRecordConverterValueType(Document mm, FmsForm mf) throws FormConfigException {
         for (String fieldKey : mm.keySet()) {
 
             MyField myField = mf.getField(fieldKey);
