@@ -28,7 +28,6 @@ import static tr.org.tspb.constants.ProjectConstants.MONGO_ID;
 import static tr.org.tspb.constants.ProjectConstants.PERIOD;
 import static tr.org.tspb.constants.ProjectConstants.TEMPLATE;
 import static tr.org.tspb.constants.ProjectConstants.ZET_DIMENSION;
-import tr.org.tspb.dao.MyFormXs;
 import tr.org.tspb.dao.refs.PlainRecord;
 import tr.org.tspb.dp.nullobj.PlainRecordData;
 import tr.org.tspb.exceptions.FormConfigException;
@@ -77,7 +76,7 @@ public class FilterService extends CommonSrv {
         this.guiFiltersHistory = new HashMap<>();
     }
 
-    public void createBaseFilter(MyFormXs myFormXs) {
+    public void createBaseFilter(FmsForm myFormXs) {
         baseFilterCurrent = new Document(myFormXs.getDefaultCurrentQuery());
         baseFilterHistory = new Document(myFormXs.getDefaultHistoryQuery());
     }
@@ -250,7 +249,7 @@ public class FilterService extends CommonSrv {
                             loginController.isUserInRole(formService.getMyForm().getMyProject().getAdminAndViewerRole()),
                             loginController.getLoggedUserDetail(),
                             loginController.getRoleMap());
-            return this;
+            return;
         }
 
         switch (myForm.getSchemaVersion()) {
