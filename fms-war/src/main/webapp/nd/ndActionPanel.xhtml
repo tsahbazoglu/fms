@@ -9,32 +9,31 @@
         <title></title>
     </h:head>
 
-    <h:form id="ndActionPanelForm">
-        <h:panelGrid 
-            columns="2"
-            columnClasses="VTopHLeftW70p,VTopHRightW30p"
-            width="100%"
+    <h:panelGrid 
+        columns="2"
+        columnClasses="VTopHLeftW70p,VTopHRightW30p"
+        width="100%"
+        >
+        <h:outputLabel 
+            value="#{formService.myForm.name}" 
+            style="width:100%;font-size: 16px;font-weight: bolder;color: #b3b3b3;"
             >
-            <h:outputLabel 
-                value="#{formService.myForm.name}" 
-                style="width:100%;font-size: 16px;font-weight: bolder;color: #b3b3b3;"
+        </h:outputLabel>
+        <p:scrollPanel style="width:500px;height:90px;">
+            <p:dataList 
+                value="#{pivotModifierCtrl.selectedFormMessages}" 
+                var="mymessage"  
+                type="ordered"
+                itemStyleClass="itemStyleClass"
+                itemType="none"
+                emptyMessage="#{fmsLabels.messages.getString('no_description')}"
                 >
-            </h:outputLabel>
-            <p:scrollPanel style="width:500px;height:90px;">
-                <p:dataList 
-                    value="#{pivotModifierCtrl.selectedFormMessages}" 
-                    var="mymessage"  
-                    type="ordered"
-                    itemStyleClass="itemStyleClass"
-                    itemType="none"
-                    emptyMessage="#{fmsLabels.messages.getString('no_description')}"
-                    >
-                    <f:facet name="header">
-                        #{fmsLabels.messages.getString('descriptions')}
-                    </f:facet>
-                    <h:outputText value="#{mymessage}" escape="false"/>
-                </p:dataList>
-            </p:scrollPanel>
-        </h:panelGrid>
-    </h:form> 
+                <f:facet name="header">
+                    #{fmsLabels.messages.getString('descriptions')}
+                </f:facet>
+                <h:outputText value="#{mymessage}" escape="false"/>
+            </p:dataList>
+        </p:scrollPanel>
+    </h:panelGrid>
+
 </html>
