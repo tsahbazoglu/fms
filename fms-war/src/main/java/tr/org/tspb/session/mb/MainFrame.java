@@ -49,7 +49,6 @@ import tr.org.tspb.common.services.AppScopeSrvCtrl;
 import tr.org.tspb.service.RepositoryService;
 import tr.org.tspb.constants.ProjectConstants;
 import tr.org.tspb.dao.FmsForm;
-import tr.org.tspb.dao.MyFormXs;
 import tr.org.tspb.dao.MyProject;
 import tr.org.tspb.datamodel.gui.FormItem;
 import tr.org.tspb.datamodel.gui.ModuleItem;
@@ -662,7 +661,7 @@ public class MainFrame implements Serializable {
             throw new RuntimeException(html);
         }
 
-        MyFormXs myFormXs = repositoryService.getMyFormXs(myProject, formKey);
+        FmsForm myFormXs = repositoryService.getMyFormXs(myProject, formKey);
 
         if (myFormXs.getLoginFkField() == null
                 && !loginController.isUserInRole(myFormXs.getMyProject().getAdminAndViewerRole())) {
@@ -732,7 +731,7 @@ public class MainFrame implements Serializable {
 
     }
 
-    private void createFreeForm2(MyFormXs myFormXs, String formKey) throws MongoOrmFailedException, NullNotExpectedException {
+    private void createFreeForm2(FmsForm myFormXs, String formKey) throws MongoOrmFailedException, NullNotExpectedException {
         filterService.createBaseFilter(myFormXs);
         FmsForm myFormLarge = repositoryService
                 .getMyFormLargeWithBaseFilter(myProject, formKey);
@@ -747,7 +746,7 @@ public class MainFrame implements Serializable {
         freeDesigner.init(myFormLarge);
     }
 
-    private void createFreeForm(MyFormXs myFormXs, String formKey) throws NullNotExpectedException, MongoOrmFailedException {
+    private void createFreeForm(FmsForm myFormXs, String formKey) throws NullNotExpectedException, MongoOrmFailedException {
 
         filterService.createBaseFilter(myFormXs);
 
@@ -767,7 +766,7 @@ public class MainFrame implements Serializable {
         formService.setMyForm(myFormLarge);
     }
 
-    private void createPageForm(MyFormXs myFormXs) throws MongoOrmFailedException,
+    private void createPageForm(FmsForm myFormXs) throws MongoOrmFailedException,
             NullNotExpectedException, MongoOrmFailedException, Exception {
 
         filterService.createBaseFilter(myFormXs);
@@ -818,7 +817,7 @@ public class MainFrame implements Serializable {
         }
     }
 
-    private void createTableForm(MyFormXs myFormXs)
+    private void createTableForm(FmsForm myFormXs)
             throws NullNotExpectedException, MongoOrmFailedException, Exception {
 
         filterService.createBaseFilter(myFormXs);
@@ -862,7 +861,7 @@ public class MainFrame implements Serializable {
 
     }
 
-    private void createPivotForm(MyFormXs myFormXs) throws Exception {
+    private void createPivotForm(FmsForm myFormXs) throws Exception {
 
         filterService.createBaseFilter(myFormXs);
 
