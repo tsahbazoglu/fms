@@ -60,7 +60,7 @@ import tr.org.tspb.converter.base.SelectOneObjectIdConverter;
 import tr.org.tspb.converter.base.SelectOneStringConverter;
 import tr.org.tspb.converter.props.MessageBundleLoaderv1;
 import tr.org.tspb.dao.MyField;
-import tr.org.tspb.dao.MyForm;
+import tr.org.tspb.dao.FmsForm;
 import tr.org.tspb.dao.MyMap;
 import tr.org.tspb.dao.MyNotifies;
 import tr.org.tspb.dao.TagEvent;
@@ -285,14 +285,14 @@ public class CrudOneDim implements ValueChangeListener, Serializable {
         return formService.getMyForm() == null ? " " : formService.getMyForm().getConstantNote();
     }
 
-    public void drawGUI(MyForm myForm) throws Exception {
+    public void drawGUI(FmsForm myForm) throws Exception {
         drawGUI(myForm, filterService.getTableFilterCurrent());
         formService.getMyForm().runAjaxBulk(getComponentMap(), crudObject,
                 loginController.getRoleMap(), loginController.getLoggedUserDetail());
 
     }
 
-    public void drawGUI(MyForm myForm, Document filter) throws Exception {
+    public void drawGUI(FmsForm myForm, Document filter) throws Exception {
 
         if (myForm.getUniqueIndexList() != null) {
             for (Object obj : myForm.getUniqueIndexList()) {
@@ -339,7 +339,7 @@ public class CrudOneDim implements ValueChangeListener, Serializable {
 
     }
 
-    private void armCrudRecord(MyForm myForm, Document modifiedSearchObject) throws FormConfigException {
+    private void armCrudRecord(FmsForm myForm, Document modifiedSearchObject) throws FormConfigException {
 
         if (crudObject == null) {
             crudObject = ogmCreator.getCrudObject();
@@ -368,7 +368,7 @@ public class CrudOneDim implements ValueChangeListener, Serializable {
 
     }
 
-    private void armDefaultValues(String key, MyForm myForm, Document modifiedSearchObject)
+    private void armDefaultValues(String key, FmsForm myForm, Document modifiedSearchObject)
             throws tr.org.tspb.exceptions.FormConfigException {
         if (crudObject.get(key) == null) {
 
@@ -631,7 +631,7 @@ public class CrudOneDim implements ValueChangeListener, Serializable {
     }
 
     //move to util
-    public List<String> createFormMsg(MyForm myForm) {
+    public List<String> createFormMsg(FmsForm myForm) {
         List<String> msgs = new ArrayList<>();
 
         if (myForm.getConstantNote() != null && !myForm.getConstantNote().isEmpty()) {
@@ -684,7 +684,7 @@ public class CrudOneDim implements ValueChangeListener, Serializable {
         listFileData = repositoryService.findGridFsFileList(myCommonRecordID);
     }
 
-    public ObjectId saveObject(MyForm myForm, LoginController loginMB, MyMap crudObject)
+    public ObjectId saveObject(FmsForm myForm, LoginController loginMB, MyMap crudObject)
             throws UserException, MessagingException, NullNotExpectedException, LdapException, FormConfigException {
 
         Object loginFkFieldValue = crudObject.get(formService.getMyForm().getLoginFkField());
@@ -717,10 +717,10 @@ public class CrudOneDim implements ValueChangeListener, Serializable {
         return returnID;
     }
 
-    private ObjectId saveOneDimensionObject(Document operatedObject, String username, MyForm myForm, String ip, String sessionId)
+    private ObjectId saveOneDimensionObject(Document operatedObject, String username, FmsForm myForm, String ip, String sessionId)
             throws MessagingException, NullNotExpectedException, LdapException, FormConfigException, UserException {
 
-        MyForm inode = (MyForm) operatedObject.get(INODE);
+        FmsForm inode = (FmsForm) operatedObject.get(INODE);
         operatedObject.remove(INODE);//just to sutisfy the icefaces
         if (inode == null) {
             inode = myForm;
@@ -891,7 +891,7 @@ public class CrudOneDim implements ValueChangeListener, Serializable {
         return (ObjectId) result.get(MONGO_ID);
     }
 
-    private void chekAttachedFiles(MyForm myForm) throws UserException {
+    private void chekAttachedFiles(FmsForm myForm) throws UserException {
         if (myForm.isHasAttachedFiles() && (listFileData == null || listFileData.isEmpty())) {
             for (MyField field : myForm.getFields().values()) {
                 if (field.isRequired() && ComponentType.inputFile.name().equals(field.getComponentType())) {
