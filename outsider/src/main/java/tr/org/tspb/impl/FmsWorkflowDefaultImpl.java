@@ -1,7 +1,7 @@
 package tr.org.tspb.impl;
 
 import org.bson.Document;
-import tr.org.tspb.dao.MyForm;
+import tr.org.tspb.dao.FmsForm;
 import tr.org.tspb.dao.MyMap;
 import tr.org.tspb.outsider.FmsWorkFlow;
 
@@ -12,7 +12,7 @@ import tr.org.tspb.outsider.FmsWorkFlow;
 public class FmsWorkflowDefaultImpl implements FmsWorkFlow {
 
     @Override
-    public void init(MyForm selectedForm, MyMap crudObject, Document searchObject) {
+    public void init(FmsForm selectedForm, MyMap crudObject, Document searchObject) {
         //
     }
 
