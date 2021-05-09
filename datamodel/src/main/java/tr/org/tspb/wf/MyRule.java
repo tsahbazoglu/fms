@@ -2,7 +2,7 @@ package tr.org.tspb.wf;
 
 import tr.org.tspb.constants.ProjectConstants;
 import tr.org.tspb.dao.MyActions;
-import tr.org.tspb.dao.MyForm;
+import tr.org.tspb.dao.FmsForm;
 import tr.org.tspb.dao.MyMap;
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -119,7 +119,7 @@ public class MyRule implements Serializable {
         return last;
     }
 
-    public void maskFields(MyForm myForm, Map searchObject, RoleMap loginController) {
+    public void maskFields(FmsForm myForm, Map searchObject, RoleMap loginController) {
 
         fields = new HashMap<>();
         Object mongoFields = dbo.get(FORMFIELDS);
@@ -134,7 +134,7 @@ public class MyRule implements Serializable {
         }
     }
 
-    public void arrangeActions(MyForm myForm, RoleMap roleMap, Document searchObject) {
+    public void arrangeActions(FmsForm myForm, RoleMap roleMap, Document searchObject) {
         this.myActions = new MyActions.Build(myForm.getMyProject().getViewerRole(), myForm.getDb(),
                 roleMap, searchObject, dbo.get(FORMACTIONS), fmsScriptRunner, userDetail)
                 .init()
@@ -142,7 +142,7 @@ public class MyRule implements Serializable {
                 .build();
     }
 
-    public void arrangeActions(MyForm myForm, RoleMap roleMap, Document searchObject, MyMap crudObject, Object actions) {
+    public void arrangeActions(FmsForm myForm, RoleMap roleMap, Document searchObject, MyMap crudObject, Object actions) {
         this.myActions = new MyActions.Build(myForm.getMyProject().getViewerRole(), myForm.getDb(),
                 roleMap, searchObject, actions, fmsScriptRunner, userDetail)
                 .init()
