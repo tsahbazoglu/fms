@@ -11,7 +11,7 @@ import static tr.org.tspb.constants.ProjectConstants.*;
 import tr.org.tspb.converter.base.SelectOneStringConverter;
 import tr.org.tspb.dao.MyField;
 import tr.org.tspb.dao.MyFieldReportComparator;
-import tr.org.tspb.dao.MyForm;
+import tr.org.tspb.dao.FmsForm;
 import tr.org.tspb.factory.qualifier.OgmCreatorQualifier;
 import tr.org.tspb.factory.cp.OgmCreatorIntr;
 import tr.org.tspb.service.FeatureService;
@@ -38,11 +38,11 @@ public abstract class FmsTableView extends AbstractViewer {
         return Collections.unmodifiableList(objectsColumnDataModel);
     }
 
-    public void drawGUI(MyForm myForm) throws Exception {
+    public void drawGUI(FmsForm myForm) throws Exception {
         drawGUI(myForm, filterService.getBaseFilterCurrent());
     }
 
-    public void drawGUI(MyForm myForm, Document filter) throws Exception {
+    public void drawGUI(FmsForm myForm, Document filter) throws Exception {
 
         if (myForm == null || myForm.getKey() == null || SelectOneStringConverter.NULL_VALUE.equals(myForm.getKey())) {
             throw new NullNotExpectedException("myForm = null");
@@ -89,7 +89,7 @@ public abstract class FmsTableView extends AbstractViewer {
 
     }
 
-    private List<MyField> createColumnFields(final MyForm myForm) {
+    private List<MyField> createColumnFields(final FmsForm myForm) {
 
         List<MyField> columnList = new ArrayList<>();
 
