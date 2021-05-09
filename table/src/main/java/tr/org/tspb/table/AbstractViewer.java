@@ -27,7 +27,7 @@ import org.primefaces.model.SortOrder;
 import org.slf4j.Logger;
 import static tr.org.tspb.constants.ProjectConstants.*;
 import tr.org.tspb.dao.MyField;
-import tr.org.tspb.dao.MyForm;
+import tr.org.tspb.dao.FmsForm;
 import tr.org.tspb.pojo.ComponentType;
 import tr.org.tspb.service.FilterService;
 import tr.org.tspb.common.services.BaseService;
@@ -74,7 +74,7 @@ public abstract class AbstractViewer implements FmsOnFlyData, Serializable {
     private LazyDataModel<Map> data;
     private MyField selectedField;
 
-    public List<String> createFormMsg(MyForm myForm) {
+    public List<String> createFormMsg(FmsForm myForm) {
         List<String> msgs = new ArrayList<>();
 
         if (myForm.getConstantNote() != null && !myForm.getConstantNote().isEmpty()) {
