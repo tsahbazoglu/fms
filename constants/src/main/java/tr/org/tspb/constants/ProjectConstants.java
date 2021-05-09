@@ -24,6 +24,7 @@ public class ProjectConstants {
     public static final String REPLACEABLE_KEY_WORD_FOR_FUNCTONS_FILTER_MEMBER = "fms_code{{filter_member}}";
     public static final String REPLACEABLE_KEY_WORD_FOR_FUNCTONS_FILTER_PERIOD = "fms_code{{filter_period}}";
     public static final String REPLACEABLE_KEY_WORD_FOR_FUNCTONS_FILTER_TEMPLATE = "fms_code{{filter_template}}";
+    public static final String REPLACEABLE_KEY_WORD_FOR_THIS_FORM = "fms_code{{this_form}}";
 
     public static final String JMS_EMAIL_QUEUE = "jms/fmsEmailQueue";
     public static final String JMS_EMAIL_QUEUE_CONN_FACTORY = "jms/fmsEmailQueueConnectionFactory";
