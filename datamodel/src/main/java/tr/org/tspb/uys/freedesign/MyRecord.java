@@ -9,7 +9,7 @@ import org.bson.Document;
 import org.bson.types.ObjectId;
 import org.primefaces.model.file.UploadedFile;
 import tr.org.tspb.dao.MyField;
-import tr.org.tspb.dao.MyForm;
+import tr.org.tspb.dao.FmsForm;
 import tr.org.tspb.pojo.RoleMap;
 import tr.org.tspb.pojo.UserDetail;
 
@@ -35,7 +35,7 @@ public class MyRecord {
 
     private Boolean renderedInOut;
 
-    private MyRecord(RoleMap roleMap, UserDetail userDetail, MyForm myForm, Map<String, String> cacheDbMamberMap) {
+    private MyRecord(RoleMap roleMap, UserDetail userDetail, FmsForm myForm, Map<String, String> cacheDbMamberMap) {
         crudFieldMap = new HashMap<>(myForm.getFields());
         for (String key : crudFieldMap.keySet()) {
             if (myForm.getField(key).getItemsAsMyItems() != null) {
@@ -46,7 +46,7 @@ public class MyRecord {
         crudMap.put(DESCRIPTION, myForm.getField(DESCRIPTION).getDefaultValue().toString());
     }
 
-    public MyRecord(RoleMap roleMap, UserDetail userDetail, Map o, MyForm myForm, Map<String, String> cacheDbMamberMap) {
+    public MyRecord(RoleMap roleMap, UserDetail userDetail, Map o, FmsForm myForm, Map<String, String> cacheDbMamberMap) {
         this(roleMap, userDetail, myForm, cacheDbMamberMap);
 
         crudMap = o;
