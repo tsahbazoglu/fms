@@ -44,7 +44,7 @@ import tr.org.tspb.converter.base.MoneyConverter;
 import tr.org.tspb.converter.base.NumberConverter;
 import tr.org.tspb.converter.base.SelectOneObjectIdConverter;
 import tr.org.tspb.dao.MyField;
-import tr.org.tspb.dao.MyForm;
+import tr.org.tspb.dao.FmsForm;
 import tr.org.tspb.dao.MyMap;
 import tr.org.tspb.dao.TagEvent;
 import tr.org.tspb.exceptions.FormConfigException;
@@ -251,7 +251,7 @@ public class PivotModifierCtrl extends PivotImpl {
         return new CellMultiDimensionKey(coordinates);
     }
 
-    protected String deleteObject(LoginController loginMB, MyForm myForm, MyMap crudObject) throws Exception {
+    protected String deleteObject(LoginController loginMB, FmsForm myForm, MyMap crudObject) throws Exception {
         String collection = myForm.getTable();
         mongoDbUtil.deleteMany(formService.getMyForm().getDb(), collection, new Document(getFilter()));
 
@@ -448,7 +448,7 @@ public class PivotModifierCtrl extends PivotImpl {
         return null;
     }
 
-    public List findList(MyForm myForm, Document searcheDBObject) throws Exception {
+    public List findList(FmsForm myForm, Document searcheDBObject) throws Exception {
         for (String key : new HashSet<>(searcheDBObject.keySet())) {
             if (myForm.getField(key) == null) {
                 searcheDBObject.remove(PERIOD);
@@ -706,7 +706,7 @@ public class PivotModifierCtrl extends PivotImpl {
         return Collections.unmodifiableList(selectedFormMessages);
     }
 
-    public List<String> createFormMsg(MyForm myForm) {
+    public List<String> createFormMsg(FmsForm myForm) {
         List<String> selectedFormMessages = new ArrayList<>();
 
         if (myForm.getConstantNote() != null && !myForm.getConstantNote().isEmpty()) {
