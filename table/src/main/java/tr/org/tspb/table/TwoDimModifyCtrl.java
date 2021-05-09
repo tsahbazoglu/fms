@@ -64,7 +64,7 @@ import org.primefaces.model.DefaultTreeNode;
 import org.primefaces.model.TreeNode;
 import tr.org.tspb.converter.base.SelectOneObjectIdConverter;
 import tr.org.tspb.dao.MyField;
-import tr.org.tspb.dao.MyForm;
+import tr.org.tspb.dao.FmsForm;
 import tr.org.tspb.dao.MyMap;
 import tr.org.tspb.outsider.FmsWorkFlow;
 import tr.org.tspb.pojo.UserDetail;
@@ -201,7 +201,7 @@ public class TwoDimModifyCtrl extends FmsTable implements ActionListener {
 
             String xmlFileName = baseService.getProperties().getTmpDownloadPath().concat(fileName).concat(".xml");
 
-            try ( FileWriter fw = new FileWriter(xmlFileName)) {
+            try (FileWriter fw = new FileWriter(xmlFileName)) {
                 fw.write(stringWriter.toString());
             }
 
@@ -860,13 +860,12 @@ public class TwoDimModifyCtrl extends FmsTable implements ActionListener {
 
     public String performCancel() {
         try {
-            MyForm chosenMyForm = ogmCreator
-                    .getMyFormLarge(null,
-                            formService.getMyForm().getMyProject().getConfigTable(),
-                            new Document(FORM, "ion_form_1020"),
-                            null,
-                            loginController.getRoleMap(),
-                            loginController.getLoggedUserDetail());
+            FmsForm chosenMyForm = ogmCreator.getMyFormLarge(null,
+                    formService.getMyForm().getMyProject().getConfigTable(),
+                    new Document(FORM, "ion_form_1020"),
+                    null,
+                    loginController.getRoleMap(),
+                    loginController.getLoggedUserDetail());
 
             this.crudObject = newObject(chosenMyForm);
 
@@ -981,7 +980,7 @@ public class TwoDimModifyCtrl extends FmsTable implements ActionListener {
         return Collections.unmodifiableList(selectedFormMessages);
     }
 
-    public void drawGUI(MyForm myForm) throws Exception {
+    public void drawGUI(FmsForm myForm) throws Exception {
         drawGUI(myForm, filterService.getBaseFilterCurrent());
         formService.getMyForm().runAjaxBulk(getComponentMap(), crudObject,
                 loginController.getRoleMap(), loginController.getLoggedUserDetail());
@@ -989,7 +988,7 @@ public class TwoDimModifyCtrl extends FmsTable implements ActionListener {
     }
 
     @Override
-    public void drawGUI(MyForm myForm, Document filter) throws Exception {
+    public void drawGUI(FmsForm myForm, Document filter) throws Exception {
 
         crudObject = ogmCreator.getCrudObject();
 
@@ -1281,7 +1280,7 @@ public class TwoDimModifyCtrl extends FmsTable implements ActionListener {
         this.newroles = newroles;
     }
 
-    private MyMap newObject(MyForm myForm) throws Exception {
+    private MyMap newObject(FmsForm myForm) throws Exception {
 
         MyMap crudObject = ogmCreator.getCrudObject();
 
@@ -1325,7 +1324,7 @@ public class TwoDimModifyCtrl extends FmsTable implements ActionListener {
         return ldapUID;
     }
 
-    private void prepareJsfComponentMap(MyForm inodeMyForm) {
+    private void prepareJsfComponentMap(FmsForm inodeMyForm) {
 
         setHeaderTitle(inodeMyForm.getName());
 
@@ -1485,7 +1484,7 @@ public class TwoDimModifyCtrl extends FmsTable implements ActionListener {
             return new ArrayList<>();
         }
 
-        MyForm myForm = formService.getMyForm();
+        FmsForm myForm = formService.getMyForm();
         if (myForm == null || myForm.getKey() == null) {
             return Collections.emptyList();
         }
