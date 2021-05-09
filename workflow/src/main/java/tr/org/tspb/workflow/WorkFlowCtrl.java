@@ -33,7 +33,7 @@ import org.primefaces.model.diagram.overlay.ArrowOverlay;
 import org.primefaces.model.diagram.overlay.LabelOverlay;
 import org.slf4j.Logger;
 import tr.org.tspb.dao.MyField;
-import tr.org.tspb.dao.MyForm;
+import tr.org.tspb.dao.FmsForm;
 import tr.org.tspb.dao.MyMap;
 import tr.org.tspb.pojo.MyCommandResult;
 import tr.org.tspb.common.qualifier.MyLoginQualifier;
@@ -85,7 +85,7 @@ public class WorkFlowCtrl implements FmsWorkFlow {
     private List<String> triggers = new ArrayList<>();
     private DefaultDiagramModel model;
     private Map<String, Element> uniqueMyRuleMap;
-    private MyForm myForm;
+    private FmsForm myForm;
     private MyMap crudObject;
     private Document filter;
     private List<MyField> fieldsAsList = new ArrayList<>();
@@ -203,7 +203,7 @@ public class WorkFlowCtrl implements FmsWorkFlow {
     }
 
     @Override
-    public void init(MyForm myForm, MyMap crudbject, Document filter) throws FormConfigException {
+    public void init(FmsForm myForm, MyMap crudbject, Document filter) throws FormConfigException {
         this.myForm = myForm;
         this.crudObject = crudbject;
         this.filter = filter;
