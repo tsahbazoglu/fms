@@ -2,6 +2,7 @@ package tr.org.tspb.pojo;
 
 import org.bson.Document;
 import org.bson.types.ObjectId;
+import static tr.org.tspb.constants.ProjectConstants.MEMBER_TYPE;
 import static tr.org.tspb.constants.ProjectConstants.MONGO_ID;
 import static tr.org.tspb.constants.ProjectConstants.NAME;
 
@@ -13,12 +14,14 @@ public class DatabaseUser {
 
     private final ObjectId objectId;
     private final String ldapUID;
+    private final String memberType;
     private final String name;
 
     public DatabaseUser(Document bsonObject, String usernameField) {
         this.objectId = (ObjectId) bsonObject.get(MONGO_ID);
         this.ldapUID = bsonObject.get(usernameField).toString();
         this.name = (String) bsonObject.get(NAME);
+        this.memberType = bsonObject.getString(MEMBER_TYPE);
     }
 
     public ObjectId getObjectId() {
@@ -35,5 +38,12 @@ public class DatabaseUser {
 
     public boolean notFound() {
         return objectId == null;
+    }
+
+    /**
+     * @return the memberType
+     */
+    public String getMemberType() {
+        return memberType;
     }
 }
