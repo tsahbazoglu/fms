@@ -19,7 +19,7 @@ import org.bson.Document;
 import org.bson.types.Code;
 import org.slf4j.Logger;
 import tr.org.tspb.dao.MyField;
-import tr.org.tspb.dao.MyForm;
+import tr.org.tspb.dao.FmsForm;
 import tr.org.tspb.util.qualifier.KeepOpenQualifier;
 import tr.org.tspb.util.tools.MongoDbUtilIntr;
 
@@ -270,7 +270,7 @@ public class JsFunctionConverter implements Converter {
             return null;
         }
 
-        MyForm myFrom = (MyForm) context.getExternalContext().getSessionMap().get(SESSION_ATTR_SELECTED_FORM);
+        FmsForm myFrom = (FmsForm) context.getExternalContext().getSessionMap().get(SESSION_ATTR_SELECTED_FORM);
 
         MyField field = myFrom.getField(fieldKey);
 
