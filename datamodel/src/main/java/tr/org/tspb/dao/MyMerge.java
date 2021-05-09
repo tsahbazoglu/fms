@@ -25,7 +25,7 @@ public class MyMerge {
     private final List<MyField> importAndAppendedFields;
     private final String strategy;
 
-    MyMerge(Map<String, Object> toMap, MyForm myForm) throws Exception {
+    MyMerge(Map<String, Object> toMap, FmsForm myForm) throws Exception {
         this.toDb = (String) toMap.get("toDB");
         this.toCollection = (String) toMap.get("toCollection");
         this.workbookSheetColumnCount = ((Number) toMap.get("workbookSheetColumnCount")).intValue();
@@ -54,13 +54,14 @@ public class MyMerge {
 
                 MyField myField = myForm.getField(key);
                 if (myField == null) {
-                    throw new Exception(String.format("form definition does not a %s key predefined on appendFields. %s", key, myForm.printToConfigAnalyze("smth")));
+                    throw new Exception(String.format("form definition does not a %s key predefined on appendFields. %s",
+                            key, myForm.printToConfigAnalyze("smth")));
                 }
 
                 appendFields.add(myField);
                 importAndAppendedFields.add(myField);
 
-                myField.createSelectItems(null, null, myForm.roleMap, myForm.userDetail, false);
+                myField.createSelectItems(null, null, myForm.getRoleMap(), myForm.getUserDetail(), false);
             }
         }
 
@@ -69,7 +70,7 @@ public class MyMerge {
             for (String key : listOfUpsertFields) {
                 MyField myField = myForm.getField(key);
                 upsertFields.add(myField);
-                myField.createSelectItems(null, null, myForm.roleMap, myForm.userDetail, false);
+                myField.createSelectItems(null, null, myForm.getRoleMap(), myForm.getUserDetail(), false);
             }
         }
 
