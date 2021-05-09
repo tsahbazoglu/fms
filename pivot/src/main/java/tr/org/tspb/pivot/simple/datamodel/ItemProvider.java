@@ -9,7 +9,7 @@ import java.util.List;
 import java.util.Map;
 import javax.faces.model.SelectItem;
 import org.bson.Document;
-import tr.org.tspb.dao.MyForm;
+import tr.org.tspb.dao.FmsForm;
 import tr.org.tspb.util.tools.MongoDbUtilIntr;
 
 /**
@@ -28,11 +28,11 @@ public class ItemProvider {
     private List<ItemField> fields;
     private List<SelectItem> fieldsAsItems;
 
-    public ItemProvider(MongoDbUtilIntr mongoDbUtil, String role, MyForm myForm) {
+    public ItemProvider(MongoDbUtilIntr mongoDbUtil, String role, FmsForm myForm) {
         init(mongoDbUtil, role, myForm);
     }
 
-    private void init(MongoDbUtilIntr mongoDbUtil, String role, MyForm myForm) {
+    private void init(MongoDbUtilIntr mongoDbUtil, String role, FmsForm myForm) {
         if (tedbirTuleriList == null) {
 
             tedbirTuleriList = new ArrayList<>();
