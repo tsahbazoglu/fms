@@ -58,14 +58,14 @@ if (!telmangrid.clarity) {
                 },
                 afterChange: function (changes) {
                     var jsfData = JSON.stringify(this.getData());
-                    var hiddenTextJsonDataToModel = $(document.getElementById("ndActionPanelForm:hiddenTextJsonDataToModel"));
+                    var hiddenTextJsonDataToModel = $(document.getElementById("id-tab-view:nd-form:id-hidden-text-json-data-to-model"));
                     hiddenTextJsonDataToModel.val(jsfData);
                 },
                 cells: function (row, col, prop) {
                     // Conditional formatting
                     // https ://handsontable.com/docs/6.1.1/demo-conditional-formatting.html
                     // press F12 go to console and type Handsontable.renderers
-                     var cellRender = colRenderers[row][col];
+                    var cellRender = colRenderers[row][col];
                     if (cellRender.component === "inputText") {
                         return {
                             renderer: function (instance, td, row, col, prop, value, cellProperties) {
