@@ -33,7 +33,6 @@ import javax.inject.Inject;
 import org.bson.Document;
 import org.bson.conversions.Bson;
 import org.bson.types.ObjectId;
-import org.primefaces.model.file.UploadedFile;
 import tr.org.tspb.common.qualifier.MyLoginQualifier;
 import tr.org.tspb.common.services.AppScopeSrvCtrl;
 import tr.org.tspb.common.services.BaseService;
@@ -41,7 +40,7 @@ import tr.org.tspb.common.services.LoginController;
 import tr.org.tspb.dao.MyActions;
 import tr.org.tspb.dao.MyField;
 import tr.org.tspb.dao.MyFile;
-import tr.org.tspb.dao.MyForm;
+import tr.org.tspb.dao.FmsForm;
 import tr.org.tspb.dao.MyFormXs;
 import tr.org.tspb.dao.MyMap;
 import tr.org.tspb.dao.MyProject;
@@ -91,7 +90,7 @@ public class RepositoryService implements Serializable {
     @Inject
     private BaseService baseService;
 
-    private final Map<String, MyForm> cacheMyFormLarge = new HashMap<>();
+    private final Map<String, FmsForm> cacheMyFormLarge = new HashMap<>();
 
     Gson gsonConverter = new Gson();
     Type gsonType = new TypeToken<List<String>>() {
@@ -100,7 +99,7 @@ public class RepositoryService implements Serializable {
     public RepositoryService() {
     }
 
-    public Document expandCrudObject(MyForm myForm, Document operatedObject) {
+    public Document expandCrudObject(FmsForm myForm, Document operatedObject) {
 
         operatedObject.remove(STATE);//is used later to dect saveable object on logout
         operatedObject.remove("rowSelected");//just to sutisfy the icefaces
@@ -147,7 +146,7 @@ public class RepositoryService implements Serializable {
         return operatedObject;
     }
 
-    public PostSaveResult runEventPostSave(Document operatedObject, MyForm myForm, MyMap crudObject) throws MongoOrmFailedException {
+    public PostSaveResult runEventPostSave(Document operatedObject, FmsForm myForm, MyMap crudObject) throws MongoOrmFailedException {
 
         TagEvent tagEvent = myForm.getEventPostSave();
 
@@ -174,7 +173,7 @@ public class RepositoryService implements Serializable {
         return PostSaveResult.getNullSingleton();
     }
 
-    public PreSaveResult runEventPreSave(Map query, MyForm myForm, MyMap crudObject) throws MongoOrmFailedException {
+    public PreSaveResult runEventPreSave(Map query, FmsForm myForm, MyMap crudObject) throws MongoOrmFailedException {
 
         if (myForm.getEventPreSave() == null) {
             return PreSaveResult.getNullSingleton();
@@ -223,21 +222,21 @@ public class RepositoryService implements Serializable {
         return PreSaveResult.getNullSingleton();
     }
 
-    public List<DocumentRecursive> findList(MyForm myForm, Document searcheDBObject, Integer limit) {
+    public List<DocumentRecursive> findList(FmsForm myForm, Document searcheDBObject, Integer limit) {
         return findList(myForm.getDb(), myForm.getTable(), myForm, searcheDBObject, limit);
     }
 
-    public List<DocumentRecursive> findList(String myFormDb, String myFormTable, MyForm myForm, Document searcheDBObject, Integer limit) {
+    public List<DocumentRecursive> findList(String myFormDb, String myFormTable, FmsForm myForm, Document searcheDBObject, Integer limit) {
         List<Document> cursor = mongoDbUtil.createCursor(myFormDb, myFormTable, searcheDBObject, limit);
         return cursorToList(cursor, myForm);
     }
 
-    public List<DocumentRecursive> findList(String myFormDb, String myFormTable, MyForm myForm, Bson searcheDBObject, Integer limit) {
+    public List<DocumentRecursive> findList(String myFormDb, String myFormTable, FmsForm myForm, Bson searcheDBObject, Integer limit) {
         List<Document> cursor = mongoDbUtil.createCursor(myFormDb, myFormTable, searcheDBObject, limit);
         return cursorToList(cursor, myForm);
     }
 
-    public List<DocumentRecursive> cursorToList(List<Document> cursor, MyForm myForm) {
+    public List<DocumentRecursive> cursorToList(List<Document> cursor, FmsForm myForm) {
         List<DocumentRecursive> list = new ArrayList<>();
 
         for (Document dbObject : cursor) {
@@ -248,7 +247,7 @@ public class RepositoryService implements Serializable {
         return list;
     }
 
-    private void armBsonRefs(Document document, MyForm myForm, Map manualDbRefs) {
+    private void armBsonRefs(Document document, FmsForm myForm, Map manualDbRefs) {
         Set<String> keySet = new HashSet<>(document.keySet());
         for (String key : keySet) {
             Object keyValue = document.get(key);
@@ -312,7 +311,7 @@ public class RepositoryService implements Serializable {
         return returnList;
     }
 
-    public List<Map<String, String>> findGridFsFileList(MyForm myForm) {
+    public List<Map<String, String>> findGridFsFileList(FmsForm myForm) {
 
         List<Map<String, String>> returnList = new ArrayList<>();
 
@@ -345,7 +344,7 @@ public class RepositoryService implements Serializable {
 
     }
 
-    public void writeImimTuik(MyForm myForm, List<TuikData> listOfToBeUpsert) {
+    public void writeImimTuik(FmsForm myForm, List<TuikData> listOfToBeUpsert) {
 
         for (TuikData tuikData : listOfToBeUpsert) {
 
@@ -431,7 +430,10 @@ public class RepositoryService implements Serializable {
 
     public List<FormItem> findModuleFormsSchemaVersion110(ModuleItem moduleItem) {
 
-        Bson filter = Filters.and(Filters.eq(MyForm.SCHEMA_VERSION, MyForm.SCHEMA_VERSION_110),
+        Bson filter = Filters.and(
+                Filters.or(
+                        Filters.eq(FmsForm.SCHEMA_VERSION, FmsForm.SCHEMA_VERSION_110),
+                        Filters.eq(FmsForm.SCHEMA_VERSION, FmsForm.SCHEMA_VERSION_111)),
                 Filters.eq(UPPER_NODES, moduleItem.getModuleKey()),
                 Filters.eq(ACCESS_CONTROL, new Document(DOLAR_IN, loginController.getRolesAsList())));
 
@@ -537,7 +539,7 @@ public class RepositoryService implements Serializable {
 
         String cacheKey = org.apache.commons.codec.digest.DigestUtils.sha256Hex(sb.toString());
 
-        MyForm myForm = cacheMyFormLarge.get(cacheKey);
+        FmsForm myForm = cacheMyFormLarge.get(cacheKey);
 
         if (myForm == null) {
             myForm = ogmCreator.getMyFormXsmall(myProject, new Document(FORM_KEY, formKey),
@@ -555,10 +557,10 @@ public class RepositoryService implements Serializable {
                 baseService.getTagLogin());
     }
 
-    public MyForm getMyFormLarge(MyProject myProject, String formKey)
+    public FmsForm getMyFormLarge(MyProject myProject, String formKey)
             throws NullNotExpectedException, MongoOrmFailedException {
 
-        MyForm myForm = cacheMyFormLarge.get(formKey);
+        FmsForm myForm = cacheMyFormLarge.get(formKey);
         if (myForm == null) {
             myForm = ogmCreator.getMyFormLarge(myProject,
                     myProject.getConfigTable(),
@@ -571,7 +573,7 @@ public class RepositoryService implements Serializable {
         return myForm;
     }
 
-    public MyForm getMyFormLargeWithTableFilter(MyProject myProject, String formKey)
+    public FmsForm getMyFormLargeWithTableFilter(MyProject myProject, String formKey)
             throws NullNotExpectedException, MongoOrmFailedException {
 
         return ogmCreator.getMyFormLarge(myProject,
@@ -583,7 +585,7 @@ public class RepositoryService implements Serializable {
 
     }
 
-    public MyForm getMyFormLargeWithBaseFilter(MyProject myProject, String formKey)
+    public FmsForm getMyFormLargeWithBaseFilter(MyProject myProject, String formKey)
             throws NullNotExpectedException, MongoOrmFailedException {
 
         StringBuilder sb = new StringBuilder();
@@ -602,7 +604,7 @@ public class RepositoryService implements Serializable {
 
         //MyForm myForm = cacheMyFormLarge.get(cacheKey);
         //   if (myForm == null) {
-        MyForm myForm = ogmCreator.getMyFormLarge(myProject,
+        FmsForm myForm = ogmCreator.getMyFormLarge(myProject,
                 myProject.getConfigTable(),
                 new Document(FORM_KEY, formKey),
                 filterService.getBaseFilterCurrent(),
@@ -618,7 +620,7 @@ public class RepositoryService implements Serializable {
         return record;
     }
 
-    public MyActions getAndCacheMyAction(MyForm myFormLarge) {
+    public MyActions getAndCacheMyAction(FmsForm myFormLarge) {
         String cacheKey = createCachActionsKey(myFormLarge);
         MyActions myActions = appScopeSrvCtrl.getCacheActions(cacheKey);
         // if (myActions == null) {
@@ -629,7 +631,7 @@ public class RepositoryService implements Serializable {
         return myActions;
     }
 
-    private String createCachActionsKey(MyForm myFormLarge) {
+    private String createCachActionsKey(FmsForm myFormLarge) {
         StringBuilder sb = new StringBuilder();
         sb.append(myFormLarge.getKey());
         sb.append(" : ");
@@ -699,7 +701,7 @@ public class RepositoryService implements Serializable {
 
     private final static String DEFAULT_LOGIN_FK_FILED_NAME = "member";
 
-    public List<Map> listAsUser(MyForm selectedForm, Map searchMap) {
+    public List<Map> listAsUser(FmsForm selectedForm, Map searchMap) {
 
         Map dBObject = new HashMap(searchMap);
         dBObject.put(FORM, selectedForm.getTable());
@@ -716,7 +718,7 @@ public class RepositoryService implements Serializable {
 
     }
 
-    public List<Map> listAsLoggedUser(MyForm selectedForm) {
+    public List<Map> listAsLoggedUser(FmsForm selectedForm) {
 
         Map dBObject = new HashMap();
         dBObject.put(FORM, selectedForm.getTable());
@@ -757,7 +759,7 @@ public class RepositoryService implements Serializable {
     }
     public static final String JOIN_ID = "joinId";
 
-    public void updateManyMyLicenseAsUser(MyForm myForm, Map searchForUpdate, MyLicense myLicense, int joinId) {
+    public void updateManyMyLicenseAsUser(FmsForm myForm, Map searchForUpdate, MyLicense myLicense, int joinId) {
 
         ObjectId memberId = loginController.getLoggedUserDetail().getDbo().getObjectId();
 
@@ -773,7 +775,7 @@ public class RepositoryService implements Serializable {
         }
     }
 
-    public void updateManyMyRecordAsUser(MyForm myForm, Map searchForUpdate, MyRecord myRecord, int joinId) {
+    public void updateManyMyRecordAsUser(FmsForm myForm, Map searchForUpdate, MyRecord myRecord, int joinId) {
 
         ObjectId memberId = loginController.getLoggedUserDetail().getDbo().getObjectId();
 
@@ -788,7 +790,7 @@ public class RepositoryService implements Serializable {
 
     }
 
-    public void createFile(MyForm selectedForm, MyRecord myRecord) throws IOException {
+    public void createFile(FmsForm selectedForm, MyRecord myRecord) throws IOException {
 
         DBObject metadata = new BasicDBObject();
         // null points to the fact that this record(file) is not related yet.
