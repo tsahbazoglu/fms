@@ -1,11 +1,9 @@
 package tr.org.tspb.dao;
 
-import com.mongodb.BasicDBObject;
-import com.mongodb.gridfs.GridFSDBFile;
+import com.mongodb.client.gridfs.model.GridFSFile;
 import java.io.IOException;
-import org.apache.commons.codec.digest.DigestUtils;
+import org.bson.Document;
 import static tr.org.tspb.constants.ProjectConstants.SIMPLE_DATE_FORMAT__1;
-import static tr.org.tspb.constants.ProjectConstants.UPLOAD_DATE;
 
 /**
  *
@@ -19,18 +17,18 @@ public class MyFileNoContent implements FmsFile {
     private final String hashFile;
     private final String name;
     private final String content;
-    private final BasicDBObject metadata;
+    private final Document metadata;
     private final String uploadDateAsString;
 
-    public MyFileNoContent(GridFSDBFile gridFSDBFile) throws IOException {
-        this.id = gridFSDBFile.getId().toString();
+    public MyFileNoContent(GridFSFile gridFSDBFile) throws IOException {
+        this.id = gridFSDBFile.getId().asObjectId().getValue().toString();
         this.mimeType = gridFSDBFile.getContentType();
         this.hash = gridFSDBFile.getMD5();
         this.hashFile = "UYS_SHA256";
         this.name = gridFSDBFile.getFilename();
-        this.metadata = (BasicDBObject) gridFSDBFile.getMetaData();
+        this.metadata = gridFSDBFile.getMetadata();
         this.content = "no content";//DigestUtils.sha256Hex(gridFSDBFile.getInputStream());
-        this.uploadDateAsString = SIMPLE_DATE_FORMAT__1.format(gridFSDBFile.get(UPLOAD_DATE));
+        this.uploadDateAsString = gridFSDBFile.getUploadDate() == null ? null : SIMPLE_DATE_FORMAT__1.format(gridFSDBFile.getUploadDate());
     }
 
     @Override
@@ -64,7 +62,7 @@ public class MyFileNoContent implements FmsFile {
     }
 
     @Override
-    public BasicDBObject getMetadata() {
+    public Document getMetadata() {
         return metadata;
     }
 
