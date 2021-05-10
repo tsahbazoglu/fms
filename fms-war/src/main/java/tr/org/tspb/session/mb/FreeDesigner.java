@@ -413,21 +413,22 @@ public class FreeDesigner implements Serializable {
 
         repositoryService.updateManyMyRecordAsUser(selectedForm, searchForUpdate, myRecord, joinId);
 
-        // begin : provide uploaded file relation
-        Map dbo = repositoryService.one(selectedForm.getDb(), selectedForm.getTable(), searchForUpdate);
+        // provide uploaded file relation
+        if (selectedForm.isHasAttachedFiles()) {
+            Map dbo = repositoryService.one(selectedForm.getDb(), selectedForm.getTable(), searchForUpdate);
 
-        Map searchMap = new HashMap();
-        searchMap.put(METADATA_CRUD_OBJECT_ID, null);
-        searchMap.put("metadata.username", memberUserName);
+            Map searchMap = new HashMap();
+            searchMap.put(METADATA_CRUD_OBJECT_ID, null);
+            searchMap.put(METADATA_USERNAME, memberUserName);
 
-        Map updateMap = new HashMap();
-        updateMap.put(METADATA_CRUD_OBJECT_ID, dbo.get(MONGO_ID));
-        updateMap.put(JOIN_ID, joinId);
+            Map updateMap = new HashMap();
+            updateMap.put(METADATA_CRUD_OBJECT_ID, dbo.get(MONGO_ID));
+            updateMap.put(JOIN_ID, joinId);
 
-        repositoryService
-                .updateMany(baseService.getProperties().getUploadTable(), "fs.files", searchMap, updateMap, true);
+            repositoryService
+                    .updateMany(baseService.getProperties().getUploadTable(), "fs.files", searchMap, updateMap, true);
+        }
 
-        //end : provide uploaded file relation
     }
 
     public MyRecord findOne() {
