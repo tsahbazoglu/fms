@@ -1,17 +1,21 @@
 package tr.org.tspb.dao;
 
-import com.mongodb.BasicDBObject;
-import com.mongodb.gridfs.GridFSDBFile;
+import com.mongodb.client.gridfs.GridFSBucket;
+import com.mongodb.client.gridfs.model.GridFSFile;
 import java.io.IOException;
 import java.io.InputStream;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.io.IOUtils;
+import org.bson.Document;
+import org.bson.types.ObjectId;
 import static tr.org.tspb.constants.ProjectConstants.SIMPLE_DATE_FORMAT__1;
-import static tr.org.tspb.constants.ProjectConstants.UPLOAD_DATE;
 
 /**
  *
  * @author Telman Şahbazoğlu
+ *
+ * https://stackoverflow.com/questions/36175190/gridfsdownloadstream-can-not-read-all-data
+ *
  */
 public class MyFile implements FmsFile {
 
@@ -20,22 +24,22 @@ public class MyFile implements FmsFile {
     private final String hash;
     private final String hashFile;
     private final String name;
-    private final String content;
-    private final BasicDBObject metadata;
+    private String content;
+    private final Document metadata;
     private final String uploadDateAsString;
     private byte[] bytes;
-    private final InputStream inputStream;
+    private InputStream inputStream;
 
-    public MyFile(GridFSDBFile gridFSDBFile) throws IOException {
-        this.inputStream = gridFSDBFile.getInputStream();
-        this.id = gridFSDBFile.getId().toString();
+    public MyFile(GridFSBucket gridFSBucket, GridFSFile gridFSDBFile) throws IOException {
+        this.id = gridFSDBFile.getId().asObjectId().getValue().toString();
         this.mimeType = gridFSDBFile.getContentType();
         this.hash = gridFSDBFile.getMD5();
         this.hashFile = "UYS_SHA256";
         this.name = gridFSDBFile.getFilename();
-        this.metadata = (BasicDBObject) gridFSDBFile.getMetaData();
-        this.content = DigestUtils.sha256Hex(gridFSDBFile.getInputStream());
-        this.uploadDateAsString = gridFSDBFile.get(UPLOAD_DATE) == null ? null : SIMPLE_DATE_FORMAT__1.format(gridFSDBFile.get(UPLOAD_DATE));
+        this.metadata = gridFSDBFile.getMetadata();
+        this.inputStream = gridFSBucket.openDownloadStream(new ObjectId(id));
+        this.content = DigestUtils.sha256Hex(gridFSBucket.openDownloadStream(new ObjectId(id)));
+        this.uploadDateAsString = gridFSDBFile.getUploadDate() == null ? null : SIMPLE_DATE_FORMAT__1.format(gridFSDBFile.getUploadDate());
     }
 
     public MyFile withBytes() throws IOException {
@@ -74,7 +78,7 @@ public class MyFile implements FmsFile {
     }
 
     @Override
-    public BasicDBObject getMetadata() {
+    public Document getMetadata() {
         return metadata;
     }
 
