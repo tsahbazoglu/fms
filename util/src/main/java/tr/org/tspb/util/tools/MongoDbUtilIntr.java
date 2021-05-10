@@ -1,34 +1,23 @@
 package tr.org.tspb.util.tools;
 
-import com.mongodb.BasicDBObject;
-import com.mongodb.DBObject;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.model.UpdateOptions;
-import com.mongodb.gridfs.GridFSDBFile;
-import com.mongodb.gridfs.GridFSInputFile;
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.Serializable;
 import tr.org.tspb.exceptions.NullNotExpectedException;
 import java.util.List;
 import java.util.Map;
 import org.bson.Document;
 import org.bson.conversions.Bson;
-import org.bson.types.ObjectId;
-import tr.org.tspb.dao.MyFile;
 import tr.org.tspb.dao.FmsForm;
 import tr.org.tspb.dao.MyItems;
 import tr.org.tspb.dao.MyLookup;
 import tr.org.tspb.pojo.RoleMap;
-import tr.org.tspb.dao.FmsFile;
 import tr.org.tspb.dao.TagEvent;
 
 /**
  *
  * @author Telman Şahbazoğlu
  */
-public interface MongoDbUtilIntr extends Serializable {
+public interface MongoDbUtilIntr extends FmsMongoGridFsIntr {
 
     public void dropTable(String UYSDB, String tbbBankCollection);
 
@@ -49,20 +38,6 @@ public interface MongoDbUtilIntr extends Serializable {
     public void createIndexUnique(String db, String collectionName, Document indexObject);
 
     public void remove(String db, String collectionName, Map<String, Object> searchMap) throws RuntimeException;
-
-    public void removeFile(String db, DBObject filter) throws RuntimeException;
-
-    public void removeFile(String db, ObjectId objectId) throws RuntimeException;
-
-    public GridFSDBFile findFile(String db, ObjectId objectId) throws RuntimeException;
-
-    public MyFile findFileAsMyFile(String db, ObjectId objectId) throws IOException;
-
-    public MyFile findFileAsMyFileInputStream(String db, ObjectId objectId) throws IOException;
-
-    public void copyFiles(String fromDb, String toDb, DBObject fromSearch) throws IOException;
-
-    public GridFSDBFile findFile(String db, DBObject filter) throws RuntimeException;
 
     public List<Map<String, Object>> find(FmsForm myForm, String collectionName,
             Map<String, Object> searchMap,
@@ -120,24 +95,6 @@ public interface MongoDbUtilIntr extends Serializable {
     public void insertOne(String database, String collection, Document record);
 
     public void deleteMany(String database, String collection, Document document);
-
-    public List<GridFSDBFile> findFiles(String db, DBObject filter);
-
-    public List<MyFile> findFilesAsMyFile(String db, DBObject filter) throws IOException;
-
-    public int countFile(String db, BasicDBObject basicDBObject);
-
-    public List<FmsFile> findFilesAsFmsFileNoContent(String db, BasicDBObject basicDBObject, int skip, int limit);
-
-    public List<MyFile> findFileList(String db, BasicDBObject basicDBObject, int skip, int limit);
-
-    public List<GridFSDBFile> findFiles(String db, String filename);
-
-    public GridFSInputFile createFile(String gridfsdb, File file) throws IOException;
-
-    public GridFSInputFile createFile(String gridfsdb, InputStream inputStream);
-
-    public GridFSInputFile createFile(String gridfsdb, byte[] bytes);
 
     public long count(String database, String table, Bson relativeQuery);
 
