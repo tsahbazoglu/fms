@@ -152,17 +152,10 @@
             <artifactId>esign</artifactId>
             <version>${fms.version}</version>
         </dependency>
-        <!--       
         <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>printer</artifactId>
             <version>${fms.version}</version>
-        </dependency> 
-        <dependency>
-            <groupId>${project.groupId}</groupId>
-            <artifactId>webclient</artifactId>
-            <version>${fms.version}</version>
-        </dependency>
-        -->
+        </dependency>           
     </dependencies>
 </project>

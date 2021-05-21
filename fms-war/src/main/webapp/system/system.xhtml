@@ -505,29 +505,29 @@
                     <h:panelGrid columns="1" border="0">
                         <h:panelGroup>
                             <h:outputText value="Web Özet İlk Sayfa No :" style="white-space: nowrap"/>
-                            <h:inputText value="#{pivotResave.jasperParameterPageNumber}" style="width: 50px;"></h:inputText>
+                            <h:inputText value="#{webOzet.jasperParameterPageNumber}" style="width: 50px;"></h:inputText>
                         </h:panelGroup>
                         <h:panelGrid columns="1" border="0">
-                            <p:selectBooleanCheckbox value="#{pivotResave.reportWebOzetSelectAll}" itemLabel="Tümünü Seç">
-                                <f:ajax listener="#{pivotResave.onSelectAll}" render="items"/>
+                            <p:selectBooleanCheckbox value="#{webOzet.reportWebOzetSelectAll}" itemLabel="Tümünü Seç">
+                                <f:ajax listener="#{webOzet.onSelectAll}" render="items"/>
                             </p:selectBooleanCheckbox>
                             <hr/>
                             <p:selectManyCheckbox 
                                 id="items"
-                                value="#{pivotResave.reportWebOzetMemberType}" 
+                                value="#{webOzet.reportWebOzetMemberType}" 
                                 layout="grid" 
                                 columns="1" >
-                                <f:selectItems value="#{pivotResave.reportWebOzetMemberTypes}"/>
+                                <f:selectItems value="#{webOzet.reportWebOzetMemberTypes}"/>
                             </p:selectManyCheckbox>
                         </h:panelGrid>
                         <p:commandButton 
                             value="WEB ÖZET : Tüm Kurumlar Tek PDF Dosyada" 
-                            action="#{pivotResave.webOzet}"
+                            action="#{webOzet.webOzet}"
                             update="#{updateAjaxMB.btnReportWebOzet},:idMessageDialog"
                             />
                         <p:commandButton 
                             value="WEB ÖZET : Tümü Kurumlar Ayrı Ayrı PDF Dosyalarda" 
-                            action="#{pivotResave.webOzetSeparatedly}"
+                            action="#{webOzet.webOzetSeparatedly}"
                             update="#{updateAjaxMB.btnReportWebOzet},:idMessageDialog"
                             />
                     </h:panelGrid>
