@@ -51,7 +51,7 @@
         <dependency>
             <groupId>org.mongodb</groupId>
             <artifactId>mongo-java-driver</artifactId>
-            <version>3.10.2</version>
+            <version>3.12.8</version>
         </dependency>
         <dependency>
             <groupId>tr.org.tspb</groupId>
