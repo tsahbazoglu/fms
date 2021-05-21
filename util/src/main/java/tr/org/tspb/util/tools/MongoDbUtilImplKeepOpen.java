@@ -1,7 +1,6 @@
 package tr.org.tspb.util.tools;
 
 import com.mongodb.BasicDBObject;
-import com.mongodb.DBCursor;
 import com.mongodb.DBObject;
 import com.mongodb.MongoClient;
 import com.mongodb.MongoClientOptions;
@@ -11,8 +10,16 @@ import com.mongodb.WriteConcern;
 import com.mongodb.client.AggregateIterable;
 import com.mongodb.client.FindIterable;
 import com.mongodb.client.ListIndexesIterable;
+import com.mongodb.client.MongoClients;
 import com.mongodb.client.MongoCollection;
+import com.mongodb.client.MongoCursor;
+import com.mongodb.client.MongoDatabase;
 import com.mongodb.client.MongoIterable;
+import com.mongodb.client.gridfs.GridFSBucket;
+import com.mongodb.client.gridfs.GridFSBuckets;
+import com.mongodb.client.gridfs.GridFSFindIterable;
+import com.mongodb.client.gridfs.model.GridFSFile;
+import com.mongodb.client.model.Collation;
 import com.mongodb.client.model.Filters;
 import com.mongodb.client.model.IndexOptions;
 import com.mongodb.client.model.UpdateOptions;
@@ -25,7 +32,6 @@ import java.io.InputStream;
 import static tr.org.tspb.constants.ProjectConstants.COLLECTION_NAME;
 import static tr.org.tspb.constants.ProjectConstants.DOLAR_SET;
 import static tr.org.tspb.constants.ProjectConstants.FORM_DB;
-import static tr.org.tspb.constants.ProjectConstants.ITEMS;
 import static tr.org.tspb.constants.ProjectConstants.MONGO_ID;
 import static tr.org.tspb.constants.ProjectConstants.NAME;
 import tr.org.tspb.exceptions.NullNotExpectedException;
@@ -36,13 +42,14 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.function.Consumer;
+import java.util.logging.Level;
 import javax.inject.Inject;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.bson.Document;
 import org.bson.codecs.configuration.CodecRegistries;
 import org.bson.codecs.configuration.CodecRegistry;
 import org.bson.conversions.Bson;
-import org.bson.types.Code;
 import org.bson.types.ObjectId;
 import org.slf4j.Logger;
 import tr.org.tspb.codec.MyBaseRecordCodec;
@@ -51,18 +58,17 @@ import tr.org.tspb.constants.ProjectConstants;
 import static tr.org.tspb.constants.ProjectConstants.DIEZ;
 import static tr.org.tspb.constants.ProjectConstants.DOLAR;
 import static tr.org.tspb.constants.ProjectConstants.DOLAR_UNSET;
-import static tr.org.tspb.constants.ProjectConstants.REPLACEABLE_KEY_WORD_FOR_FUNCTONS_LOGIN_MEMBER_TYPE;
 import static tr.org.tspb.constants.ProjectConstants.RETVAL;
 import tr.org.tspb.dao.MyBaseRecord;
 import tr.org.tspb.dao.MyField;
 import tr.org.tspb.dao.MyFile;
 import tr.org.tspb.dao.MyFileNoContent;
-import tr.org.tspb.dao.MyForm;
 import tr.org.tspb.dao.MyItems;
 import tr.org.tspb.dao.MyLookup;
 import tr.org.tspb.dao.refs.PlainRecord;
 import tr.org.tspb.pojo.RoleMap;
 import tr.org.tspb.dao.FmsFile;
+import tr.org.tspb.dao.FmsForm;
 import tr.org.tspb.dao.TagEvent;
 
 /**
@@ -85,13 +91,15 @@ public class MongoDbUtilImplKeepOpen implements MongoDbUtilIntr {
     public String mongoAdminPswd = "to be set on server jndi prop";
     public ServerAddress serverAddress = new ServerAddress();
 
-    private MongoClient mongoClient;
+    private final com.mongodb.MongoClient mongoClient;
+    private com.mongodb.client.MongoClient mongoClient445;
 
     public MongoDbUtilImplKeepOpen(String mongoAdminUser, String mongoAdminPswd, ServerAddress serverAddress) {
         this.mongoAdminUser = mongoAdminUser;
         this.mongoAdminPswd = mongoAdminPswd;
         this.serverAddress = serverAddress;
         mongoClient = connect();
+        // mongoClient445 = connect445();
     }
 
     private MongoClientOptions getMongoClientOptions() {
@@ -118,9 +126,21 @@ public class MongoDbUtilImplKeepOpen implements MongoDbUtilIntr {
         return mongoCredential;
     }
 
-    private MongoClient connect() {
-        //MongoClient mongo = new MongoClient(serverAddress, getMongoCredential(), getMongoClientOptions());
+    private com.mongodb.MongoClient connect() {
+        // MongoClient mongo = new MongoClient(serverAddress, getMongoCredential(), getMongoClientOptions());
         MongoClient mongo = new MongoClient(serverAddress, getMongoClientOptions());
+        return mongo;
+    }
+
+    private com.mongodb.client.MongoClient connect445() {
+        com.mongodb.client.MongoClient mongo = null;
+        try {
+            // mongo = new MongoClient(serverAddress, getMongoCredential(), getMongoClientOptions());
+            //mongo = new MongoClient(serverAddress, getMongoClientOptions());
+            mongo = MongoClients.create("mongodb://mongodb:27017");
+        } catch (Exception ex) {
+            java.util.logging.Logger.getLogger(this.getClass().getName()).log(Level.SEVERE, null, ex);
+        }
         return mongo;
     }
 
@@ -188,7 +208,7 @@ public class MongoDbUtilImplKeepOpen implements MongoDbUtilIntr {
         createIndex(myItems.getDb(), myItems.getTable(), myItems.getSort());
     }
 
-    public void createIndex(MyForm myForm, Document indexObject) {
+    public void createIndex(FmsForm myForm, Document indexObject) {
         createIndex(myForm.getDb(), myForm.getTable(), indexObject);
     }
 
@@ -221,7 +241,7 @@ public class MongoDbUtilImplKeepOpen implements MongoDbUtilIntr {
 
     }
 
-    public void createIndexUnique(MyForm myForm, Document indexObject) {
+    public void createIndexUnique(FmsForm myForm, Document indexObject) {
         createIndexUnique(myForm.getDb(), myForm.getTable(), indexObject);
     }
 
@@ -231,6 +251,17 @@ public class MongoDbUtilImplKeepOpen implements MongoDbUtilIntr {
 
     public void remove(String db, String collectionName, Map<String, Object> searchMap) throws RuntimeException {
         mongoClient.getDatabase(db).getCollection(collectionName, null).deleteMany(new Document(searchMap));
+    }
+
+    public void copyFiles(String fromDb, String toDb, DBObject fromSearch) throws IOException {
+        List<GridFSDBFile> list = new GridFS(mongoClient.getDB(fromDb)).find(fromSearch);
+        for (GridFSDBFile fileIonUploadedFile : list) {
+            String sha256 = DigestUtils.sha256Hex(fileIonUploadedFile.getInputStream());
+            GridFSInputFile gridFSInputFileAttachment = createFile(toDb, fileIonUploadedFile.getInputStream());
+            gridFSInputFileAttachment.setFilename(fileIonUploadedFile.getFilename());
+            gridFSInputFileAttachment.setMetaData(new BasicDBObject(fileIonUploadedFile.getMetaData().toMap()).append("sha256", sha256));
+            gridFSInputFileAttachment.save();
+        }
     }
 
     public void removeFile(String db, DBObject filter) throws RuntimeException {
@@ -246,36 +277,13 @@ public class MongoDbUtilImplKeepOpen implements MongoDbUtilIntr {
         return gridFSDBFile;
     }
 
-    public MyFile findFileAsMyFile(String db, ObjectId objectId) throws IOException {
-        GridFSDBFile gridFSDBFile = new GridFS(mongoClient.getDB(db)).find(objectId);
-        MyFile myFile = new MyFile(gridFSDBFile).withBytes();
-        return myFile;
-    }
-
-    public MyFile findFileAsMyFileInputStream(String db, ObjectId objectId) throws IOException {
-        GridFSDBFile gridFSDBFile = new GridFS(mongoClient.getDB(db)).find(objectId);
-        MyFile myFile = new MyFile(gridFSDBFile);
-        return myFile;
-    }
-
-    public void copyFiles(String fromDb, String toDb, DBObject fromSearch) throws IOException {
-        List<GridFSDBFile> list = new GridFS(mongoClient.getDB(fromDb)).find(fromSearch);
-        for (GridFSDBFile fileIonUploadedFile : list) {
-            String sha256 = DigestUtils.sha256Hex(fileIonUploadedFile.getInputStream());
-            GridFSInputFile gridFSInputFileAttachment = createFile(toDb, fileIonUploadedFile.getInputStream());
-            gridFSInputFileAttachment.setFilename(fileIonUploadedFile.getFilename());
-            gridFSInputFileAttachment.setMetaData(new BasicDBObject(fileIonUploadedFile.getMetaData().toMap()).append("sha256", sha256));
-            gridFSInputFileAttachment.save();
-        }
-    }
-
     public GridFSDBFile findFile(String db, DBObject filter) throws RuntimeException {
         GridFSDBFile gridFSDBFile = new GridFS(mongoClient.getDB(db)).findOne(filter);
         return gridFSDBFile;
     }
 
     @Override
-    public List<Map<String, Object>> find(MyForm myForm, String collectionName,
+    public List<Map<String, Object>> find(FmsForm myForm, String collectionName,
             Map<String, Object> searchMap,
             Map<String, Object> returnMap,
             int skip,
@@ -306,7 +314,7 @@ public class MongoDbUtilImplKeepOpen implements MongoDbUtilIntr {
         return listMaps;
     }
 
-    public DocumentRecursive wrapIt(MyForm myForm, Document dBObject) throws NullNotExpectedException {
+    public DocumentRecursive wrapIt(FmsForm myForm, Document dBObject) throws NullNotExpectedException {
         Map manualDbRefs = new HashMap();
 
         for (String key : dBObject.keySet()) {
@@ -677,11 +685,11 @@ public class MongoDbUtilImplKeepOpen implements MongoDbUtilIntr {
         }
     }
 
-    public void updateMany(MyForm myForm, Bson filter, Document record, UpdateOptions uo) {
+    public void updateMany(FmsForm myForm, Bson filter, Document record, UpdateOptions uo) {
         updateMany(myForm.getDb(), myForm.getTable(), filter, record, uo);
     }
 
-    public void updateMany(MyForm myForm, Bson filter, Document record) {
+    public void updateMany(FmsForm myForm, Bson filter, Document record) {
         updateMany(myForm.getDb(), myForm.getTable(), filter, record);
     }
 
@@ -695,12 +703,13 @@ public class MongoDbUtilImplKeepOpen implements MongoDbUtilIntr {
                 .updateMany(filter, new Document(DOLAR_SET, record));
     }
 
-    public List<DocumentRecursive> findListAsName(String myFormDb, String myFormTable, MyForm myForm, Document searcheDBObject, Integer limit) {
+    public List<DocumentRecursive> findListAsName(String myFormDb, String myFormTable,
+            FmsForm myForm, Document searcheDBObject, Integer limit) {
         List<Document> cursor = createCursor(myFormDb, myFormTable, searcheDBObject, limit);
         return cursorToListAsName(cursor, myForm);
     }
 
-    private List<DocumentRecursive> cursorToListAsName(List<Document> cursor, MyForm myForm) {
+    private List<DocumentRecursive> cursorToListAsName(List<Document> cursor, FmsForm myForm) {
         List<DocumentRecursive> list = new ArrayList<>();
 
         for (Document document : cursor) {
@@ -711,7 +720,7 @@ public class MongoDbUtilImplKeepOpen implements MongoDbUtilIntr {
         return list;
     }
 
-    private static void armBsonRefs(Document document, MyForm myForm, Map manualDbRefs) {
+    private static void armBsonRefs(Document document, FmsForm myForm, Map manualDbRefs) {
         Set<String> keySet = new HashSet<>(document.keySet());
         for (String key : keySet) {
             Object keyValue = document.get(key);
@@ -746,12 +755,46 @@ public class MongoDbUtilImplKeepOpen implements MongoDbUtilIntr {
         return list;
     }
 
-    public List<MyFile> findFilesAsMyFile(String db, DBObject filter) throws IOException {
-        List<MyFile> listOfMyFile = new ArrayList<>();
-        List<GridFSDBFile> list = new GridFS(mongoClient.getDB(db)).find(filter);
+    private GridFSBucket createGridFSConnection(String database) {
+        MongoDatabase db = mongoClient.getDatabase(database);
+        return GridFSBuckets.create(db);
+        // return GridFSBuckets.create(db, ASSOCIATED_FILES);
+    }
 
-        for (GridFSDBFile gridFSDBFile : list) {
-            listOfMyFile.add(new MyFile(gridFSDBFile));
+    public MyFile findFileAsMyFile(String db, ObjectId objectId) throws IOException {
+        GridFSBucket gridFS = createGridFSConnection(db);
+        MyFile myFile = new MyFile(gridFS, gridFS.find(Filters.eq("_id", objectId)).first())
+                .withBytes();
+        return myFile;
+    }
+
+    public MyFile findFileAsMyFileInputStream(String db, ObjectId objectId) throws IOException {
+        GridFSBucket gridFS = createGridFSConnection(db);
+        MyFile myFile = new MyFile(gridFS, gridFS.find(Filters.eq("_id", objectId)).first());
+        return myFile;
+    }
+
+    public List<MyFile> findFilesAsMyFile(String db, DBObject filter)
+            throws IOException {
+
+        List<MyFile> listOfMyFile = new ArrayList<>();
+
+        GridFSBucket gridFS = createGridFSConnection(db);
+
+        Collation collation = Collation.builder().locale("tr").build();
+
+        GridFSFindIterable gridFSFindIterable = gridFS.find(new Document(filter.toMap()));
+
+        if (gridFSFindIterable.iterator().hasNext()) {
+            gridFSFindIterable
+                    //                .collation(collation)
+                    .forEach((Consumer<com.mongodb.client.gridfs.model.GridFSFile>) gridFSFile -> {
+                        try {
+                            listOfMyFile.add(new MyFile(gridFS, gridFSFile));
+                        } catch (IOException ex) {
+                            java.util.logging.Logger.getLogger(MongoDbUtilImplKeepOpen.class.getName()).log(Level.SEVERE, null, ex);
+                        }
+                    });
         }
 
         return listOfMyFile;
@@ -764,14 +807,19 @@ public class MongoDbUtilImplKeepOpen implements MongoDbUtilIntr {
 
     public List<FmsFile> findFilesAsFmsFileNoContent(String db, BasicDBObject basicDBObject, int skip, int limit) {
 
-        DBCursor cursor = new GridFS(mongoClient.getDB(db)).getFileList(basicDBObject);
-        cursor.skip(skip);
-        cursor.limit(limit);
+        GridFSBucket gridFS = createGridFSConnection(db);
+
+        MongoCursor cursor = gridFS.find(basicDBObject)
+                .skip(skip)
+                .limit(limit)
+                .iterator();
 
         List<FmsFile> listOut = new ArrayList<>();
-        for (DBObject document : cursor) {
+
+        while (cursor.hasNext()) {
+            GridFSFile file = (GridFSFile) cursor.next();
             try {
-                listOut.add(new MyFileNoContent((GridFSDBFile) document));
+                listOut.add(new MyFileNoContent(file));
             } catch (IOException ex) {
                 logger.error("error occured", ex);
             }
@@ -781,14 +829,19 @@ public class MongoDbUtilImplKeepOpen implements MongoDbUtilIntr {
 
     public List<MyFile> findFileList(String db, BasicDBObject basicDBObject, int skip, int limit) {
 
-        DBCursor cursor = new GridFS(mongoClient.getDB(db)).getFileList(basicDBObject);
-        cursor.skip(skip);
-        cursor.limit(limit);
+        GridFSBucket gridFS = createGridFSConnection(db);
+
+        MongoCursor cursor = gridFS.find(basicDBObject)
+                .skip(skip)
+                .limit(limit)
+                .iterator();
 
         List<MyFile> listOut = new ArrayList<>();
-        for (DBObject document : cursor) {
+
+        while (cursor.hasNext()) {
+            GridFSFile file = (GridFSFile) cursor.next();
             try {
-                listOut.add(new MyFile((GridFSDBFile) document));
+                listOut.add(new MyFile(gridFS, file));
             } catch (IOException ex) {
                 logger.error("error occured", ex);
             }
