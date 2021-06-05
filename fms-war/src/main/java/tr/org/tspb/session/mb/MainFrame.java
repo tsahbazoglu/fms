@@ -861,11 +861,11 @@ public class MainFrame implements Serializable {
 
     }
 
-    private void createPivotForm(FmsForm myFormXs) throws Exception {
+    private void createPivotForm(FmsForm fmsForm) throws Exception {
 
-        filterService.createBaseFilter(myFormXs);
+        filterService.createBaseFilter(fmsForm);
 
-        FmsForm myFormLarge = repositoryService.getMyFormLargeWithBaseFilter(myProject, myFormXs.getKey());
+        FmsForm myFormLarge = repositoryService.getMyFormLargeWithBaseFilter(myProject, fmsForm.getKey());
 
         myFormLarge.initActions(repositoryService.getAndCacheMyAction(myFormLarge));
 

@@ -57,7 +57,7 @@ public class PivotViewerCtrl extends PivotImpl {
     }
 
     public void valueChangeListenerZet(AjaxBehaviorEvent event) {
-        filterService.createPivotFilterHistory();
+        filterService.createPivotFilterHistoryOnGuiChange();
         try {
 //            prepareJsfComponentMap(formService.getMyForm());
 //            refreshRowData(formService.getMyForm());

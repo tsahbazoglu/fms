@@ -351,7 +351,7 @@ public class PivotModifierCtrl extends PivotImpl {
 
     public void valueChangeListenerZet(AjaxBehaviorEvent event) {
         try {
-            filterService.createPivotFilterCurrent();
+            filterService.createPivotFilterCurrentOnGuiChange();
             createDimensionIksIgrek(formService.getMyForm());
             refreshPivotData();
         } catch (NullNotExpectedException | MongoOrmFailedException | MoreThenOneInListException | UserException | FormConfigException ex) {

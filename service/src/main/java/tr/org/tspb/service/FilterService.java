@@ -181,6 +181,32 @@ public class FilterService extends CommonSrv {
         pivotFilterHistory.put(FORMS, formService.getMyForm().getKey());
     }
 
+    public void createPivotFilterCurrentOnGuiChange() throws FormConfigException {
+        pivotFilterCurrent = new Document();
+        FmsForm myForm = formService.getMyForm();
+        if (myForm.getZetDimension() == null) {
+            throw new FormConfigException(ZET_DIMENSION.concat(" is resolved to null"));
+        }
+        for (String key : myForm.getZetDimension()) {
+            String fieldName = myForm.getField(key).getField();
+            pivotFilterCurrent.put(fieldName, guiFiltersCurrent.get(fieldName));
+        }
+        pivotFilterCurrent.put(FORMS, formService.getMyForm().getKey());
+    }
+
+    public void createPivotFilterHistoryOnGuiChange() {
+        pivotFilterHistory = new Document();
+        FmsForm myForm = formService.getMyForm();
+        if (myForm.getZetDimension() == null) {
+            throw new FormConfigException(ZET_DIMENSION.concat(" is resolved to null"));
+        }
+        for (String key : formService.getMyForm().getZetDimension()) {
+            String fieldName = myForm.getField(key).getField();
+            pivotFilterHistory.put(fieldName, guiFiltersHistory.get(fieldName));
+        }
+        pivotFilterHistory.put(FORMS, formService.getMyForm().getKey());
+    }
+
     public void resetColumnDataModel() {
         this.advanceFilters = new ArrayList<>();
     }
