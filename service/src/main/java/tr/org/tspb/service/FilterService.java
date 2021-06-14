@@ -194,7 +194,7 @@ public class FilterService extends CommonSrv {
         pivotFilterCurrent.put(FORMS, formService.getMyForm().getKey());
     }
 
-    public void createPivotFilterHistoryOnGuiChange() {
+    public void createPivotFilterHistoryOnGuiChange() throws FormConfigException {
         pivotFilterHistory = new Document();
         FmsForm myForm = formService.getMyForm();
         if (myForm.getZetDimension() == null) {
@@ -300,18 +300,43 @@ public class FilterService extends CommonSrv {
         }
     }
 
-    public List<Document> createDocuments(MyItems myItems, FmsForm selectedForm, Map<String, Object> filter, boolean history) {
+    public List<Document> createZetDimensionCurrentDocuments(MyItems myItems, FmsForm selectedForm, Map<String, Object> filter) {
+
+        Object queryObject = myItems.getQuery();
+
+        if (queryObject instanceof Code) {
+            Code func = new Code(((Code) queryObject).getCode().replace(DIEZ, DOLAR));
+
+            Document commandResult = mongoDbUtil.runCommand(selectedForm.getDb(), func.getCode(), filter, null);
+
+            queryObject = commandResult.get(RETVAL);
+        }
+
         String collectionName = myItems.getTable();
         String database = myItems.getDb();
 
-        Object queryObject = history ? myItems.getHistoryQuery() : myItems.getQuery();
+        Document queryDoc = mongoDbUtil.replaceToDollar((Document) queryObject);
 
+        Document sortObject = myItems.getSort();
+
+        List<Document> cursor = mongoDbUtil.find(database == null ? selectedForm.getDb()
+                : database, collectionName, queryDoc, sortObject, null);
+
+        return cursor;
+    }
+
+    public List<Document> createZetDimensionHistoryDocuments(MyItems myItems, FmsForm selectedForm, Map<String, Object> filter) {
+
+        Object queryObject = myItems.getHistoryQuery();
         if (queryObject == null) {
 
-            logger.warn("query object is resolved to null");
+            logger.warn("history query object is resolved to null");
 
             queryObject = myItems.getQuery();
         }
+
+        String collectionName = myItems.getTable();
+        String database = myItems.getDb();
 
         if (queryObject instanceof Code) {
             Code func = new Code(((Code) queryObject).getCode().replace(DIEZ, DOLAR));
@@ -325,7 +350,8 @@ public class FilterService extends CommonSrv {
 
         Document sortObject = myItems.getSort();
 
-        List<Document> cursor = mongoDbUtil.find(database == null ? selectedForm.getDb() : database, collectionName, queryDoc, sortObject, null);
+        List<Document> cursor = mongoDbUtil.find(database == null ? selectedForm.getDb()
+                : database, collectionName, queryDoc, sortObject, null);
 
         return cursor;
     }

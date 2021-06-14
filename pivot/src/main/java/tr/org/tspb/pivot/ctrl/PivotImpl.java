@@ -405,7 +405,7 @@ public abstract class PivotImpl implements Serializable, PivotApi {
      *
      * @param myForm
      */
-    protected void createDimensionZet(FmsForm myForm) throws FormConfigException {
+    protected void createDimensionZet(FmsForm myForm, boolean history) throws FormConfigException {
 
         dimensionZet = new ArrayList<>();
 
@@ -458,16 +458,22 @@ public abstract class PivotImpl implements Serializable, PivotApi {
                     sb.append(" : ");
                     sb.append(getFilter());
                     sb.append(" : ");
+                    sb.append(history);
+                    sb.append(" : ");
                     sb.append(loginController.getRolesAsSet());
                     String cacheKey = org.apache.commons.codec.digest.DigestUtils.sha256Hex(sb.toString());
 
                     List<SelectItem> zetDimensionItems = appScopeSrvCtrl.getCacheZetDimensionItems(cacheKey);
 
                     if (zetDimensionItems == null) {
-                        MyItems myItems = myField.getItemsAsMyItems();
 
-                        List<Document> cursor = filterService
-                                .createDocuments(myItems, myForm, getFilter(), this instanceof PivotViewerCtrl);
+                        MyItems myItems = myField.getItemsAsMyItems();
+                        List<Document> cursor = null;
+                        if (history) {
+                            cursor = filterService.createZetDimensionHistoryDocuments(myItems, myForm, getFilter());
+                        } else {
+                            cursor = filterService.createZetDimensionCurrentDocuments(myItems, myForm, getFilter());
+                        }
 
                         Document modifiedView = new Document();
 

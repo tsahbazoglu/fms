@@ -57,8 +57,8 @@ public class PivotViewerCtrl extends PivotImpl {
     }
 
     public void valueChangeListenerZet(AjaxBehaviorEvent event) {
-        filterService.createPivotFilterHistoryOnGuiChange();
         try {
+            filterService.createPivotFilterHistoryOnGuiChange();
 //            prepareJsfComponentMap(formService.getMyForm());
 //            refreshRowData(formService.getMyForm());
             createDimensionIksIgrek(formService.getMyForm());
@@ -70,7 +70,7 @@ public class PivotViewerCtrl extends PivotImpl {
 
     public Map<String, String> drawGUI() throws Exception {
 
-        createDimensionZet(formService.getMyForm());
+        createDimensionZet(formService.getMyForm(), true);
 
         createDimensionIksIgrek(formService.getMyForm());
 

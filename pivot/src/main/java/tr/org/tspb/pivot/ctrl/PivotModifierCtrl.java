@@ -85,6 +85,8 @@ public class PivotModifierCtrl extends PivotImpl {
 
     private String saveObject() throws Exception {
 
+        filterService.createPivotFilterCurrentOnGuiChange();
+
         calcService.createPivotCalcData(pivotData, true, true, formService.getMyForm(), getFilter());
 
         Map<String, Object> autosetMapValues = new HashMap<>();
@@ -384,7 +386,7 @@ public class PivotModifierCtrl extends PivotImpl {
 
     public Map<String, String> drawGUI() throws Exception {
 
-        createDimensionZet(formService.getMyForm());
+        createDimensionZet(formService.getMyForm(), false);
 
         createDimensionIksIgrek(formService.getMyForm());
 

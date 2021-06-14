@@ -515,71 +515,13 @@ public class MyItems {
                     this.query = new Document("fms_item_query_code_error", "fms_item_query_code_error");
                 }
             } else if (listOfFilter != null) {
-
-                for (Document d : listOfFilter) {
-
-                    String key = d.get("key", String.class);
-
-                    Document refValue = d.get("ref-value", Document.class);
-                    String fmsValue = d.get("fms-value", String.class);
-                    String strValue = d.get("string-value", String.class);
-                    Number numberValue = d.get("number-value", Number.class);
-                    List<String> arrayValue = d.getList("array-value", String.class);
-
-                    if (refValue != null) {
-                        this.query.put(key, new TagItemsQueryRef(refValue, filter, fmsScriptRunner).value());
-                    } else if (fmsValue != null) {
-                        switch (fmsValue) {
-                            case ProjectConstants.REPLACEABLE_KEY_WORD_FOR_FUNCTONS_FILTER_PERIOD:
-                                this.query.put(key, filter.get("period") == null ? "no result" : filter.get("period"));
-                                break;
-                            case ProjectConstants.REPLACEABLE_KEY_WORD_FOR_FUNCTONS_FILTER_TEMPLATE:
-                                this.query.put(key, filter.get("template") == null ? "no result" : filter.get("template"));
-                                break;
-                            case ProjectConstants.REPLACEABLE_KEY_WORD_FOR_FUNCTONS_LOGIN_MEMBER_ID:
-                                this.query.put(key, loginMemberId == null ? "no result" : loginMemberId);
-                                break;
-                            default:
-                                throw new RuntimeException("could not find replaceble word");
-                        }
-                    } else if (strValue != null) {
-                        this.query.put(key, strValue);
-                    } else if (numberValue != null) {
-                        this.query.put(key, numberValue);
-                    } else if (arrayValue != null) {
-                        this.query.put(key, new Document(DOLAR_IN, arrayValue));
-                    } else {
-
-                        String type = d.get("type", String.class);
-                        if (type == null) {
-                            type = "string";
-                        }
-                        switch (type) {
-                            case "number":
-                                this.query.put(key, d.get(VALUE, Number.class));
-                                break;
-                            case "string":
-                                this.query.put(key, d.get(VALUE, String.class).replaceAll(DIEZ, DOLAR));
-                                break;
-                            case "in":
-                                this.query.put(key, new Document(DOLAR_IN, Arrays.asList(d.get(VALUE, String.class).replaceAll(DIEZ, DOLAR).split(","))));
-                                break;
-                            case "ne":
-                                this.query.put(key, new Document(DOLAR_NE, d.get(VALUE, String.class).replaceAll(DIEZ, DOLAR)));
-                                break;
-                            case "regex":
-                                this.query.put(key, new Document(DOLAR_REGEX, d.get(VALUE, String.class).replaceAll(DIEZ, DOLAR)));
-                                break;
-                            default:
-                                throw new UnsupportedOperationException("field.items.query.type is not supported  : " + type);
-                        }
-                    }
-                }
+                this.query.putAll(handleListOfQuery(listOfFilter, filter, fmsScriptRunner, loginMemberId));
             }
         }
     }
 
-    private void createHistoryQuery(ObjectId loginMemberId, boolean admin, Map filter, FmsScriptRunner fmsScriptRunner) throws RuntimeException {
+    private void createHistoryQuery(ObjectId loginMemberId, boolean admin, Map filter, FmsScriptRunner fmsScriptRunner)
+            throws RuntimeException {
 
         Document historyQuery_ = itemsDoc.get(HISTORY_QUERY, Document.class);
         if (admin && itemsDoc.get(ADMIN_QUERY) != null) {
@@ -605,71 +547,80 @@ public class MyItems {
                 this.historyQuery = new Document("fms_item_query_code_error", "fms_item_query_code_error");
             }
         } else if (listOfFilter != null) {
+            this.historyQuery.putAll(handleListOfQuery(listOfFilter, filter, fmsScriptRunner, loginMemberId));
+        }
 
-            for (Document d : listOfFilter) {
+    }
 
-                String key = d.get("key", String.class);
+    private Document handleListOfQuery(List<Document> listOfFilter, Map filter,
+            FmsScriptRunner fmsScriptRunner, ObjectId loginMemberId) throws RuntimeException {
 
-                Document refValue = d.get("ref-value", Document.class);
-                String fmsValue = d.get("fms-value", String.class);
-                String strValue = d.get("string-value", String.class);
-                Number numberValue = d.get("number-value", Number.class);
-                List<String> arrayValue = d.getList("array-value", String.class);
+        Document result = new Document();
 
-                if (refValue != null) {
+        for (Document d : listOfFilter) {
 
-                    this.historyQuery.put(key, new TagItemsQueryRef(refValue, filter, fmsScriptRunner).value());
+            String key = d.get("key", String.class);
 
-                } else if (fmsValue != null) {
+            Document refValue = d.get("ref-value", Document.class);
+            String fmsValue = d.get("fms-value", String.class);
+            String strValue = d.get("string-value", String.class);
+            Number numberValue = d.get("number-value", Number.class);
+            List<String> listOfString = d.getList("array-value", String.class);
+            List<Number> listOfNumber = d.getList("array-number", Number.class);
 
-                    switch (fmsValue) {
-                        case ProjectConstants.REPLACEABLE_KEY_WORD_FOR_FUNCTONS_FILTER_PERIOD:
-                            this.historyQuery.put(key, filter.get("period") == null ? "no result" : filter.get("period"));
-                            break;
-                        case ProjectConstants.REPLACEABLE_KEY_WORD_FOR_FUNCTONS_FILTER_TEMPLATE:
-                            this.historyQuery.put(key, filter.get("template") == null ? "no result" : filter.get("template"));
-                            break;
-                        case ProjectConstants.REPLACEABLE_KEY_WORD_FOR_FUNCTONS_LOGIN_MEMBER_ID:
-                            this.historyQuery.put(key, loginMemberId == null ? "no result" : loginMemberId);
-                            break;
-                        default:
-                            throw new RuntimeException("could not find replaceble word");
-                    }
+            if (refValue != null) {
+                result.put(key, new TagItemsQueryRef(refValue, filter, fmsScriptRunner).value());
+            } else if (fmsValue != null) {
+                switch (fmsValue) {
+                    case ProjectConstants.REPLACEABLE_KEY_WORD_FOR_FUNCTONS_FILTER_PERIOD:
+                        result.put(key, filter.get("period") == null ? "no result" : filter.get("period"));
+                        break;
+                    case ProjectConstants.REPLACEABLE_KEY_WORD_FOR_FUNCTONS_FILTER_TEMPLATE:
+                        result.put(key, filter.get("template") == null ? "no result" : filter.get("template"));
+                        break;
+                    case ProjectConstants.REPLACEABLE_KEY_WORD_FOR_FUNCTONS_LOGIN_MEMBER_ID:
+                        result.put(key, loginMemberId == null ? "no result" : loginMemberId);
+                        break;
+                    default:
+                        throw new RuntimeException("could not find replaceble word");
+                }
 
-                } else if (strValue != null) {
-                    this.historyQuery.put(key, strValue);
-                } else if (numberValue != null) {
-                    this.historyQuery.put(key, numberValue);
-                } else if (arrayValue != null) {
-                    this.historyQuery.put(key, new Document(DOLAR_IN, arrayValue));
-                } else {
+            } else if (strValue != null) {
+                result.put(key, strValue);
+            } else if (numberValue != null) {
+                result.put(key, numberValue);
+            } else if (listOfString != null) {
+                result.put(key, new Document(DOLAR_IN, listOfString));
+            } else if (listOfNumber != null) {
+                result.put(key, new Document(DOLAR_IN, listOfNumber));
+            } else {
 
-                    String type = d.get("type", String.class);
-                    if (type == null) {
-                        type = "string";
-                    }
-                    switch (type) {
-                        case "number":
-                            this.historyQuery.put(key, d.get(VALUE, Number.class));
-                            break;
-                        case "string":
-                            this.historyQuery.put(key, d.get(VALUE, String.class).replaceAll(DIEZ, DOLAR));
-                            break;
-                        case "in":
-                            this.historyQuery.put(key, new Document(DOLAR_IN, Arrays.asList(d.get(VALUE, String.class).replaceAll(DIEZ, DOLAR).split(","))));
-                            break;
-                        case "ne":
-                            this.historyQuery.put(key, new Document(DOLAR_NE, d.get(VALUE, String.class).replaceAll(DIEZ, DOLAR)));
-                            break;
-                        case "regex":
-                            this.historyQuery.put(key, new Document(DOLAR_REGEX, d.get(VALUE, String.class).replaceAll(DIEZ, DOLAR)));
-                            break;
-                        default:
-                            throw new UnsupportedOperationException("field.items.query.type is not supported  : " + type);
-                    }
+                String type = d.get("type", String.class);
+                if (type == null) {
+                    type = "string";
+                }
+                switch (type) {
+                    case "number":
+                        result.put(key, d.get(VALUE, Number.class));
+                        break;
+                    case "string":
+                        result.put(key, d.get(VALUE, String.class).replaceAll(DIEZ, DOLAR));
+                        break;
+                    case "in":
+                        result.put(key, new Document(DOLAR_IN, Arrays.asList(d.get(VALUE, String.class).replaceAll(DIEZ, DOLAR).split(","))));
+                        break;
+                    case "ne":
+                        result.put(key, new Document(DOLAR_NE, d.get(VALUE, String.class).replaceAll(DIEZ, DOLAR)));
+                        break;
+                    case "regex":
+                        result.put(key, new Document(DOLAR_REGEX, d.get(VALUE, String.class).replaceAll(DIEZ, DOLAR)));
+                        break;
+                    default:
+                        throw new UnsupportedOperationException("field.items.query.type is not supported  : " + type);
                 }
             }
         }
+        return result;
     }
 
 }
