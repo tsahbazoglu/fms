@@ -212,6 +212,7 @@ public class ProjectConstants {
     public static final String FILE_EXTENSION_DOCX = ".docx";
     public static final String FILE_EXTENSION_JASPER = ".jasper";
     public static final String FAIL_MESSAGE = "failMessage";
+    public static final String FILTER_PROJECTION = "filter-projection";
 
     //G
     public static final String GROUP = "group";

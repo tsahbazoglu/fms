@@ -88,6 +88,7 @@ public class MyField {
     // E
     private boolean embeddedAsList;
     // F
+    private String filterProjection;
     private String fieldNote;
     private String field;
     private String fileType = "/(\\.|\\/)(pdf)$/";
@@ -838,6 +839,8 @@ public class MyField {
             this.myField.visible = (String) docField.get(VISIBLE);
             this.myField.valueChangeListenerAction = docField.get(VALUE_CHANGE_LISTENER_ACTION);
             this.myField.workflow = Boolean.TRUE.equals(docField.get(WORKFLOW));
+
+            this.myField.filterProjection = docField.getString(FILTER_PROJECTION);
         }
 
         public Builder maskCalculate(Document docField) {
@@ -1269,5 +1272,12 @@ public class MyField {
             return this.myField;
         }
 
+    }
+
+    /**
+     * @return the filterProjection
+     */
+    public String getFilterProjection() {
+        return filterProjection;
     }
 }

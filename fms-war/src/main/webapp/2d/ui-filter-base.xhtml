@@ -23,7 +23,7 @@
     <h:outputText value="Basit Filtre" style="font-size: 22px;font-weight: bolder;color: #b3b3b3;"/>
 
     <h:form id="id-2d-form-quick-filter">
-        <p:panelGrid columns="10">
+        <p:panelGrid columns="5">
             <c:forEach items="#{filterService.quickFilters}" var="columnMap">
                 <h:panelGroup>
                     <h:outputText value="#{columnMap.shortName}" escape="false"/> 

@@ -75,10 +75,10 @@ public class TagEventCheckListDoc {
             String db = doc.getString("db");
             String table = doc.getString("table");
 
-            List<Document> filters = doc.getList("query", Document.class);
+            List<Document> findFilters = doc.getList("query", Document.class);
             List<Document> countFilters = doc.getList("count-filter", Document.class);
 
-            Document query = createQuery(filters, userDetail, myFilter);
+            Document query = createQuery(findFilters, userDetail, myFilter);
 
             String decision = doc.getString("check");
 

@@ -858,6 +858,16 @@ public class FilterUtil {
             filter.put(myForm.getLoginFkField(), userDetail.getLoginFkSearchMapInListOfValues());
         }
 
+        for (Iterator<String> iterator = modifiedFilter.keySet().iterator(); iterator.hasNext();) {
+            String key = iterator.next();
+            Object value = modifiedFilter.get(key);
+            String filterProjection = myForm.getField(key).getFilterProjection();
+            if (filterProjection != null) {
+                modifiedFilter.remove(key);
+                modifiedFilter.put(filterProjection, value);
+            }
+        }
+
         return modifiedFilter;
 
     }
