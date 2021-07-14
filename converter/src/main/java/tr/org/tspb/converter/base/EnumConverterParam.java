@@ -1,7 +1,7 @@
 package tr.org.tspb.converter.base;
 
 /**
- * 
+ *
  * @author Telman Şahbazoğlu
  */
 public enum EnumConverterParam {
@@ -40,6 +40,8 @@ public enum EnumConverterParam {
         switch (name) {
             case "TC":
                 return EnumConverterParam.TC;
+            case "LITERAL":
+                return EnumConverterParam.LITERAL;
             default:
         }
         return null;
