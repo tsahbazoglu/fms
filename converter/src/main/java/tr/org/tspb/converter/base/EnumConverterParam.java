@@ -42,9 +42,15 @@ public enum EnumConverterParam {
                 return EnumConverterParam.TC;
             case "LITERAL":
                 return EnumConverterParam.LITERAL;
+            case "EMAIL":
+                return EnumConverterParam.EMAIL;
+            case "ALPHANUMERIC":
+                return EnumConverterParam.ALPHANUMERIC;
+            case "NUMERIC":
+                return EnumConverterParam.NUMERIC;
             default:
+                return EnumConverterParam.ALPHANUMERIC;
         }
-        return null;
     }
 
 }
