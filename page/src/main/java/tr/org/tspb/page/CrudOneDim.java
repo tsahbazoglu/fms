@@ -967,7 +967,7 @@ public class CrudOneDim implements ValueChangeListener, Serializable {
             }
 
             MyField myField = formService.getMyForm().getField(fieldKey);
-            String ajaxAction = myField.getAjaxAction();
+            String ajaxAction = myField.getAjax().getAction();
 
             if (ajaxAction == null) {
                 return;
@@ -981,6 +981,10 @@ public class CrudOneDim implements ValueChangeListener, Serializable {
                     break;
                 case "render-ref":
                     formService.getMyForm().runAjaxRenderRef(myField, componentMap, formService.getMyForm(), crudObject,
+                            loginController.getRoleMap(), loginController.getLoggedUserDetail(), filterService.getTableFilterCurrent());
+                    break;
+                case "list":
+                    formService.getMyForm().runAjaxList(myField, componentMap, formService.getMyForm(), crudObject,
                             loginController.getRoleMap(), loginController.getLoggedUserDetail(), filterService.getTableFilterCurrent());
                     break;
                 default:
