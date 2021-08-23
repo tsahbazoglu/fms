@@ -42,13 +42,11 @@
                     value="Kaydet" 
                     rendered="#{mainFrame.isTwoDim and formService.myForm.myActions.save}"
                     />
-                <p:commandButton 
-                    id="id_2d_buttonSaveAsObjectId"
+                <p:button
+                    onclick="rcSaveAs();return false;"
                     value="Farklı Kaydet" 
-                    action="#{twoDimModifyCtrl.saveAsObject}" 
                     rendered="#{mainFrame.isTwoDim and formService.myForm.myActions.saveAs}"
-                    update="#{updateAjaxMB.btn2dSaveAs}"
-                    />
+                    />               
                 <p:commandButton 
                     id="id_2d_button_esign"
                     value="2:1 - Eimza Süreci" 
@@ -161,6 +159,13 @@
                     rendered="#{mainFrame.isTwoDim and formService.myForm.myActions.save}"
                     update="#{updateAjaxMB.btn2dSave},:idTwoDlgTabView,id-tab-view:id-table-file-list"
                     />
+                <p:remoteCommand 
+                    name="rcSaveAs"
+                    value="Farklı Kaydet" 
+                    action="#{twoDimModifyCtrl.saveAsObject}" 
+                    rendered="#{mainFrame.isTwoDim and formService.myForm.myActions.saveAs}"
+                    update="#{updateAjaxMB.btn2dSave},:idTwoDlgTabView,id-tab-view:id-table-file-list"
+                    />
                 <br/>
                 <h:panelGrid 
                     id="crud_2d_dlg_panel"
@@ -219,7 +224,7 @@
                                     myrequired="#{myField.required}"
                                     rendered="#{myField.rendered}"
                                     myconverter="#{myField.myconverter}"
-                                    isAjax="#{myField.ajax}"
+                                    isAjax="#{myField.ajax.enable}"
                                     ajax_update="#{myField.ajaxUpdate}"
                                     />
                             </c:if>
@@ -237,7 +242,7 @@
                                 minQueryLength="3"    
                                 inputStyle="width:335px;"
                                 >
-                                <c:if test="#{myField.ajax}">
+                                <c:if test="#{myField.ajax.enable}">
                                     <f:attribute name="fieldKey" value="#{myField.key}"/>
                                     <p:ajax 
                                         event="itemSelect" 
@@ -267,6 +272,8 @@
                                 myConverter="#{myField.myconverter}"
                                 myConverterInstance="#{myField.converterInstance}" 
                                 myConverterFormat="#{myField.converterFormat}" 
+                                myConverterParam="#{myField.converterParam}"
+                                myMinStrLength="#{myField.converterMinStrLength}" 
                                 crudObject="#{twoDimModifyCtrl.myObject}"
                                 myMaxValue="#{myField.maxValue}" 
                                 shouldCheckNegative="#{myField.shouldCheckNegative}"
