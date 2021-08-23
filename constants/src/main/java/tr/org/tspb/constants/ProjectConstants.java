@@ -99,6 +99,7 @@ public class ProjectConstants {
     public static final String CONVERTER_PARAM = "converterParam";
     public static final String CONVERTER_INSTANCE = "converterInstance";
     public static final String CONVERTER_FORMAT = "converterFormat";
+    public static final String CONVERTER_MIN_STR_LENGTH = "min-str-length";
     public static final String CONSTRAINTS = "constraints";
     public static final String CONTROL_FUNCTION = "controlFunction";
     public static final String CONTROL_RESULT = "controlResult";
@@ -352,8 +353,9 @@ public class ProjectConstants {
     public static final String REF_COLLECTION = "refCollection";
     public static final String ROW_LIST = "rowList";
     public static final String REGISTRED_FUNC_NAME = "registred-func-name";
-    //S
+    public static final String RELATIONS_PRESENTATION = "relationsPresentation";
 
+    //S
     public static final String ACTION_CHECK_ALL = "checkAll";
     public static final String ACTION_NEW = "new";
     public static final String ACTION_DOWNLOAD = "download";
