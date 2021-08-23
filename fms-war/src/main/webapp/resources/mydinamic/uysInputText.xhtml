@@ -25,6 +25,7 @@
         <composite:attribute name="myCalculateOnSave"/>
         <composite:attribute name="myrequired"/>
         <composite:attribute name="myMaxValue"/>
+        <composite:attribute name="myMinStrLength"/>
         <composite:attribute name="shouldCheckNegative"/>
     </composite:interface>
 
@@ -48,6 +49,7 @@
             <f:attribute name="shouldCheckNegative" value="#{cc.attrs.shouldCheckNegative}"/>
             <f:attribute name="trequired" value="#{cc.attrs.myrequired}"/>
             <f:attribute name="maxValue" value="#{cc.attrs.myMaxValue}"/>
+            <f:attribute name="myMinStrLength" value="#{cc.attrs.myMinStrLength}"/>
         </h:inputText>
     </composite:implementation>
 </html>
