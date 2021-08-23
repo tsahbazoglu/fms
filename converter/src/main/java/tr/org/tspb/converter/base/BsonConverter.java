@@ -1,12 +1,19 @@
 package tr.org.tspb.converter.base;
 
+import java.text.MessageFormat;
 import java.util.List;
+import javax.faces.application.FacesMessage;
 import javax.faces.component.UIComponent;
 import javax.faces.component.UIOutput;
 import javax.faces.component.UISelectOne;
 import javax.faces.context.FacesContext;
 import javax.faces.convert.Converter;
+import javax.faces.convert.ConverterException;
 import org.bson.Document;
+import org.bson.types.ObjectId;
+import static tr.org.tspb.converter.base.ConverterAttrs.LABEL;
+import static tr.org.tspb.converter.base.ConverterAttrs.TREQUIRED;
+import tr.org.tspb.converter.props.MessageBundleLoader;
 import tr.org.tspb.dao.MyField;
 
 /**
@@ -15,8 +22,19 @@ import tr.org.tspb.dao.MyField;
  */
 public class BsonConverter implements Converter {
 
+    public static final String NULL_VALUE = "BSON_CONVERTER_NULL_VALUE";
+
     @Override
-    public Object getAsObject(FacesContext fc, UIComponent uic, String value) {
+    public Object getAsObject(FacesContext fc, UIComponent component, String value) {
+        String label = (String) component.getAttributes().get(LABEL);
+        Boolean required = Boolean.TRUE.equals(component.getAttributes().get(TREQUIRED));
+        if (required && NULL_VALUE.equals(value)) {
+            FacesMessage facesMessageRequired = new FacesMessage(//
+                    FacesMessage.SEVERITY_ERROR, //
+                    MessageFormat.format("[{0}] {1}", label, MessageBundleLoader.getMessage("requiredMessage")),//
+                    "*");
+            throw new ConverterException(facesMessageRequired);
+        }
         return value;
     }
 
@@ -51,7 +69,7 @@ public class BsonConverter implements Converter {
                 if (component instanceof UISelectOne) {
                     return valueKey;
                 } else if (component instanceof UIOutput) {
-                    return myField.getCacheBsonConverter().getOrDefault(valueKey, "alan hafızasında code testip edilemedi".concat(valueKey));
+                    return myField.getCacheBsonConverter().getOrDefault(valueKey, "alan hafızasında code tespit edilemedi".concat(valueKey));
                 } else {
                     System.out.println("exception");
                 }
