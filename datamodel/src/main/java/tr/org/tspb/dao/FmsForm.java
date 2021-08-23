@@ -168,6 +168,14 @@ public interface FmsForm {
             UserDetail userDetail,
             Document filter);
 
+    public void runAjaxList(MyField myField,
+            Map<String, MyField> componentMap,
+            final FmsForm selectedForm,
+            MyMap crudObject,
+            RoleMap roleMap,
+            UserDetail userDetail,
+            Document filter);
+
     public void runAjax__uys_member_generate_ldapUID(Map crudObject);
 
     public List<String> getFieldsRowKeys();
