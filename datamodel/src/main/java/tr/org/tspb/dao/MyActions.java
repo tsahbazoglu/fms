@@ -339,18 +339,22 @@ public class MyActions {
                 switch (key) {
                     case ACTION_SAVE:
                         myActions.saveAction = new TagActionsAction(enable, enableResult, action,
-                                myActions.myForm.getMyProject().getRegistredFunctions(), searchObject, userDetail);
+                                myActions.myForm.getMyProject().getRegistredFunctions(),
+                                searchObject, userDetail, fmsScriptRunner);
                         break;
                     case ACTION_CHECK_ALL:
                         myActions.checkAllAction = new TagActionsAction(enable, enableResult, action,
-                                myActions.myForm.getMyProject().getRegistredFunctions(), searchObject, userDetail);
+                                myActions.myForm.getMyProject().getRegistredFunctions(),
+                                searchObject, userDetail, fmsScriptRunner);
                         break;
                     case ACTION_SEND_FROMS:
                         myActions.sendFormAction = new TagActionsAction(enable, enableResult, action,
-                                myActions.myForm.getMyProject().getRegistredFunctions(), searchObject, userDetail);
+                                myActions.myForm.getMyProject().getRegistredFunctions(),
+                                searchObject, userDetail, fmsScriptRunner);
                     case ACTION_NORECORD:
                         myActions.norecordAction = new TagActionsAction(enable, enableResult, action,
-                                myActions.myForm.getMyProject().getRegistredFunctions(), searchObject, userDetail);
+                                myActions.myForm.getMyProject().getRegistredFunctions(),
+                                searchObject, userDetail, fmsScriptRunner);
                         break;
                 }
 
