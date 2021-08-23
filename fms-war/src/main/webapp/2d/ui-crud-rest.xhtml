@@ -222,7 +222,7 @@
                                 myrequired="#{myField.required}"
                                 rendered="#{twoDimModifyCtrl.selectOneMenu eq  myField.componentType and myField.rendered}"
                                 myconverter="#{myField.myconverter}"
-                                isAjax="#{myField.ajax}"
+                                isAjax="#{myField.ajax.enable}"
                                 ajax_update="#{myField.ajaxUpdate}"
                                 />
                             <p:autoComplete 
@@ -386,7 +386,7 @@
                                     myrequired="#{myField.required}"
                                     rendered="#{twoDimModifyCtrl.selectOneMenu eq  myField.componentType and myField.rendered}"
                                     myconverter="#{myField.myconverter}"
-                                    isAjax="#{myField.ajax}"
+                                    isAjax="#{myField.ajax.enable}"
                                     ajax_update="#{myField.ajaxUpdate}"
                                     myStyle="width:50px;"
                                     />
