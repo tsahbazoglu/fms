@@ -2,7 +2,6 @@ package tr.org.tspb.dao;
 
 import java.util.List;
 import static tr.org.tspb.constants.ProjectConstants.*;
-import java.util.Map;
 import org.bson.Document;
 
 /**
@@ -23,8 +22,9 @@ public class MyProject {
     private final String loginDetailLdapUID;
     private final String key;
     private Document registredFunctions;
+    private Document jsonSchemaDef;
 
-    public MyProject(Map docProject, String loginDetailDb, String loginDetailTable, String loginDetailLdapUID, Document loginDetailQuery) {
+    public MyProject(Document docProject, String loginDetailDb, String loginDetailTable, String loginDetailLdapUID, Document loginDetailQuery) {
         this.configCollection = docProject.get(CONFIG_COLLECTIONS).toString();
         this.adminRole = docProject.get(ADMIN_ROLE).toString();
         this.adminAndViewerRole = adminRole;
@@ -45,6 +45,8 @@ public class MyProject {
         this.loginDetailQuery = loginDetailQuery;
 
         this.maskRegistredFunctions(new Document(docProject));
+
+        this.jsonSchemaDef = docProject.get("json-schema-def", Document.class);
 
     }
 
@@ -94,6 +96,10 @@ public class MyProject {
 
     public String getKey() {
         return key;
+    }
+
+    public Document getJsonSchemaDef() {
+        return jsonSchemaDef;
     }
 
     public final void maskRegistredFunctions(Document docProject) {
