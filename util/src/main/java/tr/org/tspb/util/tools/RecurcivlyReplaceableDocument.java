@@ -38,23 +38,27 @@ public class RecurcivlyReplaceableDocument {
 
         for (String key : document.keySet()) {
             Object value = document.get(key);
-            if (value instanceof ObjectId) {
-                result.put(key.replace(DIEZ, DOLAR).replace("!DOT!", "."), value);
+
+            String key_ = key.replace(DIEZ, DOLAR).replace("!DOT!", ".");
+
+            if (value == null) {
+                result.put(key_, value);
+            } else if (value instanceof ObjectId) {
+                result.put(key_, value);
             } else if (value instanceof List) {
-                result.put(key.replace(DIEZ, DOLAR).replace("!DOT!", "."), value);
+                result.put(key_, value);
             } else if (value instanceof Document) {
-                result.put(key.replace(DIEZ, DOLAR).replace("!DOT!", "."), new RecurcivlyReplaceableDocument((Document) value).replaceToDollar());
+                result.put(key_, new RecurcivlyReplaceableDocument((Document) value).replaceToDollar());
             } else if (value instanceof Code) {
                 value = new Code(value.toString().replace(DIEZ, DOLAR).replace("!DOT!", "."));
-                key = key.replace(DIEZ, DOLAR).replace("!DOT!", ".");
-                result.put(key, value);
+                result.put(key_, value);
             } else if (value instanceof Number) {
-                result.put(key.replace(DIEZ, DOLAR).replace("!DOT!", "."), value);
+                result.put(key_, value);
             } else if (value instanceof List) {
-                result.put(key.replace(DIEZ, DOLAR).replace("!DOT!", "."), value);
+                result.put(key_, value);
             } else {
                 value = value.toString().replace(DIEZ, DOLAR).replace("!DOT!", ".");
-                result.put(key.replace(DIEZ, DOLAR).replace("!DOT!", "."), value);
+                result.put(key_, value);
             }
         }
 
