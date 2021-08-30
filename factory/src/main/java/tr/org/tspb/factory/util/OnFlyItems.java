@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.Map;
 import javax.faces.model.SelectItem;
 import org.bson.Document;
+import org.bson.conversions.Bson;
 import org.bson.types.Code;
 import tr.org.tspb.constants.ProjectConstants;
 import static tr.org.tspb.constants.ProjectConstants.CODE;
@@ -336,7 +337,8 @@ public class OnFlyItems implements FmsAutoComplete {
                 items.add(new SelectItem(((ConverterAttrs) myField.getMyconverter()).getNullValue(), SELECT_PLEASE));//FIXME Generalize NULL statemnet. use somthing like NullPttern
             } else if (myField.getMyconverter() instanceof BsonConverter) {
                 if (!ComponentType.selectManyListbox.name().equals(myField.getComponentType())) {
-                    items.add(new SelectItem(null, SELECT_PLEASE));//FIXME Generalize NULL statemnet. use somthing like NullPttern
+                    //FIXME Generalize NULL statemnet. use somthing like NullPttern
+                    items.add(new SelectItem(BsonConverter.NULL_VALUE, SELECT_PLEASE));
                 }
             } else {
                 throw new UnsupportedOperationException("engine does not support this type of converter.");
