@@ -335,10 +335,10 @@ public abstract class PivotImpl implements Serializable, PivotApi {
             componentMap.get(key).put(CONVERTER_FORMAT, converterFormat);
             componentMap.get(key).put(CALCULATE_ON_SAVE, calculateOnSave);
             componentMap.get(key).put(CALCULATE_ON_CRUD_VIEW, calculateOnCrudView);
-            componentMap.get(key).put(IS_AJAX, Boolean.TRUE.equals(fieldStructure.isAjax()));
-            if (fieldStructure.getAjaxEffectedKeys() != null) {
+            componentMap.get(key).put(IS_AJAX, Boolean.TRUE.equals(fieldStructure.getAjax().isEnable()));
+            if (fieldStructure.getAjax().getEffectedKeys() != null) {
                 String ajaxUpdate = "";
-                for (String ajaxKey : fieldStructure.getAjaxEffectedKeys()) {
+                for (String ajaxKey : fieldStructure.getAjax().getEffectedKeys()) {
                     ajaxUpdate += ":crud2dForm:label_".concat(ajaxKey).concat(COMMA);
                     ajaxUpdate += ":crud2dForm:component_".concat(ajaxKey).concat(COMMA);
                 }
