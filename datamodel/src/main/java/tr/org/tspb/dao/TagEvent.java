@@ -5,6 +5,7 @@
  */
 package tr.org.tspb.dao;
 
+import java.util.List;
 import org.bson.Document;
 import static tr.org.tspb.constants.ProjectConstants.COLLECTION;
 import static tr.org.tspb.constants.ProjectConstants.MESSAGE;
@@ -58,6 +59,18 @@ public class TagEvent {
 
         tagEvent.table = docEvent.getString(COLLECTION);
         tagEvent.msg = docEvent.getString(MESSAGE);
+
+        List<String> ul = docEvent.getList("ul", String.class);
+        if (ul != null) {
+            StringBuilder sb = new StringBuilder();
+            sb.append("<ul>");
+            for (String string : ul) {
+                sb.append("<li>").append(string).append("</li>");
+            }
+            sb.append("</ul>");
+            tagEvent.msg = sb.toString();
+        }
+
         tagEvent.jsFunction = docEvent.getString("jsFunction");
 
         tagEvent.cacheQuery = docEvent.get("cacheQuery", Document.class);
