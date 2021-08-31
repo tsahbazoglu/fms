@@ -74,9 +74,9 @@ import tr.org.tspb.dao.MyActions;
 import tr.org.tspb.dao.MyBaseRecord;
 import tr.org.tspb.dao.MyItems;
 import tr.org.tspb.dao.FmsFormProperty;
+import tr.org.tspb.dao.TagEvent;
 import tr.org.tspb.dp.nullobj.PlainRecordData;
 import tr.org.tspb.factory.qualifier.OgmCreatorQualifier;
-import tr.org.tspb.outsider.EsignDoor;
 import tr.org.tspb.outsider.PaymentDoor;
 import tr.org.tspb.outsider.qualifier.DefaultPaymentDoor;
 import tr.org.tspb.util.qualifier.KeepOpenQualifier;
@@ -85,6 +85,7 @@ import tr.org.tspb.factory.cp.OgmCreatorIntr;
 import tr.org.tspb.outsider.qualifier.MyWorkFlowQualifier;
 import tr.org.tspb.pojo.DatabaseUser;
 import tr.org.tspb.service.FeatureService;
+import tr.org.tspb.tags.FmsCheck;
 
 /*
  * @author Telman Şahbazoğlu
@@ -585,6 +586,7 @@ public class TwoDimModifyCtrl extends FmsTable implements ActionListener {
             ctrlService.crossCheck(filterClone);
             callAdditionalAction(filterClone, formService.getMyForm().getMyActions().getCheckAllAction());
             resetActions();
+            ((FmsTableDataModel) getData()).initRowCount(findDataCount());
         } catch (Exception ex) {
             logger.error("error occured", ex);
             dialogController.showPopupError(ex.getMessage());
@@ -598,6 +600,33 @@ public class TwoDimModifyCtrl extends FmsTable implements ActionListener {
 
         if (fmsAction.isEnable() && fmsAction.getActionFunc() != null) {
             mongoDbUtil.runCommand(fmsAction.getDb(), fmsAction.getActionFunc(), filter, loginController.getRolesAsSet());
+        }
+
+        if (fmsAction.isEnable() && fmsAction.getOperations() != null) {
+
+            List<FmsCheck> fmsChecks = fmsAction.getCheckList();
+
+            Boolean ifcase = null;
+
+            if (fmsChecks != null) {
+                for (FmsCheck fmsCheck : fmsChecks) {
+                    ifcase = (ifcase == null) ? fmsCheck.execute() : ifcase && fmsCheck.execute();
+                }
+            }
+
+            for (TagActionsAction.Operation operation : fmsAction.getOperations()) {
+                if (ifcase == null || operation.getIfcase() == ifcase) {
+                    switch (operation.getOp()) {
+                        case "upsert":
+                            mongoDbUtil.upsertOne(operation.getDb(), operation.getTable(), operation.getFilter(), operation.getSet());
+                            break;
+                        case "update":
+                            mongoDbUtil.updateMany(operation.getDb(), operation.getTable(), operation.getFilter(), operation.getSet());
+                            break;
+                    }
+                }
+            }
+
         }
     }
 
@@ -642,7 +671,7 @@ public class TwoDimModifyCtrl extends FmsTable implements ActionListener {
     public String saveObject(MyCommandResult smControlResult)
             throws UserException, NullNotExpectedException, FormConfigException, MessagingException, LdapException, ScriptException, NoSuchMethodException, EvaluationException, MongoOrmFailedException, ParseException, MoreThenOneInListException, RecursiveLimitExceedException, net.sourceforge.jeval.EvaluationException {
 
-        if (runEventPreSave(filterService.getTableFilterCurrent())) {
+        if (runEventPreSave(filterService.getTableFilterCurrent(), crudObject)) {
             return null;
         }
 
@@ -691,22 +720,29 @@ public class TwoDimModifyCtrl extends FmsTable implements ActionListener {
     public String saveAsObject() {
         try {
 
-            if (formService.getMyForm().getEventPreSave() != null) {
-                String db = formService.getMyForm().getEventPreSave().getDb();
-                String code = formService.getMyForm().getEventPreSave().getJsFunction();
-                if (db != null) {
-                    Document commandResult = mongoDbUtil.runCommand(db, code, filterService.getTableFilterCurrent(), crudObject);
-                    if (commandResult.getBoolean(RETVAL)) {
-                        dialogController.showPopupInfoWithOk("<ul>"
-                                + "<li><font color='red'>Kaydetme İşlemi Gerçekleştirilemedi.</font></li>"
-                                + "<li>\"Birlik Temsilcisi\" yalnız bir defa seçilebilmektedir. <br/>Daha önce seçim yaptınız.</li>"
-                                + "</ul>", MESSAGE_DIALOG);
-                        return null;
-                    }
-                }
+            if (crudObject.get(MONGO_ID) == null) {
+                saveObject();
+                return null;
             }
 
-            Object loginFkFieldValue = crudObject.get(formService.getMyForm().getLoginFkField());
+            MyMap crud = (MyMap) crudObject.clone();
+
+            StringBuilder message = new StringBuilder();
+            if (crud.get(NOTE) != null) {
+                message.append(crud.get(NOTE).toString());
+            }
+            message.append(". kopyalanarak oluşturuldu. original ID : ");
+            message.append(crud.get(MONGO_ID).toString());
+
+            crud.remove(MONGO_ID);
+
+            crud.put(NOTE, message.toString());
+
+            if (runEventPreSave(filterService.getTableFilterCurrent(), crud)) {
+                return null;
+            }
+
+            Object loginFkFieldValue = crud.get(formService.getMyForm().getLoginFkField());
 
             boolean ok = loginController.isUserInRole(formService.getMyForm().getMyProject().getAdminRole());
             ok = ok || loginController.getLoggedUserDetail().getDbo().getObjectId().equals(loginFkFieldValue);
@@ -722,17 +758,7 @@ public class TwoDimModifyCtrl extends FmsTable implements ActionListener {
                 throw new Exception("Sisteme girş yapan kullanıcı yalnızca kendisine ait veri ekleyip değiştirebilir.");
             }
 
-            StringBuilder message = new StringBuilder();
-            if (crudObject.get(NOTE) != null) {
-                message.append(crudObject.get(NOTE).toString());
-            }
-            message.append(". kopyalanarak oluşturuldu. original ID : ");
-            message.append(crudObject.get(MONGO_ID).toString());
-
-            crudObject.remove(MONGO_ID);
-            crudObject.put(NOTE, message.toString());
-
-            ObjectId returnID = saveObject(formService.getMyForm(), loginController, crudObject);
+            ObjectId returnID = saveObject(formService.getMyForm(), loginController, crud);
 
             retrieveObjectFromDB(new Document(MONGO_ID, returnID), true);
 
@@ -744,7 +770,6 @@ public class TwoDimModifyCtrl extends FmsTable implements ActionListener {
 
             formService.getMyForm().runAjaxBulk(getComponentMap(), crudObject, loginController.getRoleMap(), loginController.getLoggedUserDetail());
             dialogController.showPopup(CRUD_OPERATION_DIALOG2);
-            //showPopup("İç Kontrol", "", "2d_dialogControlAndSave");
         } catch (UserException ex) {
             logger.error(ex.getMessage());
             dialogController.showPopup(ex.getTitle(), ex.getMessage(), MESSAGE_DIALOG);
@@ -759,10 +784,13 @@ public class TwoDimModifyCtrl extends FmsTable implements ActionListener {
         return mapRequired;
     }
 
-    private void retrieveObjectFromDB(Map map, Boolean recall) throws FormConfigException {
+    private MyMap retrieveObjectFromDB(Map map, Boolean recall) throws FormConfigException {
 
         if (recall) {
-            map = mongoDbUtil.findOne(formService.getMyForm().getDb(), formService.getMyForm().getTable(), new Document(MONGO_ID, map.get(MONGO_ID)));
+            map = mongoDbUtil
+                    .findOne(formService.getMyForm().getDb(),
+                            formService.getMyForm().getTable(),
+                            new Document(MONGO_ID, map.get(MONGO_ID)));
         }
 
         ctrlService.checkRecordConverterValueType(new Document(map), formService.getMyForm());
@@ -796,6 +824,8 @@ public class TwoDimModifyCtrl extends FmsTable implements ActionListener {
         } else {
             httpSession.removeAttribute(HTTP_SESSION_ATTR_MAP_REQURED_CONTROL);
         }
+
+        return crudObject;
     }
 
     protected Map<String, List> internalCheck()
@@ -984,6 +1014,11 @@ public class TwoDimModifyCtrl extends FmsTable implements ActionListener {
         drawGUI(myForm, filterService.getBaseFilterCurrent());
         formService.getMyForm().runAjaxBulk(getComponentMap(), crudObject,
                 loginController.getRoleMap(), loginController.getLoggedUserDetail());
+
+        TagEvent trigger = myForm.getEventFormSelection();
+        if (trigger != null && TagEvent.TagEventType.showWarnErrPopup.equals(trigger.getType())) {
+            dialogController.showPopupInfoWithOk(trigger.getMsg(), MESSAGE_DIALOG);
+        }
 
     }
 
@@ -1174,16 +1209,35 @@ public class TwoDimModifyCtrl extends FmsTable implements ActionListener {
             TimeZone timeZone = TimeZone.getTimeZone("Asia/Istanbul");
             SIMPLE_DATE_FORMAT__3.setTimeZone(timeZone);
 
-            successMessage = String.format(successMessage, SIMPLE_DATE_FORMAT__3.format(new Date()),
-                    mongoDbUtil.findOne("uysdb", "common", Filters.and(
-                            Filters.eq(FORMS, PERIOD),
-                            Filters.eq(MONGO_ID, getSearchObjectValue(PERIOD)))).getString(NAME));
+            MyField periodField = formService.getMyForm().getFields().get(PERIOD);
+
+            String periodName = null;
+
+            if (periodField != null) {
+                periodName = mongoDbUtil.findOne(
+                        periodField.getItemsAsMyItems().getDb(),
+                        periodField.getItemsAsMyItems().getTable(),
+                        Filters.and(
+                                Filters.eq(FORMS, PERIOD),
+                                Filters.eq(MONGO_ID, getSearchObjectValue(PERIOD)))).getString(NAME);
+            }
+
+            successMessage = String.format("%s - ".concat(successMessage).concat(". Gönderim Tarihi :  %s"),
+                    periodName, SIMPLE_DATE_FORMAT__3.format(new Date()));
 
             String myActionType = formService.getMyForm().getMyActions().getSendFormAction().getEnableResult().getMyActionType();
             String javaFunc = formService.getMyForm().getMyActions().getSendFormAction().getEnableResult().getJavaFunc();
             String code = formService.getMyForm().getMyActions().getSendFormAction().getEnableResult().getMyaction();
 
-            if (myActionType == null) {
+            List<TagActionsAction.Operation> operaiotns = formService.getMyForm().getMyActions().getSendFormAction().getOperations();
+
+            if (operaiotns != null && !operaiotns.isEmpty()) {
+                callAdditionalAction(filterService.getTableFilterCurrent(), formService.getMyForm().getMyActions().getSendFormAction());
+                putSearchObjectValue(PERIOD, SelectOneObjectIdConverter.NULL_VALUE);
+                resetActions();
+                actionSearchObject();
+                dialogController.showPopupInfo(successMessage, MESSAGE_DIALOG);
+            } else if (myActionType == null) {
                 if (code == null) {
                     dialogController.showPopupWarning("Bu olay üzerinde eylem tanımlı değil.<br/>Sistem yöneticisi ile iletişime geçiniz.", MESSAGE_DIALOG);
                 } else {
@@ -1425,7 +1479,7 @@ public class TwoDimModifyCtrl extends FmsTable implements ActionListener {
             }
 
             MyField myField = formService.getMyForm().getField(fieldKey);
-            String ajaxAction = myField.getAjaxAction();
+            String ajaxAction = myField.getAjax().getAction();
 
             if (ajaxAction == null) {
                 return;
@@ -1460,6 +1514,10 @@ public class TwoDimModifyCtrl extends FmsTable implements ActionListener {
                     break;
                 case "render-ref":
                     formService.getMyForm().runAjaxRenderRef(myField, getComponentMap(), formService.getMyForm(), crudObject,
+                            loginController.getRoleMap(), loginController.getLoggedUserDetail(), filterService.getTableFilterCurrent());
+                    break;
+                case "list":
+                    formService.getMyForm().runAjaxList(myField, getComponentMap(), formService.getMyForm(), crudObject,
                             loginController.getRoleMap(), loginController.getLoggedUserDetail(), filterService.getTableFilterCurrent());
                     break;
                 default:
