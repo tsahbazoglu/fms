@@ -468,6 +468,12 @@ public class MyItems {
         }
     }
 
+    public void changeDbTableQuery(String db, String table, Document query) {
+        this.db = db;
+        this.table = table;
+        this.query = query;
+    }
+
     public void reCreateQuery(ObjectId loginMemberId, Map filter, MyMap crudObject, RoleMap roleMap, FmsScriptRunner fmsScriptRunner) {
         if (queryCode != null) {
             Document tempDbObject = new Document(crudObject);
@@ -562,6 +568,7 @@ public class MyItems {
             String key = d.get("key", String.class);
 
             Document refValue = d.get("ref-value", Document.class);
+            Document inRef = d.get("in-ref", Document.class);
             String fmsValue = d.get("fms-value", String.class);
             String strValue = d.get("string-value", String.class);
             Number numberValue = d.get("number-value", Number.class);
@@ -569,7 +576,11 @@ public class MyItems {
             List<Number> listOfNumber = d.getList("array-number", Number.class);
 
             if (refValue != null) {
-                result.put(key, new TagItemsQueryRef(refValue, filter, fmsScriptRunner).value());
+                result.put(key,
+                        new TagItemsQueryRef(refValue, filter, fmsScriptRunner, loginMemberId).value());
+            } else if (inRef != null) {
+                result.put(key, new Document(DOLAR_IN,
+                        new TagItemsQueryRef(inRef, filter, fmsScriptRunner, loginMemberId).values()));
             } else if (fmsValue != null) {
                 switch (fmsValue) {
                     case ProjectConstants.REPLACEABLE_KEY_WORD_FOR_FUNCTONS_FILTER_PERIOD:
