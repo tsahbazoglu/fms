@@ -144,6 +144,10 @@
         <group-name>gsuser</group-name>
     </security-role-mapping>
     <security-role-mapping>
+        <role-name>gsyoout</role-name>
+        <group-name>gsyoout</group-name>
+    </security-role-mapping>
+    <security-role-mapping>
         <role-name>mkuser</role-name>
         <group-name>mkuser</group-name>
     </security-role-mapping>
