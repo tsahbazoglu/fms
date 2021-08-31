@@ -162,7 +162,7 @@ public abstract class FmsTable extends FmsTableView {
         this.componentMap = componentMap;
     }
 
-    public boolean runEventPreSave(Map query) {
+    public boolean runEventPreSave(Map query, MyMap crud) {
 
         if (formService.getMyForm().getEventPreSave() == null) {
             return false;
@@ -179,7 +179,7 @@ public abstract class FmsTable extends FmsTableView {
             return true;
         }
 
-        Document myCrudObject = new Document(crudObject);
+        Document myCrudObject = new Document(crud);
         myCrudObject.remove(INODE);// we remove it bacuase of MyForm class cannot be serialized for mongo.doEval
 
         String code = formService.getMyForm().getEventPreSave().getJsFunction();
