@@ -130,6 +130,7 @@
             <role-name>pyuser</role-name>
             <role-name>gyuser</role-name>
             <role-name>gsuser</role-name>
+            <role-name>gsyoout</role-name>
             <role-name>mkuser</role-name>
             <role-name>bnkuser</role-name>
             <role-name>ktbuser</role-name>
@@ -279,6 +280,10 @@
     <security-role>
         <description/>
         <role-name>gsuser</role-name>
+    </security-role>
+    <security-role>
+        <description/>
+        <role-name>gsyoout</role-name>
     </security-role>
     <security-role>
         <description/>
