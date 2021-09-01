@@ -619,12 +619,14 @@ public class RepositoryService implements Serializable {
         return record;
     }
 
-    public MyActions getAndCacheMyAction(FmsForm myFormLarge) {
+    public MyActions getAndCacheMyAction(FmsForm myFormLarge, Document filter) {
         String cacheKey = createCachActionsKey(myFormLarge);
         MyActions myActions = appScopeSrvCtrl.getCacheActions(cacheKey);
         // if (myActions == null) {
         myActions = ogmCreator
-                .getMyActions(myFormLarge, loginController.getRoleMap(), filterService.getBaseFilterCurrent(), loginController.getLoggedUserDetail());
+                .getMyActions(myFormLarge, loginController.getRoleMap(),
+                        filter,
+                        loginController.getLoggedUserDetail());
         appScopeSrvCtrl.putCacheActions(cacheKey, myActions);
         // }
         return myActions;
