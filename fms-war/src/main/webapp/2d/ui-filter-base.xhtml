@@ -47,7 +47,7 @@
                         >
                         <p:ajax 
                             listener="#{twoDimModifyCtrl.valueChangeListenerTableSearch}"
-                            update="#{updateAjaxMB.action2DSearch}"
+                            update="#{updateAjaxMB.action2DSearch},#{updateAjaxMB.btnCheckAll}"
                             />
                         <f:selectItems value="#{columnMap.selectItemsCurrent}"/>  
                         <f:attribute name="myField" value="#{columnMap}"/>
@@ -91,16 +91,18 @@
                     </p:inputText> 
                 </h:panelGroup>
             </c:forEach>
-            <p:button
-                onclick="rcBaseFilter();return false;"
-                value="ara"
-                >
-            </p:button>
-            <p:button
-                onclick="rcBaseFilterReset();return false;"
-                value="sıfırla"
-                >
-            </p:button>
+            <h:panelGroup>
+                <p:button
+                    onclick="rcBaseFilter();return false;"
+                    value="ara"
+                    >
+                </p:button>
+                <p:button
+                    onclick="rcBaseFilterReset();return false;"
+                    value="sıfırla"
+                    >
+                </p:button>
+            </h:panelGroup>
         </p:panelGrid> 
 
         <p:remoteCommand 
