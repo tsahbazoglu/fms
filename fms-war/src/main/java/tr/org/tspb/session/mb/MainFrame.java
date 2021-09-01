@@ -43,6 +43,7 @@ import tr.org.tspb.common.services.LoginController;
 import tr.org.tspb.common.services.MailService;
 import htmlflow.StaticHtml;
 import java.io.Serializable;
+import org.bson.Document;
 import org.primefaces.model.menu.MenuModel;
 import org.slf4j.Logger;
 import tr.org.tspb.common.services.AppScopeSrvCtrl;
@@ -735,7 +736,8 @@ public class MainFrame implements Serializable {
         filterService.createBaseFilter(myFormXs);
         FmsForm myFormLarge = repositoryService
                 .getMyFormLargeWithBaseFilter(myProject, formKey);
-        myFormLarge.initActions(repositoryService.getAndCacheMyAction(myFormLarge));
+        myFormLarge.initActions(repositoryService.getAndCacheMyAction(myFormLarge,
+                filterService.getBaseFilterCurrent()));
         if (loginController.isUserInRole(formService.getMyForm().getMyProject().getAdminAndViewerRole())) {
             currEnumPage = EnumPage.FREE_FORM_DAYANAK_VARLILARI_2D;
         } else if (loginController.isUserInRole(formService.getMyForm().getMyProject().getUserRole())) {
@@ -753,7 +755,8 @@ public class MainFrame implements Serializable {
         FmsForm myFormLarge = repositoryService
                 .getMyFormLargeWithBaseFilter(myProject, formKey);
 
-        myFormLarge.initActions(repositoryService.getAndCacheMyAction(myFormLarge));
+        myFormLarge.initActions(repositoryService.getAndCacheMyAction(myFormLarge,
+                filterService.getBaseFilterCurrent()));
 
         if (loginController.isUserInRole(myFormLarge.getMyProject().getAdminAndViewerRole())) {
             currEnumPage = EnumPage.FREE_FORM_2D;
@@ -774,7 +777,8 @@ public class MainFrame implements Serializable {
         FmsForm myFormLarge = repositoryService
                 .getMyFormLargeWithBaseFilter(myProject, myFormXs.getKey());
 
-        myFormLarge.initActions(repositoryService.getAndCacheMyAction(myFormLarge));
+        myFormLarge.initActions(repositoryService.getAndCacheMyAction(myFormLarge,
+                filterService.getBaseFilterCurrent()));
 
         formService.setMyForm(myFormLarge);
 
@@ -821,10 +825,17 @@ public class MainFrame implements Serializable {
             throws NullNotExpectedException, MongoOrmFailedException, Exception {
 
         filterService.createBaseFilter(myFormXs);
+        for (String key : filterService.getBaseFilterCurrent().keySet()) {
+            if (filterService.getGuiFilterCurrent().get(key) == null) {
+                filterService.getGuiFilterCurrent()
+                        .put(key, filterService.getBaseFilterCurrent().get(key));
+            }
+        }
 
         FmsForm myFormLarge = repositoryService.getMyFormLargeWithBaseFilter(myProject, myFormXs.getKey());
 
-        myFormLarge.initActions(repositoryService.getAndCacheMyAction(myFormLarge));
+        myFormLarge.initActions(repositoryService.getAndCacheMyAction(myFormLarge,
+                new Document(filterService.getGuiFilterCurrent())));
 
         formService.setMyForm(myFormLarge);
 
@@ -867,7 +878,8 @@ public class MainFrame implements Serializable {
 
         FmsForm myFormLarge = repositoryService.getMyFormLargeWithBaseFilter(myProject, fmsForm.getKey());
 
-        myFormLarge.initActions(repositoryService.getAndCacheMyAction(myFormLarge));
+        myFormLarge.initActions(repositoryService.getAndCacheMyAction(myFormLarge,
+                filterService.getBaseFilterCurrent()));
 
         formService.setMyForm(myFormLarge);
 
