@@ -34,12 +34,22 @@ public class TelmanStringConverter implements Converter, ConverterAttrs {
         Boolean submitAllow = "true".equals((String) component.getAttributes().get(SUBMITALLOW));
         String label = (String) component.getAttributes().get(LABEL);
         String trequiredDependOnComponentId = (String) component.getAttributes().get(TREQUIREDDEPENDONID);
-        EnumConverterParam converterParam = null;
 
-        if (component.getAttributes().get(CONVERTER_PARAM_NAME) instanceof String) {
-            converterParam = EnumConverterParam.getEnumConverterParam(component.getAttributes().get(CONVERTER_PARAM_NAME).toString());
-        } else if (component.getAttributes().get(CONVERTER_PARAM_NAME) instanceof EnumConverterParam) {
-            converterParam = (EnumConverterParam) component.getAttributes().get(CONVERTER_PARAM_NAME);
+        Integer converterMinStrLength = null;
+
+        if (component.getAttributes().get("myMinStrLength") instanceof Integer) {
+            converterMinStrLength = (Integer) component.getAttributes().get("myMinStrLength");
+        } else {
+            converterMinStrLength = 3;
+        }
+
+        EnumConverterParam converterParam = null;
+        Object converterParamObject = component.getAttributes().get(CONVERTER_PARAM_NAME);
+
+        if (converterParamObject instanceof String) {
+            converterParam = EnumConverterParam.getEnumConverterParam(converterParamObject.toString());
+        } else if (converterParamObject instanceof EnumConverterParam) {
+            converterParam = (EnumConverterParam) converterParamObject;
         }
 
         HttpSession httpSession = (HttpSession) FacesContext.getCurrentInstance().getExternalContext().getSession(false);
@@ -176,6 +186,16 @@ public class TelmanStringConverter implements Converter, ConverterAttrs {
                         } else {
                             throw new ConverterException(facesMessageEmailWrong);
                         }
+                    } else if (value.length() < converterMinStrLength) {
+                        FacesMessage facesMessageEmailWrong = new FacesMessage(//
+                                FacesMessage.SEVERITY_ERROR, //
+                                MessageFormat.format("[{0}] alanı en az {1} harf olmalı", label, converterMinStrLength),//
+                                "*");
+                        if (submitAllow) {
+                            context.addMessage(component.getClientId(context), facesMessageEmailWrong);
+                        } else {
+                            throw new ConverterException(facesMessageEmailWrong);
+                        }
                     }
                     break;
                 case ALPHABETIC:
@@ -260,16 +280,16 @@ public class TelmanStringConverter implements Converter, ConverterAttrs {
                     break;
                 case JSF_ID_CHECK:
                     try {
-                        validateId(value);
-                    } catch (Exception ex) {
-                        FacesMessage facesMessageEmailWrong = new FacesMessage(//
-                                FacesMessage.SEVERITY_ERROR, //
-                                MessageFormat//
-                                        .format("[{0}]\talanı componentId olarak kullanılmaktadır. Girilen değer geçerli ID değil.", label),//
-                                "*");
-                        throw new ConverterException(facesMessageEmailWrong);
-                    }
-                    break;
+                    validateId(value);
+                } catch (Exception ex) {
+                    FacesMessage facesMessageEmailWrong = new FacesMessage(//
+                            FacesMessage.SEVERITY_ERROR, //
+                            MessageFormat//
+                                    .format("[{0}]\talanı componentId olarak kullanılmaktadır. Girilen değer geçerli ID değil.", label),//
+                            "*");
+                    throw new ConverterException(facesMessageEmailWrong);
+                }
+                break;
                 default:
                     ;
             }
