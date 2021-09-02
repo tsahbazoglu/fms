@@ -197,64 +197,7 @@ public class FilterUtil {
             if (value instanceof ObjectId) {
                 modifiedSearchObject.put(field, value);
             } else if (value instanceof String) {
-
-                if (myField.getMyconverter() instanceof BsonConverter) {
-                    modifiedSearchObject.put(field, value);
-                } else if (myField.getMyconverter() instanceof TelmanStringConverter) {
-                    if (value.toString().startsWith("(!=)")) { // NOT EQUAL
-                        modifiedSearchObject.put(entry.getKey(),
-                                new Document(DOLAR_NE, value.toString().substring(4))
-                        );
-                    } else if (value.toString().startsWith("(!%)")) { // NOT LIKE
-                        modifiedSearchObject.put(entry.getKey(),
-                                new Document(DOLAR_OPTIONS, "i")
-                                        .append(DOLAR_REGEX, "^((?!" + value.toString().substring(4) + ").)*$")
-                        );
-                    } else {
-                        // EQUAL
-                        modifiedSearchObject.put(entry.getKey(),
-                                new Document(DOLAR_OPTIONS, "i")
-                                        //.append($REGEX, ((String) value).toUpperCase(new Locale("tr", "TR")))
-                                        .append(DOLAR_REGEX, value)
-                        );
-                    }
-
-                } else if (myField.getMyconverter() instanceof NumberConverter) {
-                    Object valueCopy = value;
-                    // NOT EQUAL
-                    if (value.toString().startsWith("(>)") || value.toString().startsWith("(<)")) {
-                        valueCopy = value.toString().substring(3);
-                    }
-
-                    if ("java.lang.Double".equals(valueType)) {
-                        valueCopy = Double.valueOf(((String) valueCopy).replace(COMMA, DOT));
-                    } else if ("java.lang.Integer".equals(valueType)) {
-                        valueCopy = Integer.valueOf(((String) valueCopy).replace(COMMA, DOT));
-                    } else {
-                        valueCopy = Integer.valueOf(((String) valueCopy).replace(COMMA, DOT));
-                    }
-
-                    if (value.toString().startsWith("(>)")) { // NOT EQUAL
-                        modifiedSearchObject.put(entry.getKey(), new Document(DOLAR_GTE, valueCopy));
-                    } else if (value.toString().startsWith("(<)")) { // NOT EQUAL
-                        modifiedSearchObject.put(entry.getKey(), new Document(DOLAR_LTE, valueCopy));
-                    } else {
-                        modifiedSearchObject.put(entry.getKey(), valueCopy);
-                    }
-
-                } else if ("true".equals(value) || "false".equals(value)) {
-                    modifiedSearchObject.put(entry.getKey(), Boolean.valueOf((String) value));
-                } else if ("java.lang.Integer".equals(valueType)) {
-                    modifiedSearchObject.put(entry.getKey(), Integer.valueOf(((String) value).replace(COMMA, DOT)));
-                } else if ("java.lang.Double".equals(valueType)) {
-                    modifiedSearchObject.put(entry.getKey(), 100 * Double.valueOf(((String) value).replace(COMMA, DOT)));
-                } else {
-                    modifiedSearchObject.put(entry.getKey(),
-                            new Document(DOLAR_OPTIONS, "i")
-                                    .append(DOLAR_REGEX, //((String) value).toUpperCase(new Locale("tr", "TR")))
-                                            value)
-                    );
-                }
+                handlleFilterStrValue(myField, modifiedSearchObject, field, value, entry, valueType);
             }
         }
 
@@ -395,64 +338,7 @@ public class FilterUtil {
             if (value instanceof ObjectId) {
                 modifiedSearchObject.put(field, value);
             } else if (value instanceof String) {
-
-                if (myField.getMyconverter() instanceof BsonConverter) {
-                    modifiedSearchObject.put(field, value);
-                } else if (myField.getMyconverter() instanceof TelmanStringConverter) {
-                    if (value.toString().startsWith("(!=)")) { // NOT EQUAL
-                        modifiedSearchObject.put(entry.getKey(),
-                                new Document(DOLAR_NE, value.toString().substring(4))
-                        );
-                    } else if (value.toString().startsWith("(!%)")) { // NOT LIKE
-                        modifiedSearchObject.put(entry.getKey(),
-                                new Document(DOLAR_OPTIONS, "i")
-                                        .append(DOLAR_REGEX, "^((?!" + value.toString().substring(4) + ").)*$")
-                        );
-                    } else {
-                        // EQUAL
-                        modifiedSearchObject.put(entry.getKey(),
-                                new Document(DOLAR_OPTIONS, "i")
-                                        //.append($REGEX, ((String) value).toUpperCase(new Locale("tr", "TR")))
-                                        .append(DOLAR_REGEX, value)
-                        );
-                    }
-
-                } else if (myField.getMyconverter() instanceof NumberConverter) {
-                    Object valueCopy = value;
-                    // NOT EQUAL
-                    if (value.toString().startsWith("(>)") || value.toString().startsWith("(<)")) {
-                        valueCopy = value.toString().substring(3);
-                    }
-
-                    if ("java.lang.Double".equals(valueType)) {
-                        valueCopy = Double.valueOf(((String) valueCopy).replace(COMMA, DOT));
-                    } else if ("java.lang.Integer".equals(valueType)) {
-                        valueCopy = Integer.valueOf(((String) valueCopy).replace(COMMA, DOT));
-                    } else {
-                        valueCopy = Integer.valueOf(((String) valueCopy).replace(COMMA, DOT));
-                    }
-
-                    if (value.toString().startsWith("(>)")) { // NOT EQUAL
-                        modifiedSearchObject.put(entry.getKey(), new Document(DOLAR_GTE, valueCopy));
-                    } else if (value.toString().startsWith("(<)")) { // NOT EQUAL
-                        modifiedSearchObject.put(entry.getKey(), new Document(DOLAR_LTE, valueCopy));
-                    } else {
-                        modifiedSearchObject.put(entry.getKey(), valueCopy);
-                    }
-
-                } else if ("true".equals(value) || "false".equals(value)) {
-                    modifiedSearchObject.put(entry.getKey(), Boolean.valueOf((String) value));
-                } else if ("java.lang.Integer".equals(valueType)) {
-                    modifiedSearchObject.put(entry.getKey(), Integer.valueOf(((String) value).replace(COMMA, DOT)));
-                } else if ("java.lang.Double".equals(valueType)) {
-                    modifiedSearchObject.put(entry.getKey(), 100 * Double.valueOf(((String) value).replace(COMMA, DOT)));
-                } else {
-                    modifiedSearchObject.put(entry.getKey(),
-                            new Document(DOLAR_OPTIONS, "i")
-                                    .append(DOLAR_REGEX, //((String) value).toUpperCase(new Locale("tr", "TR")))
-                                            value)
-                    );
-                }
+                handlleFilterStrValue(myField, modifiedSearchObject, field, value, entry, valueType);
             }
         }
 
@@ -558,64 +444,7 @@ public class FilterUtil {
             if (filterValue instanceof ObjectId) {
                 modifiedFilter.put(filterField, filterValue);
             } else if (filterValue instanceof String) {
-
-                if (myField.getMyconverter() instanceof BsonConverter) {
-                    modifiedFilter.put(filterField, filterValue);
-                } else if (myField.getMyconverter() instanceof TelmanStringConverter) {
-                    if (filterValue.toString().startsWith("(!=)")) { // NOT EQUAL
-                        modifiedFilter.put(entry.getKey(),
-                                new Document(DOLAR_NE, filterValue.toString().substring(4))
-                        );
-                    } else if (filterValue.toString().startsWith("(!%)")) { // NOT LIKE
-                        modifiedFilter.put(entry.getKey(),
-                                new Document(DOLAR_OPTIONS, "i")
-                                        .append(DOLAR_REGEX, "^((?!" + filterValue.toString().substring(4) + ").)*$")
-                        );
-                    } else {
-                        // EQUAL
-                        modifiedFilter.put(entry.getKey(),
-                                new Document(DOLAR_OPTIONS, "i")
-                                        //.append($REGEX, ((String) value).toUpperCase(new Locale("tr", "TR")))
-                                        .append(DOLAR_REGEX, filterValue)
-                        );
-                    }
-
-                } else if (myField.getMyconverter() instanceof NumberConverter) {
-                    Object valueCopy = filterValue;
-                    // NOT EQUAL
-                    if (filterValue.toString().startsWith("(>)") || filterValue.toString().startsWith("(<)")) {
-                        valueCopy = filterValue.toString().substring(3);
-                    }
-
-                    if ("java.lang.Double".equals(filterType)) {
-                        valueCopy = Double.valueOf(((String) valueCopy).replace(COMMA, DOT));
-                    } else if ("java.lang.Integer".equals(filterType)) {
-                        valueCopy = Integer.valueOf(((String) valueCopy).replace(COMMA, DOT));
-                    } else {
-                        valueCopy = Integer.valueOf(((String) valueCopy).replace(COMMA, DOT));
-                    }
-
-                    if (filterValue.toString().startsWith("(>)")) { // NOT EQUAL
-                        modifiedFilter.put(entry.getKey(), new Document(DOLAR_GTE, valueCopy));
-                    } else if (filterValue.toString().startsWith("(<)")) { // NOT EQUAL
-                        modifiedFilter.put(entry.getKey(), new Document(DOLAR_LTE, valueCopy));
-                    } else {
-                        modifiedFilter.put(entry.getKey(), valueCopy);
-                    }
-
-                } else if ("true".equals(filterValue) || "false".equals(filterValue)) {
-                    modifiedFilter.put(entry.getKey(), Boolean.valueOf((String) filterValue));
-                } else if ("java.lang.Integer".equals(filterType)) {
-                    modifiedFilter.put(entry.getKey(), Integer.valueOf(((String) filterValue).replace(COMMA, DOT)));
-                } else if ("java.lang.Double".equals(filterType)) {
-                    modifiedFilter.put(entry.getKey(), 100 * Double.valueOf(((String) filterValue).replace(COMMA, DOT)));
-                } else {
-                    modifiedFilter.put(entry.getKey(),
-                            new Document(DOLAR_OPTIONS, "i")
-                                    .append(DOLAR_REGEX, //((String) value).toUpperCase(new Locale("tr", "TR")))
-                                            filterValue)
-                    );
-                }
+                handlleFilterStrValue(myField, modifiedFilter, filterField, filterValue, entry, filterType);
             }
         }
 
@@ -719,7 +548,9 @@ public class FilterUtil {
         for (Iterator<String> iterator = filter.keySet().iterator(); iterator.hasNext();) {
             String key = iterator.next();
             Object value = filter.get(key);
-            if ((value == null || SelectOneObjectIdConverter.NULL_VALUE.equals(value))) {
+            if (value == null
+                    || SelectOneObjectIdConverter.NULL_VALUE.equals(value)
+                    || BsonConverter.NULL_VALUE.equals(value)) {
                 iterator.remove();
             }
 
@@ -771,8 +602,11 @@ public class FilterUtil {
                 throw new NullNotExpectedException("field must be defined for ".concat(entry.getKey()));
             }
 
-            if (filterType == null
-                    || filterValue == null
+            if (filterType == null) {
+                throw new NullNotExpectedException("valueType must be defined for ".concat(entry.getKey()));
+            }
+
+            if (filterValue == null
                     || "null".equals(filterValue)
                     || SelectOneStringConverter.NULL_VALUE.equals(filterValue)
                     || filterValue instanceof String && ((String) filterValue).isEmpty()) {
@@ -782,64 +616,7 @@ public class FilterUtil {
             if (filterValue instanceof ObjectId) {
                 modifiedFilter.put(filterField, filterValue);
             } else if (filterValue instanceof String) {
-
-                if (myField.getMyconverter() instanceof BsonConverter) {
-                    modifiedFilter.put(filterField, filterValue);
-                } else if (myField.getMyconverter() instanceof TelmanStringConverter) {
-                    if (filterValue.toString().startsWith("(!=)")) { // NOT EQUAL
-                        modifiedFilter.put(entry.getKey(),
-                                new Document(DOLAR_NE, filterValue.toString().substring(4))
-                        );
-                    } else if (filterValue.toString().startsWith("(!%)")) { // NOT LIKE
-                        modifiedFilter.put(entry.getKey(),
-                                new Document(DOLAR_OPTIONS, "i")
-                                        .append(DOLAR_REGEX, "^((?!" + filterValue.toString().substring(4) + ").)*$")
-                        );
-                    } else {
-                        // EQUAL
-                        modifiedFilter.put(entry.getKey(),
-                                new Document(DOLAR_OPTIONS, "i")
-                                        //.append($REGEX, ((String) value).toUpperCase(new Locale("tr", "TR")))
-                                        .append(DOLAR_REGEX, filterValue)
-                        );
-                    }
-
-                } else if (myField.getMyconverter() instanceof NumberConverter) {
-                    Object valueCopy = filterValue;
-                    // NOT EQUAL
-                    if (filterValue.toString().startsWith("(>)") || filterValue.toString().startsWith("(<)")) {
-                        valueCopy = filterValue.toString().substring(3);
-                    }
-
-                    if ("java.lang.Double".equals(filterType)) {
-                        valueCopy = Double.valueOf(((String) valueCopy).replace(COMMA, DOT));
-                    } else if ("java.lang.Integer".equals(filterType)) {
-                        valueCopy = Integer.valueOf(((String) valueCopy).replace(COMMA, DOT));
-                    } else {
-                        valueCopy = Integer.valueOf(((String) valueCopy).replace(COMMA, DOT));
-                    }
-
-                    if (filterValue.toString().startsWith("(>)")) { // NOT EQUAL
-                        modifiedFilter.put(entry.getKey(), new Document(DOLAR_GTE, valueCopy));
-                    } else if (filterValue.toString().startsWith("(<)")) { // NOT EQUAL
-                        modifiedFilter.put(entry.getKey(), new Document(DOLAR_LTE, valueCopy));
-                    } else {
-                        modifiedFilter.put(entry.getKey(), valueCopy);
-                    }
-
-                } else if ("true".equals(filterValue) || "false".equals(filterValue)) {
-                    modifiedFilter.put(entry.getKey(), Boolean.valueOf((String) filterValue));
-                } else if ("java.lang.Integer".equals(filterType)) {
-                    modifiedFilter.put(entry.getKey(), Integer.valueOf(((String) filterValue).replace(COMMA, DOT)));
-                } else if ("java.lang.Double".equals(filterType)) {
-                    modifiedFilter.put(entry.getKey(), 100 * Double.valueOf(((String) filterValue).replace(COMMA, DOT)));
-                } else {
-                    modifiedFilter.put(entry.getKey(),
-                            new Document(DOLAR_OPTIONS, "i")
-                                    .append(DOLAR_REGEX, //((String) value).toUpperCase(new Locale("tr", "TR")))
-                                            filterValue)
-                    );
-                }
+                handlleFilterStrValue(myField, modifiedFilter, filterField, filterValue, entry, filterType);
             }
         }
 
@@ -858,18 +635,81 @@ public class FilterUtil {
             filter.put(myForm.getLoginFkField(), userDetail.getLoginFkSearchMapInListOfValues());
         }
 
+        // apply projection
         for (Iterator<String> iterator = modifiedFilter.keySet().iterator(); iterator.hasNext();) {
             String key = iterator.next();
             Object value = modifiedFilter.get(key);
-            String filterProjection = myForm.getField(key).getFilterProjection();
-            if (filterProjection != null) {
-                modifiedFilter.remove(key);
-                modifiedFilter.put(filterProjection, value);
+            if (myForm.getField(key) != null) {
+                String filterProjection = myForm.getField(key).getFilterProjection();
+                if (filterProjection != null) {
+                    modifiedFilter.remove(key);
+                    modifiedFilter.put(filterProjection, value);
+                }
             }
         }
 
         return modifiedFilter;
 
+    }
+
+    private void handlleFilterStrValue(MyField myField, Document modifiedFilter, String filterField, Object filterValue, Map.Entry<String, Object> entry, Object filterType) throws NumberFormatException {
+        if (myField.getMyconverter() instanceof BsonConverter) {
+            modifiedFilter.put(filterField, filterValue);
+        } else if (myField.getMyconverter() instanceof TelmanStringConverter) {
+            if (filterValue.toString().startsWith("(!=)")) { // NOT EQUAL
+                modifiedFilter.put(entry.getKey(),
+                        new Document(DOLAR_NE, filterValue.toString().substring(4))
+                );
+            } else if (filterValue.toString().startsWith("(!%)")) { // NOT LIKE
+                modifiedFilter.put(entry.getKey(),
+                        new Document(DOLAR_OPTIONS, "i")
+                                .append(DOLAR_REGEX, "^((?!" + filterValue.toString().substring(4) + ").)*$")
+                );
+            } else {
+                // EQUAL
+                modifiedFilter.put(entry.getKey(),
+                        new Document(DOLAR_OPTIONS, "i")
+                                //.append($REGEX, ((String) value).toUpperCase(new Locale("tr", "TR")))
+                                .append(DOLAR_REGEX, filterValue)
+                );
+            }
+
+        } else if (myField.getMyconverter() instanceof NumberConverter) {
+            Object valueCopy = filterValue;
+            // NOT EQUAL
+            if (filterValue.toString().startsWith("(>)") || filterValue.toString().startsWith("(<)")) {
+                valueCopy = filterValue.toString().substring(3);
+            }
+
+            if ("java.lang.Double".equals(filterType)) {
+                valueCopy = Double.valueOf(((String) valueCopy).replace(COMMA, DOT));
+            } else if ("java.lang.Integer".equals(filterType)) {
+                valueCopy = Integer.valueOf(((String) valueCopy).replace(COMMA, DOT));
+            } else {
+                valueCopy = Integer.valueOf(((String) valueCopy).replace(COMMA, DOT));
+            }
+
+            if (filterValue.toString().startsWith("(>)")) { // NOT EQUAL
+                modifiedFilter.put(entry.getKey(), new Document(DOLAR_GTE, valueCopy));
+            } else if (filterValue.toString().startsWith("(<)")) { // NOT EQUAL
+                modifiedFilter.put(entry.getKey(), new Document(DOLAR_LTE, valueCopy));
+            } else {
+                modifiedFilter.put(entry.getKey(), valueCopy);
+            }
+
+        } else if ("true".equals(filterValue) || "false".equals(filterValue)) {
+            modifiedFilter.put(entry.getKey(), Boolean.valueOf((String) filterValue));
+        } else if ("java.lang.Integer".equals(filterType)) {
+            modifiedFilter.put(entry.getKey(), Integer.valueOf(((String) filterValue).replace(COMMA, DOT)));
+        } else if ("java.lang.Double".equals(filterType)) {
+            modifiedFilter.put(entry.getKey(), 100 * Double.valueOf(((String) filterValue).replace(COMMA, DOT)));
+        } else {
+            modifiedFilter.put(entry.getKey(),
+                    new Document(DOLAR_OPTIONS, "i")
+                            .append(DOLAR_REGEX, //((String) value).toUpperCase(new Locale("tr", "TR")))
+                                    filterValue)
+            );
+        }
     }
 
     private Document resolveAutosetValue(MyItems myItems, FmsForm selectedForm,
