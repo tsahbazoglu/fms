@@ -1203,8 +1203,11 @@ public class TwoDimModifyCtrl extends FmsTable implements ActionListener {
 
         try {
 
+            TagActionsAction tagActionsAction = formService.getMyForm()
+                    .getMyActions().getSendFormAction();
+
             //Only java native variables can be pass through jsf attributes
-            String successMessage = formService.getMyForm().getMyActions().getSendFormAction().getEnableResult().getSuccessMessage();
+            String successMessage = tagActionsAction.getEnableResult().getSuccessMessage();
 
             TimeZone timeZone = TimeZone.getTimeZone("Asia/Istanbul");
             SIMPLE_DATE_FORMAT__3.setTimeZone(timeZone);
@@ -1225,14 +1228,14 @@ public class TwoDimModifyCtrl extends FmsTable implements ActionListener {
             successMessage = String.format("%s - ".concat(successMessage).concat(". Gönderim Tarihi :  %s"),
                     periodName, SIMPLE_DATE_FORMAT__3.format(new Date()));
 
-            String myActionType = formService.getMyForm().getMyActions().getSendFormAction().getEnableResult().getMyActionType();
-            String javaFunc = formService.getMyForm().getMyActions().getSendFormAction().getEnableResult().getJavaFunc();
-            String code = formService.getMyForm().getMyActions().getSendFormAction().getEnableResult().getMyaction();
+            String myActionType = tagActionsAction.getEnableResult().getMyActionType();
+            String javaFunc = tagActionsAction.getEnableResult().getJavaFunc();
+            String code = tagActionsAction.getEnableResult().getMyaction();
 
-            List<TagActionsAction.Operation> operaiotns = formService.getMyForm().getMyActions().getSendFormAction().getOperations();
+            List<TagActionsAction.Operation> operaiotns = tagActionsAction.getOperations();
 
             if (operaiotns != null && !operaiotns.isEmpty()) {
-                callAdditionalAction(filterService.getTableFilterCurrent(), formService.getMyForm().getMyActions().getSendFormAction());
+                callAdditionalAction(filterService.getTableFilterCurrent(), tagActionsAction);
                 putSearchObjectValue(PERIOD, SelectOneObjectIdConverter.NULL_VALUE);
                 resetActions();
                 actionSearchObject();
