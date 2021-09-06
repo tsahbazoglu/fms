@@ -50,6 +50,7 @@ import tr.org.tspb.converter.base.TelmanStringConverter;
 import tr.org.tspb.converter.base.UysStringConverter;
 import tr.org.tspb.dao.MyField;
 import tr.org.tspb.dao.FmsForm;
+import tr.org.tspb.tags.FmsQuery;
 
 /**
  *
@@ -743,11 +744,24 @@ public class CtrlService extends CommonSrv {
 
         List<Map<String, Object>> all = new ArrayList<>();
 
-        FmsForm constraintFormDef = appScopeSrvCtrl.getFormDefinitionByKey(configCollection, "constraint", filter);
+        String contraintConfigDefinitionKey = formService.getMyForm()
+                .getConstraintItems().get("config-definition-key", String.class);
 
-        String overAllCheck = constraintFormDef.getMyNamedQueries().get("overAllCheck", String.class);
+        FmsForm constraintFormDef = appScopeSrvCtrl
+                .getFormDefinitionByKey(configCollection, contraintConfigDefinitionKey, filter);
 
-        /*
+        Document overallCheckDoc = constraintFormDef.getMyNamedQueries()
+                .get("overAllCheck", Document.class);
+        String overAllCheck;
+        List listOfQueries;
+
+        ObjectId loginMemberId = loginController.getLoggedUserDetail().getDbo().getObjectId();
+
+        Document constraintQuery = null;
+
+        if ((overAllCheck = overallCheckDoc.get("func", String.class)) != null) {
+
+            /*
          overAllCheck: function(searchObject){
          month = db.common.findOne({
          _id:searchObject.period
@@ -760,35 +774,38 @@ public class CtrlService extends CommonSrv {
          "enabled":true
          }
          } 
-         */
-        overAllCheck = overAllCheck.replace(DIEZ, DOLAR);
+             */
+            overAllCheck = overAllCheck.replace(DIEZ, DOLAR);
 
-        Document tempSearchObject = new Document();
+            Document tempSearchObject = new Document();
 
-        if (loginController.isUserInRole(formService.getMyForm().getMyProject().getAdminRole())) {
-            tempSearchObject.put(
-                    formService.getMyForm().getLoginFkField(), filter.get(formService.getMyForm().getLoginFkField()));
-            tempSearchObject.put(
-                    PERIOD, filter.get(PERIOD));
-            tempSearchObject.put(
-                    TEMPLATE, filter.get(TEMPLATE));
-        } else {
-            tempSearchObject.put(
-                    formService.getMyForm().getLoginFkField(), loginController.getLoggedUserDetail().getDbo().getObjectId());
-            tempSearchObject.put(
-                    PERIOD, filter.get(PERIOD));
-            tempSearchObject.put(
-                    TEMPLATE, filter.get(TEMPLATE));
+            if (loginController.isUserInRole(formService.getMyForm().getMyProject().getAdminRole())) {
+                tempSearchObject.put(
+                        formService.getMyForm().getLoginFkField(), filter.get(formService.getMyForm().getLoginFkField()));
+                tempSearchObject.put(
+                        PERIOD, filter.get(PERIOD));
+                tempSearchObject.put(
+                        TEMPLATE, filter.get(TEMPLATE));
+            } else {
+                tempSearchObject.put(
+                        formService.getMyForm().getLoginFkField(), loginMemberId);
+                tempSearchObject.put(
+                        PERIOD, filter.get(PERIOD));
+                tempSearchObject.put(
+                        TEMPLATE, filter.get(TEMPLATE));
+            }
+
+            Document commandResult = mongoDbUtil
+                    .runCommand(formService.getMyForm().getDb(), overAllCheck, tempSearchObject, null);
+
+            constraintQuery = commandResult.get(RETVAL, Document.class);
+
+        } else if ((listOfQueries = overallCheckDoc.getList("list", Document.class)) != null) {
+            constraintQuery = FmsQuery.buildListQuery(listOfQueries, filter, null, loginMemberId);
         }
-
-        Document commandResult = mongoDbUtil
-                .runCommand(formService.getMyForm().getDb(), overAllCheck, tempSearchObject, null);
-
-        Document constraintQuery = commandResult.get(RETVAL, Document.class);
 
         List<Document> constraintCursor = mongoDbUtil
                 .find(constraintFormDef.getDb(), constraintFormDef.getTable(), constraintQuery, new Document(TRANSFER_ORDER, 1), null);
-
         boolean checkTestControl = false;//to accelarate followed loop
         List listOfTestControlNo = new ArrayList();
 
@@ -844,7 +861,8 @@ public class CtrlService extends CommonSrv {
                 for (Map map : resultListOfMap) {
                     myConstraintFormula.setControlResult(new MyControlResult(map));
                     Map row = new HashMap();
-                    row.put(RESULT_TYPE, myConstraintFormula.getResultTypeCode());
+                    row.put(RELATIONS_PRESENTATION, myConstraintFormula.getRelationsPresentation());
+                    row.put(RESULT_TYPE, myConstraintFormula.getResultType());
                     row.put(EXPRESSION, myConstraintFormula.getControlResult().getExpression());
                     row.put(RESULT, myConstraintFormula.getControlResult().getControlResult());
                     row.put(TRANSFER_ORDER, myConstraintFormula.getTransferOrder());
