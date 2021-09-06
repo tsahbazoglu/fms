@@ -884,6 +884,15 @@ public class OgmCreatorImpl implements OgmCreatorIntr {
             dboForm = mongoDbUtil.findOne(CONFIG_DB, collection, new Document(formSearch));
             if (myProject != null) {
                 dboForm.put(PROJECT_KEY, myProject.getKey());
+                List<Document> fieldList = dboForm.getList("fields", Document.class);
+                if (fieldList != null) {
+                    for (Document fieldDoc : fieldList) {
+                        String ref = fieldDoc.getString("$fms-ref");
+                        if (ref != null) {
+                            fieldDoc.putAll(myProject.getJsonSchemaDef().get(ref, Document.class));
+                        }
+                    }
+                }
             }
             cacheDocumentForm.put(cacheKey, dboForm);
         }
@@ -1269,6 +1278,25 @@ public class OgmCreatorImpl implements OgmCreatorIntr {
         @Override
         public Document replaceToDolar(Document document) {
             return mongoDbUtil.replaceToDollar(document);
+        }
+
+        @Override
+        public List<ObjectId> findObjectIds(String db, String collection, Document query, String projection) {
+            List<Document> docs = mongoDbUtil
+                    .findWithProjection(db, collection, query, new Document(projection, Boolean.TRUE));
+            if (docs != null) {
+                List<ObjectId> list = new ArrayList<>();
+                for (Document doc : docs) {
+                    list.add(doc.getObjectId(projection));
+                }
+                return list;
+            }
+            return null;
+        }
+
+        @Override
+        public List<Document> aggreagate(String db, String table, List<Document> listOfAggrDoc) {
+            return mongoDbUtil.aggregate(db, table, listOfAggrDoc);
         }
 
     }
