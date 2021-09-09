@@ -11,11 +11,10 @@ import java.util.Map;
 import org.bson.Document;
 import static tr.org.tspb.constants.ProjectConstants.DIEZ;
 import static tr.org.tspb.constants.ProjectConstants.DOLAR;
-import static tr.org.tspb.constants.ProjectConstants.DOLAR_IN;
-import static tr.org.tspb.constants.ProjectConstants.PERIOD;
-import static tr.org.tspb.constants.ProjectConstants.REPLACEABLE_KEY_WORD_FOR_FUNCTONS_FILTER_PERIOD;
-import static tr.org.tspb.constants.ProjectConstants.REPLACEABLE_KEY_WORD_FOR_FUNCTONS_LOGIN_MEMBER_ID;
+import tr.org.tspb.datamodel.expected.FmsScriptRunner;
 import tr.org.tspb.pojo.UserDetail;
+import tr.org.tspb.tags.FmsCheck;
+import tr.org.tspb.tags.FmsQuery;
 
 /**
  *
@@ -28,8 +27,11 @@ public class TagActionsAction {
     private final ActionEnableResult enableResult;
     private String actionFunc;
     private List<Operation> operations;
+    private List<FmsCheck> checkList;
 
-    public TagActionsAction(boolean enable, ActionEnableResult enableResult, Document eventAction, Document registredFunctions, Map myfilter, UserDetail userDetail) {
+    public TagActionsAction(boolean enable, ActionEnableResult enableResult,
+            Document eventAction, Document registredFunctions, Map myfilter,
+            UserDetail userDetail, FmsScriptRunner fmsScriptRunner) {
         this.enable = enable;
         this.enableResult = enableResult;
 
@@ -38,6 +40,16 @@ public class TagActionsAction {
         if (whattodo != null) {
 
             this.db = whattodo.getString("db");
+
+            List<Document> checkList;
+
+            if ((checkList = whattodo.getList("check-list", Document.class)) != null) {
+                this.checkList = new ArrayList<>();
+                for (Document document : checkList) {
+                    this.checkList.add(FmsCheck.build(document, myfilter,
+                            userDetail.getDbo().getObjectId(), fmsScriptRunner));
+                }
+            }
 
             if (whattodo.getString("func") != null) {
                 this.actionFunc = whattodo.getString("func");
@@ -76,21 +88,28 @@ public class TagActionsAction {
         return operations;
     }
 
+    public List<FmsCheck> getCheckList() {
+        return checkList;
+    }
+
     public class Operation {
 
-        String db, table, op;
-        Document filter, set;
+        String db;
+        String table;
+        String op;
+        Document set;
+        Document filter;
+        Boolean ifcase;
 
         public Operation(Document doc, Map myfilter, UserDetail userDetail) {
+            this.ifcase = doc.getBoolean("case");
             this.db = doc.getString("db");
             this.table = doc.getString("table");
             this.op = doc.getString("op");
             List<Document> _filter = doc.getList("filter", Document.class);
             List<Document> _set = doc.getList("set", Document.class);
-
-            this.filter = createQuery(_filter, userDetail, myfilter);
-            this.set = createQuery(_set, userDetail, myfilter);
-
+            this.filter = FmsQuery.buildListQuery(_filter, myfilter, null, userDetail.getDbo().getObjectId());
+            this.set = FmsQuery.buildListQuery(_set, myfilter, null, userDetail.getDbo().getObjectId());
         }
 
         public String getDb() {
@@ -113,36 +132,10 @@ public class TagActionsAction {
             return set;
         }
 
-    }
-
-    private static Document createQuery(List<Document> filters, UserDetail userDetail, Map myFilter) throws RuntimeException {
-        Document query = new Document();
-        for (Document filter : filters) {
-            String key = filter.getString("key");
-            String stringValue = filter.getString("string-value");
-            List<String> arrayValue = filter.getList("array-value", String.class);
-            String fmsValue = filter.getString("fms-value");
-
-            if (stringValue != null) {
-                query.append(key, stringValue);
-            } else if (arrayValue != null) {
-                query.append(key, new Document(DOLAR_IN, arrayValue));
-            } else if (fmsValue != null) {
-                switch (fmsValue) {
-                    case REPLACEABLE_KEY_WORD_FOR_FUNCTONS_LOGIN_MEMBER_ID:
-                        query.append(key, userDetail.getDbo().getObjectId());
-                        break;
-                    case REPLACEABLE_KEY_WORD_FOR_FUNCTONS_FILTER_PERIOD:
-                        query.append(key, myFilter.get(PERIOD));
-                        break;
-                    default:
-                        throw new RuntimeException(fmsValue.concat(" is not supported"));
-                }
-            } else {
-                throw new RuntimeException(key.concat(" has a not supported type of value"));
-            }
+        public Boolean getIfcase() {
+            return ifcase;
         }
-        return query;
+
     }
 
 }
