@@ -22,11 +22,11 @@ import jdk.nashorn.api.scripting.ScriptObjectMirror;
 import org.bson.Document;
 import org.bson.types.Code;
 import org.bson.types.ObjectId;
-import tr.org.tspb.constants.ProjectConstants;
 import tr.org.tspb.datamodel.expected.FmsRunMongoCmd;
 import tr.org.tspb.datamodel.expected.FmsScriptRunner;
 import tr.org.tspb.pojo.ComponentType;
 import tr.org.tspb.pojo.UserDetail;
+import tr.org.tspb.tags.FmsQuery;
 
 /**
  *
@@ -419,12 +419,15 @@ public class MyForm extends FmsFormAbstract {
 
         for (String ajaxFieldKey : ajaxFields) {
             MyField myField = getField(ajaxFieldKey);
-            switch (myField.getAjaxAction()) {
+            switch (myField.getAjax().getAction()) {
                 case "render":
                     runAjaxRender(myField, componentMap, this, crudObject, roleMap, userDetail, null);
                     break;
                 case "render-ref":
                     runAjaxRenderRef(myField, componentMap, this, crudObject, roleMap, userDetail, null);
+                    break;
+                case "list":
+                    runAjaxList(myField, componentMap, this, crudObject, roleMap, userDetail, null);
                     break;
                 default:
                     break;
@@ -507,7 +510,7 @@ public class MyForm extends FmsFormAbstract {
             UserDetail userDetail,
             Document filter) {
 
-        myField.getAjaxEffectedKeys().forEach((key) -> {
+        myField.getAjax().getEffectedKeys().forEach((key) -> {
             crudObject.removeUnSetKey(key);
         });
 
@@ -518,7 +521,7 @@ public class MyForm extends FmsFormAbstract {
 
         if (FmsForm.SCHEMA_VERSION_111.equals(selectedForm.getSchemaVersion())) {
             try {
-                String jsScriptString = myField.getAjaxShowHide().replace(DIEZ, DOLAR);
+                String jsScriptString = myField.getAjax().getShowHideJsFunction().replace(DIEZ, DOLAR);
                 jsScriptString = "calculate=" + jsScriptString;
                 jsEngine.eval(jsScriptString);
                 Invocable inv = (Invocable) jsEngine;
@@ -534,18 +537,18 @@ public class MyForm extends FmsFormAbstract {
             }
         } else {
             Document commandResult = fmsScriptRunner.runCommand(selectedForm.getDb(),
-                    myField.getAjaxShowHide(), crudObject.get(myField.getKey()), crudObjAsDoc, roleMap);
+                    myField.getAjax().getShowHideJsFunction(), crudObject.get(myField.getKey()), crudObjAsDoc, roleMap);
             result = commandResult.get(RETVAL);
         }
 
         if (result instanceof Boolean) {
             if (Boolean.TRUE.equals(result)) {
-                for (String key : myField.getAjaxEffectedKeys()) {
+                for (String key : myField.getAjax().getEffectedKeys()) {
                     componentMap.get(key).setRendered(true);
                     componentMap.get(key).createSelectItems(filter, crudObject, roleMap, userDetail, true);
                 }
             } else {
-                for (String ajaxEffectedKey : myField.getAjaxEffectedKeys()) {
+                for (String ajaxEffectedKey : myField.getAjax().getEffectedKeys()) {
                     crudObject.remove(ajaxEffectedKey);
                     MyField myField1 = componentMap.get(ajaxEffectedKey);
                     if (myField1 != null) {
@@ -563,11 +566,37 @@ public class MyForm extends FmsFormAbstract {
                         myField1.createSelectItems(filter, crudObject, roleMap, userDetail, true);
                     } else {
                         myField1.setRendered(false);
-                        if (myField.isAjaxRemoveNonRenderdFieldOnRecord()) {
+                        if (myField.getAjax().isAjaxRemoveNonRenderdFieldOnRecord()) {
                             crudObject.remove(key);
                             crudObject.addUnSetKey(key);
                         }
                     }
+                }
+            }
+        }
+    }
+
+    public void runAjaxList(MyField myField,
+            Map<String, MyField> componentMap,
+            final FmsForm selectedForm,
+            MyMap crudObject,
+            RoleMap roleMap,
+            UserDetail userDetail,
+            Document filter) {
+
+        List<TagAjax.AjaxElement> list = myField.getAjax().getAjaxElements();
+
+        for (TagAjax.AjaxElement ajaxElement : list) {
+            for (String effectedKey : ajaxElement.effectedKeys) {
+                MyField effectedField = componentMap.get(effectedKey);
+                if (effectedField != null) {
+                    Document query = FmsQuery.buildListQueryAjax(ajaxElement.refreshItemsQuery, filter, fmsScriptRunner,
+                            userDetail.getDbo().getObjectId(), crudObject);
+
+                    effectedField.getItemsAsMyItems()
+                            .changeDbTableQuery(ajaxElement.refreshItemsDb, ajaxElement.refreshItemsTable, query);
+
+                    effectedField.createSelectItems(filter, crudObject, roleMap, userDetail, false);
                 }
             }
         }
@@ -581,26 +610,27 @@ public class MyForm extends FmsFormAbstract {
             UserDetail userDetail,
             Document filter) {
 
-        myField.getAjaxEffectedKeys().forEach((key) -> {
+        myField.getAjax().getEffectedKeys().forEach((key) -> {
             crudObject.removeUnSetKey(key);
         });
 
         Document crudObjAsDoc = new Document(crudObject);
         crudObjAsDoc.remove(INODE);
 
-        myField.getTagAjaxRef().resolveRenderedFields(fmsScriptRunner, crudObject);
+        myField.getAjax().getRef()
+                .resolveRenderedFields(fmsScriptRunner, crudObject);
 
-        for (String fieldKey : myField.getTagAjaxRef().getRender().keySet()) {
+        for (String fieldKey : myField.getAjax().getRef().getRender().keySet()) {
 
             MyField myField1 = componentMap.get(fieldKey);
 
             if (myField1 != null) {
-                if (Boolean.TRUE.equals(myField.getTagAjaxRef().getRender().get(fieldKey))) {
+                if (Boolean.TRUE.equals(myField.getAjax().getRef().getRender().get(fieldKey))) {
                     myField1.setRendered(true);
                     myField1.createSelectItems(filter, crudObject, roleMap, userDetail, true);
                 } else {
                     myField1.setRendered(false);
-                    if (myField.isAjaxRemoveNonRenderdFieldOnRecord()) {
+                    if (myField.getAjax().isAjaxRemoveNonRenderdFieldOnRecord()) {
                         crudObject.remove(fieldKey);
                         crudObject.addUnSetKey(fieldKey);
                     }
@@ -975,10 +1005,12 @@ public class MyForm extends FmsFormAbstract {
 
             String funVal = null;
             String strVal = null;
+            List<String> arrVal = null;
 
             if (obj instanceof Document) {
                 funVal = ((Document) obj).getString("fnctn-val");
                 strVal = ((Document) obj).getString("strng-val");
+                arrVal = ((Document) obj).getList("array-val", String.class);
             } else if (obj instanceof String) {
                 funVal = obj.toString();
             }
@@ -987,6 +1019,14 @@ public class MyForm extends FmsFormAbstract {
                 this.myForm.userNote = executeFunc(funVal);
             } else if (strVal != null) {
                 this.myForm.userNote = strVal;
+            } else if (arrVal != null) {
+                StringBuilder sb = new StringBuilder();
+                sb.append("<ul>");
+                for (String string : arrVal) {
+                    sb.append("<li>").append(string).append("</li>").append("<br/>");
+                }
+                sb.append("</ul>");
+                this.myForm.userNote = sb.toString();
             }
 
             this.myForm.funcNote = dbObjectForm.getString(FUNC_NOTE);
@@ -1225,46 +1265,18 @@ public class MyForm extends FmsFormAbstract {
                 this.myForm.defaultHistoryQuery = new HashMap();
 
                 if (dfcq != null) {
-                    for (Document x : dfcq) {
-                        String key = x.getString("key");
-                        String fmsValue = x.getString("fms-value");
-                        if (fmsValue != null) {
-                            switch (fmsValue) {
-                                case ProjectConstants.REPLACEABLE_KEY_WORD_FOR_FUNCTONS_FILTER_PERIOD:
-                                    this.myForm.defaultCurrentQuery.put(key, this.myForm.searchObject.get("period") == null ? "no result" : this.myForm.searchObject.get("period"));
-                                    break;
-                                case ProjectConstants.REPLACEABLE_KEY_WORD_FOR_FUNCTONS_FILTER_TEMPLATE:
-                                    this.myForm.defaultCurrentQuery.put(key, this.myForm.searchObject.get("template") == null ? "no result" : this.myForm.searchObject.get("template"));
-                                    break;
-                                case ProjectConstants.REPLACEABLE_KEY_WORD_FOR_FUNCTONS_LOGIN_MEMBER_ID:
-                                    this.myForm.defaultCurrentQuery.put(key, myForm.getUserDetail().getDbo().getObjectId() == null ? "no result" : myForm.getUserDetail().getDbo().getObjectId());
-                                    break;
-                                default:
-                                    throw new RuntimeException("could not find replaceble word");
-                            }
-                        }
+                    Document query = FmsQuery
+                            .buildListQuery(dfcq, this.myForm.searchObject, this.myForm.fmsScriptRunner, myForm.getUserDetail().getDbo().getObjectId());
+                    for (String key : query.keySet()) {
+                        this.myForm.defaultCurrentQuery.put(key, query.get(key));
                     }
                 }
 
                 if (dfhq != null) {
-                    for (Document x : dfhq) {
-                        String key = x.getString("key");
-                        String fmsValue = x.getString("fms-value");
-                        if (fmsValue != null) {
-                            switch (fmsValue) {
-                                case ProjectConstants.REPLACEABLE_KEY_WORD_FOR_FUNCTONS_FILTER_PERIOD:
-                                    this.myForm.defaultHistoryQuery.put(key, this.myForm.searchObject.get("period") == null ? "no result" : this.myForm.searchObject.get("period"));
-                                    break;
-                                case ProjectConstants.REPLACEABLE_KEY_WORD_FOR_FUNCTONS_FILTER_TEMPLATE:
-                                    this.myForm.defaultHistoryQuery.put(key, this.myForm.searchObject.get("template") == null ? "no result" : this.myForm.searchObject.get("template"));
-                                    break;
-                                case ProjectConstants.REPLACEABLE_KEY_WORD_FOR_FUNCTONS_LOGIN_MEMBER_ID:
-                                    this.myForm.defaultHistoryQuery.put(key, myForm.getUserDetail().getDbo().getObjectId() == null ? "no result" : myForm.getUserDetail().getDbo().getObjectId());
-                                    break;
-                                default:
-                                    throw new RuntimeException("could not find replaceble word");
-                            }
-                        }
+                    Document query = FmsQuery
+                            .buildListQuery(dfhq, this.myForm.searchObject, this.myForm.fmsScriptRunner, myForm.getUserDetail().getDbo().getObjectId());
+                    for (String key : query.keySet()) {
+                        this.myForm.defaultCurrentQuery.put(key, query.get(key));
                     }
                 }
 
@@ -1677,7 +1689,17 @@ public class MyForm extends FmsFormAbstract {
         public Builder maskAjax() {
             for (MyField myField : this.myForm.fields.values()) {
 
-                List<String> ajaxEffectedKeys = myField.getAjaxEffectedKeys();
+                List<String> ajaxEffectedKeys = myField.getAjax().getEffectedKeys();
+
+                if ("list".equals(myField.getAjax().getAction())) {
+
+                    ajaxEffectedKeys = new ArrayList<>();
+                    for (TagAjax.AjaxElement ajaxElement : myField.getAjax().getAjaxElements()) {
+                        ajaxEffectedKeys.addAll(ajaxElement.effectedKeys);
+                    }
+                }
+
+                boolean notFoundAnyEffectedKeys = true;
 
                 if (ajaxEffectedKeys != null && !ajaxEffectedKeys.isEmpty()) {
                     StringBuilder jsfAjaxUpdateValue = new StringBuilder();
@@ -1685,17 +1707,19 @@ public class MyForm extends FmsFormAbstract {
                         MyField efectedField = this.myForm.getField(effectedKey);
 
                         if (efectedField != null) {
-
+                            notFoundAnyEffectedKeys = false;
                             if (efectedField.getComponentType().equals(ComponentType.inputFile.name())) {
                                 myField.setHasAjaxEffectedInputFileField(true);
                             }
-
                             String styleClass = "id-class-".concat(effectedKey);
                             efectedField.setStyleClass(styleClass);
                             jsfAjaxUpdateValue.append(String.format("@(.%s),", styleClass));
                         }
                     }
                     myField.setAjaxUpdate(jsfAjaxUpdateValue.toString());
+                }
+                if (notFoundAnyEffectedKeys) {
+                    myField.getAjax().setEnable(false);
                 }
             }
             return this;
@@ -1722,7 +1746,7 @@ public class MyForm extends FmsFormAbstract {
 
                 myField.setMyForm(this.myForm);
 
-                if (myField.isAjax()) {
+                if (myField.getAjax().isEnable()) {
                     myForm.ajaxFields.add(myField.getKey());
                 }
             }
