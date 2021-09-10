@@ -47,13 +47,8 @@ public class MyField {
     private Boolean quickFilter;
     private Boolean autoset;
     private Boolean hasAjaxEffectedInputFileField;
-    private String ajaxAction;
-    private String ajaxShowHide;
     private String ajaxUpdate;
-    private List<String> ajaxEffectedKeys = new ArrayList<>();
-    private boolean ajax;
-    private boolean ajaxRemoveNonRenderdFieldOnRecord = true;
-    private TagAjaxRef tagAjaxRef;
+    private TagAjax tagAjax;
     // C
     private String code;//this is the case for nd
     private String calculateEngine;
@@ -69,6 +64,7 @@ public class MyField {
     private String converterInstance;
     private String converterFormat;
     private String converterParam;
+    private Integer converterMinStrLength;
     private Map<String, String> cacheBsonConverter = new HashMap<>();
     private Map<ForumColumnCellKey, Converter> cacheMapConverter = new HashMap<>();
     // D
@@ -166,10 +162,6 @@ public class MyField {
     }
 
 // <editor-fold defaultstate="collapsed" desc="getters">
-    public String getAjaxShowHide() {
-        return ajaxShowHide;
-    }
-
     public MyItems getItemsAsMyItems() {
         return itemsAsMyItems;
     }
@@ -307,10 +299,6 @@ public class MyField {
 
     public String getDateRangeEndKey() {
         return dateRangeEndKey;
-    }
-
-    public String getAjaxAction() {
-        return ajaxAction;
     }
 
     public String getAjaxUpdate() {
@@ -495,14 +483,6 @@ public class MyField {
 
     public Boolean getShouldCheckNegative() {
         return shouldCheckNegative;
-    }
-
-    public boolean isAjax() {
-        return ajax;
-    }
-
-    public List<String> getAjaxEffectedKeys() {
-        return Collections.unmodifiableList(ajaxEffectedKeys);
     }
 
     public Object getReferance() {
@@ -758,8 +738,8 @@ public class MyField {
         this.myForm = myForm;
     }
 
-    public TagAjaxRef getTagAjaxRef() {
-        return tagAjaxRef;
+    public TagAjax getAjax() {
+        return tagAjax;
     }
 
     public Boolean getHasAjaxEffectedInputFileField() {
@@ -768,10 +748,6 @@ public class MyField {
 
     public void setHasAjaxEffectedInputFileField(Boolean hasAjaxEffectedInputFileField) {
         this.hasAjaxEffectedInputFileField = hasAjaxEffectedInputFileField;
-    }
-
-    public boolean isAjaxRemoveNonRenderdFieldOnRecord() {
-        return ajaxRemoveNonRenderdFieldOnRecord;
     }
 
     public static class Builder {
@@ -793,36 +769,40 @@ public class MyField {
             //
             this.myField.fmsScriptRunner = fmsScriptRunner;
             this.myField._id = (ObjectId) docField.get(MONGO_ID);
-            this.myField.code = (String) docField.get(CODE);
+            this.myField.code = docField.getString(CODE);
 
             maskCalculate(docField);
+
+            this.myField.converterInstance = docField.getString(CONVERTER_INSTANCE);
+            this.myField.converterFormat = docField.getString(CONVERTER_FORMAT);
+            this.myField.converterParam = docField.getString(CONVERTER_PARAM);
 
             this.myField.dbo = docField;
             this.myField.dateRangeControl = Boolean.TRUE.equals(docField.get(DATE_RANGE_CONTROL));
             this.myField.dateRangeValidate = Boolean.TRUE.equals(docField.get(DATE_RANGE_VALIDATE));
-            this.myField.dateRangeBeginKey = (String) docField.get(DATE_RANGE_BEGIN_KEY);
-            this.myField.dateRangeEndKey = (String) docField.get(DATE_RANGE_END_KEY);
+            this.myField.dateRangeBeginKey = docField.getString(DATE_RANGE_BEGIN_KEY);
+            this.myField.dateRangeEndKey = docField.getString(DATE_RANGE_END_KEY);
             this.myField.divider = docField.get(DIVIDER);
             this.myField.disabled = Boolean.TRUE.equals(docField.get(DISABLED));
-            this.myField.field = (String) docField.get(FIELD);
-            this.myField.fieldNote = (String) docField.get(FIELD_NOTE);
-            this.myField.href = (String) docField.get("href");
+            this.myField.field = docField.getString(FIELD);
+            this.myField.fieldNote = docField.getString(FIELD_NOTE);
+            this.myField.href = docField.getString("href");
             this.myField.immediate = Boolean.TRUE.equals(docField.get(IMMEDIATE));
-            this.myField.key = (String) docField.get(FORM_KEY);
+            this.myField.key = docField.getString(FORM_KEY);
             this.myField.loginFK = Boolean.TRUE.equals(docField.get("loginFK"));
-            this.myField.myFormKey = (String) docField.get(FORM_KEY);
+            this.myField.myFormKey = docField.getString(FORM_KEY);
             this.myField.money = Boolean.TRUE.equals(docField.get(MONEY));
-            this.myField.maxMoney = (String) docField.get(MAX_MONEY);
+            this.myField.maxMoney = docField.getString(MAX_MONEY);
 
             Number number = docField.get(MAX_VALUE, Number.class);
             if (number != null) {
                 this.myField.maxValue = number.doubleValue();
             }
 
-            this.myField.mask = (String) docField.get(MASK);
+            this.myField.mask = docField.getString(MASK);
             this.myField.minFractationDigits = docField.get(MIN_FRACTATION_DIGITIS);
             this.myField.maxFractationDigits = docField.get(MAX_FRACTATION_DIGITIS);
-            this.myField.name = (String) docField.get(NAME);
+            this.myField.name = docField.getString(NAME);
             this.myField.observable = docField.get(OBSERVABLE);
             this.myField.observableAttr = docField.get(OBSERVABLE);
             this.myField.observerAttr = docField.get(OBSERVER);
@@ -830,20 +810,31 @@ public class MyField {
             this.myField.required = Boolean.TRUE.equals(docField.get(REQUIRED));
             this.myField.roleCheck = Boolean.TRUE.equals(docField.get(ROLECHECK));
             this.myField.reportRendered = Boolean.TRUE.equals(docField.get(REPORT_RENDERED));
-            this.myField.refCollection = (String) docField.get(REF_COLLECTION);
-            this.myField.subGroup = (String) docField.get(SUB_GROUP);
+            this.myField.refCollection = docField.getString(REF_COLLECTION);
+            this.myField.subGroup = docField.getString(SUB_GROUP);
             this.myField.shouldCheckNegative = Boolean.TRUE.equals(docField.get(SHOULD_CHECK_NEGOTIF));
-            this.myField.uysformat = (String) docField.get(FORMAT);
+            this.myField.uysformat = docField.getString(FORMAT);
             this.myField.version = Boolean.TRUE.equals(docField.get(VERSION));
-            this.myField.valueType = (String) docField.get(VALUE_TYPE);
-            this.myField.visible = (String) docField.get(VISIBLE);
+            this.myField.valueType = docField.getString(VALUE_TYPE);
+            this.myField.visible = docField.getString(VISIBLE);
             this.myField.valueChangeListenerAction = docField.get(VALUE_CHANGE_LISTENER_ACTION);
             this.myField.workflow = Boolean.TRUE.equals(docField.get(WORKFLOW));
-
             this.myField.filterProjection = docField.getString(FILTER_PROJECTION);
+            maskConverterJson(docField);
         }
 
-        public Builder maskCalculate(Document docField) {
+        private Builder maskConverterJson(Document docField) {
+            Document converterJson = docField.get("converter-json", Document.class);
+            if (converterJson != null) {
+                this.myField.converterInstance = converterJson.getString(CONVERTER_INSTANCE);
+                this.myField.converterFormat = converterJson.getString(CONVERTER_FORMAT);
+                this.myField.converterParam = converterJson.getString(CONVERTER_PARAM);
+                this.myField.converterMinStrLength = converterJson.getInteger(CONVERTER_MIN_STR_LENGTH);
+            }
+            return this;
+        }
+
+        private Builder maskCalculate(Document docField) {
 
             Document docCalc = docField.get(CALCULATE, Document.class);
             if (docCalc != null) {
@@ -854,9 +845,6 @@ public class MyField {
                 this.myField.calculateOnListView = Boolean.TRUE.equals(docCalc.get(CALCULATE_ON_LIST_VIEW));
                 this.myField.calculateOnCrudView = Boolean.TRUE.equals(docCalc.get(CALCULATE_ON_CRUD_VIEW));
                 this.myField.calculateOnClient = docCalc.getString(CALCULATE_ON_CLIENT);
-                this.myField.converterInstance = docCalc.getString(CONVERTER_INSTANCE);
-                this.myField.converterFormat = docCalc.getString(CONVERTER_FORMAT);
-                this.myField.converterParam = docCalc.getString(CONVERTER_PARAM);
                 this.myField.calculateEngine = docCalc.getString(CALCULATE_ENGINE);//FIXME
             } else {
                 this.myField.calculateOnSave = false;
@@ -1072,7 +1060,7 @@ public class MyField {
             if (converterValue.getClass().getSimpleName().equalsIgnoreCase(CONVERTER_BSON_CONVERTER)) {
                 // this.myField.createMyItemsOnSession(null, null, roleMap, this.myField.myForm.userDetail);
                 this.myField.viewKey = Arrays.asList("name");
-            } else if (converterValue.getClass().getSimpleName().equalsIgnoreCase("SelectOneObjectIdConverter")) {
+            } else if (converterValue.getClass().getSimpleName().equalsIgnoreCase(CONVERTER_SELECT_ONE_OBJECTID_CONVERTER)) {
 
                 if (this.myField.getItemsAsMyItems() != null) {
 
@@ -1088,7 +1076,7 @@ public class MyField {
 
                 }
 
-            } else if (converterValue.getClass().getSimpleName().equalsIgnoreCase("TelmanStringConverter")) {
+            } else if (converterValue.getClass().getSimpleName().equalsIgnoreCase(CONVERTER_TELMAN_STRING_CONVERTER)) {
                 if (this.myField.getItemsAsMyItems() != null) {
                     throw new RuntimeException(new StringBuilder()
                             .append(this.myField.getKey())
@@ -1162,21 +1150,14 @@ public class MyField {
 
         public Builder maskAjax() {
 
+            this.myField.tagAjax = new TagAjax(new Document());
+
             Document ajax = this.myField.dbo.get(AJAX, Document.class);
             if (ajax == null) {
                 return this;
             }
 
-            this.myField.ajax = Boolean.TRUE.equals(ajax.getBoolean("enable"));
-            this.myField.ajaxRemoveNonRenderdFieldOnRecord = ajax.getBoolean("remove-non-rendered-field-on-record", false);
-            this.myField.ajaxShowHide = ajax.getString("show-hide");
-            this.myField.ajaxAction = ajax.getString(AJAX_ACTION);
-            this.myField.ajaxEffectedKeys = ajax.getList(AJAX_EFFECTED_KEYS, String.class);
-
-            Document ajaxRef = ajax.get("ref", Document.class);
-            if (ajaxRef != null) {
-                this.myField.tagAjaxRef = new TagAjaxRef(ajaxRef);
-            }
+            this.myField.tagAjax = new TagAjax(ajax);
 
             return this;
         }
@@ -1279,5 +1260,12 @@ public class MyField {
      */
     public String getFilterProjection() {
         return filterProjection;
+    }
+
+    /**
+     * @return the minLength
+     */
+    public Integer getConverterMinStrLength() {
+        return converterMinStrLength;
     }
 }
