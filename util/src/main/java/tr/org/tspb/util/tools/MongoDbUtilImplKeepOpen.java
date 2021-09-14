@@ -94,6 +94,8 @@ public class MongoDbUtilImplKeepOpen implements MongoDbUtilIntr {
     private final com.mongodb.MongoClient mongoClient;
     private com.mongodb.client.MongoClient mongoClient445;
 
+    private final Map<String, Document> MAP_OF_RECORD = new HashMap<>();
+
     public MongoDbUtilImplKeepOpen(String mongoAdminUser, String mongoAdminPswd, ServerAddress serverAddress) {
         this.mongoAdminUser = mongoAdminUser;
         this.mongoAdminPswd = mongoAdminPswd;
@@ -165,8 +167,27 @@ public class MongoDbUtilImplKeepOpen implements MongoDbUtilIntr {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
+    public void remove(String db, String collectionName, Map<String, Object> searchMap)
+            throws RuntimeException {
+        mongoClient.getDatabase(db).getCollection(collectionName, null).deleteMany(new Document(searchMap));
+    }
+
     public void deleteOne(String database, String collectionName, Document document) {
         mongoClient.getDatabase(database).getCollection(collectionName).deleteOne(document);
+        // crlear cache
+        ObjectId recordId = document.getObjectId("_id");
+        if (recordId != null) {
+            deleteCacheOne(database, collectionName, recordId);
+        }
+    }
+
+    public void deleteMany(String database, String collection, Document document) {
+        mongoClient.getDatabase(database).getCollection(collection).deleteMany(document);
+        // crlear cache
+        ObjectId recordId = document.getObjectId("_id");
+        if (recordId != null) {
+            deleteCacheOne(database, collection, recordId);
+        }
     }
 
     public List<Document> aggregate(String db, String table, List<Document> aggregateList) {
@@ -247,10 +268,6 @@ public class MongoDbUtilImplKeepOpen implements MongoDbUtilIntr {
 
     public void createIndexUnique(String db, String collectionName, Document indexObject) {
         mongoClient.getDatabase(db).getCollection(collectionName).createIndex(indexObject, new IndexOptions().unique(true));
-    }
-
-    public void remove(String db, String collectionName, Map<String, Object> searchMap) throws RuntimeException {
-        mongoClient.getDatabase(db).getCollection(collectionName, null).deleteMany(new Document(searchMap));
     }
 
     public void copyFiles(String fromDb, String toDb, DBObject fromSearch) throws IOException {
@@ -746,10 +763,6 @@ public class MongoDbUtilImplKeepOpen implements MongoDbUtilIntr {
         }
     }
 
-    public void deleteMany(String database, String collection, Document document) {
-        mongoClient.getDatabase(database).getCollection(collection).deleteMany(document);
-    }
-
     public List<GridFSDBFile> findFiles(String db, DBObject filter) {
         List<GridFSDBFile> list = new GridFS(mongoClient.getDB(db)).find(filter);
         return list;
@@ -1054,16 +1067,36 @@ public class MongoDbUtilImplKeepOpen implements MongoDbUtilIntr {
         return new RecurcivlyReplaceableDocument(document).replaceToDollar();
     }
 
-    private final Map<Map, Document> MAP_OF_RECORD = new HashMap<>();
+    public void deleteCacheOne(String db, String collectionName, ObjectId id) {
+        MAP_OF_RECORD.remove(createCacheKey(db, collectionName, id));
+    }
 
     public Document cacheAndGet(Map<String, Object> map) {
-        if (MAP_OF_RECORD.get(map) == null) {
-            String db = (String) map.get("db");
-            String collectionName = (String) map.get("collectionName");
-            ObjectId id = (ObjectId) map.get("_id");
-            MAP_OF_RECORD.put(map, findOne(db, collectionName, new Document("_id", id)));
+
+        String db = (String) map.get("db");
+        String collectionName = (String) map.get("collectionName");
+        ObjectId id = (ObjectId) map.get("_id");
+
+        String cacheKey = createCacheKey(db, collectionName, id);
+
+        Document doc = MAP_OF_RECORD.get(cacheKey);
+
+        if (doc == null) {
+            doc = findOne(db, collectionName, Filters.eq("_id", id));
+            MAP_OF_RECORD.put(cacheKey, doc);
         }
-        return MAP_OF_RECORD.get(map);
+
+        return doc;
+    }
+
+    public String createCacheKey(String db, String table, ObjectId objectId) {
+        StringBuilder sb = new StringBuilder();
+        sb.append(db)
+                .append(":")
+                .append(table)
+                .append(":")
+                .append(objectId.toString());
+        return sb.toString();
     }
 
 }
