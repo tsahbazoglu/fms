@@ -191,25 +191,24 @@ public class MyActions {
 
         private MyActions myActions;
         private Map<String, Boolean> map = new HashMap<>();
-        private static final Set<String> ACTIONS = new HashSet<>(Arrays.asList(
-                ACTION_NEW,
-                "delete",
+        private static final Set<String> ACTIONS = new HashSet<>(Arrays.asList(ACTION_NEW,
+                ACTION_DELETE,
                 ACTION_SAVE,
-                SAVE_AS,
+                ACTION_SAVE_AS,
                 ACTION_DOWNLOAD,
                 EIMZA,
                 ACTION_CHECK_ALL,
                 EMAIL,
+                EMAIL_TO_ALL,
+                ACTION_SEND_FROMS,
+                ACTION_NORECORD,
                 "eimza1D",
                 "eimza2D",
-                EMAIL_TO_ALL,
                 "upload",
                 "customDownload",
                 "payment",
                 "pdf",
-                "ldap",
-                ACTION_SEND_FROMS,
-                ACTION_NORECORD
+                "ldap"
         ));
 
         private String viewerRole;
@@ -297,7 +296,7 @@ public class MyActions {
             return this;
         }
 
-        public Build initAsSchemaVersion100() {
+        public Build initAsSchemaVersion100(MyMap crudObject) {
 
             for (String key : ((Document) attrActions).keySet()) {
 
@@ -326,7 +325,7 @@ public class MyActions {
                     Document commandResult = fmsScriptRunner.runCommand(db, func, searchObject, roleMap.keySet());
                     enable = commandResult.getBoolean(RETVAL);
                 } else if (ref != null) {
-                    enable = TagActionRef.calc(ref, searchObject, userDetail, fmsScriptRunner);
+                    enable = TagActionRef.calc(ref, searchObject, userDetail, fmsScriptRunner, crudObject);
                 } else if (action.get(EVENT_ENABLE) != null) {
                     enableResult = checkControlResultSchemaVersion110(searchObject, action);
                     enable = enableResult.isEnable();
@@ -375,13 +374,13 @@ public class MyActions {
                     case ACTION_NEW:
                         myActions.create = value;
                         break;
-                    case "delete":
+                    case ACTION_DELETE:
                         myActions.delete = value;
                         break;
                     case ACTION_SAVE:
                         myActions.save = value;
                         break;
-                    case SAVE_AS:
+                    case ACTION_SAVE_AS:
                         myActions.saveAs = value;
                         break;
                     case ACTION_DOWNLOAD:
@@ -435,6 +434,10 @@ public class MyActions {
 
             if (!this.myActions.save) {
                 this.myActions.save = this.myActions.create && crudObject.isNew();
+            }
+
+            if (this.myActions.save) {
+                this.myActions.saveAction.enable();
             }
 
             if (this.myActions.list != null) {
