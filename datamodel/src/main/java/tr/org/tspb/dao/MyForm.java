@@ -110,6 +110,7 @@ public class MyForm extends FmsFormAbstract {
     private boolean hasAttachedFiles;
     private boolean versionEnable;
     private boolean esignable;
+    private boolean selectAllOnPleaseSelect;
     private Set<String> fieldsKeySet;
     private List<String> userConstantNoteList = new ArrayList<>();
     private List<String> ajaxFields = new ArrayList<>();
@@ -141,8 +142,14 @@ public class MyForm extends FmsFormAbstract {
     private Map<String, MyField> fieldsRow;
     private MyMerge uploadMerge;
     private List<String> fieldsRowKeys;
+    private boolean deleteChildsOnDelete;
 
     public MyForm() {
+    }
+
+    public boolean isSelectAllOnPleaseSelect() {
+        return selectAllOnPleaseSelect;
+
     }
 
     public String getSchemaVersion() {
@@ -655,7 +662,7 @@ public class MyForm extends FmsFormAbstract {
             this.myActions = new MyActions.Build(this.getMyProject().getViewerRole(), this.getDb(),
                     roleMap, searchObject, actions, fmsScriptRunner, userDetail)
                     .maskMyForm(this)
-                    .initAsSchemaVersion100()
+                    .initAsSchemaVersion100(crudObject)
                     .base()
                     .maskSaveWithCurrentCrudObject(crudObject)
                     .maskDeleteWithSave()
@@ -816,6 +823,11 @@ public class MyForm extends FmsFormAbstract {
         return multiUpload;
     }
 
+    @Override
+    public boolean getDeleteChildsOnDelete() {
+        return deleteChildsOnDelete;
+    }
+
     private static class OrderedKey {
 
         private final int orderno;
@@ -856,6 +868,8 @@ public class MyForm extends FmsFormAbstract {
             this.dbObjectForm = dbObjectForm;
             this.searchObject = searchObject;
             this.admin = roleMap.isUserInRole(myProject.getAdminAndViewerRole());
+            this.myForm.deleteChildsOnDelete = dbObjectForm.getBoolean("deleteChildsOnDelete", false);
+            this.myForm.selectAllOnPleaseSelect = dbObjectForm.getBoolean("selectAllOnPleaseSelect", false);
         }
 
         public Builder maskWorkflowRelation() {
