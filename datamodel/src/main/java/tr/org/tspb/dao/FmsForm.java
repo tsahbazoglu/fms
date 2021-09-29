@@ -26,6 +26,8 @@ public interface FmsForm {
     public static final String SCHEMA_VERSION = "schemaVersion";
     public static final String ION_SETTING_ACTIVITY_STATUS = "ion_setting_activity_status";
 
+    public boolean getDeleteChildsOnDelete();
+
     public String getKey();
 
     public String getLoginFkField();
@@ -189,5 +191,7 @@ public interface FmsForm {
     public String getEsignEmailBccRecipients();
 
     public String getAnotherEimzaColletionKey();
+
+    public boolean isSelectAllOnPleaseSelect();
 
 }
