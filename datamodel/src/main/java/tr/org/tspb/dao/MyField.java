@@ -27,6 +27,13 @@ import tr.org.tspb.exceptions.FormConfigException;
  */
 public class MyField {
 
+    /**
+     * @return the initialReadonly
+     */
+    public boolean isInitialReadonly() {
+        return initialReadonly;
+    }
+
     private static final String DEFAULT_CURRENT_VALUE = "defaultCurrentValue";
     private static final String DEFAULT_HISTORY_VALUE = "defaultHistoryValue";
 
@@ -131,6 +138,7 @@ public class MyField {
     private boolean reportRendered;
     private boolean roleCheck;
     private boolean readonly;
+    private boolean initialReadonly;
     // S
     private String sessionKey;
     private String subGroup;
@@ -155,6 +163,7 @@ public class MyField {
     private FmsScriptRunner fmsScriptRunner;
     // 
     private boolean isAutoComplete;
+    private List<Object> selectAllValues;
 
 // </editor-fold>
     public MyField() {
@@ -821,6 +830,12 @@ public class MyField {
             this.myField.workflow = Boolean.TRUE.equals(docField.get(WORKFLOW));
             this.myField.filterProjection = docField.getString(FILTER_PROJECTION);
             maskConverterJson(docField);
+
+            Document pleaseSelect = docField.get("please-select", Document.class);
+            if (pleaseSelect != null) {
+                this.myField.selectAllValues = new FmsSelectAllStrategy(fmsScriptRunner,
+                        pleaseSelect, loginMemberId, null).getListOfObjectIds();
+            }
         }
 
         private Builder maskConverterJson(Document docField) {
@@ -896,6 +911,7 @@ public class MyField {
 
         public Builder withReadonly(boolean readOnly) {
             this.myField.readonly = readOnly;
+            this.myField.initialReadonly = readOnly;
             return this;
         }
 
@@ -1267,5 +1283,12 @@ public class MyField {
      */
     public Integer getConverterMinStrLength() {
         return converterMinStrLength;
+    }
+
+    /**
+     * @return the selectAllStrategy
+     */
+    public List<Object> getSelectAllValues() {
+        return selectAllValues;
     }
 }
