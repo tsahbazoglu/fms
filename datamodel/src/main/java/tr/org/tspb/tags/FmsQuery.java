@@ -112,9 +112,10 @@ public class FmsQuery {
             FmsScriptRunner fmsScriptRunner, ObjectId loginMemberId) throws RuntimeException {
 
         Document result = new Document();
-
-        for (Document d : listOfFilter) {
-            result.putAll(FmsQuery.build(d, filter, fmsScriptRunner, loginMemberId));
+        if (listOfFilter != null) {
+            for (Document d : listOfFilter) {
+                result.putAll(FmsQuery.build(d, filter, fmsScriptRunner, loginMemberId));
+            }
         }
         return result;
     }
