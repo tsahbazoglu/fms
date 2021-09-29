@@ -362,7 +362,9 @@ public class ProjectConstants {
     public static final String ACTION_SAVE = "save";
     public static final String ACTION_SEND_FROMS = "sendForms";
     public static final String ACTION_NORECORD = "norecord";
-    public static final String SAVE_AS = "saveAs";
+    public static final String ACTION_DELETE = "delete";
+    public static final String ACTION_SAVE_AS = "saveAs";
+    public static final String ACTION_COPY_PASTE = "copypaste";
     public static final String SELECT_PLEASE = "Lütfen Seçiniz";
     public static final String SELF = "self";
     public static final String SELECTED_FORM_KEY = "selectedFormKey";
