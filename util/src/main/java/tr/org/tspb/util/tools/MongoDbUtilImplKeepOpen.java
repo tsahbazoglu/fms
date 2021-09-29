@@ -46,6 +46,7 @@ import java.util.function.Consumer;
 import java.util.logging.Level;
 import javax.inject.Inject;
 import org.apache.commons.codec.digest.DigestUtils;
+import org.bson.BsonDocument;
 import org.bson.Document;
 import org.bson.codecs.configuration.CodecRegistries;
 import org.bson.codecs.configuration.CodecRegistry;
@@ -697,6 +698,13 @@ public class MongoDbUtilImplKeepOpen implements MongoDbUtilIntr {
             setUnset.append(DOLAR_SET, record);
 
             mongoClient.getDatabase(database).getCollection(collection).updateOne(filter, setUnset);
+
+            ObjectId recordId = record.getObjectId("_id");
+
+            if (recordId != null) {
+                deleteCacheOne(database, collection, recordId);
+            }
+
         } catch (Exception ex) {
             throw ex;
         }
