@@ -1059,16 +1059,13 @@ public abstract class FmsTable extends FmsTableView {
 
             Document toBeDeleted = repositoryService.expandCrudObject(myForm, new Document(crudObject));
 
-            mongoDbUtil.trigger(//
-                    toBeDeleted,//
-                    myForm.getEventPreDelete(), loginController.getRolesAsList());
+            mongoDbUtil.trigger(toBeDeleted, myForm.getEventPreDelete(),
+                    loginController.getRolesAsList());
 
-            List<ChildFilter> childFilters = myForm.getChilds();
-
-            for (ChildFilter childFilter : childFilters) {
-                if (mongoDbUtil.findOne(childFilter.getDb(), childFilter.getTable(), Filters.eq(childFilter.getFieldKey(), objectID)) != null) {
-                    throw new Exception(childFilter.print(objectID));
-                }
+            if (myForm.getDeleteChildsOnDelete()) {
+                deleteChilds(myForm, objectID);
+            } else {
+                checkChilds(myForm, objectID);
             }
 
             mongoDbUtil.deleteMany(myForm.getDb(), collection, new Document(MONGO_ID, objectID));
@@ -1085,6 +1082,22 @@ public abstract class FmsTable extends FmsTableView {
         dialogController.hidePopup(CRUD_OPERATION_DIALOG2);
 
         return null;
+    }
+
+    private void checkChilds(FmsForm myForm, ObjectId objectID) throws Exception {
+        List<ChildFilter> childFilters = myForm.getChilds();
+        for (ChildFilter childFilter : childFilters) {
+            if (mongoDbUtil.findOne(childFilter.getDb(), childFilter.getTable(), Filters.eq(childFilter.getFieldKey(), objectID)) != null) {
+                throw new Exception(childFilter.print(objectID));
+            }
+        }
+    }
+
+    private void deleteChilds(FmsForm myForm, ObjectId objectID) throws Exception {
+        List<ChildFilter> childFilters = myForm.getChilds();
+        for (ChildFilter childFilter : childFilters) {
+            mongoDbUtil.deleteMany(childFilter.getDb(), childFilter.getTable(), new Document(childFilter.getFieldKey(), objectID));
+        }
     }
 
     public String copyObject(FmsForm myForm, LoginController loginMB, MyMap crudObject) throws Exception {
