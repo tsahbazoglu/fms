@@ -893,6 +893,16 @@ public class OgmCreatorImpl implements OgmCreatorIntr {
                         }
                     }
                 }
+                Document actionsDoc = dboForm.get("actions", Document.class);
+                if (actionsDoc != null) {
+                    for (String actionKey : actionsDoc.keySet()) {
+                        Document action = actionsDoc.get(actionKey, Document.class);
+                        String ref = action.getString("$fms-ref");
+                        if (ref != null) {
+                            action.putAll(myProject.getJsonSchemaDef().get(ref, Document.class));
+                        }
+                    }
+                }
             }
             cacheDocumentForm.put(cacheKey, dboForm);
         }
@@ -1229,7 +1239,7 @@ public class OgmCreatorImpl implements OgmCreatorIntr {
             return new MyActions.Build(myFormLarge.getMyProject().getViewerRole(), myFormLarge.getDb(),
                     roleMap, filter, myFormLarge.getActions(), fmsScriptRunner, userDetail)
                     .maskMyForm(myFormLarge)
-                    .initAsSchemaVersion100()
+                    .initAsSchemaVersion100(null)
                     .base()
                     .build();
         }
