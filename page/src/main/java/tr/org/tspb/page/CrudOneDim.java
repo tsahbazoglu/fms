@@ -771,9 +771,9 @@ public class CrudOneDim implements ValueChangeListener, Serializable {
         }
 
         for (String fieldKey : myForm.getFieldsKeySet()) {
-            MyField fieldStructure = myForm.getField(fieldKey);
-            if (fieldStructure.getCalculateOnSave()) {
-                operatedObject.put(fieldKey, calcService.calculateValue(operatedObject, fieldKey, FacesContext.getCurrentInstance()));
+            MyField myField = myForm.getField(fieldKey);
+            if (myField.getCalculateOnSave()) {
+                operatedObject.put(fieldKey, calcService.calculateValue(operatedObject, myField, FacesContext.getCurrentInstance()));
             }
         }
 
@@ -816,10 +816,10 @@ public class CrudOneDim implements ValueChangeListener, Serializable {
 
         }
 
-        for (String field : myForm.getFieldsKeySet()) {
-            MyField fieldStriucture = myForm.getField(field);
-            if (fieldStriucture.getCalculateAfterSave()) {
-                result.put(field, calcService.calculateValue(operatedObject, field, FacesContext.getCurrentInstance()));
+        for (String fieldKey : myForm.getFieldsKeySet()) {
+            MyField myField = myForm.getField(fieldKey);
+            if (myField.getCalculateAfterSave()) {
+                result.put(fieldKey, calcService.calculateValue(operatedObject, myField, FacesContext.getCurrentInstance()));
             }
         }
 
