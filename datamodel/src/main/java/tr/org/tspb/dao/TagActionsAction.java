@@ -23,7 +23,7 @@ import tr.org.tspb.tags.FmsQuery;
 public class TagActionsAction {
 
     private String db;
-    private final boolean enable;
+    private boolean enable;
     private final ActionEnableResult enableResult;
     private String actionFunc;
     private List<Operation> operations;
@@ -66,6 +66,10 @@ public class TagActionsAction {
                 }
             }
         }
+    }
+
+    public void enable() {
+        this.enable = true;
     }
 
     public boolean isEnable() {
