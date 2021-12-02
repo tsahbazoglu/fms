@@ -187,11 +187,6 @@ public class FreeDesigner implements Serializable {
             }
 
             @Override
-            public List<MyRecord> load(int first, int pageSize, String sortField, SortOrder sortOrder, Map<String, FilterMeta> filterBy) {
-                return FreeDesigner.this.load(null, false, first, pageSize, selectedForm);
-            }
-
-            @Override
             public MyRecord getRowData(String rowKey) {
                 return FreeDesigner.this.getRowData(rowKey);
             }
