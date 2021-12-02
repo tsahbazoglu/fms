@@ -41,6 +41,7 @@ import static tr.org.tspb.constants.ProjectConstants.DOLAR;
 import static tr.org.tspb.constants.ProjectConstants.FIELDS_ROW;
 import static tr.org.tspb.constants.ProjectConstants.FORMFIELDS;
 import static tr.org.tspb.constants.ProjectConstants.FORMS;
+import static tr.org.tspb.constants.ProjectConstants.FORM_CHILD_FIELDS;
 import static tr.org.tspb.constants.ProjectConstants.FORM_DB;
 import static tr.org.tspb.constants.ProjectConstants.FORM_KEY;
 import static tr.org.tspb.constants.ProjectConstants.HAYIR;
@@ -684,6 +685,8 @@ public class OgmCreatorImpl implements OgmCreatorIntr {
         try {
             Map<String, MyField> fields = createFields(myProject, dboForm, filter, roleMap, userDetail);
 
+            List<MyField> childFields = createChildFields(myProject, dboForm, filter, roleMap, userDetail);
+
             Map<String, MyField> rowFields = createRowFields(myProject, dboForm, filter, roleMap, userDetail);
 
             List< MyField> fieldsAsList = new ArrayList<>();
@@ -717,6 +720,7 @@ public class OgmCreatorImpl implements OgmCreatorIntr {
                         .maskReadOnlyNote()
                         .maskUserNote()
                         .maskFields(fields)
+                        .maskChildFields(childFields)
                         .withFieldsAsList(fieldsAsList)
                         .maskRowFields(rowFields)
                         .maskFieldsKeySet()
@@ -749,6 +753,7 @@ public class OgmCreatorImpl implements OgmCreatorIntr {
                                 .maskAccesscontrol()
                                 .maskReadOnlyNote()
                                 .maskUserNote()
+                                .maskChildFields(childFields)
                                 .maskFields(fields)
                                 .withFieldsAsList(fieldsAsList)
                                 .maskRowFields(rowFields)
@@ -780,6 +785,7 @@ public class OgmCreatorImpl implements OgmCreatorIntr {
                                 .maskAccesscontrol()
                                 .maskReadOnlyNote()
                                 .maskUserNote()
+                                .maskChildFields(childFields)
                                 .maskFields(fields)
                                 .withFieldsAsList(fieldsAsList)
                                 .maskRowFields(rowFields)
@@ -811,6 +817,7 @@ public class OgmCreatorImpl implements OgmCreatorIntr {
                                 .maskAccesscontrol()
                                 .maskReadOnlyNote()
                                 .maskUserNote()
+                                .maskChildFields(childFields)
                                 .maskFields(fields)
                                 .withFieldsAsList(fieldsAsList)
                                 .maskRowFields(rowFields)
@@ -842,6 +849,7 @@ public class OgmCreatorImpl implements OgmCreatorIntr {
                                 .maskAccesscontrol()
                                 .maskReadOnlyNote()
                                 .maskUserNote()
+                                .maskChildFields(childFields)
                                 .maskFields(fields)
                                 .withFieldsAsList(fieldsAsList)
                                 .maskRowFields(rowFields)
@@ -941,6 +949,57 @@ public class OgmCreatorImpl implements OgmCreatorIntr {
     @Override
     public MyMap getCrudObject() {
         return new MyMap();
+    }
+
+    private List<MyField> createChildFields(MyProject myProject, Document docForm, Map filter,
+            RoleMap roleMap, UserDetail userDetail) throws NullNotExpectedException, FormConfigException {
+
+        List<Document> childFields = docForm.getList(FORM_CHILD_FIELDS, Document.class);
+
+        List< MyField> fields = new ArrayList<>();
+
+        if (childFields == null) {
+            return fields;
+        }
+
+        if (FmsForm.SCHEMA_VERSION_110.equals(docForm.getString(FmsForm.SCHEMA_VERSION))
+                || FmsForm.SCHEMA_VERSION_111.equals(docForm.getString(FmsForm.SCHEMA_VERSION))) {
+
+            for (Document docField : childFields) {
+
+                Converter converter = createConverter(docForm, docField);
+
+                MyField myField = new MyField.Builder(userDetail.getDbo().getObjectId(), myProject, docField, fmsScriptRunner)
+                        .maskAutoset((String) docForm.get(FmsForm.SCHEMA_VERSION), roleMap)
+                        .maskShortName()
+                        .maskCode()
+                        .withRendered(calcRendered(roleMap, docField, filter, userDetail))
+                        .withReadonly(calcReadOnly(docField, filter, roleMap))
+                        .maskAccesscontrol()
+                        .maskNdTypeAndNdAxis()
+                        .withDefaultValue(calcDefaultValue(myProject, docForm, docField, roleMap, filter, userDetail))
+                        .maskComponentType()
+                        .maskItemsAsMyItems((String) docForm.get(MyForm.SCHEMA_VERSION), filter, roleMap.isUserInRole(myProject.getAdminRole()), roleMap.keySet())
+                        .withConverter(converter, null)
+                        .maskRestOfThem()
+                        .maskDescription()
+                        .maskOrders()
+                        .maskAjax()
+                        .maskSearchAccess()
+                        .maskEmbeddedAsList()
+                        .cacheBsonConverter(converter instanceof BsonConverter)
+                        .build();
+
+                FmsAutoComplete autoComplete = new OnFlyItems(myProject, myField, docForm, filter, roleMap, userDetail, mongoDbUtil);
+
+                myField.setAutoComplete(autoComplete);
+
+                fields.add(myField);
+            }
+
+        }
+
+        return fields;
     }
 
     private Map<String, MyField> createFields(MyProject myProject, Document docForm, Map filter,
