@@ -48,11 +48,6 @@ public class SimplePivotCtrlAdmin implements Serializable {
             }
 
             @Override
-            public List<PivotRecord> load(int first, int pageSize, String sortField, SortOrder sortOrder, Map<String, FilterMeta> filterBy) {
-                return SimplePivotCtrlAdmin.this.load(null, false, first, pageSize, myForm);
-            }
-
-            @Override
             public PivotRecord getRowData(String rowKey) {
                 return SimplePivotCtrlAdmin.this.getRowData(rowKey);
             }
