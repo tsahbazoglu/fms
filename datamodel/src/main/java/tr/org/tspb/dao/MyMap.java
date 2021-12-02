@@ -2,6 +2,8 @@ package tr.org.tspb.dao;
 
 import static tr.org.tspb.constants.ProjectConstants.MONGO_ID;
 import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import org.bson.Document;
 import tr.org.tspb.constants.ProjectConstants;
 
@@ -10,6 +12,8 @@ import tr.org.tspb.constants.ProjectConstants;
  * @author Telman Şahbazoğlu
  */
 public class MyMap extends HashMap {
+
+    public static String __CHILDS = "__childs";
 
     public MyMap() {
         super();
@@ -39,5 +43,19 @@ public class MyMap extends HashMap {
 
     public void addUnSetKey(String unsetKey) {
         ((Document) this.get(ProjectConstants.DOLAR_UNSET)).put(unsetKey, true);
+    }
+
+    /**
+     * @return the myObjectChilds
+     */
+    public List<MyMap> getMyObjectChilds() {
+        return (List<MyMap>) this.get(__CHILDS);
+    }
+
+    /**
+     * @param myObjectChilds the myObjectChilds to set
+     */
+    public void setMyObjectChilds(List<Map> myObjectChilds) {
+        this.put(__CHILDS, myObjectChilds);
     }
 }
