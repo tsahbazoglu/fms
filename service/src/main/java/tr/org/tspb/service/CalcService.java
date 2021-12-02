@@ -42,6 +42,9 @@ public class CalcService extends CommonSrv {
     @MyCtrlServiceQualifier
     protected CtrlService ctrlService;
 
+    @Inject
+    protected FormService formService;
+
     private Map<Map, Map> mapCalculateCache;
 
     Map<Map, List<Document>> applicationSearchResults = new HashMap<>();
@@ -418,15 +421,13 @@ public class CalcService extends CommonSrv {
     private final ScriptEngineManager mgr = new ScriptEngineManager();
     private final ScriptEngine jsEngine = mgr.getEngineByName("JavaScript");
 
-    public Object calculateValue(Map crudObject, String fieldKey, FacesContext context) {
+    public Object calculateValue(Map crudObject, MyField field, FacesContext context) {
 
         if (crudObject == null || crudObject.isEmpty()) {
             return null;
         }
 
-        FmsForm myFrom = (FmsForm) context.getExternalContext().getSessionMap().get(SESSION_ATTR_SELECTED_FORM);
-
-        MyField field = myFrom.getField(fieldKey);
+        FmsForm myFrom = formService.getMyForm();
 
         String calculateOnClient = field.getCalculateOnClient();
 
