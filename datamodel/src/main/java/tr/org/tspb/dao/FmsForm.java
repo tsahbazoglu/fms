@@ -26,6 +26,8 @@ public interface FmsForm {
     public static final String SCHEMA_VERSION = "schemaVersion";
     public static final String ION_SETTING_ACTIVITY_STATUS = "ion_setting_activity_status";
 
+    public List<MyField> getChildFields();
+
     public boolean getDeleteChildsOnDelete();
 
     public String getKey();
@@ -96,6 +98,8 @@ public interface FmsForm {
 
     public Boolean getHistoryRendered();
 
+    public void runAjaxBulkChild(Map<String, MyField> componentMap, MyMap crudObject, RoleMap roleMap, UserDetail userDetail);
+
     public void runAjaxBulk(Map<String, MyField> componentMap, MyMap crudObject, RoleMap roleMap, UserDetail userDetail);
 
     public List getUniqueIndexList();
@@ -162,6 +166,14 @@ public interface FmsForm {
             UserDetail userDetail,
             Document filter);
 
+    public void runAjaxRenderChild(MyField myField,
+            Map<String, MyField> componentMap,
+            final FmsForm selectedForm,
+            MyMap crudObject,
+            RoleMap roleMap,
+            UserDetail userDetail,
+            Document filter);
+
     public void runAjaxRenderRef(MyField myField,
             Map<String, MyField> componentMap,
             final FmsForm selectedForm,
@@ -193,5 +205,7 @@ public interface FmsForm {
     public String getAnotherEimzaColletionKey();
 
     public boolean isSelectAllOnPleaseSelect();
+
+    public MyField getChildField(String fieldKey);
 
 }
