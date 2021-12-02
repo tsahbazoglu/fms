@@ -108,6 +108,8 @@ public abstract class FmsTable extends FmsTableView {
     protected MyMap crudObject;
 
     private Map<String, MyField> componentMap = new HashMap();
+    private Map<String, MyField> componentMapChilds = new HashMap();
+
     private Map transparentProperties = new HashMap();
     private Map emailData = new HashMap();
     private String crudObjectTextViewer;
@@ -156,6 +158,10 @@ public abstract class FmsTable extends FmsTableView {
 
     public void addComponent(String key, MyField myField) {
         this.componentMap.put(key, myField);
+    }
+
+    public void addComponentChild(String key, MyField myField) {
+        this.componentMapChilds.put(key, myField);
     }
 
     public void setComponentMap(Map<String, MyField> componentMap) {
@@ -925,9 +931,9 @@ public abstract class FmsTable extends FmsTableView {
         }
 
         for (String fieldKey : myForm.getFieldsKeySet()) {
-            MyField fieldStriucture = myForm.getField(fieldKey);
-            if (fieldStriucture.getCalculateOnSave()) {
-                operatedObject.put(fieldKey, calcService.calculateValue(operatedObject, fieldKey, FacesContext.getCurrentInstance()));
+            MyField myField = myForm.getField(fieldKey);
+            if (myField.getCalculateOnSave()) {
+                operatedObject.put(fieldKey, calcService.calculateValue(operatedObject, myField, FacesContext.getCurrentInstance()));
             }
         }
 
@@ -981,10 +987,10 @@ public abstract class FmsTable extends FmsTableView {
 
         }
 
-        for (String field : myForm.getFieldsKeySet()) {
-            MyField fieldStriucture = myForm.getField(field);
-            if (fieldStriucture.getCalculateAfterSave()) {
-                result.put(field, calcService.calculateValue(operatedObject, field, FacesContext.getCurrentInstance()));
+        for (String fieldKey : myForm.getFieldsKeySet()) {
+            MyField myField = myForm.getField(fieldKey);
+            if (myField.getCalculateAfterSave()) {
+                result.put(fieldKey, calcService.calculateValue(operatedObject, myField, FacesContext.getCurrentInstance()));
             }
         }
 
@@ -1271,6 +1277,10 @@ public abstract class FmsTable extends FmsTableView {
 
     public void setListOfToBeUpsert(List<Document> listOfToBeUpsert) {
         this.listOfToBeUpsert = listOfToBeUpsert;
+    }
+
+    public Map<String, MyField> getComponentMapChilds() {
+        return componentMapChilds;
     }
 
 }
