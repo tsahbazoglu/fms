@@ -20,44 +20,56 @@ public class MenuModelCreator {
         model = new DefaultMenuModel();
 
         //First submenu
-        DefaultSubMenu firstSubmenu = new DefaultSubMenu("Dynamic Submenu");
+        DefaultSubMenu firstSubmenu = DefaultSubMenu.builder()
+                .label("Dynamic Submenu")
+                .build();
 
-        DefaultMenuItem item = new DefaultMenuItem("External");
+        DefaultMenuItem item = DefaultMenuItem.builder().build();// new DefaultMenuItem("External");
         item.setUrl("http://www.primefaces.org");
         item.setIcon("ui-icon-home");
         firstSubmenu.getElements().add(item);
 
-        model.addElement(firstSubmenu);
+        model.getElements().add(firstSubmenu);
 
         //Second submenu
-        DefaultSubMenu secondSubmenu = new DefaultSubMenu("Dynamic Actions");
+        DefaultSubMenu secondSubmenu = DefaultSubMenu.builder()
+                .label("Dynamic Actions")
+                .build();
 
-        item = new DefaultMenuItem("Save");
+        item = DefaultMenuItem.builder()
+                .value("Save")
+                .build();
         item.setIcon("ui-icon-disk");
         item.setCommand("#{menuBean.save}");
         // item.setUpdate("messages");
         secondSubmenu.getElements().add(item);
 
-        item = new DefaultMenuItem("Delete");
+        item = DefaultMenuItem.builder()
+                .value("Delete")
+                .build();
         item.setIcon("ui-icon-close");
         //item.setCommand("#{menuBean.delete}");
         item.setAjax(false);
         secondSubmenu.getElements().add(item);
 
-        item = new DefaultMenuItem("Redirect");
+        item = DefaultMenuItem.builder()
+                .value("Redirect")
+                .build();
         item.setIcon("ui-icon-search");
         //item.setCommand("#{menuBean.redirect}");
         secondSubmenu.getElements().add(item);
 
-        model.addElement(secondSubmenu);
+        model.getElements().add(secondSubmenu);
     }
 
     public MenuModelCreator(List<ModuleItem> accordionItems) {
 
         model = new DefaultMenuModel();
         for (ModuleItem moduleItem : accordionItems) {
-            DefaultSubMenu submenu = new DefaultSubMenu(moduleItem.getName());
-            model.addElement(submenu);
+            DefaultSubMenu submenu = DefaultSubMenu.builder()
+                    .label(moduleItem.getName())
+                    .build();
+            model.getElements().add(submenu);
             for (SelectItem selectItem : moduleItem.getMyLinks()) {
                 createMenuItem(submenu, selectItem);
             }
@@ -65,7 +77,9 @@ public class MenuModelCreator {
     }
 
     private void createMenuItem(DefaultSubMenu submenu, SelectItem selectItem) {
-        DefaultMenuItem item = new DefaultMenuItem(selectItem.getLabel());
+        DefaultMenuItem item = DefaultMenuItem.builder()
+                .value(selectItem.getLabel())
+                .build();
         item.setUrl("http://www.primefaces.org");
         item.setIcon("ui-icon-home");
         submenu.getElements().add(item);
