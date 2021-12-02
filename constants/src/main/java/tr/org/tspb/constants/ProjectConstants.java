@@ -191,6 +191,7 @@ public class ProjectConstants {
     public static final String FORM_TYPE = "formType";
     public static final String FORM_NAME = "formName";
     public static final String FORMFIELDS = "fields";
+    public static final String FORM_CHILD_FIELDS = "child-fields";
     public static final String FIELDS_ROW = "fieldsRow";
     public static final String FIELD = "field";
     public static final String FIELD_KEY = "fieldKey";
@@ -364,8 +365,8 @@ public class ProjectConstants {
     public static final String ACTION_NORECORD = "norecord";
     public static final String ACTION_DELETE = "delete";
     public static final String ACTION_SAVE_AS = "saveAs";
-    public static final String ACTION_COPY_PASTE = "copypaste";
     public static final String SELECT_PLEASE = "Lütfen Seçiniz";
+    public static final String SELECT_ALL = "Tümü";
     public static final String SELF = "self";
     public static final String SELECTED_FORM_KEY = "selectedFormKey";
     public static final String SELECT_FORM_KEY = "selectFormKey";

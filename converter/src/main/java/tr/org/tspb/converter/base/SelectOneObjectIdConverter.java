@@ -25,6 +25,7 @@ import org.bson.types.ObjectId;
 public class SelectOneObjectIdConverter implements Converter, ConverterAttrs {
 
     public static final ObjectId NULL_VALUE = new ObjectId();
+    public static final ObjectId SELECT_ALL = new ObjectId();
 
     public static Map<Object, String> mapClientIdPerMongoKey = new HashMap<>();
     public static Map<Object, UIComponent> mapComponentPerMongoKey = new HashMap<>();
