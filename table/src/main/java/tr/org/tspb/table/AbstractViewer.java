@@ -126,19 +126,7 @@ public abstract class AbstractViewer implements FmsOnFlyData, Serializable {
                 return randomCars;
             }
 
-            @Override
-            public List<Map> load(int first, int pageSize, String sortField, SortOrder sortOrder, Map<String, FilterMeta> filterBy) {
-                List<Map> randomCars = new ArrayList<>();
-                for (Object obj : list) {
-                    try {
-                        randomCars.add(mongoDbUtil.wrapIt(formService.getMyForm(), (Document) obj));
-                    } catch (NullNotExpectedException ex) {
-                        logger.error("error occured", ex);
-                    }
-                }
-                return randomCars;
-            }
-
+           
             @Override
             public Map getRowData(String rowKey) {
                 return AbstractViewer.this.retriveRowData(rowKey);
