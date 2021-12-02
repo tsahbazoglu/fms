@@ -10,7 +10,6 @@ import java.util.List;
 import java.util.Map;
 import javax.faces.model.SelectItem;
 import org.bson.Document;
-import org.bson.conversions.Bson;
 import org.bson.types.Code;
 import tr.org.tspb.constants.ProjectConstants;
 import static tr.org.tspb.constants.ProjectConstants.CODE;
@@ -28,7 +27,6 @@ import static tr.org.tspb.constants.ProjectConstants.SIMPLE_DATE_FORMAT__0;
 import static tr.org.tspb.constants.ProjectConstants.UPPER_NODES;
 import tr.org.tspb.converter.base.BsonConverter;
 import tr.org.tspb.converter.base.SelectOneDBObjectConverter;
-import tr.org.tspb.converter.base.SelectOneObjectIdConverter;
 import tr.org.tspb.converter.base.SelectOneStringConverter;
 import tr.org.tspb.converter.mb.MySessionStore;
 import tr.org.tspb.dao.FmsAutoComplete;
@@ -115,7 +113,7 @@ public class OnFlyItems implements FmsAutoComplete {
             List<Document> documents = mongoDbUtil.find(myField.getItemsAsMyItems().getDb(), myField.getItemsAsMyItems().getTable(), new Document(MONGO_ID, new Document(DOLAR_IN, listOfIds)));
 
             if (!ComponentType.selectManyListbox.name().equals(myField.getComponentType())) {
-                items.add(new SelectItem(SelectOneObjectIdConverter.NULL_VALUE, SELECT_PLEASE));
+//                items.add(new SelectItem(SelectOneObjectIdConverter.NULL_VALUE, SELECT_PLEASE));
             }
 
             items.addAll(documentsToSelectItems(documents, myField.getItemsAsMyItems().getView()));
@@ -181,7 +179,7 @@ public class OnFlyItems implements FmsAutoComplete {
             List<Document> documents = mongoDbUtil.find(myField.getItemsAsMyItems().getDb(), myField.getItemsAsMyItems().getTable(), new Document(MONGO_ID, new Document(DOLAR_IN, listOfIds)));
 
             if (!ComponentType.selectManyListbox.name().equals(myField.getComponentType())) {
-                items.add(new SelectItem(SelectOneObjectIdConverter.NULL_VALUE, SELECT_PLEASE));
+//                items.add(new SelectItem(SelectOneObjectIdConverter.NULL_VALUE, SELECT_PLEASE));
             }
 
             items.addAll(documentsToSelectItems(documents, myField.getItemsAsMyItems().getView()));
@@ -235,7 +233,7 @@ public class OnFlyItems implements FmsAutoComplete {
                     .find(myField.getItemsAsMyItems().getDb(), myField.getItemsAsMyItems().getTable(), new Document(MONGO_ID, new Document(DOLAR_IN, listOfIds)));
 
             if (!ComponentType.selectManyListbox.name().equals(myField.getComponentType())) {
-                items.add(new SelectItem(SelectOneObjectIdConverter.NULL_VALUE, SELECT_PLEASE));
+//                items.add(new SelectItem(SelectOneObjectIdConverter.NULL_VALUE, SELECT_PLEASE));
             }
 
             items.addAll(documentsToSelectItems(docs, myField.getItemsAsMyItems().getView()));
@@ -374,7 +372,7 @@ public class OnFlyItems implements FmsAutoComplete {
         List<SelectItem> items = new ArrayList<>();
 
         if (!"selectManyListbox".equals(myField.getComponentType())) {
-            items.add(new SelectItem(SelectOneObjectIdConverter.NULL_VALUE, SELECT_PLEASE));
+//            items.add(new SelectItem(SelectOneObjectIdConverter.NULL_VALUE, SELECT_PLEASE));
         }
 
         if (myField.getObserver() instanceof Map) {
