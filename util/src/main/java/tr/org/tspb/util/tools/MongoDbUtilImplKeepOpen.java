@@ -46,7 +46,6 @@ import java.util.function.Consumer;
 import java.util.logging.Level;
 import javax.inject.Inject;
 import org.apache.commons.codec.digest.DigestUtils;
-import org.bson.BsonDocument;
 import org.bson.Document;
 import org.bson.codecs.configuration.CodecRegistries;
 import org.bson.codecs.configuration.CodecRegistry;
@@ -70,6 +69,7 @@ import tr.org.tspb.dao.refs.PlainRecord;
 import tr.org.tspb.pojo.RoleMap;
 import tr.org.tspb.dao.FmsFile;
 import tr.org.tspb.dao.FmsForm;
+import tr.org.tspb.dao.MyMap;
 import tr.org.tspb.dao.TagEvent;
 
 /**
@@ -679,6 +679,18 @@ public class MongoDbUtilImplKeepOpen implements MongoDbUtilIntr {
                 record.put(key, ((String) record.get(key)).replaceAll("<", "").replaceAll(">", ""));
             } else if (record.get(key) instanceof MyBaseRecord) {
                 record.put(key, ((MyBaseRecord) record.get(key)).getObjectId());
+            }
+        }
+
+        List<MyMap> childs = (List<MyMap>) record.get(MyMap.__CHILDS);
+        if (childs != null) {
+            for (MyMap child : childs) {
+                Document unset = (Document) child.remove(DOLAR_UNSET);
+                if (unset != null && !unset.isEmpty()) {
+                    for (String key : unset.keySet()) {
+                        child.remove(key);
+                    }
+                }
             }
         }
 
