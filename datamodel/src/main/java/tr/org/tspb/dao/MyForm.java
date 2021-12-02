@@ -8,6 +8,7 @@ import htmlflow.StaticHtml;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -143,8 +144,14 @@ public class MyForm extends FmsFormAbstract {
     private MyMerge uploadMerge;
     private List<String> fieldsRowKeys;
     private boolean deleteChildsOnDelete;
+    private List<MyField> childFields;
+    private boolean hasChildFields = true;
 
     public MyForm() {
+    }
+
+    public boolean isHasChildFields() {
+        return hasChildFields;
     }
 
     public boolean isSelectAllOnPleaseSelect() {
@@ -442,6 +449,31 @@ public class MyForm extends FmsFormAbstract {
         }
     }
 
+    @Override
+    public void runAjaxBulkChild(Map<String, MyField> componentMap, MyMap crudObject, RoleMap roleMap, UserDetail userDetail) {
+
+        crudObject.initUnSet();
+
+        for (MyField field : componentMap.values()) {
+
+            if (field.getAjax().isEnable()) {
+                switch (field.getAjax().getAction()) {
+                    case "render":
+                        runAjaxRender(field, componentMap, this, crudObject, roleMap, userDetail, null);
+                        break;
+                    case "render-ref":
+                        runAjaxRenderRef(field, componentMap, this, crudObject, roleMap, userDetail, null);
+                        break;
+                    case "list":
+                        runAjaxList(field, componentMap, this, crudObject, roleMap, userDetail, null);
+                        break;
+                    default:
+                        break;
+                }
+            }
+        }
+    }
+
     public void runAjax__uys_member_generate_ldapUID(Map crudObject) {
         if (crudObject.get(MONGO_ID) == null) {
 
@@ -506,6 +538,80 @@ public class MyForm extends FmsFormAbstract {
 
             }
 
+        }
+    }
+
+    public void runAjaxRenderChild(MyField myField,
+            Map<String, MyField> componentMap,
+            final FmsForm selectedForm,
+            MyMap crudObject,
+            RoleMap roleMap,
+            UserDetail userDetail,
+            Document filter) {
+
+        myField.getAjax().getEffectedKeys().forEach((key) -> {
+            crudObject.removeUnSetKey(key);
+        });
+
+        Document crudObjAsDoc = new Document(crudObject);
+        crudObjAsDoc.remove(INODE);
+
+        Object result = null;
+
+        if (FmsForm.SCHEMA_VERSION_111.equals(selectedForm.getSchemaVersion())) {
+            try {
+                String jsScriptString = myField.getAjax().getShowHideJsFunction().replace(DIEZ, DOLAR);
+                jsScriptString = "calculate=" + jsScriptString;
+                jsEngine.eval(jsScriptString);
+                Invocable inv = (Invocable) jsEngine;
+                Object obj = inv.invokeFunction("calculate", crudObject.get(myField.getKey()));
+                if (obj instanceof ScriptObjectMirror) {
+                    ScriptObjectMirror scriptObjectMirror = (ScriptObjectMirror) obj;
+                    result = new Document();
+                    for (String key : scriptObjectMirror.keySet()) {
+                        ((Document) result).put(key, scriptObjectMirror.get(key));
+                    }
+                }
+            } catch (Exception e) {
+            }
+        } else {
+            Document commandResult = fmsScriptRunner.runCommand(selectedForm.getDb(),
+                    myField.getAjax().getShowHideJsFunction(), crudObject.get(myField.getKey()), crudObjAsDoc, roleMap);
+            result = commandResult.get(RETVAL);
+        }
+
+        if (result instanceof Boolean) {
+            if (Boolean.TRUE.equals(result)) {
+                for (String key : myField.getAjax().getEffectedKeys()) {
+                    componentMap.get(key).setRendered(true);
+                    componentMap.get(key).createSelectItems(filter, crudObject, roleMap, userDetail, true);
+                }
+            } else {
+                for (String ajaxEffectedKey : myField.getAjax().getEffectedKeys()) {
+                    crudObject.remove(ajaxEffectedKey);
+                    MyField myField1 = componentMap.get(ajaxEffectedKey);
+                    if (myField1 != null) {
+                        myField1.setRendered(false);
+                    }
+                }
+            }
+        } else if (result instanceof Document) {
+            Document resultDBO = ((Document) result);
+            for (String key : resultDBO.keySet()) {
+                MyField myField1 = componentMap.get(key);
+                if (myField1 != null) {
+                    if (Boolean.TRUE.equals(resultDBO.get(key))) {
+                        myField1.setRendered(true);
+                        myField1.createSelectItems(filter, crudObject, roleMap, userDetail, true);
+                    } else {
+                        myField1.setRendered(false);
+                        if (myField.getAjax().isAjaxRemoveNonRenderdFieldOnRecord()) {
+                            crudObject.remove(key);
+                            crudObject.addUnSetKey(key);
+                        }
+                    }
+                }
+            }
         }
     }
 
@@ -790,6 +896,10 @@ public class MyForm extends FmsFormAbstract {
         return fieldsAsList;
     }
 
+    public List<MyField> getChildFields() {
+        return childFields;
+    }
+
     public boolean isVersionEnable() {
         return versionEnable;
     }
@@ -826,6 +936,16 @@ public class MyForm extends FmsFormAbstract {
     @Override
     public boolean getDeleteChildsOnDelete() {
         return deleteChildsOnDelete;
+    }
+
+    @Override
+    public MyField getChildField(String fieldKey) {
+        for (MyField field : childFields) {
+            if (field.getKey().equals(fieldKey)) {
+                return field;
+            }
+        }
+        return null;
     }
 
     private static class OrderedKey {
@@ -1701,7 +1821,13 @@ public class MyForm extends FmsFormAbstract {
         }
 
         public Builder maskAjax() {
-            for (MyField myField : this.myForm.fields.values()) {
+            maskFieldAjaxUpdatePhrase(this.myForm.fields.values());
+            maskFieldAjaxUpdatePhrase(this.myForm.childFields);
+            return this;
+        }
+
+        private void maskFieldAjaxUpdatePhrase(Collection<MyField> fields) {
+            for (MyField myField : fields) {
 
                 List<String> ajaxEffectedKeys = myField.getAjax().getEffectedKeys();
 
@@ -1718,15 +1844,17 @@ public class MyForm extends FmsFormAbstract {
                 if (ajaxEffectedKeys != null && !ajaxEffectedKeys.isEmpty()) {
                     StringBuilder jsfAjaxUpdateValue = new StringBuilder();
                     for (String effectedKey : ajaxEffectedKeys) {
-                        MyField efectedField = this.myForm.getField(effectedKey);
-
-                        if (efectedField != null) {
+                        MyField effectedField = this.myForm.getChildField(effectedKey);
+                        if (effectedField == null) {
+                            effectedField = this.myForm.getField(effectedKey);
+                        }
+                        if (effectedField != null) {
                             notFoundAnyEffectedKeys = false;
-                            if (efectedField.getComponentType().equals(ComponentType.inputFile.name())) {
+                            if (effectedField.getComponentType().equals(ComponentType.inputFile.name())) {
                                 myField.setHasAjaxEffectedInputFileField(true);
                             }
                             String styleClass = "id-class-".concat(effectedKey);
-                            efectedField.setStyleClass(styleClass);
+                            effectedField.setStyleClass(styleClass);
                             jsfAjaxUpdateValue.append(String.format("@(.%s),", styleClass));
                         }
                     }
@@ -1736,7 +1864,6 @@ public class MyForm extends FmsFormAbstract {
                     myField.getAjax().setEnable(false);
                 }
             }
-            return this;
         }
 
         public Builder maskRowFieldsKeySet() {
@@ -1749,6 +1876,11 @@ public class MyForm extends FmsFormAbstract {
 
         public Builder maskInputFile() {
             this.myForm.resolveAttachedFile();
+            return this;
+        }
+
+        public Builder maskChildFields(List<MyField> childFields) {
+            this.myForm.childFields = childFields;
             return this;
         }
 
