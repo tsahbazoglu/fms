@@ -11,6 +11,7 @@ import javax.servlet.http.HttpSession;
 import org.bson.Document;
 import org.bson.types.Code;
 import org.bson.types.ObjectId;
+import tr.org.tspb.constants.ProjectConstants;
 import static tr.org.tspb.constants.ProjectConstants.COMMA;
 import static tr.org.tspb.constants.ProjectConstants.CREATE_SESSIONID;
 import static tr.org.tspb.constants.ProjectConstants.DEFAULT_QUERY;
@@ -271,6 +272,17 @@ public class FilterUtil {
 
     }
 
+    public void selectAll(FmsForm selectedForm, Document filter, String filterKey) {
+        List selectAllValues = selectedForm.getField(filterKey).getSelectAllValues();
+        if (selectAllValues != null) {
+            filter.put(filterKey, selectAllValues);
+        } else if (selectedForm.isSelectAllOnPleaseSelect()) {
+            filter.remove(filterKey);
+        } else {
+            filter.put(filterKey, "no result");
+        }
+    }
+
     public Document createTableHistoryScemaVersion110(FmsForm selectedForm, Map<String, Object> baseCurrent, Map<String, Object> guiHistory,
             boolean admin, UserDetail userDetail, RoleMap roleMap)
             throws NullNotExpectedException {
@@ -297,9 +309,12 @@ public class FilterUtil {
         Map<String, Object> concurrentModification = new HashMap(filter);
 
         for (Map.Entry<String, Object> entry : concurrentModification.entrySet()) {
+            String filterKey = entry.getKey();
             Object value = entry.getValue();
             if ((value == null || SelectOneObjectIdConverter.NULL_VALUE.equals(value))) {
-                filter.remove(entry.getKey());
+                filter.put(filterKey, "no result");
+            } else if (SelectOneObjectIdConverter.SELECT_ALL.equals(value)) {
+                selectAll(selectedForm, filter, filterKey);
             }
         }
 
@@ -551,9 +566,11 @@ public class FilterUtil {
             if (value == null
                     || SelectOneObjectIdConverter.NULL_VALUE.equals(value)
                     || BsonConverter.NULL_VALUE.equals(value)) {
-                iterator.remove();
+                filter.put(key, "no result");
+            } else if (SelectOneObjectIdConverter.SELECT_ALL.equals(value)) {
+                selectAll(myForm, filter, key);
             }
-
+            
         }
 
         // apply autoset field values
@@ -617,6 +634,8 @@ public class FilterUtil {
                 modifiedFilter.put(filterField, filterValue);
             } else if (filterValue instanceof String) {
                 handlleFilterStrValue(myField, modifiedFilter, filterField, filterValue, entry, filterType);
+            } else if (filterValue instanceof List) {
+                modifiedFilter.put(filterField, new Document(ProjectConstants.DOLAR_IN, filterValue));
             }
         }
 
