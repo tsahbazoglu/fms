@@ -44,16 +44,6 @@ public class FmsTableDataModel extends LazyDataModel<Map> {
     }
 
     @Override
-    public List<Map> load(int first, int pageSize, String sortField, SortOrder sortOrder, Map<String, FilterMeta> filterBy) {
-        try {
-            return fmsOnFlyData.findLazyData(first, pageSize);
-        } catch (Exception ex) {
-            fmsOnFlyData.warn(this.getClass().getName(), "load data", ex);
-            return Collections.emptyList();
-        }
-    }
-
-    @Override
     public Map getRowData(String rowKey) {
         return fmsOnFlyData.retriveRowData(rowKey);
     }
