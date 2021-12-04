@@ -330,13 +330,12 @@ public class OnFlyItems implements FmsAutoComplete {
 
         if (!"selectManyListbox".equals(myField.getComponentType())) {
             if (myField.getMyconverter() instanceof SelectOneStringConverter) {
-                items.add(new SelectItem(((ConverterAttrs) myField.getMyconverter()).getNullValue(), SELECT_PLEASE));//FIXME Generalize NULL statemnet. use somthing like NullPttern
+//                items.add(new SelectItem(((ConverterAttrs) myField.getMyconverter()).getNullValue(), SELECT_PLEASE));//FIXME Generalize NULL statemnet. use somthing like NullPttern
             } else if (myField.getMyconverter() instanceof SelectOneDBObjectConverter) {
-                items.add(new SelectItem(((ConverterAttrs) myField.getMyconverter()).getNullValue(), SELECT_PLEASE));//FIXME Generalize NULL statemnet. use somthing like NullPttern
+//                items.add(new SelectItem(((ConverterAttrs) myField.getMyconverter()).getNullValue(), SELECT_PLEASE));//FIXME Generalize NULL statemnet. use somthing like NullPttern
             } else if (myField.getMyconverter() instanceof BsonConverter) {
                 if (!ComponentType.selectManyListbox.name().equals(myField.getComponentType())) {
-                    //FIXME Generalize NULL statemnet. use somthing like NullPttern
-                    items.add(new SelectItem(BsonConverter.NULL_VALUE, SELECT_PLEASE));
+//                    items.add(new SelectItem(BsonConverter.NULL_VALUE, SELECT_PLEASE));
                 }
             } else {
                 throw new UnsupportedOperationException("engine does not support this type of converter.");
