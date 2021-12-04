@@ -440,7 +440,7 @@
                                     cols="35"
                                     rows="6"
                                     />  
-                                <h:outputText value="&lt;/br>Silmek istediğinizden emin misiniz?&lt;/br>&lt;/br>" escape="false"/>
+                                <h:outputText value="#{formService.myForm.deleteChildsOnDelete?'&lt;/br>Silmek istediğinizden emin misiniz?&lt;/br>&lt;/br>':'Bu kaydı silmek, kayda dair diğer sayfalarda girilen tüm verileri silecektir. Lütfen dikkat ediniz'}" escape="false"/>
 
                                 <h:panelGrid columns="2" style="width: 100%;border: 1px solid green;"
                                              cellspacing="10px;"
