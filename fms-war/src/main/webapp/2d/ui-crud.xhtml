@@ -11,6 +11,12 @@
 
     <h:head>
         <title></title>
+        <style>
+            .td-8{
+                width:100%;
+                height:500px;
+            }
+        </style>
     </h:head>
 
 
@@ -46,7 +52,7 @@
                     onclick="rcSaveAs();return false;"
                     value="Farklı Kaydet" 
                     rendered="#{mainFrame.isTwoDim and formService.myForm.myActions.saveAs}"
-                    />               
+                    />  
                 <p:commandButton 
                     id="id_2d_button_esign"
                     value="2:1 - Eimza Süreci" 
@@ -165,7 +171,7 @@
                     action="#{twoDimModifyCtrl.saveAsObject}" 
                     rendered="#{mainFrame.isTwoDim and formService.myForm.myActions.saveAs}"
                     update="#{updateAjaxMB.btn2dSave},:idTwoDlgTabView,id-tab-view:id-table-file-list"
-                    />
+                    />             
                 <br/>
                 <h:panelGrid 
                     id="crud_2d_dlg_panel"
@@ -226,6 +232,7 @@
                                     myconverter="#{myField.myconverter}"
                                     isAjax="#{myField.ajax.enable}"
                                     ajax_update="#{myField.ajaxUpdate}"
+                                    someaction="#{twoDimModifyCtrl.someaction}"
                                     />
                             </c:if>
                             <p:autoComplete 
@@ -391,7 +398,27 @@
                     </c:forEach>
 
                 </h:panelGrid>
+                <br/>
+                <br/>
+                <ui:include 
+                    src="ui-crud-childs-data-table.xhtml"
+                    />
+            </h:form>
 
+            <h:form id="crud-2d-child-form">
+                <p:dialog
+                    id="id-dlg-child-row-edit"
+                    widgetVar="wv-dlg-child-row-edit"
+                    closeOnEscape="true"
+                    closable="true"
+                    draggable="true"
+                    >
+                    <p:panel>
+                        <ui:include 
+                            src="ui-crud-childs-data-table-edit.xhtml"
+                            />     
+                    </p:panel>
+                </p:dialog>
             </h:form>
             <br/>
             <br/>
@@ -422,12 +449,4 @@
             update="@(.class-data-table-inline-up-files),idTwoDlgTabView:id-table-crud-dlg-tab-attachments,id-tab-view:id-table-file-list"
             />
     </h:form>
-
-
-
-
-
-
-
-
 </html>
