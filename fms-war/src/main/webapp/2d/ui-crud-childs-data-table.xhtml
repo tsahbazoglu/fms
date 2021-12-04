@@ -1,0 +1,95 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://java.sun.com/jsf/html"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:c="http://xmlns.jcp.org/jsp/jstl/core"
+      xmlns:f="http://xmlns.jcp.org/jsf/core">
+
+    <h:head>
+        <title></title>
+    </h:head>
+
+    <div class="ui-g">
+        <div class="ui-g-12">
+            <p:commandButton 
+                value="ekle" 
+                styleClass="ui-priority-primary"
+                update="idTwoDlgTabView:crud2dForm:idDataTableChilds"
+                action="#{twoDimModifyCtrl.onAddNew}" 
+                rendered="#{not empty formService.myForm.childFields}"
+                />
+        </div>
+    </div>
+
+    <p:dataTable 
+        id="idDataTableChilds" 
+        widgetVar="wvDataTableChilds" 
+        var="rowData" 
+        value="#{twoDimModifyCtrl.childRecords}"
+        style="margin:5px;width: 90%"
+        rendered="#{not empty formService.myForm.childFields}"
+        selectionMode="single" 
+        selection="#{twoDimModifyCtrl.selectedChildRow}" 
+        rowKey="#{rowData['rowKey']}"        
+        >
+
+        <p:column width="20px">
+            <h:outputText value="&nbsp;" escape="false"/>
+        </p:column>
+
+        <c:forEach items="#{twoDimModifyCtrl.childFields}" var="field">
+            <p:column headerText="#{field.name}">
+                <h:outputText  
+                    style="#{field.style}"
+                    value="#{rowData[field.field]}"
+                    rendered="#{field.componentType == 'inputDate'}"
+                    converter="fmsDateTimeConverterReadonly"
+                    >
+                    <f:attribute name="datePattern" value="#{field.datePattern}"/>
+                </h:outputText>
+                <h:outputText 
+                    style="#{field.style}"
+                    value="#{rowData[field.field]}"
+                    rendered="#{false 
+                                or field.componentType == twoDimModifyCtrl.selectOneRadio
+                                or field.componentType == twoDimModifyCtrl.selectOneMenu
+                                or field.componentType == twoDimModifyCtrl.inputTextarea
+                                or field.componentType == twoDimModifyCtrl.inputText
+                                or field.componentType == twoDimModifyCtrl.inputMask
+                                or field.componentType == twoDimModifyCtrl.autoComplete}"
+                    converter ="#{field.myconverter}"     
+                    >
+                    <f:attribute name="converterInstance" value="#{field.converterInstance}"/>
+                    <f:attribute name="minFractationDigits" value="#{field.minFractationDigits}"/>
+                    <f:attribute name="maxFractationDigits" value="#{field.maxFractationDigits}"/>
+                    <f:attribute name="divider" value="#{field.divider}"/>
+                    <f:attribute name="fieldKey" value="#{field.fieldKey}"/>
+                    <f:attribute name="crudObject" value="#{rowData}"/>
+                    <f:attribute name="uysformat" value="#{field.uysformat}"/>
+
+                    <f:attribute name="viewKey" value="#{field.viewKey}"/>
+                    <f:attribute name="calculateOnView" value="#{field.calculateOnView}"/>
+                    <f:attribute name="myField" value="#{field}"/>
+                    <f:attribute name="converterFormat" value="#{field.converterFormat}"/>
+                    <f:attribute name="sessionKey" value="#{field.sessionKey}"/>
+                </h:outputText>
+            </p:column>
+        </c:forEach>
+
+        <p:ajax 
+            event="rowSelect" 
+            listener="#{twoDimModifyCtrl.selectChildListener}"
+            update="idTwoDlgTabView:crud-2d-child-form:id-dlg-child-row-edit"
+            partialSubmit="true"
+            process="@this,idTwoDlgTabView:crud2dForm:crud_2d_dlg_panel"
+            />
+
+    </p:dataTable>
+
+
+
+
+
+
+</html>
