@@ -1881,6 +1881,7 @@ public class MyForm extends FmsFormAbstract {
 
         public Builder maskChildFields(List<MyField> childFields) {
             this.myForm.childFields = childFields;
+            this.myForm.hasChildFields = !(childFields == null || childFields.isEmpty());
             return this;
         }
 
