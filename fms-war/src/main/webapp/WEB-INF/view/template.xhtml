@@ -4,7 +4,10 @@
       xmlns:h="http://java.sun.com/jsf/html"
       xmlns:p="http://primefaces.org/ui"
       xmlns:ui="http://java.sun.com/jsf/facelets"
-      xmlns:f="http://java.sun.com/jsf/core">
+      xmlns:f="http://java.sun.com/jsf/core"
+      xmlns:pe="http://primefaces.org/ui/extensions"
+
+      >
     <h:head>
         <title></title>
     </h:head>
@@ -80,20 +83,20 @@
     </h:head>
 
     <h:body style="background-color: #C3CDCE;">
-        <p:layout id="idPFLayout" fullPage="true" style="background-color: #C3CDCE;">
-            <p:layoutUnit id="idPFLayoutUnitNorth" position="north">
+        <pe:layout id="idPFLayout" fullPage="true" style="background-color: #C3CDCE;">
+            <pe:layoutPane id="idPFLayoutUnitNorth" position="north">
                 <h:form id="iceformTop">
                     <ui:include src="/WEB-INF/view/top.xhtml"/>
                 </h:form>
-            </p:layoutUnit>
+            </pe:layoutPane>
 
-            <p:layoutUnit id="idPFLayoutUnitWest" position="west" resizable="true" size="450" minSize="100" maxSize="700">
+            <pe:layoutPane id="idPFLayoutUnitWest" position="west" resizable="true" size="450" minSize="100" maxSize="700">
                 <h:form id="iceformLeft"> 
                     <ui:include src="/WEB-INF/view/menu.xhtml"/> 
                 </h:form> 
-            </p:layoutUnit>
+            </pe:layoutPane>
 
-            <p:layoutUnit id="idPFLayoutUnitCenter" position="center">
+            <pe:layoutPane id="idPFLayoutUnitCenter" position="center">
                 <p:panel 
                     id="idCenterTop"
                     > 
@@ -169,8 +172,8 @@
                         </p:tab>
                     </p:tabView>
                 </h:panelGroup>
-            </p:layoutUnit>
-            <p:layoutUnit id="idPFLayoutUnitSouth" position="south">
+            </pe:layoutPane>
+            <pe:layoutPane id="idPFLayoutUnitSouth" position="south">
                 <h:panelGrid 
                     columns="2"
                     columnClasses="VMiddleHLeftNowrap,VMiddleHRightNowrap"
@@ -182,9 +185,9 @@
                         Copyright © 2012 Türkiye Sermaye Piyasaları Birliği
                     </h:panelGroup>
                 </h:panelGrid>
-            </p:layoutUnit>
+            </pe:layoutPane>
 
-        </p:layout>
+        </pe:layout>
 
         <ui:insert name="dimBasedialog"></ui:insert>
 
