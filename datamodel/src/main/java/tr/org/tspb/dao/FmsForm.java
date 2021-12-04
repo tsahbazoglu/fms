@@ -28,6 +28,8 @@ public interface FmsForm {
 
     public List<MyField> getChildFields();
 
+    public boolean isHasChildFields();
+
     public boolean getDeleteChildsOnDelete();
 
     public String getKey();
