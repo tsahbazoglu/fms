@@ -49,6 +49,8 @@
                             listener="#{twoDimModifyCtrl.valueChangeListenerTableSearch}"
                             update="#{updateAjaxMB.action2DSearch},#{updateAjaxMB.btnCheckAll}"
                             />
+                        <f:selectItem value="#{twoDimModifyCtrl.selectPleaseItem}"/>  
+                        <f:selectItem value="#{twoDimModifyCtrl.selectAllItem}"/>  
                         <f:selectItems value="#{columnMap.selectItemsCurrent}"/>  
                         <f:attribute name="myField" value="#{columnMap}"/>
                         <f:attribute name="myKey" value="#{columnMap.field}"/>  
