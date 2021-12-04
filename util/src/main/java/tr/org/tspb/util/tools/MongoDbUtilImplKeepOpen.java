@@ -649,6 +649,18 @@ public class MongoDbUtilImplKeepOpen implements MongoDbUtilIntr {
             }
         }
 
+        List<MyMap> childs = (List<MyMap>) record.get(MyMap.__CHILDS);
+        if (childs != null) {
+            for (MyMap child : childs) {
+                Document unset = (Document) child.remove(DOLAR_UNSET);
+                if (unset != null && !unset.isEmpty()) {
+                    for (String key : unset.keySet()) {
+                        child.remove(key);
+                    }
+                }
+            }
+        }
+
         Document setUnset = new Document(DOLAR_SET, record);
         if (record.containsKey(DOLAR_UNSET)) {
             setUnset.append(DOLAR_UNSET, record.remove(DOLAR_UNSET));
