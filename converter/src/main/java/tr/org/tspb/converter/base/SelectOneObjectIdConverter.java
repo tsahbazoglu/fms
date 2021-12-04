@@ -147,6 +147,6 @@ public class SelectOneObjectIdConverter implements Converter, ConverterAttrs {
 
     @Override
     public Object getNullValue() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        return NULL_VALUE;
     }
 }
