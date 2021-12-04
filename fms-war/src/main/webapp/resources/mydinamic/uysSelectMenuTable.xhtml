@@ -40,6 +40,10 @@
             caseSensitive="true"
             autoWidth="false" 
             >
+            <f:selectItem
+                itemValue="#{cc.attrs.myconverter.nullValue}" 
+                itemLabel="Lütfen Seçiniz"
+                />
             <f:selectItems value="#{cc.attrs.myitems}" var="item" itemValue="#{item.value}" itemLabel="#{item.label}"/>
             <f:attribute name="label" value="#{cc.attrs.label}"/>
             <f:attribute name="trequired" value="#{cc.attrs.myrequired}"/>
@@ -52,7 +56,7 @@
             <f:param name="fieldKey" value="#{cc.attrs.myFieldKey}"/>
 
             <p:ajax 
-                listener="#{twoDimModifyCtrl.someaction}"
+                listener="#{cc.attrs.someaction}"
                 disabled="#{not cc.attrs.isAjax}" 
                 update="#{cc.attrs.ajax_update}"
                 >
