@@ -10,7 +10,6 @@ import javax.faces.context.FacesContext;
 import javax.faces.convert.Converter;
 import javax.faces.convert.ConverterException;
 import org.bson.Document;
-import org.bson.types.ObjectId;
 import static tr.org.tspb.converter.base.ConverterAttrs.LABEL;
 import static tr.org.tspb.converter.base.ConverterAttrs.TREQUIRED;
 import tr.org.tspb.converter.props.MessageBundleLoader;
@@ -23,6 +22,10 @@ import tr.org.tspb.dao.MyField;
 public class BsonConverter implements Converter {
 
     public static final String NULL_VALUE = "BSON_CONVERTER_NULL_VALUE";
+
+    public Object getNullValue() {
+        return NULL_VALUE;
+    }
 
     @Override
     public Object getAsObject(FacesContext fc, UIComponent component, String value) {
