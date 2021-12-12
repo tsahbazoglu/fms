@@ -16,6 +16,7 @@ import javax.faces.convert.ConverterException;
 public class SelectOneStringConverter implements Converter, ConverterAttrs {
 
     public static final String NULL_VALUE = "NULL_VALUE";
+    public static final String SELECT_ALL = "ALL_VALUE";
 
     public SelectOneStringConverter() {
     }
@@ -64,5 +65,9 @@ public class SelectOneStringConverter implements Converter, ConverterAttrs {
     @Override
     public Object getNullValue() {
         return NULL_VALUE;
+    }
+
+    public Object getSelectAllItem() {
+        return SELECT_ALL;
     }
 }
