@@ -136,8 +136,6 @@ public class TwoDimModifyCtrl extends FmsTable implements ActionListener {
     private static final String SUCCESS_LIST = "successList";
     private String asciidoctorContent = "";
     private Asciidoctor asciidoctor;
-    private SelectItem selectAllItem = new SelectItem(SelectOneObjectIdConverter.SELECT_ALL, SELECT_ALL);
-    private SelectItem selectNull = new SelectItem(SelectOneObjectIdConverter.NULL_VALUE, SELECT_PLEASE);
 
     private TreeNode root;
 
@@ -672,14 +670,6 @@ public class TwoDimModifyCtrl extends FmsTable implements ActionListener {
         return null;
     }
 
-    public SelectItem getSelectAllItem() {
-        return selectAllItem;
-    }
-
-    public SelectItem getSelectPleaseItem() {
-        return selectNull;
-    }
-
     public String saveObject() {
         try {
             saveObject(null);
@@ -995,7 +985,7 @@ public class TwoDimModifyCtrl extends FmsTable implements ActionListener {
             if (formService.getMyForm().isHasChildFields()) {
                 crudObject.setMyObjectChilds(new ArrayList<>());
                 setChildRecords(crudObject.getMyObjectChilds());
-                reset(6);
+                reset(formService.getMyForm().getChildCountDefault());
             }
 
         } catch (Exception ex) {
