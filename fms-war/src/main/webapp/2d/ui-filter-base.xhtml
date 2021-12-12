@@ -49,8 +49,14 @@
                             listener="#{twoDimModifyCtrl.valueChangeListenerTableSearch}"
                             update="#{updateAjaxMB.action2DSearch},#{updateAjaxMB.btnCheckAll}"
                             />
-                        <f:selectItem value="#{twoDimModifyCtrl.selectPleaseItem}"/>  
-                        <f:selectItem value="#{twoDimModifyCtrl.selectAllItem}"/>  
+                        <f:selectItem
+                            itemValue="#{columnMap.myconverter.nullValue}" 
+                            itemLabel="Lütfen Seçiniz ..."
+                            />
+                        <f:selectItem
+                            itemValue="#{columnMap.myconverter.selectAllItem}" 
+                            itemLabel="Tümü"
+                            />
                         <f:selectItems value="#{columnMap.selectItemsCurrent}"/>  
                         <f:attribute name="myField" value="#{columnMap}"/>
                         <f:attribute name="myKey" value="#{columnMap.field}"/>  
