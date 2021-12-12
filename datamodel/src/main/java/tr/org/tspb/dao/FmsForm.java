@@ -28,9 +28,15 @@ public interface FmsForm {
 
     public List<MyField> getChildFields();
 
+    public boolean isChildAdd();
+
+    public int getChildCountDefault();
+
     public boolean isHasChildFields();
 
     public boolean getDeleteChildsOnDelete();
+
+    public String getDeleteChildsOnDeleteMsg();
 
     public String getKey();
 
