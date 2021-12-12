@@ -149,4 +149,8 @@ public class SelectOneObjectIdConverter implements Converter, ConverterAttrs {
     public Object getNullValue() {
         return NULL_VALUE;
     }
+
+    public Object getSelectAllItem() {
+        return SELECT_ALL;
+    }
 }
