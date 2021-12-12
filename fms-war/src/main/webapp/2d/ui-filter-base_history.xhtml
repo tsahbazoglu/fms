@@ -49,6 +49,14 @@
                             listener="#{twoDimViewCtrl.valueChangeListenerTableSearch}"
                             update="#{updateAjaxMB.action2DHistory}"
                             />
+                        <f:selectItem
+                            itemValue="#{columnMap.myconverter.nullValue}" 
+                            itemLabel="Lütfen Seçiniz ..."
+                            />
+                        <f:selectItem
+                            itemValue="#{columnMap.myconverter.selectAllItem}" 
+                            itemLabel="Tümü"
+                            />
                         <f:selectItems value="#{columnMap.selectItemsHistory}"/>  
                         <f:attribute name="myField" value="#{columnMap}"/>
                         <f:attribute name="myKey" value="#{columnMap.field}"/>  
@@ -59,6 +67,14 @@
                         converter="#{columnMap.myconverter}"
                         style="width: 180px"
                         >
+                        <f:selectItem
+                            itemValue="#{columnMap.myconverter.nullValue}" 
+                            itemLabel="Lütfen Seçiniz ..."
+                            />
+                        <f:selectItem
+                            itemValue="#{columnMap.myconverter.selectAllItem}" 
+                            itemLabel="Tümü"
+                            />
                         <p:ajax 
                             listener="#{twoDimViewCtrl.valueChangeListenerTableSearch}" 
                             update="#{updateAjaxMB.action2DHistory}"
