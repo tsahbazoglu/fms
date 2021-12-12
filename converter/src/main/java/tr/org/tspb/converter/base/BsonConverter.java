@@ -22,9 +22,14 @@ import tr.org.tspb.dao.MyField;
 public class BsonConverter implements Converter {
 
     public static final String NULL_VALUE = "BSON_CONVERTER_NULL_VALUE";
+    public static final String SELECT_ALL = "BSON_CONVERTER_ALL_VALUE";
 
     public Object getNullValue() {
         return NULL_VALUE;
+    }
+
+    public Object getSelectAllItem() {
+        return SELECT_ALL;
     }
 
     @Override
