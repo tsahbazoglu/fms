@@ -51,6 +51,8 @@ public class MyForm extends FmsFormAbstract {
     public Map searchObject;
     private String loginFkField;
     //    
+    private boolean childAdd;
+    private int childCountDefault;
     private String posAmountField;
     private String posOrderIdField;
     private String importTextFormat;
@@ -144,6 +146,7 @@ public class MyForm extends FmsFormAbstract {
     private MyMerge uploadMerge;
     private List<String> fieldsRowKeys;
     private boolean deleteChildsOnDelete;
+    private String deleteChildsOnDeleteMsg;
     private List<MyField> childFields;
     private boolean hasChildFields = true;
 
@@ -948,6 +951,18 @@ public class MyForm extends FmsFormAbstract {
         return null;
     }
 
+    public int getChildCountDefault() {
+        return childCountDefault;
+    }
+
+    public boolean isChildAdd() {
+        return childAdd;
+    }
+
+    public String getDeleteChildsOnDeleteMsg() {
+        return deleteChildsOnDeleteMsg;
+    }
+
     private static class OrderedKey {
 
         private final int orderno;
@@ -989,7 +1004,12 @@ public class MyForm extends FmsFormAbstract {
             this.searchObject = searchObject;
             this.admin = roleMap.isUserInRole(myProject.getAdminAndViewerRole());
             this.myForm.deleteChildsOnDelete = dbObjectForm.getBoolean("deleteChildsOnDelete", false);
+            this.myForm.deleteChildsOnDeleteMsg = dbObjectForm.getString("deleteChildsOnDeleteMsg");
+            if (this.myForm.deleteChildsOnDeleteMsg == null) {
+                this.myForm.deleteChildsOnDeleteMsg = "</br>Bu kaydı silmek,</br> kayda dair diğer sayfalarda girilen tüm verileri silecektir. </br></br>Yine de kaydı silmek istiyor musunuz?</br></br>";
+            }
             this.myForm.selectAllOnPleaseSelect = dbObjectForm.getBoolean("selectAllOnPleaseSelect", false);
+            this.myForm.childCountDefault = dbObjectForm.getInteger("child-count-default", 5);
         }
 
         public Builder maskWorkflowRelation() {
