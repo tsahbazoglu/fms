@@ -17,7 +17,7 @@
                 styleClass="ui-priority-primary"
                 update="idTwoDlgTabView:crud2dForm:idDataTableChilds"
                 action="#{twoDimModifyCtrl.onAddNew}" 
-                rendered="#{not empty formService.myForm.childFields}"
+                rendered="#{not empty formService.myForm.childFields and formService.myForm.childAdd}"
                 />
         </div>
     </div>
