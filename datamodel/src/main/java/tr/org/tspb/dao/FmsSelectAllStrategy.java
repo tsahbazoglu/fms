@@ -49,11 +49,13 @@ public class FmsSelectAllStrategy {
         String table = selectAllQuery.getString("table");
         String projection = selectAllQuery.getString("projection");
 
-        List<Document> queryList = selectAllQuery.get("query", Document.class).getList("list", Document.class);
-
-        Document query = FmsQuery.buildListQuery(queryList, filter, fmsScriptRunner, loginMemberId);
-
-        this.listOfObjectIds = fmsScriptRunner.findObjectIds(db, table, query, projection);
+        switch (strategy) {
+            case "QUERY":
+                List<Document> queryList = selectAllQuery.get("query", Document.class).getList("list", Document.class);
+                Document query = FmsQuery.buildListQuery(queryList, filter, fmsScriptRunner, loginMemberId);
+                this.listOfObjectIds = fmsScriptRunner.findObjectIds(db, table, query, projection);
+            default:
+        }
 
     }
 
