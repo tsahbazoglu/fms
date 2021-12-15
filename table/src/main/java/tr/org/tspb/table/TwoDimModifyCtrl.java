@@ -673,6 +673,9 @@ public class TwoDimModifyCtrl extends FmsTable implements ActionListener {
     public String saveObject() {
         try {
             saveObject(null);
+            if (formService.getMyForm().isHasChildFields()) {
+                setChildRecords(crudObject.getMyObjectChilds());
+            }
             ((FmsTableDataModel) getData()).initRowCount(findDataCount());
             ((FmsTableDataModel) getData()).emptyListOfData();
             formService.getMyForm()
@@ -1728,8 +1731,8 @@ public class TwoDimModifyCtrl extends FmsTable implements ActionListener {
             }
             childRecords.remove(toBeRemoved);
         }
+        saveObject();
         dialogController.hidePopup("wv-dlg-child-row-edit");
-
         return null;
     }
 
