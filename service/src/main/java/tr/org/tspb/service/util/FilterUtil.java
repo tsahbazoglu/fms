@@ -3,9 +3,11 @@ package tr.org.tspb.service.util;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import javax.faces.context.FacesContext;
 import javax.servlet.http.HttpSession;
 import org.bson.Document;
@@ -272,15 +274,29 @@ public class FilterUtil {
 
     }
 
-    public void selectAll(FmsForm selectedForm, Document filter, String filterKey) {
-        List selectAllValues = selectedForm.getField(filterKey).getSelectAllValues();
-        if (selectAllValues != null) {
-            filter.put(filterKey, selectAllValues);
-        } else if (selectedForm.isSelectAllOnPleaseSelect()) {
+    public void selectAll(FmsForm selectedForm, Document filter, String filterKey, boolean admin) {
+
+        if (admin) {
             filter.remove(filterKey);
-        } else {
-            filter.put(filterKey, "no result");
+            return;
         }
+
+        MyField myField = selectedForm.getField(filterKey);
+
+        if (myField == null) {
+            filter.remove(filterKey);
+            return;
+        }
+
+        List selectAllValues = selectedForm.getField(filterKey).getSelectAllValues();
+
+        if (selectAllValues == null) {
+            filter.remove(filterKey);
+            return;
+        }
+
+        filter.put(filterKey, selectAllValues);
+
     }
 
     public Document createTableHistoryScemaVersion110(FmsForm selectedForm, Map<String, Object> baseCurrent, Map<String, Object> guiHistory,
@@ -314,7 +330,7 @@ public class FilterUtil {
             if ((value == null || SelectOneObjectIdConverter.NULL_VALUE.equals(value))) {
                 filter.put(filterKey, "no result");
             } else if (SelectOneObjectIdConverter.SELECT_ALL.equals(value)) {
-                selectAll(selectedForm, filter, filterKey);
+                selectAll(selectedForm, filter, filterKey, admin);
             }
         }
 
@@ -560,17 +576,24 @@ public class FilterUtil {
             }
         }
 
-        for (Iterator<String> iterator = filter.keySet().iterator(); iterator.hasNext();) {
+        Set<String> concurrentModificationException = new HashSet<>(filter.keySet());
+
+        for (Iterator<String> iterator = concurrentModificationException.iterator(); iterator.hasNext();) {
             String key = iterator.next();
             Object value = filter.get(key);
             if (value == null
                     || SelectOneObjectIdConverter.NULL_VALUE.equals(value)
-                    || BsonConverter.NULL_VALUE.equals(value)) {
+                    || BsonConverter.NULL_VALUE.equals(value)
+                    || SelectOneStringConverter.NULL_VALUE.equals(value)) {
                 filter.put(key, "no result");
             } else if (SelectOneObjectIdConverter.SELECT_ALL.equals(value)) {
-                selectAll(myForm, filter, key);
+                selectAll(myForm, filter, key, admin);
+            } else if (BsonConverter.SELECT_ALL.equals(value)) {
+                selectAll(myForm, filter, key, admin);
+            } else if (SelectOneStringConverter.SELECT_ALL.equals(value)) {
+                selectAll(myForm, filter, key, admin);
             }
-            
+
         }
 
         // apply autoset field values
