@@ -23,6 +23,7 @@ import static tr.org.tspb.constants.ProjectConstants.VALUE;
 import tr.org.tspb.dao.MyMap;
 import tr.org.tspb.dao.TagItemsQueryRef;
 import tr.org.tspb.datamodel.expected.FmsScriptRunner;
+import tr.org.tspb.pojo.RoleMap;
 
 /**
  *
@@ -122,12 +123,12 @@ public class FmsQuery {
 
     public static Document buildListQueryAjax(List<Document> listOfFilter, Map filter,
             FmsScriptRunner fmsScriptRunner, ObjectId loginMemberId,
-            MyMap crud) throws RuntimeException {
+            MyMap crud, RoleMap roleMap) throws RuntimeException {
 
         Document result = new Document();
 
         for (Document d : listOfFilter) {
-            result.putAll(FmsQuery.buildAjax(d, filter, fmsScriptRunner, loginMemberId, crud));
+            result.putAll(FmsQuery.buildAjax(d, filter, fmsScriptRunner, loginMemberId, crud, roleMap));
         }
         return result;
     }
@@ -136,11 +137,16 @@ public class FmsQuery {
 
     public static Document buildAjax(Document d, Map filter,
             FmsScriptRunner fmsScriptRunner, ObjectId loginMemberId,
-            MyMap crud) {
+            MyMap crud, RoleMap roleMap) {
 
         Document q = new Document();
 
         String key = d.get("key", String.class);
+
+        List roles = d.getList("roles", String.class);
+        if (roles != null && !roleMap.isUserInRole(roles)) {
+            return new Document();
+        }
 
         Document refValue = d.get("ref-value", Document.class);
         Document inRef = d.get("in-ref", Document.class);
