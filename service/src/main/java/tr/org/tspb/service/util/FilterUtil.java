@@ -745,6 +745,8 @@ public class FilterUtil {
             modifiedFilter.put(entry.getKey(), Integer.valueOf(((String) filterValue).replace(COMMA, DOT)));
         } else if ("java.lang.Double".equals(filterType)) {
             modifiedFilter.put(entry.getKey(), 100 * Double.valueOf(((String) filterValue).replace(COMMA, DOT)));
+        } else if ("java.util.Date".equals(filterType) && filterValue.equals("no result")) {
+            //noting
         } else {
             modifiedFilter.put(entry.getKey(),
                     new Document(DOLAR_OPTIONS, "i")
