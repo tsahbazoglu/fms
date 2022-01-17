@@ -23,7 +23,7 @@ public class SharedValues {
     public static final String DB_CONFIG = "configdb";
     public static final String COLLECTION_UPLOADEDFILE = "uploadedfile";
     public static final String COLLECTION_USERS = "users";
-    public static final String COLLECTION_PROJECT = "project2";
+    public static final String COLLECTION_PROJECT = "project3";
     public static final String PATTERN_MAPREDUCE_NAME_DEPARTMENT_USERS_AND_LEADERS = "mapReduceDepartmentUserEmailsPivot";
     public static final String PATTERN_MAPREDUCE_NAME_LEADER_DEPARTMENT_PERSONEL = "mapReduceLeaderDepratmenUser";
     public static final String PATTERN_MAPREDUCE_NAME_IOLOG_MIN = "minMapReduce";
