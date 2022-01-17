@@ -9,6 +9,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import org.bson.Document;
 import org.bson.types.Code;
 import org.bson.types.ObjectId;
@@ -558,6 +560,8 @@ public class MyItems {
 
     }
 
+    static Pattern pattern_fms_crud = Pattern.compile("fms_crud\\{\\{(.*?)\\}\\}");
+
     private Document handleListOfQuery(List<Document> listOfFilter, Map filter,
             FmsScriptRunner fmsScriptRunner, ObjectId loginMemberId) throws RuntimeException {
 
@@ -582,20 +586,25 @@ public class MyItems {
                 result.put(key, new Document(DOLAR_IN,
                         new TagItemsQueryRef(inRef, filter, fmsScriptRunner, loginMemberId).values()));
             } else if (fmsValue != null) {
-                switch (fmsValue) {
-                    case ProjectConstants.REPLACEABLE_KEY_WORD_FOR_FUNCTONS_FILTER_PERIOD:
-                        result.put(key, filter.get("period") == null ? "no result" : filter.get("period"));
-                        break;
-                    case ProjectConstants.REPLACEABLE_KEY_WORD_FOR_FUNCTONS_FILTER_TEMPLATE:
-                        result.put(key, filter.get("template") == null ? "no result" : filter.get("template"));
-                        break;
-                    case ProjectConstants.REPLACEABLE_KEY_WORD_FOR_FUNCTONS_LOGIN_MEMBER_ID:
-                        result.put(key, loginMemberId == null ? "no result" : loginMemberId);
-                        break;
-                    default:
-                        throw new RuntimeException("could not find replaceble word");
+                Matcher m = pattern_fms_crud.matcher(fmsValue);
+                if (m.find()) {
+//                    Object crudValue = crud.get(m.group(1));
+//                    result.put(key, crudValue == null ? "no result" : crudValue);
+                } else {
+                    switch (fmsValue) {
+                        case ProjectConstants.REPLACEABLE_KEY_WORD_FOR_FUNCTONS_FILTER_PERIOD:
+                            result.put(key, filter.get("period") == null ? "no result" : filter.get("period"));
+                            break;
+                        case ProjectConstants.REPLACEABLE_KEY_WORD_FOR_FUNCTONS_FILTER_TEMPLATE:
+                            result.put(key, filter.get("template") == null ? "no result" : filter.get("template"));
+                            break;
+                        case ProjectConstants.REPLACEABLE_KEY_WORD_FOR_FUNCTONS_LOGIN_MEMBER_ID:
+                            result.put(key, loginMemberId == null ? "no result" : loginMemberId);
+                            break;
+                        default:
+                            throw new RuntimeException("could not find replaceble word");
+                    }
                 }
-
             } else if (strValue != null) {
                 result.put(key, strValue);
             } else if (numberValue != null) {
