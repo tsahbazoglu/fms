@@ -707,7 +707,7 @@ public class MyForm extends FmsFormAbstract {
                 MyField effectedField = componentMap.get(effectedKey);
                 if (effectedField != null) {
                     Document query = FmsQuery.buildListQueryAjax(ajaxElement.refreshItemsQuery, filter, fmsScriptRunner,
-                            userDetail.getDbo().getObjectId(), crudObject);
+                            userDetail.getDbo().getObjectId(), crudObject, roleMap);
 
                     effectedField.getItemsAsMyItems()
                             .changeDbTableQuery(ajaxElement.refreshItemsDb, ajaxElement.refreshItemsTable, query);
