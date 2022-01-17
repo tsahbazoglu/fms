@@ -454,12 +454,6 @@ public class TwoDimModifyCtrl extends FmsTable implements ActionListener {
 
     }
 
-    public void valueChangeListenerTableSearch(AjaxBehaviorEvent event) {
-        search();
-        resetActions();
-
-    }
-
     public String actionSearchObject() {
         search();
         resetActions();
@@ -1519,6 +1513,47 @@ public class TwoDimModifyCtrl extends FmsTable implements ActionListener {
 
     }
 
+    public void valueChangeListenerTableSearch(AjaxBehaviorEvent event) {
+        search();
+        resetActions();
+
+        String fieldKey = null;
+
+        if (event == null) {//it is when p:selectOneMenu is place inside ui:include
+            fieldKey = FacesContext.getCurrentInstance().getExternalContext().getRequestParameterMap().get(FIELD_KEY);
+        } else {
+            fieldKey = (String) event.getComponent().getAttributes().get(FIELD_KEY);
+        }
+
+        if (fieldKey == null) {
+            throw new MongoConfigurationException("fieldKey aattribute missed on ajax component");
+        }
+
+        Map<String, MyField> componentMap = new HashMap<>();
+
+        MyField eventField = null;
+
+        for (MyField field : filterService.getQuickFilters()) {
+            if (field.getKey().equals(fieldKey)) {
+                eventField = field;
+            }
+            componentMap.put(field.getKey(), field);
+        }
+
+        MyMap filterAsMap = new MyMap();
+
+        Document doc = filterService.getTableFilterCurrent();
+
+        for (String key : doc.keySet()) {
+            filterAsMap.put(key, doc.get(key));
+        }
+
+        if (eventField != null) {
+            ajaxAction(eventField, componentMap, filterAsMap);
+        }
+
+    }
+
     public void someaction(final AjaxBehaviorEvent event) {
         try {
 
@@ -1535,53 +1570,60 @@ public class TwoDimModifyCtrl extends FmsTable implements ActionListener {
             }
 
             MyField myField = formService.getMyForm().getField(fieldKey);
-            String ajaxAction = myField.getAjax().getAction();
 
-            if (ajaxAction == null) {
-                return;
-            }
-            HttpSession httpSession = (HttpSession) FacesContext.getCurrentInstance().getExternalContext().getSession(false);
+            ajaxAction(myField, getComponentMap(), crudObject);
 
-            switch (ajaxAction) {
-                case "ypi_refresh_list_of_country_and_empty_stock_market":
-                    break;
-                case "ypi_override_required_check":
-                    mapRequired = new HashMap();
-                    if (HAYIR.equals(crudObject.get("is_operated"))) {
-                        mapRequired.put("period", true);
-                        mapRequired.put("is_operated", true);
-                        mapRequired.put("continent", false);
-                        mapRequired.put("country", false);
-                        mapRequired.put("stock_market", false);
-                        mapRequired.put("clearing_house_name", false);
-                        mapRequired.put("trading_volume_client", false);
-                        mapRequired.put("trading_volume_portfolio", false);
-                        httpSession.setAttribute(HTTP_SESSION_ATTR_MAP_REQURED_CONTROL, mapRequired);
-                    } else {
-                        httpSession.removeAttribute(HTTP_SESSION_ATTR_MAP_REQURED_CONTROL);
-                    }
-                    break;
-                case "uys_member_generate_ldapUID":
-                    formService.getMyForm().runAjax__uys_member_generate_ldapUID(crudObject);
-                    throw new UnsupportedOperationException("review ajax functionality");
-                case "render":
-                    formService.getMyForm().runAjaxRender(myField, getComponentMap(), formService.getMyForm(), crudObject,
-                            loginController.getRoleMap(), loginController.getLoggedUserDetail(), filterService.getTableFilterCurrent());
-                    break;
-                case "render-ref":
-                    formService.getMyForm().runAjaxRenderRef(myField, getComponentMap(), formService.getMyForm(), crudObject,
-                            loginController.getRoleMap(), loginController.getLoggedUserDetail(), filterService.getTableFilterCurrent());
-                    break;
-                case "list":
-                    formService.getMyForm().runAjaxList(myField, getComponentMap(), formService.getMyForm(), crudObject,
-                            loginController.getRoleMap(), loginController.getLoggedUserDetail(), filterService.getTableFilterCurrent());
-                    break;
-                default:
-                     ;
-            }
         } catch (Exception ex) {
             addMessage(null, null, ex.getMessage(), FacesMessage.SEVERITY_ERROR);
         }
+    }
+
+    public void ajaxAction(MyField myField, Map<String, MyField> componentMap, MyMap crudObject) {
+
+        String ajaxAction = myField.getAjax().getAction();
+
+        if (ajaxAction == null) {
+            return;
+        }
+        HttpSession httpSession = (HttpSession) FacesContext.getCurrentInstance().getExternalContext().getSession(false);
+
+        switch (ajaxAction) {
+            case "ypi_refresh_list_of_country_and_empty_stock_market":
+                break;
+            case "ypi_override_required_check":
+                mapRequired = new HashMap();
+                if (HAYIR.equals(crudObject.get("is_operated"))) {
+                    mapRequired.put("period", true);
+                    mapRequired.put("is_operated", true);
+                    mapRequired.put("continent", false);
+                    mapRequired.put("country", false);
+                    mapRequired.put("stock_market", false);
+                    mapRequired.put("clearing_house_name", false);
+                    mapRequired.put("trading_volume_client", false);
+                    mapRequired.put("trading_volume_portfolio", false);
+                    httpSession.setAttribute(HTTP_SESSION_ATTR_MAP_REQURED_CONTROL, mapRequired);
+                } else {
+                    httpSession.removeAttribute(HTTP_SESSION_ATTR_MAP_REQURED_CONTROL);
+                }
+                break;
+            case "uys_member_generate_ldapUID":
+                formService.getMyForm().runAjax__uys_member_generate_ldapUID(crudObject);
+                throw new UnsupportedOperationException("review ajax functionality");
+            case "render":
+                formService.getMyForm().runAjaxRender(myField, componentMap, formService.getMyForm(), crudObject,
+                        loginController.getRoleMap(), loginController.getLoggedUserDetail(), filterService.getTableFilterCurrent());
+                break;
+            case "render-ref":
+                formService.getMyForm().runAjaxRenderRef(myField, componentMap, formService.getMyForm(), crudObject,
+                        loginController.getRoleMap(), loginController.getLoggedUserDetail(), filterService.getTableFilterCurrent());
+                break;
+            case "list":
+                formService.getMyForm().runAjaxList(myField, componentMap, formService.getMyForm(), crudObject,
+                        loginController.getRoleMap(), loginController.getLoggedUserDetail(), filterService.getTableFilterCurrent());
+                break;
+            default:
+        }
+
     }
 
     private final String DLG_DESC = "wvDescDlg";
@@ -1715,6 +1757,11 @@ public class TwoDimModifyCtrl extends FmsTable implements ActionListener {
                 }
             }
         }
+
+        if (runEventPreSaveOnChild(filterService.getTableFilterCurrent(), selectedChildRow)) {
+            return null;
+        }
+
         saveObject();
         dialogController.hidePopup("wv-dlg-child-row-edit");
         return null;
