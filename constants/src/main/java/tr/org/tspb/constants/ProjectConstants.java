@@ -87,7 +87,7 @@ public class ProjectConstants {
     public static final String CALCULATE_COLLECTION = "calculateCollection";
     public static final String CALCULATE_REF = "calculate-ref";
     public static final String CELL_VERSION = "cellVersion";
-    public static final String CFG_TABLE_PROJECT = "project2";
+    public static final String CFG_TABLE_PROJECT = "project3";
     public static final String CHILDS = "childs";
     public static final String CODE = "code";
     public static final String COLLECTION = "collection";
