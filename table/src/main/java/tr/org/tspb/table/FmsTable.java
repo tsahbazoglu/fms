@@ -72,6 +72,7 @@ import javax.annotation.PostConstruct;
 import tr.org.tspb.common.qualifier.MyCtrlServiceQualifier;
 import tr.org.tspb.dao.ChildFilter;
 import tr.org.tspb.dao.MyBaseRecord;
+import tr.org.tspb.dao.TagEvent;
 import tr.org.tspb.exceptions.MongoOrmFailedException;
 import tr.org.tspb.factory.qualifier.OgmCreatorQualifier;
 import tr.org.tspb.service.CtrlService;
@@ -229,6 +230,71 @@ public abstract class FmsTable extends FmsTableView {
             return true;
         }
 
+        return false;
+    }
+
+    public boolean runEventPreSaveOnChild(Map query, MyMap crud) {
+
+        TagEvent event = formService.getMyForm().getEventPreSave();
+
+        if (event == null) {
+            return false;
+        }
+
+        String eventPreSaveDB = event.getDb();
+
+        if (eventPreSaveDB == null) {
+            //FIXME messagebundle
+            dialogController.showPopupInfoWithOk("<ul>"
+                    + "<li><font color='red'>Kaydetme İşlemi Gerçekleştirilemedi.</font></li>"
+                    + "<li>Konfigürasyon Hatası : db tanımlı değil.</li>"
+                    + "</ul>", MESSAGE_DIALOG);
+            return true;
+        }
+
+        Document myCrudObject = new Document(crud);
+        myCrudObject.remove(INODE);// we remove it bacuase of MyForm class cannot be serialized for mongo.doEval
+
+        String code = event.getJsFunction();
+        Document commandResult = mongoDbUtil.runCommand(eventPreSaveDB, code, query, myCrudObject);
+        Object result = commandResult.get(RETVAL);
+
+        if (Boolean.TRUE.equals(result)) {
+            //FIXME messagebundle
+            dialogController.showPopupInfoWithOk("<ul>"
+                    + "<li><font color='red'>Kaydetme İşlemi Gerçekleştirilemedi.</font></li>"
+                    + "<li>\"Birlik Temsilcisi\" yalnız bir defa seçilebilmektedir. <br/>Daha önce seçim yaptınız.</li>"
+                    + "</ul>", MESSAGE_DIALOG);
+            return true;
+        }
+
+        if (result instanceof Document) {
+            Document resultJSON = (Document) result;
+            if ("facesMessage".equals(resultJSON.get("gui"))) {
+                String mssssage = resultJSON.get("facesMessage").toString();
+                FacesMessage.Severity severity;
+                switch (resultJSON.get("facesMessageSeverity").toString()) {
+                    case "error":
+                        severity = FacesMessage.SEVERITY_ERROR;
+                        break;
+                    case "info":
+                        severity = FacesMessage.SEVERITY_INFO;
+                        break;
+                    case "warn":
+                        severity = FacesMessage.SEVERITY_WARN;
+                        break;
+                    default:
+                        severity = FacesMessage.SEVERITY_INFO;
+                        break;
+                }
+                FacesContext.getCurrentInstance()
+                        .addMessage(null, new FacesMessage(severity, mssssage, "*"));
+            } else {
+                String mssssage = resultJSON.get("popupMessage").toString();
+                dialogController.showPopupInfoWithOk(mssssage, MESSAGE_DIALOG);
+            }
+            return true;
+        }
         return false;
     }
 
