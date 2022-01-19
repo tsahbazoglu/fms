@@ -1,0 +1,140 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:f="http://java.sun.com/jsf/core"
+      xmlns:h="http://java.sun.com/jsf/html"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:c="http://java.sun.com/jsp/jstl/core"
+      xmlns:mygrid="http://java.sun.com/jsf/composite/telmangrid"
+      xmlns:mydynamic="http://java.sun.com/jsf/composite/mydinamic"
+      xmlns:pe="http://primefaces.org/ui/extensions"
+      >
+
+    <h:head>
+        <title></title>
+        <style>
+            .fms-sheet{
+                height:400;
+                width: 100%;
+            }
+        </style>
+
+        <script>
+            PrimeFaces.locales['tr'] = {
+                closeText: 'kapat',
+                prevText: 'geri',
+                nextText: 'ileri',
+                currentText: 'bugün',
+                monthNames: ['Ocak', 'Şubat', 'Mart', 'Nisan', 'Mayıs', 'Haziran', 'Temmuz', 'Ağustos', 'Eylül', 'Ekim', 'Kasım', 'Aralık'],
+                monthNamesShort: ['Oca', 'Şub', 'Mar', 'Nis', 'May', 'Haz', 'Tem', 'Ağu', 'Eyl', 'Eki', 'Kas', 'Ara'],
+                dayNames: ['Pazar', 'Pazartesi', 'Salı', 'Çarşamba', 'Perşembe', 'Cuma', 'Cumartesi'],
+                dayNamesShort: ['Pz', 'Pt', 'Sa', 'Ça', 'Pe', 'Cu', 'Ct'],
+                dayNamesMin: ['Pz', 'Pt', 'Sa', 'Ça', 'Pe', 'Cu', 'Ct'],
+                weekHeader: 'Hf',
+                firstDay: 1,
+                isRTL: false,
+                showMonthAfterYear: false,
+                yearSuffix: '',
+                timeOnlyTitle: 'Zaman Seçiniz',
+                timeText: 'Zaman',
+                hourText: 'Saat',
+                minuteText: 'Dakika',
+                secondText: 'Saniye',
+                ampm: false,
+                month: 'Ay',
+                week: 'Hafta',
+                day: 'Gün',
+                allDayText: 'Tüm Gün'
+            };
+        </script>
+
+    </h:head>
+
+
+
+
+    <p:growl id="msgs" showDetail="true"/>
+
+
+    <pe:sheet 
+        id="sheet" 
+        widgetVar="sheetWidget" 
+        value="#{sheetController.assets}" 
+        var="row"
+        height="400" 
+        styleClass="fms-sheet"
+        rowKey="#{row.assetId}" 
+        showRowHeaders="true"
+        resizableCols="true" 
+        resizableRows="true" 
+        filteredValue="#{sheetController.filteredAssets}"
+        sortBy="#{row.assetId}" 
+        sortOrder="ascending" 
+        readOnly="false" 
+        locale="tr"
+        rowStyleClass="#{row.purchasePrice gt 0 ? 'positive' : 'negative'}">
+
+        <f:facet name="header">
+            <h:outputText value="Assets"/>
+        </f:facet> 
+
+        <f:facet name="footer">
+            <h:outputText id="footer" value="#{sheetController.filteredAssets.size()} Records"/>
+        </f:facet>
+
+        <c:forEach items="#{formService.myForm.childFields}" var="myField">
+            <pe:sheetcolumn 
+                headerText="#{myField.label}"
+                value="#{row.assetId}"
+                sortBy="#{row.assetId}"
+                filterBy="#{row.assetId}"
+                filterOptions="#{sheetOptionProducer.assetTypes}"
+                colWidth="150"
+                colType="dropdown"
+                selectItems="#{sheetOptionProducer.assetTypesAll}"
+                rendered="#{'selectOneMenu'== myField.componentType}"
+                >
+            </pe:sheetcolumn>  
+            <pe:sheetcolumn 
+                headerText="#{myField.label}"
+                value="#{row.assetId}"
+                sortBy="#{row.assetId}"
+                colWidth="150"
+                colType="text"
+                filterBy="#{row.assetId}"
+                rendered="#{'inputText'== myField.componentType}"
+                >
+            </pe:sheetcolumn>  
+            <pe:sheetcolumn 
+                headerText="#{myField.label}"
+                value="#{row.assetId}"
+                sortBy="#{row.assetId}"
+                colWidth="150"
+                colType="date"
+                filterBy="#{row.assetId}"
+                dateFormat="YYYY-MM-DD"
+                rendered="#{'inputDate'== myField.componentType}"
+                >
+                <f:convertDateTime type="date" pattern="YYYY-MM-DD"/>
+            </pe:sheetcolumn>
+
+        </c:forEach>
+
+    </pe:sheet>
+
+
+    <style type="text/css">
+        .positive {
+            color: Green !important;
+        }
+
+        .negative {
+            color: Red !important;
+        }
+
+        .password {
+            color: DarkViolet !important
+        }
+    </style>
+
+</html>

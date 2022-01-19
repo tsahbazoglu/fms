@@ -1,0 +1,122 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:f="http://java.sun.com/jsf/core"
+      xmlns:h="http://java.sun.com/jsf/html"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:c="http://java.sun.com/jsp/jstl/core"
+      xmlns:mygrid="http://java.sun.com/jsf/composite/telmangrid"
+      xmlns:mydynamic="http://java.sun.com/jsf/composite/mydinamic"
+      >
+
+    <h:head>
+        <title></title>
+    </h:head>
+
+
+    <p:commandButton 
+        value="+"
+        immediate="true"
+        action="#{twoDimModifyCtrl.addChild}"
+        update=":idTwoDlgTabView:crud2dForm:denemelerim"
+        />
+
+    <p:scrollPanel 
+        mode="native"
+        styleClass="td-8"
+        id="denemelerim"
+        >
+
+        <p:dataGrid
+            columns="1"
+            value="#{twoDimModifyCtrl.myObject['__childs']}"
+            var="child"
+            >
+
+
+            <h:panelGrid 
+                columns="2" 
+                columnClasses="td-3,td-2,td-2,td-1" 
+                styleClass="tableWidth"
+                >
+
+
+                <c:forEach items="#{formService.myForm.childFields}" var="myField">
+
+                    <h:panelGroup>
+                        <h:outputLabel
+                            value="#{myField.label}" 
+                            escape="false"
+                            style="#{myField.labelStyle}"
+                            styleClass="medium-font-size"
+                            rendered="#{myField.rendered}"
+                            >
+                        </h:outputLabel>
+                    </h:panelGroup>
+
+                    <h:panelGroup>
+                        <c:if test="#{twoDimModifyCtrl.selectOneMenu eq  myField.componentType}">
+                            <mydynamic:uysSelectMenuTable  
+                                myField="#{myField}"                                    
+                                myvalue="#{child[myField.key]}"
+                                myFieldKey="#{myField.key}"
+                                myProjectKey="#{formService.myForm.projectKey}"
+                                myUpperNode="#{formService.myForm.upperNode}"
+                                myFormKey="#{formService.myForm.key}"
+                                myreadonly="#{myField.readonly}" 
+                                label="#{myField.label}" 
+                                myitems="#{myField.selectItemsCurrent}" 
+                                myrequired="#{myField.required}"
+                                rendered="#{myField.rendered}"
+                                myconverter="#{myField.myconverter}"
+                                isAjax="#{myField.ajax.enable}"
+                                ajax_update="#{myField.ajaxUpdate}"
+                                />
+                        </c:if>
+                        <mydynamic:uysDateTimeEntry 
+                            myvalue="#{child[myField.key]}"
+                            myreadonly="#{myField.readonly}"
+                            label="#{myField.label}" 
+                            rendered="#{myField.componentType eq twoDimModifyCtrl.inputDate and myField.rendered}"
+                            myconverter="#{myField.myconverter}"
+                            myrequired="#{myField.required}"
+                            mypattern="#{myField.datePattern}"
+                            dateChange="#{twoDimModifyCtrl.dateChange}"
+                            />
+                        <mydynamic:uysInputText 
+                            myvalue="#{child[myField.key]}"
+                            myFieldKey="#{myField.key}"
+                            myreadonly="#{myField.readonly}" 
+                            myrequired="#{myField.required}"
+                            mystyle="#{myField.style}"
+                            myCalculateOnCrudView="#{myField.calculateOnCrudView}"
+                            myCalculateOnListView="#{myField.calculateOnListView}"
+                            myCalculateOnSave="#{myField.calculateOnSave}"
+                            label="#{myField.label}" 
+                            rendered="#{twoDimModifyCtrl.inputText eq  myField.componentType and myField.rendered}"
+                            myConverter="#{myField.myconverter}"
+                            myConverterInstance="#{myField.converterInstance}" 
+                            myConverterFormat="#{myField.converterFormat}" 
+                            myConverterParam="#{myField.converterParam}"
+                            myMinStrLength="#{myField.converterMinStrLength}" 
+                            crudObject="#{twoDimModifyCtrl.myObject}"
+                            myMaxValue="#{myField.maxValue}" 
+                            shouldCheckNegative="#{myField.shouldCheckNegative}"
+                            /> 
+                    </h:panelGroup>
+
+                </c:forEach>
+
+                <br/>
+                <hr/>
+                <br/>
+
+            </h:panelGrid>
+
+
+
+        </p:dataGrid>
+
+
+    </p:scrollPanel>
+</html>

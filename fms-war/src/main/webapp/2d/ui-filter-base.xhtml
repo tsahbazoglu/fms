@@ -36,31 +36,38 @@
                         mypattern="#{columnMap.datePattern}"
                         dateChange="#{twoDimModifyCtrl.dateChange}"
                         />
-                    <p:selectOneMenu 
-                        value="#{filterService.guiFilterCurrent[columnMap.field]}"
-                        rendered="#{columnMap!=null and columnMap.componentType eq twoDimModifyCtrl.selectOneMenu}"
-                        converter="#{columnMap.myconverter}"
-                        filter="true" 
-                        filterMatchMode="contains"   
-                        caseSensitive="true"
-                        style="width: 180px"
-                        >
-                        <p:ajax 
-                            listener="#{twoDimModifyCtrl.valueChangeListenerTableSearch}"
-                            update="#{updateAjaxMB.action2DSearch},#{updateAjaxMB.btnCheckAll}"
-                            />
-                        <f:selectItem
-                            itemValue="#{columnMap.myconverter.nullValue}" 
-                            itemLabel="Lütfen Seçiniz ..."
-                            />
-                        <f:selectItem
-                            itemValue="#{columnMap.myconverter.selectAllItem}" 
-                            itemLabel="Tümü"
-                            />
-                        <f:selectItems value="#{columnMap.selectItemsCurrent}"/>  
-                        <f:attribute name="myField" value="#{columnMap}"/>
-                        <f:attribute name="myKey" value="#{columnMap.field}"/>  
-                    </p:selectOneMenu>
+                    <c:if test="#{twoDimModifyCtrl.selectOneMenu eq  columnMap.componentType}">
+                        <p:selectOneMenu 
+                            value="#{filterService.guiFilterCurrent[columnMap.field]}"
+                            converter="#{columnMap.myconverter}"
+                            filter="true" 
+                            filterMatchMode="contains"   
+                            caseSensitive="true"
+                            style="width: 180px"
+                            >
+
+                            <f:selectItem
+                                itemValue="#{columnMap.myconverter.nullValue}" 
+                                itemLabel="Lütfen Seçiniz ..."
+                                />
+                            <f:selectItem
+                                itemValue="#{columnMap.myconverter.selectAllItem}" 
+                                itemLabel="Tümü"
+                                />
+                            <f:selectItems value="#{columnMap.selectItemsCurrent}"/>  
+
+                            <f:attribute name="myField" value="#{columnMap}"/>
+                            <f:attribute name="myKey" value="#{columnMap.field}"/>  
+                            <f:attribute name="fieldKey" value="#{columnMap.key}"/>
+
+                            <p:ajax 
+                                listener="#{twoDimModifyCtrl.valueChangeListenerTableSearch}"
+                                update="id-2d-form-quick-filter,#{updateAjaxMB.action2DSearch},#{updateAjaxMB.btnCheckAll}"
+                                process="@form"
+                                />
+                        </p:selectOneMenu>
+                    </c:if>
+
                     <h:selectOneMenu 
                         value="#{filterService.guiFilterCurrent[columnMap.field]}"
                         rendered="#{columnMap!=null and columnMap.componentType eq twoDimModifyCtrl.selectOneRadio}"
