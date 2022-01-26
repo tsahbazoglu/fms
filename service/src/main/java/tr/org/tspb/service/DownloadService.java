@@ -12,6 +12,7 @@ import java.io.StringReader;
 import java.io.StringWriter;
 import java.text.NumberFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Currency;
 import java.util.Date;
 import java.util.HashMap;
@@ -90,7 +91,7 @@ public class DownloadService extends CommonSrv {
     private Document searcheDBObject;
     private StringWriter sw;
     private int columnCount;
-    private final Map<ObjectId, String> tempCache = new HashMap<>();
+    private final Map<ObjectId, List<String>> tempCache = new HashMap<>();
     private final Map<String, String> tempCacheBsonconverter = new HashMap<>();
 
     public DownloadService() {
@@ -180,7 +181,13 @@ public class DownloadService extends CommonSrv {
             int y = 0;
             for (String key : columnList) {
                 MyField field = formService.getMyForm().getField(key);
-                row.createCell(y++).setCellValue(field.getName());
+                if (field.getItemsAsMyItems() != null && field.getItemsAsMyItems().getView() != null) {
+                    for (String columnName : field.getItemsAsMyItems().getView()) {
+                        row.createCell(y++).setCellValue(field.getDbo().get(columnName) == null ? columnName : field.getDbo().get(columnName).toString());
+                    }
+                } else {
+                    row.createCell(y++).setCellValue(field.getName());
+                }
             }
             i++;
             FileOutputStream fileOut;
@@ -195,20 +202,29 @@ public class DownloadService extends CommonSrv {
                     Object keyValue = data.get(key);
                     if (keyValue instanceof ObjectId && !MONGO_ID.equals(key)) {
                         if (field != null) {
-                            String myDb = field.getItemsAsMyItems().getDb();
-                            String myColl = field.getRefCollection() == null ? field.getItemsAsMyItems().getTable() : field.getRefCollection();
-                            String columnName = field.getItemsAsMyItems().getView().get(0);
-                            if (tempCache.get((ObjectId) keyValue) == null) {
+                            ObjectId keyValueObjectId = (ObjectId) keyValue;
+
+                            if (tempCache.get(keyValueObjectId) == null) {
+                                String myDb = field.getItemsAsMyItems().getDb();
+                                String myColl = field.getRefCollection() == null ? field.getItemsAsMyItems().getTable() : field.getRefCollection();
+
                                 Document record = mongoDbUtil.findOne(
                                         myDb == null ? formService.getMyForm().getDb() : myDb,
                                         myColl,
-                                        new Document(MONGO_ID, keyValue));
-                                tempCache.put((ObjectId) keyValue, record == null ? "NO DATA ERROR"
-                                        : record.get(columnName) == null ? "NO NAME" : record.get(columnName).toString());
+                                        new Document(MONGO_ID, keyValueObjectId));
+
+                                if (record == null) {
+                                    tempCache.put(keyValueObjectId, Arrays.asList("NO DATA ERROR"));
+                                } else {
+                                    List<String> names = new ArrayList<>();
+
+                                    for (String columnName : field.getItemsAsMyItems().getView()) {
+                                        names.add(record.get(columnName) == null ? "NO NAME" : record.get(columnName).toString());
+                                    }
+                                    tempCache.put(keyValueObjectId, names);
+                                }
                             }
-
-                            keyValue = tempCache.get((ObjectId) keyValue);
-
+                            keyValue = tempCache.get(keyValueObjectId);
                         }
                     } else if (keyValue instanceof Document) {
                         keyValue = ((Document) keyValue).get(NAME);
@@ -216,17 +232,26 @@ public class DownloadService extends CommonSrv {
                         keyValue = getTempCacheBsonconverter(keyValue.toString(), field);
                     }
 
-                    XSSFCell cell = row.createCell(y++);
-                    cell.setCellValue(keyValue == null ? "no data" : keyValue.toString());
-                    if (keyValue instanceof Number) {
-                        if (field.getMyconverter() instanceof MoneyConverter) {
-                            keyValue = ((Number) keyValue).doubleValue() / 100;
+                    if (keyValue instanceof List) {
+
+                        for (String strValue : (List<String>) keyValue) {
+                            XSSFCell cell = row.createCell(y++);
+                            cell.setCellValue(keyValue == null ? "no data" : strValue);
                         }
-                        XSSFCellStyle style = xssfWorkbook.createCellStyle();
-                        style.setDataFormat((short) 0x27);
-                        cell.setCellStyle(style);
-                        cell.setCellValue(((Number) keyValue).doubleValue());
-                        cell.setCellType(XSSFCell.CELL_TYPE_NUMERIC);
+
+                    } else {
+                        XSSFCell cell = row.createCell(y++);
+                        cell.setCellValue(keyValue == null ? "no data" : keyValue.toString());
+                        if (keyValue instanceof Number) {
+                            if (field.getMyconverter() instanceof MoneyConverter) {
+                                keyValue = ((Number) keyValue).doubleValue() / 100;
+                            }
+                            XSSFCellStyle style = xssfWorkbook.createCellStyle();
+                            style.setDataFormat((short) 0x27);
+                            cell.setCellStyle(style);
+                            cell.setCellValue(((Number) keyValue).doubleValue());
+                            cell.setCellType(XSSFCell.CELL_TYPE_NUMERIC);
+                        }
                     }
                 }
                 i++;
