@@ -87,7 +87,7 @@ public class NumberConverter implements Converter, ConverterAttrs {
                 throw new ConverterException(facesMessageRequired);
             }
             //null durumunda veri set edilmiyor
-            return "";
+            return 0;
         }
 
         Object max = component.getAttributes().get("maxValue");//kuruş degil,TL anlamındadır
