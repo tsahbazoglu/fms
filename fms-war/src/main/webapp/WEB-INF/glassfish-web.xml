@@ -11,6 +11,10 @@
     <security-role-mapping>
         <role-name>admin</role-name>
         <group-name>admin</group-name>
+    </security-role-mapping> 
+    <security-role-mapping>
+        <role-name>gyonadadmin</role-name>
+        <group-name>gyonadadmin</group-name>
     </security-role-mapping>
     <security-role-mapping>
         <role-name>uysviewer</role-name>

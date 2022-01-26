@@ -104,6 +104,7 @@
             <role-name>architect</role-name>          
             <role-name>uysviewer</role-name>
             <role-name>uysuser</role-name>
+            <role-name>gyonadadmin</role-name>
             <role-name>uysadmin</role-name>
             <role-name>uysadmin2</role-name>
             <role-name>uysdesigner</role-name>
@@ -255,6 +256,10 @@
     <security-role>
         <description/>
         <role-name>ypiadmin</role-name>
+    </security-role>  
+    <security-role>
+        <description/>
+        <role-name>gyonadadmin</role-name>
     </security-role>
     <security-role>
         <description/>
