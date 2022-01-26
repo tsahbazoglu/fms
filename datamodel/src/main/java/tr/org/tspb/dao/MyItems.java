@@ -167,6 +167,9 @@ public class MyItems {
     }
 
     public List<String> getView() {
+        if (view == null) {
+            return null;
+        }
         return Collections.unmodifiableList(view);
     }
 
