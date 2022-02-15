@@ -72,7 +72,7 @@ if (!telmangrid.clarity) {
                                 // Handsontable.TextCell.renderer.apply(this, arguments); -version 0.10.5
                                 Handsontable.renderers.TextRenderer.apply(this, arguments);
                                 $(td).css({
-                                    background: cellRender.background,
+                                    "background": cellRender.background,
                                     "text-align": "right"
                                 });
                             },
