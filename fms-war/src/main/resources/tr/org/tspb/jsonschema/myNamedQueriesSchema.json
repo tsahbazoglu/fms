@@ -1,0 +1,33 @@
+{
+    "$schema": "http://json-schema.org/draft-04/schema#",
+    "title": "MyNamedQueries",
+    "description": "MyNamedQueries Description",
+    "type": "object",
+    "properties": {
+        "include": {
+            "type": "array",
+            "items": {
+                "type": "object",
+                "properties": {
+                    "query": {
+                        "type": "object"
+                    },
+                    "priority": {
+                        "type": "number"
+                    },
+                    "roles": {
+                        "type": "array",
+                        "items": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "overAllCheck": {
+            "type": "object"
+        }
+    },
+    "required": [],
+    "additionalProperties": false
+}

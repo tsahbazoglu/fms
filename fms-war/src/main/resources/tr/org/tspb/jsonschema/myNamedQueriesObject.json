@@ -1,0 +1,24 @@
+{
+    "include": [
+        {
+            "roles": ["kpbarchitect", "kpbadmin"],
+            "query": [
+            ],
+            "priority": 7
+        },
+        {
+            "roles": ["uysuser", "bnkakuser"],
+            "query": [
+                {
+                    "key": "result",
+                    "string-value": "HATA VAR"
+                },
+                {
+                    "key": "member",
+                    "fms-value": "fms_code{{login_member_id}}"
+                }
+            ],
+            "priority": 7
+        }
+    ]
+}

@@ -1,0 +1,18 @@
+{
+    "$schema": "http://json-schema.org/draft-04/schema#",
+    "title": "MyField",
+    "description": "MyField Description",
+    "type": "object",
+    "properties": {
+        "rendered": {
+            "type": "object",
+            "properties": {
+                "boolean-value": {
+                    "type": "boolean"
+                }
+            }
+        }
+    },
+    "required": [],
+    "additionalProperties": true
+}
