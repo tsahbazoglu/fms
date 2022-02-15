@@ -107,6 +107,13 @@
                 rendered="#{formService.myForm.myActions.emailToAll}"
                 style="white-space: nowrap;"
                 />
+
+            <p:button 
+                value="Toplu Veri Yükleme Aracı" 
+                rendered="#{formService.myForm.myActions.upload}"
+                onclick="PF('wv-bulkdupload').show();return false;"
+                style="white-space: nowrap;"
+                />
         </f:facet>
     </p:toolbar>
 
