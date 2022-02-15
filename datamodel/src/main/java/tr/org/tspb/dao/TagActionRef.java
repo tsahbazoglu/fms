@@ -6,6 +6,7 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import org.bson.Document;
+import org.bson.types.ObjectId;
 import tr.org.tspb.constants.ProjectConstants;
 import static tr.org.tspb.constants.ProjectConstants.DIEZ;
 import static tr.org.tspb.constants.ProjectConstants.DOLAR;
@@ -14,6 +15,8 @@ import static tr.org.tspb.constants.ProjectConstants.DOLAR_NE;
 import static tr.org.tspb.constants.ProjectConstants.DOLAR_REGEX;
 import static tr.org.tspb.constants.ProjectConstants.MEMBER;
 import static tr.org.tspb.constants.ProjectConstants.PERIOD;
+import static tr.org.tspb.constants.ProjectConstants.REPLACEABLE_KEY_FMS_ID_VALUE;
+import static tr.org.tspb.constants.ProjectConstants.REPLACEABLE_KEY_FMS_VALUE;
 import static tr.org.tspb.constants.ProjectConstants.TEMPLATE;
 import static tr.org.tspb.constants.ProjectConstants.VALUE;
 import tr.org.tspb.datamodel.expected.FmsScriptRunner;
@@ -26,6 +29,7 @@ import tr.org.tspb.pojo.UserDetail;
 public class TagActionRef {
 
     static Pattern pattern_fms_crud = Pattern.compile("fms_crud\\{\\{(.*?)\\}\\}");
+    static Pattern pattern_fms_filter = Pattern.compile("fms_filter\\{\\{(.*?)\\}\\}");
 
     static Boolean calc(Document ref, Map filter, UserDetail userDetail, FmsScriptRunner fmsScriptRunner, MyMap crudObject) {
 
@@ -41,36 +45,61 @@ public class TagActionRef {
 
             String key = d.get("key", String.class);
 
-            String fmsValue = d.get("fms-value", String.class);
+            String fmsValue = d.get(REPLACEABLE_KEY_FMS_VALUE, String.class);
+            String fmsIdValue = d.get(REPLACEABLE_KEY_FMS_ID_VALUE, String.class);
             String strValue = d.get("string-value", String.class);
             Number numberValue = d.get("number-value", Number.class);
 
-            if (fmsValue != null) {
-
+            if (fmsIdValue != null) {
+                Matcher crudMatcher = pattern_fms_crud.matcher(fmsIdValue);
+                if (crudMatcher.find()) {
+                    Object crudValue = crudObject == null ? null : crudObject.get(crudMatcher.group(1));
+                    query.put(key, crudValue instanceof ObjectId ? "no result" : crudValue);
+                } else {
+                    Object crudValue;
+                    switch (fmsIdValue) {
+                        case ProjectConstants.REPLACEABLE_KEY_WORD_FOR_FUNCTONS_FILTER_MEMBER:
+                            crudValue = filter.get(MEMBER);
+                            break;
+                        case ProjectConstants.REPLACEABLE_KEY_WORD_FOR_FUNCTONS_FILTER_PERIOD:
+                            crudValue = filter.get(PERIOD);
+                            break;
+                        case ProjectConstants.REPLACEABLE_KEY_WORD_FOR_FUNCTONS_FILTER_TEMPLATE:
+                            crudValue = filter.get(TEMPLATE);
+                            break;
+                        case ProjectConstants.REPLACEABLE_KEY_WORD_FOR_FUNCTONS_LOGIN_MEMBER_ID:
+                            crudValue = userDetail.getDbo().getObjectId();
+                            break;
+                        default:
+                            throw new RuntimeException("could not find replaceble word");
+                    }
+                    query.put(key, crudValue instanceof ObjectId ? crudValue : "no result");
+                }
+            } else if (fmsValue != null) {
                 Matcher m = pattern_fms_crud.matcher(fmsValue);
                 if (m.find()) {
                     Object crudValue = crudObject == null ? null : crudObject.get(m.group(1));
                     query.put(key, crudValue == null ? "no result" : crudValue);
                 } else {
-
+                    Object crudValue;
                     switch (fmsValue) {
                         case ProjectConstants.REPLACEABLE_KEY_WORD_FOR_FUNCTONS_FILTER_MEMBER:
-                            query.put(key, filter.get(MEMBER) == null ? "no result" : filter.get(MEMBER));
+                            crudValue = filter.get(MEMBER);
                             break;
                         case ProjectConstants.REPLACEABLE_KEY_WORD_FOR_FUNCTONS_FILTER_PERIOD:
-                            query.put(key, filter.get(PERIOD) == null ? "no result" : filter.get(PERIOD));
+                            crudValue = filter.get(PERIOD);
                             break;
                         case ProjectConstants.REPLACEABLE_KEY_WORD_FOR_FUNCTONS_FILTER_TEMPLATE:
-                            query.put(key, filter.get(TEMPLATE) == null ? "no result" : filter.get(TEMPLATE));
+                            crudValue = filter.get(TEMPLATE);
                             break;
                         case ProjectConstants.REPLACEABLE_KEY_WORD_FOR_FUNCTONS_LOGIN_MEMBER_ID:
-                            query.put(key, userDetail.getDbo().getObjectId() == null ? "no result" : userDetail.getDbo().getObjectId());
+                            crudValue = userDetail.getDbo().getObjectId();
                             break;
                         default:
                             throw new RuntimeException("could not find replaceble word");
                     }
+                    query.put(key, crudValue == null ? "no result" : crudValue);
                 }
-
             } else if (strValue != null) {
                 query.put(key, strValue);
             } else if (numberValue != null) {
