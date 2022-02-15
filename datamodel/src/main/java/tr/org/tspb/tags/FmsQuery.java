@@ -19,6 +19,7 @@ import static tr.org.tspb.constants.ProjectConstants.DOLAR;
 import static tr.org.tspb.constants.ProjectConstants.DOLAR_IN;
 import static tr.org.tspb.constants.ProjectConstants.DOLAR_NE;
 import static tr.org.tspb.constants.ProjectConstants.DOLAR_REGEX;
+import static tr.org.tspb.constants.ProjectConstants.REPLACEABLE_KEY_FMS_VALUE;
 import static tr.org.tspb.constants.ProjectConstants.VALUE;
 import tr.org.tspb.dao.MyMap;
 import tr.org.tspb.dao.TagItemsQueryRef;
@@ -40,7 +41,7 @@ public class FmsQuery {
 
         Document refValue = d.get("ref-value", Document.class);
         Document inRef = d.get("in-ref", Document.class);
-        String fmsValue = d.get("fms-value", String.class);
+        String fmsValue = d.get(REPLACEABLE_KEY_FMS_VALUE, String.class);
         Boolean booleanValue = d.get("boolean-value", Boolean.class);
         String strValue = d.get("string-value", String.class);
         Number numberValue = d.get("number-value", Number.class);
@@ -150,7 +151,7 @@ public class FmsQuery {
 
         Document refValue = d.get("ref-value", Document.class);
         Document inRef = d.get("in-ref", Document.class);
-        String fmsValue = d.get("fms-value", String.class);
+        String fmsValue = d.get(REPLACEABLE_KEY_FMS_VALUE, String.class);
         Boolean booleanValue = d.get("boolean-value", Boolean.class);
         String strValue = d.get("string-value", String.class);
         Number numberValue = d.get("number-value", Number.class);
