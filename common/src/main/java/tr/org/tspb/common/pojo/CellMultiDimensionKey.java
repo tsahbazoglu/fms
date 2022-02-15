@@ -45,7 +45,7 @@ public class CellMultiDimensionKey extends HashMap {
             }
         }
         if (i > 1) {
-            logger.warn("Should not be. Multi Measure Axes is not supported yet by Telman Sphere Engine. Take the Cramer Cross Check into account");
+            logger.warn("Should not be. Multi Measure Axes is not supported yet by FMS Sphere Engine. Take the Cramer Cross Check into account");
         }
 
     }
