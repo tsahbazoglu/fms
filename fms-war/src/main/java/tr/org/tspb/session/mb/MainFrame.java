@@ -44,6 +44,10 @@ import tr.org.tspb.common.services.MailService;
 import htmlflow.StaticHtml;
 import java.io.Serializable;
 import org.bson.Document;
+import org.everit.json.schema.Schema;
+import org.everit.json.schema.loader.SchemaLoader;
+import org.json.JSONObject;
+import org.json.JSONTokener;
 import org.primefaces.model.menu.MenuModel;
 import org.slf4j.Logger;
 import tr.org.tspb.common.services.AppScopeSrvCtrl;
@@ -59,6 +63,7 @@ import tr.org.tspb.pivot.ctrl.PivotViewerCtrl;
 import tr.org.tspb.exceptions.MongoOrmFailedException;
 import tr.org.tspb.exceptions.NullNotExpectedException;
 import tr.org.tspb.helper.MenuModelCreator;
+import tr.org.tspb.jsonschema.JSONSchemaTest;
 import tr.org.tspb.pivot.simple.ctrl.SimplePivotCtrl;
 import tr.org.tspb.util.stereotype.MyController;
 import tr.org.tspb.service.FilterService;
@@ -73,8 +78,46 @@ import tr.org.tspb.service.FeatureService;
 @MyController
 public class MainFrame implements Serializable {
 
+    private JSONObject jsonSchemaMyNamedQueries = new JSONObject(
+            new JSONTokener(JSONSchemaTest.class.getResourceAsStream("myNamedQueriesSchema.json")));
+
+    private JSONObject jsonSchemaMyField = new JSONObject(
+            new JSONTokener(JSONSchemaTest.class.getResourceAsStream("myFieldSchema.json")));
+
+    private Schema schemaMyNamedQueries = SchemaLoader.load(jsonSchemaMyNamedQueries);
+    private Schema schemaMyMyField = SchemaLoader.load(jsonSchemaMyField);
+
     public CenterPage getCenterPage() {
         return centerPage;
+    }
+
+    private void verify(FmsForm myFormXs) {
+
+        Document document = myFormXs.getDbo().get("myNamedQueries", Document.class);
+        if (document != null) {
+            JSONObject jsonSubject;
+            if (false) {
+                jsonSubject = new JSONObject(
+                        new JSONTokener(JSONSchemaTest.class.getResourceAsStream("myNamedQueriesObject.json")));
+            } else {
+                jsonSubject = new JSONObject(new JSONTokener(document.toJson()));
+            }
+            try {
+                schemaMyNamedQueries.validate(jsonSubject);
+            } catch (Exception ex) {
+                throw new RuntimeException("myNamedQueries:".concat(ex.getMessage()), ex);
+            }
+        }
+
+        for (String key : myFormXs.getFieldsKeySet()) {
+            JSONObject jsonMyField = new JSONObject(new JSONTokener(myFormXs.getField(key).getDbo().toJson()));
+            try {
+                schemaMyMyField.validate(jsonMyField);
+            } catch (Exception ex) {
+                throw new RuntimeException("myField:".concat(ex.getMessage()), ex);
+            }
+        }
+
     }
 
     enum CenterPage {
@@ -833,6 +876,8 @@ public class MainFrame implements Serializable {
         }
 
         FmsForm myFormLarge = repositoryService.getMyFormLargeWithBaseFilter(myProject, myFormXs.getKey());
+
+        verify(myFormLarge);
 
         myFormLarge.initActions(repositoryService.getAndCacheMyAction(myFormLarge,
                 new Document(filterService.getGuiFilterCurrent())));
