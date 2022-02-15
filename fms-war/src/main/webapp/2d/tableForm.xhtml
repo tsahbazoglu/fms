@@ -22,92 +22,6 @@
             return false;
         }
     </script>
-    <p:panel  
-        header="Toplu Veri Yükleme Aracı"
-        rendered="#{formService.myForm.myActions.upload}"
-        >
-        <!-- 1024*1024*1 = 1048576 = 1MB -->
-        <!-- 1024*1024*2 = 2097152 = 2MB -->
-        <!-- 1024*1024*3 = 3145728 = 3MB -->
-        <!-- 1024*1024*4 = 4194304 = 4MB -->
-        <!-- 1024*1024*5 = 5242880 = 5MB -->
-        <!-- 1024*1024*6 = 6291456 = 6MB -->
-        <!-- 1024*1024*7 = 7340032 = 7MB -->
-        <h:form  enctype="multipart/form-data">
-            <p:panel header="Excell Dosya Seçimi ... ">
-                <p:fileUpload 
-                    value="#{twoDimModifyCtrl.uploadedFileKpbDb}"
-                    listener="#{twoDimModifyCtrl.uploadExcell}"
-                    cancelLabel="Vazgeç"
-                    uploadLabel="Yükle"
-                    label="Seç"
-                    invalidSizeMessage="Dosya Boyutu 2MB dan büyük olmamalı : "
-                    invalidFileMessage="Geçersiz Dosya Tipi (Sadece PDF dosyalar eklenebilir) : "
-                    fileLimitMessage="En fazla 2MB dosya eklenebilir."
-                    fileLimit="2097152"
-                    allowTypes="/(\.|\/)(xlsx)$/"
-                    sizeLimit="2097152"
-                    />
-            </p:panel>
-            <p:panel header="Yüklenecek olan veriye eklenecek olan alanlar">
-                <h:panelGrid columns="2">
-                    <c:forEach items="#{formService.myForm.uploadMerge.appendFields}" var="field">
-                        <p:outputLabel value="#{field.name}"/>
-                        <h:panelGroup>
-                            <mydynamic:uysSelectMenuTable
-                                myProjectKey="#{formService.myForm.projectKey}"
-                                myUpperNode="#{formService.myForm.upperNode}"
-                                myFormKey="#{formService.myForm.key}"
-                                myField="#{field}"                                    
-                                myFieldKey="#{field.key}"
-                                myreadonly="false" 
-                                myvalue="#{twoDimModifyCtrl.uploadedMergeObject[field.key]}"
-                                label="#{field.label}" 
-                                myitems="#{field.selectItemsCurrent}" 
-                                myrequired="#{field.required}"
-                                rendered="#{twoDimModifyCtrl.selectOneMenu eq field.componentType and field.rendered}"
-                                myconverter="#{field.myconverter}"
-                                isAjax="#{field.ajax.enable}"
-                                ajax_update="#{field.ajaxUpdate}"
-                                />
-                            <mydynamic:uysInputText 
-                                myreadonly="#{field.readonly}" 
-                                myrequired="#{field.required}"
-                                mystyle="#{field.style}"
-                                myvalue="#{twoDimModifyCtrl.uploadedMergeObject[field.key]}"
-                                myCalculateOnCrudView="#{field.calculateOnCrudView}"
-                                myCalculateOnListView="#{field.calculateOnListView}"
-                                myCalculateOnSave="#{field.calculateOnSave}"
-                                label="#{field.label}" 
-                                rendered="#{twoDimModifyCtrl.inputText eq field.componentType and field.rendered}"
-                                myConverter="#{field.myconverter}"
-                                myConverterInstance="#{field.converterInstance}" 
-                                myConverterFormat ="#{field.converterFormat}" 
-                                crudObject= "#{twoDimModifyCtrl.myObject}"
-                                myFieldKey= "#{field.key}"
-                                myMaxValue="#{field.maxValue}" 
-                                shouldCheckNegative="#{field.shouldCheckNegative}"
-                                /> 
-                            <mydynamic:uysDateTimeEntry 
-                                myvalue="#{twoDimModifyCtrl.uploadedMergeObject[field.key]}"
-                                label="#{field.label}" 
-                                rendered="#{twoDimModifyCtrl.inputDate eq field.componentType and field.rendered}"
-                                myconverter="#{field.myconverter}"
-                                myrequired="#{field.required}"
-                                mypattern="#{field.datePattern}"
-                                dateChange="#{twoDimModifyCtrl.dateChange}"
-                                />
-                        </h:panelGroup>
-                    </c:forEach>
-                </h:panelGrid>
-            </p:panel>
-            <p:commandButton 
-                value="Önizleme" 
-                action="#{twoDimModifyCtrl.previewUpload}" 
-                update=":id_kpb_bulk_preview,:idMessageDialog"
-                />
-        </h:form>
-    </p:panel>
 
 
 
@@ -123,4 +37,105 @@
     <!--<ui:include src="ui-crud-tree-list.xhtml"/>-->
 
     <br/>
+
+
+    <p:dialog
+        widgetVar="wv-bulkdupload"
+        header="Toplu Veri Yükleme"
+        modal="true"
+        width="800"
+        height="400"
+        closable="true"
+        closeOnEscape="true"                     
+        position="center"
+        resizable="true"
+        >
+
+        <h:panelGroup  
+            rendered="#{formService.myForm.myActions.upload}"
+            >
+            <!-- 1024*1024*1 = 1048576 = 1MB -->
+            <!-- 1024*1024*2 = 2097152 = 2MB -->
+            <!-- 1024*1024*3 = 3145728 = 3MB -->
+            <!-- 1024*1024*4 = 4194304 = 4MB -->
+            <!-- 1024*1024*5 = 5242880 = 5MB -->
+            <!-- 1024*1024*6 = 6291456 = 6MB -->
+            <!-- 1024*1024*7 = 7340032 = 7MB -->
+            <h:form  enctype="multipart/form-data">
+                <p:panel header="Excell Dosya Seçimi ... ">
+                    <p:fileUpload 
+                        value="#{twoDimModifyCtrl.uploadedFileKpbDb}"
+                        listener="#{twoDimModifyCtrl.uploadExcell}"
+                        cancelLabel="Vazgeç"
+                        uploadLabel="Yükle"
+                        label="Seç"
+                        invalidSizeMessage="Dosya Boyutu 2MB dan büyük olmamalı : "
+                        invalidFileMessage="Geçersiz Dosya Tipi (Sadece PDF dosyalar eklenebilir) : "
+                        fileLimitMessage="En fazla 2MB dosya eklenebilir."
+                        fileLimit="2097152"
+                        allowTypes="/(\.|\/)(xlsx)$/"
+                        sizeLimit="2097152"
+                        />
+                </p:panel>
+                <p:panel header="Yüklenecek olan veriye eklenecek olan alanlar">
+                    <h:panelGrid columns="2">
+                        <c:forEach items="#{formService.myForm.uploadMerge.appendFields}" var="field">
+                            <p:outputLabel value="#{field.name}"/>
+                            <h:panelGroup>
+                                <mydynamic:uysSelectMenuTable
+                                    myProjectKey="#{formService.myForm.projectKey}"
+                                    myUpperNode="#{formService.myForm.upperNode}"
+                                    myFormKey="#{formService.myForm.key}"
+                                    myField="#{field}"                                    
+                                    myFieldKey="#{field.key}"
+                                    myreadonly="false" 
+                                    myvalue="#{twoDimModifyCtrl.uploadedMergeObject[field.key]}"
+                                    label="#{field.label}" 
+                                    myitems="#{field.selectItemsCurrent}" 
+                                    myrequired="#{field.required}"
+                                    rendered="#{twoDimModifyCtrl.selectOneMenu eq field.componentType and field.rendered}"
+                                    myconverter="#{field.myconverter}"
+                                    isAjax="#{field.ajax.enable}"
+                                    ajax_update="#{field.ajaxUpdate}"
+                                    />
+                                <mydynamic:uysInputText 
+                                    myreadonly="#{field.readonly}" 
+                                    myrequired="#{field.required}"
+                                    mystyle="#{field.style}"
+                                    myvalue="#{twoDimModifyCtrl.uploadedMergeObject[field.key]}"
+                                    myCalculateOnCrudView="#{field.calculateOnCrudView}"
+                                    myCalculateOnListView="#{field.calculateOnListView}"
+                                    myCalculateOnSave="#{field.calculateOnSave}"
+                                    label="#{field.label}" 
+                                    rendered="#{twoDimModifyCtrl.inputText eq field.componentType and field.rendered}"
+                                    myConverter="#{field.myconverter}"
+                                    myConverterInstance="#{field.converterInstance}" 
+                                    myConverterFormat ="#{field.converterFormat}" 
+                                    crudObject= "#{twoDimModifyCtrl.myObject}"
+                                    myFieldKey= "#{field.key}"
+                                    myMaxValue="#{field.maxValue}" 
+                                    shouldCheckNegative="#{field.shouldCheckNegative}"
+                                    /> 
+                                <mydynamic:uysDateTimeEntry 
+                                    myvalue="#{twoDimModifyCtrl.uploadedMergeObject[field.key]}"
+                                    label="#{field.label}" 
+                                    rendered="#{twoDimModifyCtrl.inputDate eq field.componentType and field.rendered}"
+                                    myconverter="#{field.myconverter}"
+                                    myrequired="#{field.required}"
+                                    mypattern="#{field.datePattern}"
+                                    dateChange="#{twoDimModifyCtrl.dateChange}"
+                                    />
+                            </h:panelGroup>
+                        </c:forEach>
+                    </h:panelGrid>
+                </p:panel>
+                <p:commandButton 
+                    value="Önizleme" 
+                    action="#{twoDimModifyCtrl.previewUpload}" 
+                    update=":id_kpb_bulk_preview,:idMessageDialog"
+                    />
+            </h:form>
+        </h:panelGroup>
+    </p:dialog>
+
 </html>
