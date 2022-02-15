@@ -98,7 +98,7 @@ public class MyItems {
 
         this.db = (String) dbo.get(FORM_DB);
         if (db == null) {
-            throw new RuntimeException("items.db is resolved to null");
+            throw new RuntimeException(myField.getKey().concat(" items.db is resolved to null"));
         }
 
         this.searchField = (String) dbo.get("searchField");
@@ -576,7 +576,7 @@ public class MyItems {
 
             Document refValue = d.get("ref-value", Document.class);
             Document inRef = d.get("in-ref", Document.class);
-            String fmsValue = d.get("fms-value", String.class);
+            String fmsValue = d.get(REPLACEABLE_KEY_FMS_VALUE, String.class);
             String strValue = d.get("string-value", String.class);
             Number numberValue = d.get("number-value", Number.class);
             List<String> listOfString = d.getList("array-value", String.class);
