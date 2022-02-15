@@ -1349,14 +1349,15 @@ public class MyForm extends FmsFormAbstract {
                     switch (doc.get(VALUE).toString()) {
                         case "page":
                             this.myForm.dimension = 0;
-                            return;
+                            break;
                         case "table":
                             this.myForm.dimension = 1;
-                            return;
+                            break;
                         case "grid":
                             this.myForm.dimension = 2;
-                            return;
-
+                            break;
+                        default:
+                            this.myForm.dimension = 0;
                     }
                 }
             }
