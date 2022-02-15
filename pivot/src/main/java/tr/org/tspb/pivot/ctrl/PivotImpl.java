@@ -169,19 +169,24 @@ public abstract class PivotImpl implements Serializable, PivotApi {
             collectionName = commandResult.get(RETVAL);
         }
 
+        Document projection = myField.getItemsAsMyItems().getQueryProjection();
+        if (projection != null) {
+            projection.put("converter", true);
+        }
+
         List<Document> cursor = mongoDbUtil
                 .findProjectLookup(myForm.getDb(), (String) collectionName,
                         mongoDbUtil.expandQuery(myField.getItemsAsMyItems().getQuery(), getFilter()),
                         myField.getItemsAsMyItems().getSort(),
                         myField.getItemsAsMyItems().getLimit(),
-                        myField.getItemsAsMyItems().getQueryProjection(),
+                        projection,
                         myField.getItemsAsMyItems().getLookup(),
                         myField.getItemsAsMyItems().getResultProjection());
 
         List<String> listOfCode = new ArrayList<>();
 
         for (Document dbObject : cursor) {
-            String code = (String) dbObject.get(CODE);
+            String code = dbObject.getString(CODE);
 
             if (FORM_DIMENSION.equals(myField.getNdType()) && (code == null || code.isEmpty() || listOfCode.contains(code))) {
                 throw new MongoOrmFailedException(String.format("<br/>A dimesion field does not have a \"code\" on its record list or duplicate it."
@@ -207,6 +212,22 @@ public abstract class PivotImpl implements Serializable, PivotApi {
 
             dbObject.put(NAME, name.substring(3));
 
+            String measureConver = dbObject.getString("converter");
+            Converter measureConverter = null;
+
+            if (measureConver != null) {
+                switch (measureConver) {
+                    case "StringConverter":
+                        measureConverter = new TelmanStringConverter();
+                        break;
+                    case "SelectOneString":
+                        measureConverter = new SelectOneStringConverter();
+                        break;
+                    default:
+                    // nothing
+                }
+            }
+
             listOfMap.add(new MyField.Builder(dbObject)
                     .maskId()
                     .maskField()
@@ -215,7 +236,9 @@ public abstract class PivotImpl implements Serializable, PivotApi {
                     .maskOrders()
                     .maskCode()
                     .maskName()
-                    .build());
+                    .maskPivotMeaseureConverter(measureConverter)
+                    .build()
+            );
 
         }
 
@@ -639,26 +662,10 @@ public abstract class PivotImpl implements Serializable, PivotApi {
 
     /**
      *
-     * @param dimensionIks
-     */
-    public void setIksDimension(List<MyField> dimensionIks) {
-        this.dimensionIks = dimensionIks;
-    }
-
-    /**
-     *
      * @return
      */
     public List<MyField> getIgrekDimension() {
         return dimensionIgrek;
-    }
-
-    /**
-     *
-     * @param dimensionIgrek
-     */
-    public void setIgrekDimension(List<MyField> dimensionIgrek) {
-        this.dimensionIgrek = dimensionIgrek;
     }
 
     /**
