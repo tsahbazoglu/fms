@@ -274,7 +274,7 @@ public class FilterUtil {
 
     }
 
-    public void selectAll(FmsForm selectedForm, Document filter, String filterKey, boolean admin) {
+    private void selectAll(FmsForm selectedForm, Document filter, String filterKey, boolean admin) {
 
         if (admin) {
             filter.remove(filterKey);
@@ -678,8 +678,8 @@ public class FilterUtil {
         }
 
         // apply projection
-        for (Iterator<String> iterator = modifiedFilter.keySet().iterator(); iterator.hasNext();) {
-            String key = iterator.next();
+        Set<String> keySet = new HashSet<>(modifiedFilter.keySet());
+        for (String key : keySet) {
             Object value = modifiedFilter.get(key);
             if (myForm.getField(key) != null) {
                 String filterProjection = myForm.getField(key).getFilterProjection();
