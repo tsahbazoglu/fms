@@ -19,6 +19,8 @@ import java.util.Locale;
  */
 public class ProjectConstants {
 
+    public static final String REPLACEABLE_KEY_FMS_VALUE = "fms-value";
+    public static final String REPLACEABLE_KEY_FMS_ID_VALUE = "fms-id-value";
     public static final String REPLACEABLE_KEY_WORD_FOR_FUNCTONS_LOGIN_MEMBER_TYPE = "fms_code{{login_member_type}}";
     public static final String REPLACEABLE_KEY_WORD_FOR_FUNCTONS_LOGIN_MEMBER_ID = "fms_code{{login_member_id}}";
     public static final String REPLACEABLE_KEY_WORD_FOR_FUNCTONS_FILTER_MEMBER = "fms_code{{filter_member}}";
