@@ -90,11 +90,11 @@
                                             <td class="handsontable-uysdatacell"
                                                 style="#{cc.attrs.cell.style}"  
                                                 >
-                                                <div style="
-                                                     height: 20px;"
-                                                     onclick="ShowControlFormula('#{cc.attrs.cell.controlDesc}');
-                                                             return false;"
-                                                     ><h:outputText 
+                                                <div 
+                                                    style="height: 20px;"
+                                                    onclick="ShowControlFormula('#{cc.attrs.cell.controlDesc}'); return false;"
+                                                    >
+                                                    <h:outputText 
                                                         value="#{cc.attrs.cell.value}" 
                                                         style="border: 0px;#{cc.attrs.cell.style}"
                                                         converter="#{cc.attrs.cell.converter}"
@@ -161,7 +161,7 @@
                             "width": colWidths + "px"
                         });
                     }
-                }
+                };
             }
             telmanHistoryGrid.clarity.init();
         </script>
