@@ -18,6 +18,7 @@ import static tr.org.tspb.constants.ProjectConstants.MEASURE;
 import static tr.org.tspb.constants.ProjectConstants.MONGO_ID;
 import tr.org.tspb.converter.base.MoneyConverter;
 import tr.org.tspb.converter.base.NumberConverter;
+import tr.org.tspb.converter.base.TelmanStringConverter;
 import tr.org.tspb.converter.base.UysStringConverter;
 import tr.org.tspb.dao.MyField;
 import tr.org.tspb.dao.FmsForm;
@@ -127,7 +128,7 @@ public class DataService implements Serializable {
 
     }
 
-    private void applyPersistentData(Map<CellMultiDimensionKey, List<CustomOlapHashMap>> pivotData, 
+    private void applyPersistentData(Map<CellMultiDimensionKey, List<CustomOlapHashMap>> pivotData,
             FmsForm myForm, Map filter)
             throws NullNotExpectedException, MongoOrmFailedException, MoreThenOneInListException, FormConfigException {
         mapReduceService.init(filter, myForm);
@@ -195,21 +196,21 @@ public class DataService implements Serializable {
                     Converter converter = measure.getMyconverter();
                     String uysformat = measure.getUysformat();
 
-                    // If some dimension around this mesure have a defined converter (on fly db record)
+                    // If some dimension around this measure have a defined converter (on fly db record)
                     // then use it instead of measure predefined one.
                     //
                     // BUT :  this coordinate must not been a measure at the same time
                     //
-                    // for example have a look  to Promosion Data under kpdb configured project
-                    if (xCoordinate.getMyconverter() != null && !MEASURE.equals(xCoordinate.getNdType())) {
-                        converter = xCoordinate.getMyconverter();
+                    // for example have a look to Promosion Data under kpdb configured project
+                    if (xCoordinate.getMeasureConverter() != null && !MEASURE.equals(xCoordinate.getNdType())) {
+                        converter = xCoordinate.getMeasureConverter();
                         uysformat = xCoordinate.getUysformat();
                     }
                     /*
-                     * horizontal dimension has a hign priority
+                     * horizontal dimension has a high priority
                      */
-                    if (yCoordinate.getMyconverter() != null && !MEASURE.equals(yCoordinate.getNdType())) {
-                        converter = yCoordinate.getMyconverter();
+                    if (yCoordinate.getMeasureConverter() != null && !MEASURE.equals(yCoordinate.getNdType())) {
+                        converter = yCoordinate.getMeasureConverter();
                         uysformat = yCoordinate.getUysformat();
                     }
 
@@ -236,7 +237,9 @@ public class DataService implements Serializable {
                             || Arrays.asList("#.###.###", "#.###.###,#", "#.###.###,##", "#.###.###,###", "#.###.###,####", "#.###.###,#####").contains(uysformat)) {
                         customOlapHashMap.setConverter(new NumberConverter());
                         customOlapHashMap.setUysformat(uysformat);
-                    } else if (converter instanceof UysStringConverter || converter instanceof NumberConverter) {
+                    } else if (converter instanceof UysStringConverter
+                            || converter instanceof TelmanStringConverter
+                            || converter instanceof NumberConverter) {
                         customOlapHashMap.setConverter(new UysStringConverter());
                     } else if (converter != null) {
                         throw new FormConfigException(String.format("The converter defined for %s  is not supported yet.", measure.getKey()));
