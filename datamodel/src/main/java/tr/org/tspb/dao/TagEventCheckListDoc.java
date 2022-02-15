@@ -17,6 +17,7 @@ import static tr.org.tspb.constants.ProjectConstants.DOLAR_NE;
 import static tr.org.tspb.constants.ProjectConstants.DOLAR_NIN;
 import static tr.org.tspb.constants.ProjectConstants.DOLAR_REGEX;
 import static tr.org.tspb.constants.ProjectConstants.PERIOD;
+import static tr.org.tspb.constants.ProjectConstants.REPLACEABLE_KEY_FMS_VALUE;
 import static tr.org.tspb.constants.ProjectConstants.REPLACEABLE_KEY_WORD_FOR_FUNCTONS_FILTER_PERIOD;
 import static tr.org.tspb.constants.ProjectConstants.REPLACEABLE_KEY_WORD_FOR_FUNCTONS_LOGIN_MEMBER_ID;
 import static tr.org.tspb.constants.ProjectConstants.VALUE;
@@ -110,14 +111,14 @@ public class TagEventCheckListDoc {
 
             boolean hasStrValue = filter.containsKey("string-value");
             boolean hasArrayValue = filter.containsKey("array-value");
-            boolean hasFmsValue = filter.containsKey("fms-value");
+            boolean hasFmsValue = filter.containsKey(REPLACEABLE_KEY_FMS_VALUE);
 
             if (hasStrValue) {
                 query.append(key, filter.getString("string-value"));
             } else if (hasArrayValue) {
                 query.append(key, new Document(DOLAR_IN, filter.getList("array-value", String.class)));
             } else if (hasFmsValue) {
-                String fmsValue = filter.getString("fms-value");
+                String fmsValue = filter.getString(REPLACEABLE_KEY_FMS_VALUE);
                 switch (fmsValue) {
                     case REPLACEABLE_KEY_WORD_FOR_FUNCTONS_LOGIN_MEMBER_ID:
                         query.append(key, userDetail.getDbo().getObjectId());
