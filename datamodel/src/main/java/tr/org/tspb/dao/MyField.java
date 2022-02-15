@@ -67,6 +67,7 @@ public class MyField {
     private Boolean calculateAfterSave;
     private Boolean calculateAfterDelete;
     private Boolean calculateOnSave;
+    private Converter measureConverter;
     private Converter converterValue;
     private String converterInstance;
     private String converterFormat;
@@ -326,14 +327,6 @@ public class MyField {
         return maxMoney;
     }
 
-    public String getConverterInstance() {
-        return converterInstance;
-    }
-
-    public String getConverterFormat() {
-        return converterFormat;
-    }
-
     public String getUysformat() {
         return uysformat;
     }
@@ -450,10 +443,6 @@ public class MyField {
         return divider;
     }
 
-    public Converter getMyconverter() {
-        return converterValue;
-    }
-
     public boolean isReportRendered() {
         return reportRendered;
     }
@@ -525,6 +514,13 @@ public class MyField {
     }
 
 // </editor-fold>
+    /**
+     * @return the measureConverter
+     */
+    public Converter getMeasureConverter() {
+        return measureConverter;
+    }
+
     @Override
     public int hashCode() {
         return (12345 + this.key.hashCode()) * (67890 + getReferance().hashCode());
@@ -689,10 +685,6 @@ public class MyField {
 
     public Boolean getLoginFK() {
         return loginFK;
-    }
-
-    public String getConverterParam() {
-        return converterParam;
     }
 
     public String getSessionKey() {
@@ -1059,7 +1051,12 @@ public class MyField {
                 }
 
             } catch (Exception e) {
-                throw new FormConfigException("field : " + this.myField.key + " : error in getting field.items<br/><br/> " + e.getLocalizedMessage(), e);
+                StringBuilder sb = new StringBuilder();
+                sb.append("field : ");
+                sb.append(this.myField.key);
+                sb.append(" : error in getting field.items<br/><br/> ");
+                sb.append(e.getLocalizedMessage());
+                throw new FormConfigException(sb.toString(), e);
             }
 
             return this;
@@ -1265,6 +1262,11 @@ public class MyField {
             return this;
         }
 
+        public Builder maskPivotMeaseureConverter(Converter measureConverter) {
+            this.myField.measureConverter = measureConverter;
+            return this;
+        }
+
         public MyField build() {
             return this.myField;
         }
@@ -1278,9 +1280,22 @@ public class MyField {
         return filterProjection;
     }
 
-    /**
-     * @return the minLength
-     */
+    public Converter getMyconverter() {
+        return converterValue;
+    }
+
+    public String getConverterInstance() {
+        return converterInstance;
+    }
+
+    public String getConverterFormat() {
+        return converterFormat;
+    }
+
+    public String getConverterParam() {
+        return converterParam;
+    }
+
     public Integer getConverterMinStrLength() {
         return converterMinStrLength;
     }
