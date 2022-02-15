@@ -55,6 +55,7 @@ import static tr.org.tspb.constants.ProjectConstants.PROJECT_KEY;
 import static tr.org.tspb.constants.ProjectConstants.QUERY;
 import static tr.org.tspb.constants.ProjectConstants.READONLY;
 import static tr.org.tspb.constants.ProjectConstants.RENDERED;
+import static tr.org.tspb.constants.ProjectConstants.REPLACEABLE_KEY_FMS_VALUE;
 import static tr.org.tspb.constants.ProjectConstants.REPLACEABLE_KEY_WORD_FOR_FUNCTONS_LOGIN_MEMBER_TYPE;
 import static tr.org.tspb.constants.ProjectConstants.REPLACEABLE_KEY_WORD_FOR_THIS_FORM;
 import static tr.org.tspb.constants.ProjectConstants.RETURN_KEY;
@@ -257,7 +258,7 @@ public class OgmCreatorImpl implements OgmCreatorIntr {
             Document filter = new Document();
             for (Document doc : queryList) {
                 String key = doc.getString("key");
-                String fmsValue = doc.getString("fms-value");
+                String fmsValue = doc.getString(REPLACEABLE_KEY_FMS_VALUE);
                 String strValue = doc.getString("string-value");
                 if (fmsValue != null) {
                     switch (fmsValue) {
@@ -1144,12 +1145,20 @@ public class OgmCreatorImpl implements OgmCreatorIntr {
     }
 
     private Converter createConverter(Document docForm, Document docField) {
-        String converter = (String) docField.get(CONVERTER);
+        return createConverter2(docForm,
+                docField.getString(CONVERTER),
+                docField.getString(COMPONENTTYPE),
+                docField.get(ProjectConstants.UYSFORMAT) != null,
+                docField.get(MY_CONVERTER));
+    }
+
+    private Converter createConverter2(Document docForm, String converter,
+            String componentType, boolean hasUysFormat, Object myConverter) {
 
         Converter converterValue = null;
 
-        if ((ComponentType.selectOneMenu.name().equals(docField.get(COMPONENTTYPE))
-                || ComponentType.selectManyListbox.name().equals(docField.get(COMPONENTTYPE)))
+        if ((ComponentType.selectOneMenu.name().equals(componentType)
+                || ComponentType.selectManyListbox.name().equals(componentType))
                 && (converter == null)) {
 
             String html = StaticHtml
@@ -1182,12 +1191,12 @@ public class OgmCreatorImpl implements OgmCreatorIntr {
             throw new RuntimeException(html);
         }
 
-        if (docField.get(MY_CONVERTER) instanceof Converter) {
-            converterValue = (Converter) docField.get(MY_CONVERTER);
+        if (myConverter instanceof Converter) {
+            converterValue = (Converter) myConverter;
         }
 
-        if (converter == null && docField.get(MY_CONVERTER) instanceof String) {
-            converter = docField.get(MY_CONVERTER).toString();
+        if (converter == null && myConverter instanceof String) {
+            converter = myConverter.toString();
         }
 
         if (converter != null && converterValue == null) {
@@ -1217,7 +1226,7 @@ public class OgmCreatorImpl implements OgmCreatorIntr {
             }
         }
 
-        if (docField.get(ProjectConstants.UYSFORMAT) != null) {
+        if (hasUysFormat) {
             converterValue = new NumberConverter();
         }
 
