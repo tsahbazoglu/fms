@@ -14,5 +14,7 @@ public enum ViewerController {
     viewerPivot,
     esignController,
     workFlowCtrl,
-    simplePivotCtrl
+    simplePivotCtrl,
+    fmsBulkUpload,
+    fmsMultiFormBulkUpload
 }
