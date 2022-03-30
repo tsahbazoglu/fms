@@ -6,7 +6,6 @@ import java.util.Map;
 import org.primefaces.model.FilterMeta;
 import org.primefaces.model.LazyDataModel;
 import org.primefaces.model.SortMeta;
-import org.primefaces.model.SortOrder;
 import static tr.org.tspb.constants.ProjectConstants.MONGO_ID;
 
 /**
@@ -55,6 +54,11 @@ public class FmsTableDataModel extends LazyDataModel<Map> {
 
     @Override
     public int getRowCount() {
+        return rowCount;
+    }
+
+    @Override
+    public int count(Map<String, FilterMeta> map) {
         return rowCount;
     }
 }
