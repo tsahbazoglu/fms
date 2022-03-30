@@ -27,7 +27,6 @@ import javax.faces.event.AjaxBehaviorEvent;
 import javax.faces.event.ValueChangeEvent;
 import javax.faces.model.DataModel;
 import javax.faces.model.ListDataModel;
-import javax.faces.model.SelectItem;
 import javax.inject.Inject;
 import javax.mail.MessagingException;
 import javax.servlet.http.HttpServletRequest;
@@ -55,6 +54,7 @@ import tr.org.tspb.service.RepositoryService;
 import tr.org.tspb.constants.ProjectConstants;
 import tr.org.tspb.dao.FmsForm;
 import tr.org.tspb.dao.MyProject;
+import tr.org.tspb.datamodel.gui.FormDef;
 import tr.org.tspb.datamodel.gui.FormItem;
 import tr.org.tspb.datamodel.gui.ModuleItem;
 import tr.org.tspb.exceptions.FormConfigException;
@@ -86,6 +86,10 @@ public class MainFrame implements Serializable {
 
     private Schema schemaMyNamedQueries = SchemaLoader.load(jsonSchemaMyNamedQueries);
     private Schema schemaMyMyField = SchemaLoader.load(jsonSchemaMyField);
+    private static final String COMMA = ",";
+    private static final String ID_CENTER_MIDDLE = "idCenterCenter";
+    private static final String ID_CENTER_TOP = "idCenterTop";
+    private static final String ID_MSG_DLG = "idMessageDialog";
 
     public CenterPage getCenterPage() {
         return centerPage;
@@ -244,7 +248,7 @@ public class MainFrame implements Serializable {
         }
 
         for (ModuleItem moduleItem : accordionItems) {
-            List<SelectItem> forms = createFormSelectItems(moduleItem);
+            List<FormDef> forms = createFormSelectItems(moduleItem);
             moduleItem.createList(forms);
         }
 
@@ -403,7 +407,7 @@ public class MainFrame implements Serializable {
         return true;
     }
 
-    private List<SelectItem> createFormSelectItems(ModuleItem moduleItem) {
+    private List<FormDef> createFormSelectItems(ModuleItem moduleItem) {
 
         List<FormItem> formItems = repositoryService.findModuleForms(moduleItem);
 
@@ -419,7 +423,7 @@ public class MainFrame implements Serializable {
             }
         });
 
-        List<SelectItem> listOfFormInfo = new ArrayList<>();
+        List<FormDef> listOfFormInfo = new ArrayList<>();
 
         for (FormItem formItem : formItems) {
             String info = formItem.getKey().concat(COMMA).concat(moduleItem.getProjectKey());
@@ -430,9 +434,17 @@ public class MainFrame implements Serializable {
                 formName.append((String) formItem.getForm());
             }
 
-            listOfFormInfo.add(new SelectItem(info, formName.toString()));
-        }
+            FormDef formDef = new FormDef(info, formName.toString());
 
+            if (formItem.getKey().equals("varlik_bulk_load")) {
+                formDef = new FormDef(info, formName.toString(),
+                        ID_CENTER_MIDDLE
+                                .concat(COMMA).concat(ID_CENTER_TOP)
+                                .concat(COMMA).concat(ID_MSG_DLG)
+                );
+            }
+            listOfFormInfo.add(formDef);
+        }
         return listOfFormInfo;
     }
 
@@ -771,8 +783,11 @@ public class MainFrame implements Serializable {
             createTableForm(myFormXs);
         } else if (detectedDimension == 2) {
             createPivotForm(myFormXs);
+        } else if (detectedDimension == 10) {
+            currEnumPage = EnumPage.BULK_UPLOAD_PAGE;
+        } else {
+            throw new RuntimeException("not supported yet");
         }
-
     }
 
     private void createFreeForm2(FmsForm myFormXs, String formKey) throws MongoOrmFailedException, NullNotExpectedException {
