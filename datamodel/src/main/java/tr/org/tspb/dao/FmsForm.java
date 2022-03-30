@@ -28,6 +28,8 @@ public interface FmsForm {
 
     public List<MyField> getChildFields();
 
+    public List<Document> getAdditionalRows();
+
     public boolean isChildAdd();
 
     public int getChildCountDefault();
