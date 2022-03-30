@@ -480,6 +480,7 @@ public class ProjectConstants {
     public final static String JAVALANG_STRING = "java.lang.String";
     public final static String JAVALANG_DATE = "java.lang.Date";
     public final static String JAVAUTIL_DATE = "java.util.Date";
+    public final static String JAVAUTIL_OBJECTID = "org.bson.types.ObjectId";
 
     // CONCATS
     public static final String METADATA_SELECTED_FORM_KEY = METADATA.concat(DOT).concat(SELECT_FORM_KEY);
