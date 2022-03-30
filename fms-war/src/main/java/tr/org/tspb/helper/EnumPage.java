@@ -189,6 +189,15 @@ public enum EnumPage {
             null,
             "/4d/4dActionPanel.xhtml"
     ),
+    BULK_UPLOAD_PAGE(//
+            "/bulkload/bulkload.xhtml",
+            "/bulkload/bulkload.xhtml",
+            "Admin",
+            "İşlemler | Toplu Veri Yükleme",
+            "/bulkload/bulkload.xhtml",
+            null,
+            null
+    ),
     PAYMENT_PAGE(//
             "/system/payment.xhtml",
             "/system/payment.xhtml",
