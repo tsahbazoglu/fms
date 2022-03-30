@@ -23,7 +23,6 @@ import org.bson.types.ObjectId;
 import org.primefaces.model.FilterMeta;
 import org.primefaces.model.LazyDataModel;
 import org.primefaces.model.SortMeta;
-import org.primefaces.model.SortOrder;
 import org.slf4j.Logger;
 import static tr.org.tspb.constants.ProjectConstants.*;
 import tr.org.tspb.dao.MyField;
@@ -141,11 +140,19 @@ public abstract class AbstractViewer implements FmsOnFlyData, Serializable {
             public int getRowCount() {
                 return list.size();
             }
+
+            @Override
+            public int count(Map<String, FilterMeta> map) {
+                throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+            }
         };
     }
 
     @Override
     public Map retriveRowData(String rowKey) {
+        if (rowKey.contains("-")) {
+            return null;
+        }
         ObjectId id = new ObjectId(rowKey);
         Document object = mongoDbUtil.findOne(formService.getMyForm().getDb(), formService.getMyForm().getTable(), new Document(MONGO_ID, id));
         return object;
