@@ -10,6 +10,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import org.bson.Document;
+import org.bson.types.ObjectId;
 import static tr.org.tspb.constants.ProjectConstants.DIEZ;
 import static tr.org.tspb.constants.ProjectConstants.DOLAR;
 import static tr.org.tspb.constants.ProjectConstants.DOLAR_IN;
@@ -17,6 +18,7 @@ import static tr.org.tspb.constants.ProjectConstants.DOLAR_NE;
 import static tr.org.tspb.constants.ProjectConstants.DOLAR_NIN;
 import static tr.org.tspb.constants.ProjectConstants.DOLAR_REGEX;
 import static tr.org.tspb.constants.ProjectConstants.PERIOD;
+import static tr.org.tspb.constants.ProjectConstants.REPLACEABLE_KEY_FMS_ID_VALUE;
 import static tr.org.tspb.constants.ProjectConstants.REPLACEABLE_KEY_FMS_VALUE;
 import static tr.org.tspb.constants.ProjectConstants.REPLACEABLE_KEY_WORD_FOR_FUNCTONS_FILTER_PERIOD;
 import static tr.org.tspb.constants.ProjectConstants.REPLACEABLE_KEY_WORD_FOR_FUNCTONS_LOGIN_MEMBER_ID;
@@ -112,6 +114,7 @@ public class TagEventCheckListDoc {
             boolean hasStrValue = filter.containsKey("string-value");
             boolean hasArrayValue = filter.containsKey("array-value");
             boolean hasFmsValue = filter.containsKey(REPLACEABLE_KEY_FMS_VALUE);
+            boolean hasFmsIdValue = filter.containsKey(REPLACEABLE_KEY_FMS_ID_VALUE);
 
             if (hasStrValue) {
                 query.append(key, filter.getString("string-value"));
@@ -129,6 +132,20 @@ public class TagEventCheckListDoc {
                     default:
                         throw new RuntimeException(fmsValue.concat(" is not supported"));
                 }
+            } else if (hasFmsIdValue) {
+                String fmsValue = filter.getString(REPLACEABLE_KEY_FMS_ID_VALUE);
+                Object filterValue = null;
+                switch (fmsValue) {
+                    case REPLACEABLE_KEY_WORD_FOR_FUNCTONS_LOGIN_MEMBER_ID:
+                        filterValue = userDetail.getDbo().getObjectId();
+                        break;
+                    case REPLACEABLE_KEY_WORD_FOR_FUNCTONS_FILTER_PERIOD:
+                        filterValue = myFilter.get(PERIOD);
+                        break;
+                    default:
+                        throw new RuntimeException(fmsValue.concat(" is not supported"));
+                }
+                query.append(key, filterValue instanceof ObjectId ? filterValue : "no result");
             } else {
 
                 String type = filter.get("type", String.class);
