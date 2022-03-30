@@ -1120,10 +1120,11 @@ public class MyField {
             this.myField.width = tmpWidth == null ? 100 : ((Number) tmpWidth).intValue();
             this.myField.style = (this.myField.dbo.get(STYLE) == null)
                     ? "white-space:nowrap;font-family: monospace;text-align:left;"
-                    : "white-space:nowrap;".concat(this.myField.dbo.get(STYLE).toString());
+                    : "white-space:nowrap;".concat(this.myField.dbo.getString(STYLE));
 
-            this.myField.myDatePattern = (this.myField.dbo.get(MY_DATE_PATTERN) instanceof String)
-                    ? this.myField.dbo.get(MY_DATE_PATTERN).toString() : "yyyy.MM.dd HH:mm";
+            Object datePattern = this.myField.dbo.get(MY_DATE_PATTERN);
+            
+            this.myField.myDatePattern = (datePattern instanceof String) ? datePattern.toString() : "yyyy.MM.dd HH:mm";
 
             // maskLabelStyle
             this.myField.labelStyle = (this.myField.dbo.get(LABEL_STYLE) == null)
