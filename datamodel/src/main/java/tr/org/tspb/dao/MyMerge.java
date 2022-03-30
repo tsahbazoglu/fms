@@ -14,11 +14,11 @@ import org.bson.Document;
  */
 public class MyMerge {
 
+    private final String exampleFile;
     private final String toDb;
     private final String toCollection;
     private final int workbookSheetColumnCount;
     private final int workbookSheetStartRow;
-    private final Map<String, ExcellColumnDef> workbookSheetColumnMap;
     private final List<ExcellColumnDef> workbookSheetColumnList;
     private final List<MyField> appendFields;
     private final List<MyField> upsertFields;
@@ -26,22 +26,21 @@ public class MyMerge {
     private final String strategy;
 
     MyMerge(Map<String, Object> toMap, FmsForm myForm) throws Exception {
+        this.exampleFile = (String) toMap.get("example-file");
         this.toDb = (String) toMap.get("toDB");
         this.toCollection = (String) toMap.get("toCollection");
         this.workbookSheetColumnCount = ((Number) toMap.get("workbookSheetColumnCount")).intValue();
         this.workbookSheetStartRow = ((Number) toMap.get("workbookSheetStartRow")).intValue();
-        this.workbookSheetColumnMap = new HashMap<>();
         this.workbookSheetColumnList = new ArrayList<>();
         this.appendFields = new ArrayList<>();
         this.upsertFields = new ArrayList<>();
         this.importAndAppendedFields = new ArrayList<>();
         this.strategy = toMap.get("strategy") == null ? "insert" : toMap.get("strategy").toString();
 
-        Document dbo = (Document) toMap.get("workbookSheetColumns");
-        if (dbo != null) {
-            for (String key : dbo.keySet()) {
-                ExcellColumnDef ecd = new ExcellColumnDef(myForm, key, (Document) dbo.get(key));
-                workbookSheetColumnMap.put(key, ecd);
+        List<Document> listOfDoc = (List<Document>) toMap.get("workbookSheetColumns");
+        if (listOfDoc != null) {
+            for (Document key : listOfDoc) {
+                ExcellColumnDef ecd = new ExcellColumnDef(myForm, key);
                 workbookSheetColumnList.add(ecd);
                 importAndAppendedFields.add(myForm.getField(ecd.getToMyField().getKey()));
             }
@@ -112,16 +111,16 @@ public class MyMerge {
         return workbookSheetColumnCount;
     }
 
-    public Map<String, ExcellColumnDef> getWorkbookSheetColumnMap() {
-        return Collections.unmodifiableMap(workbookSheetColumnMap);
-    }
-
     public List<ExcellColumnDef> getWorkbookSheetColumnList() {
         return Collections.unmodifiableList(workbookSheetColumnList);
     }
 
     public int getWorkbookSheetStartRow() {
         return workbookSheetStartRow;
+    }
+
+    public String getExampleFile() {
+        return exampleFile;
     }
 
 }
