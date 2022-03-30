@@ -11,35 +11,28 @@ import tr.org.tspb.dao.FmsForm;
  */
 public class ExcellColumnDef {
 
-    private final String key;
     private final String type;
     private final boolean cache;
     private final int cellType;
     private final Code converter;
     private final MyField toMyField;
 
-    public ExcellColumnDef(FmsForm myForm, String mapKey, Document dbo) {
-        this.key = mapKey;
-        this.type = (String) dbo.get("type");
+    public ExcellColumnDef(FmsForm myForm, Document dbo) {
+        this.type = dbo.getString("type");
         this.cache = Boolean.TRUE.equals(dbo.get("cache"));
         this.cellType = resolveCellType();
-        this.converter = (Code) dbo.get("converter");
+        this.converter = new Code(dbo.getString("converter"));
 
-        String toFieldKey = (String) dbo.get("to");
+        String toFieldKey = dbo.getString("to");
 
         toMyField = myForm.getField(toFieldKey);
         if (toMyField == null) {
             throw new RuntimeException(String.format("form fields does not contain key %s mentioned in upload-config property", toFieldKey));
         }
-
     }
 
     public Code getConverter() {
         return converter;
-    }
-
-    public String getKey() {
-        return key;
     }
 
     public MyField getToMyField() {
@@ -72,7 +65,7 @@ public class ExcellColumnDef {
 
     @Override
     public String toString() {
-        return this.key.concat(" - ").concat(this.toMyField.getKey());
+        return this.toMyField.getKey();
     }
 
 }
