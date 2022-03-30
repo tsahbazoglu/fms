@@ -196,6 +196,11 @@ public class FreeDesigner implements Serializable {
                 return myRecord.getMongoIdAsString();
             }
 
+            @Override
+            public int count(Map<String, FilterMeta> map) {
+                throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+            }
+
         };
 
         myRecords.setRowCount(3000000);
