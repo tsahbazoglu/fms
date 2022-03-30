@@ -139,6 +139,13 @@ public class UpdateAjaxMB implements Serializable {
         btnSistem = ID_CENTER_TOP
                 .concat(COMMA).concat(ID_CENTER_MIDDLE)
                 .concat(COMMA).concat(ID_ESIGN);
+        btnSistem = ID_MSG_DLG
+                // .concat(COMMA).concat(ID_CRUD_OPS)
+                .concat(COMMA).concat(ID_TWO_DIM_DLG_PNL)
+                .concat(COMMA).concat(ID_CENTER_MIDDLE)
+                .concat(COMMA).concat(ID_DLGS)
+                .concat(COMMA).concat(ID_CENTER_TOP)
+                .concat(COMMA).concat(ID_DIM_BASED_DLGS);
         btn1dSave = ID_UPLOADED_FILES
                 .concat(COMMA).concat(ID_VERSION_TABLE)
                 .concat(COMMA).concat(ID_MSG_DLG)
