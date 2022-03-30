@@ -55,8 +55,8 @@
                     <c:forEach items="#{item.myLinks}" var="item">
                         <p:menuitem 
                             value="#{item.label}"
+                            update="#{item.jsfupdate}"
                             action="#{cc.attrs.myAction}"
-                            update="#{cc.attrs.fmsupdate}"
                             icon="ui-icon-document"
                             styleClass="#{item.value eq cc.attrs.selectedFormInfo?'fms-highlight':''} medium-font-size"
                             >

@@ -27,6 +27,74 @@
         <ui:include src="ui-filter.xhtml"/>
     </p:dialog>
 
+    <style>
+        .leftColumn{
+            text-align: left;
+        }
+        .rightColumn{
+            text-align: right;
+        }
+    </style>
+
+    <p:dialog  
+        resizable="false"
+        closeOnEscape="false"
+        closable="false"
+        modal="true"
+        widgetVar="wv_are_you_escape"
+        >        
+        <p:panel>
+            <br/>
+            <p:outputLabel value="Kayıt edilmeyen veri değişiklikleri tespit edildi"/>
+            <br/>
+            <br/>
+            <br/>
+        </p:panel>
+        <f:facet name="footer">
+            <h:panelGrid 
+                style="width:100%"
+                columns="2"
+                columnClasses="leftColumn,rightColumn"         
+                > 
+                <p:button 
+                    value="Kaydet" 
+                    onclick="falseAndCloseAll();return false;"/>
+                <p:button 
+                    value="Kaydetmeden Kapat" 
+                    onclick="justClose();return false;"/>
+            </h:panelGrid>
+        </f:facet>
+
+        <script type="text/javascript">
+            function falseAndCloseAll() {
+                rcSave();
+                hideDialods();
+            }
+            function justClose() {
+                falsechange();
+                hideDialods();
+            }
+            function hideDialods() {
+                PF("wv_are_you_escape").hide();
+                PF('crudOperationDialog2').hide();
+            }
+            function falsechange() {
+                $("#id-status-data-change").val("false");
+            }
+            function truechange() {
+                $("#id-status-data-change").val("true");
+            }
+            function openAnotherPopup() {
+                if ($("#id-status-data-change").val() == "true") {
+                    PF('wv_are_you_escape').show();
+                } else {
+                    PF('crudOperationDialog2').hide();
+                }
+                return false;
+            }
+        </script>
+    </p:dialog>
+
     <p:dialog 
         id="idCrudOperation"
         widgetVar="crudOperationDialog2"
@@ -34,14 +102,38 @@
         height="700"
         header="#{formService.myForm.name}"
         closable="true"
-        closeOnEscape="true"                     
-        modal="false"
+        closeOnEscape="false"                     
+        modal="true"
         draggable="true"
         position="center"
         resizable="false"
         maximizable="false"
         minimizable="false"
         >
+
+        <h:inputHidden id="id-status-data-change" value="false"/>
+        <script type="text/javascript">
+            // catch primefaces close and change its clikc event
+            // var dlg_close_span = $(".ui-icon-closethick");
+            var dlg_close_span = $("#idCrudOperation .ui-icon-closethick");
+            dlg_close_span.on("click", openAnotherPopup);
+
+            var form = $(document.getElementById("idTwoDlgTabView:crud2dForm"));
+            form.change(function () {
+                truechange();
+            });
+            form.keyup(function (e) {
+                if (e.which != 27) {
+                    truechange();
+                }
+            });
+            $(document).keyup(function (e) {
+                if (e.which == 27) {
+                    dlg_close_span.click();
+                }
+            });
+        </script>
+
         <p:tabView id="idTwoDlgTabView">
             <p:tab 
                 title="Güncel Veri Girişi"

@@ -114,7 +114,55 @@
                 onclick="PF('wv-bulkdupload').show();return false;"
                 style="white-space: nowrap;"
                 />
+            <p:button 
+                value="Toplu Silme" 
+                rendered="#{formService.myForm.myActions.delete}"
+                onclick="PF('wv-confirm-multiple-delete').show();return false;"
+                style="white-space: nowrap;"
+                />
         </f:facet>
     </p:toolbar>
+
+
+
+    <p:dialog
+        widgetVar="wv-confirm-multiple-delete"
+        width="100px;"
+        modal="false"
+        closeOnEscape="true"
+        resizable="false"
+        header=""
+        >
+        <p:panel>
+            <h:outputText value="&lt;/br>Silmek istediğinizden emin misiniz?&lt;/br>&lt;/br>" escape="false"/>
+        </p:panel>
+        <f:facet name="footer">
+            <script>
+                function yesMultipleDelete() {
+                    rcMultipleDelete();
+                    PF('wv-confirm-multiple-delete').hide();
+                }
+                function notMultipleDelete() {
+                    PF('wv-confirm-multiple-delete').hide();
+                }
+            </script>
+            <h:panelGrid 
+                columns="2" 
+                style="width:100%"
+                cellspacing="10px;"
+                columnClasses="VTopHLeftW50pNowrap,VTopHLeftW50pNowrap"
+                >
+                <p:button
+                    value="Evet"
+                    onclick="yesMultipleDelete();return false;"  
+                    />   
+                <p:button 
+                    value="Hayır (esc)"
+                    onclick="notMultipleDelete();return false;"
+                    />
+            </h:panelGrid>
+        </f:facet>
+
+    </p:dialog>
 
 </html>

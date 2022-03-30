@@ -149,7 +149,9 @@
             mode="native"
             styleClass="td-8">
 
-            <h:form id="crud2dForm">
+            <h:form 
+                id="crud2dForm"
+                >
                 <p:remoteCommand                
                     name="rc_2d_delete"
                     value="Sormadan Sil"
@@ -160,6 +162,7 @@
                     /> 
                 <p:remoteCommand 
                     name="rcSave"
+                    oncomplete="falsechange();"
                     value="Kaydet" 
                     action="#{twoDimModifyCtrl.saveObject}" 
                     rendered="#{mainFrame.isTwoDim and formService.myForm.myActions.save}"
@@ -168,6 +171,7 @@
                 <p:remoteCommand 
                     name="rcSaveAs"
                     value="Farklı Kaydet" 
+                    oncomplete="falsechange();"
                     action="#{twoDimModifyCtrl.saveAsObject}" 
                     rendered="#{mainFrame.isTwoDim and formService.myForm.myActions.saveAs}"
                     update="#{updateAjaxMB.btn2dSave},:idTwoDlgTabView,id-tab-view:id-table-file-list"
@@ -432,6 +436,7 @@
         >
         <p:fileUpload 
             id="id-up-file"
+            widgetVar="widget-var-page-file-upload"
             value="#{twoDimModifyCtrl.uploadedFile}"
             listener="#{twoDimModifyCtrl.upload}"
             allowTypes="#{twoDimModifyCtrl.mongoUploadFileType}"
@@ -444,7 +449,6 @@
             uploadLabel="Yükle"
             label="Seç"
             auto="true"
-            widgetVar="widget-var-page-file-upload"
             style="display:none;"
             update="@(.class-data-table-inline-up-files),idTwoDlgTabView:id-table-crud-dlg-tab-attachments,id-tab-view:id-table-file-list"
             />

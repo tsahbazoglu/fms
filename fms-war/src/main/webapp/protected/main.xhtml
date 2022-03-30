@@ -250,7 +250,12 @@
                                     <p:commandButton value="Veritabanına Yaz" action="#{importDataMB.writeToDb}"
                                                      />
                                 </h:panelGrid>   
-                                <p:dataTable  value="#{importDataMB.listOfToBeUpsert}" var="x" id="id_import_success_data">
+                                <p:dataTable  
+                                    value="#{importDataMB.listOfToBeUpsert}" 
+                                    var="x" 
+                                    id="id_import_success_data"
+                                    lazy="true"
+                                    >
                                     <p:column headerText="ldapUID">
                                         #{x['ldapUID']}
                                     </p:column>
@@ -288,11 +293,12 @@
 
                     <p:dialog 
                         widgetVar="widget_1d_delete_confirmation"
+                        modal="true"
                         closeOnEscape="true"
                         resizable="false"
                         header=""
                         >
-                        <h:panelGroup>
+                        <p:panel>
                             <h:panelGrid style="
                                          width: 100%;
                                          text-align: left;
@@ -309,26 +315,26 @@
                                     rows="6"
                                     />  
                                 <h:outputText value="&lt;/br>Silmek istediğinizden emin misiniz?&lt;/br>&lt;/br>" escape="false"/>
-
-                                <h:panelGrid columns="2" style="width: 100%;border: 1px solid green;"
-                                             cellspacing="10px;"
-                                             columnClasses="VTopHLeftW50pNowrap,VTopHLeftW50pNowrap"
-                                             >
-                                    <h:commandButton 
-                                        style="width: 100%;"                            
-                                        value="Evet"
-                                        onclick="yes1dDoDelete();"  
-                                        type="button" 
-                                        />   
-                                    <h:commandButton 
-                                        style="width: 100%;"                            
-                                        value="Hayır (esc)"
-                                        onclick="no1dDoNotDelete();"
-                                        type="button" 
-                                        />
-                                </h:panelGrid>
                             </h:panelGrid>
-                        </h:panelGroup>
+                        </p:panel>
+                        <f:facet name="footer">
+                            <h:panelGrid 
+                                columns="2" 
+                                style="width:100%"
+                                cellspacing="10px;"
+                                columnClasses="VTopHLeftW50pNowrap,VTopHLeftW50pNowrap"
+                                >
+                                <p:button
+                                    value="Evet"
+                                    onclick="yes1dDoDelete();"  
+                                    />   
+                                <p:button 
+                                    value="Hayır (esc)"
+                                    onclick="no1dDoNotDelete();"
+                                    />
+                            </h:panelGrid>
+                        </f:facet>
+
                     </p:dialog>
 
                     <p:dialog
@@ -374,8 +380,8 @@
                         <p:toolbar>
                             <f:facet name="left">
                                 <p:commandButton 
-                                    value="Veri Tabanına Akatrımı Onaylıyorum" 
-                                    action="#{twoDimModifyCtrl.bulkLoadExcell}"
+                                    value="Veri Tabanına Aktarımı Onaylıyorum" 
+                                    action="#{fmsBulkUpload.bulkLoadExcell}"
                                     update="#{updateAjaxMB.btnBulkLoad}"
                                     /> 
                             </f:facet>
@@ -400,7 +406,7 @@
                             </style>
 
                             <p:dataTable 
-                                value="#{twoDimModifyCtrl.listOfToBeUpsert}" 
+                                value="#{fmsBulkUpload.listOfToBeUpsert}" 
                                 var="x" 
                                 style="white-space: nowrap;" 
                                 rowStyleClass="#{x.style}"
@@ -420,6 +426,7 @@
 
                     <p:dialog 
                         widgetVar="specialConfirmationDialog"
+                        modal="true"
                         closeOnEscape="true"
                         resizable="false"
                         header=""

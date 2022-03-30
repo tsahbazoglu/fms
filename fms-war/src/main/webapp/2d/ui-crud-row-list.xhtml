@@ -25,6 +25,9 @@
             value="Güncel Dönem Verisi" 
             style="font-size: 22px;font-weight: bolder;color: #b3b3b3;"/>
 
+        <!--
+          selectionMode="multiple" should be defined on p:dataTable or in p:column not on both
+        -->
         <h:form 
             id="id2DCurrentObjectList" 
             rendered="#{formService.myForm.currentRendered}">  
@@ -37,7 +40,6 @@
                 rows="10"
                 paginatorTemplate="{RowsPerPageDropdown} {FirstPageLink} {PreviousPageLink} {CurrentPageReport} {NextPageLink} {LastPageLink}"
                 rowsPerPageTemplate="10,20,30" 
-                selectionMode="single" 
                 selection="#{twoDimModifyCtrl.selectedRow}" 
                 lazy="true"
                 resizableColumns="true"
@@ -45,11 +47,15 @@
                 scrollable="true"
                 scrollWidth="1270px;"
                 > 
+
                 <p:ajax 
                     event="rowSelect" 
                     listener="#{twoDimModifyCtrl.selectListener}"
                     update="#{updateAjaxMB.twoDimRowSelect}"
                     />
+
+                <p:column selectionMode="multiple" style="width:14px;text-align:center"/>
+
                 <c:forEach items="#{twoDimModifyCtrl.objectsColumnDataModel}" var="columnMap">
                     <p:column   
                         headerText="#{columnMap.shortName}"
@@ -108,6 +114,13 @@
                 <p:column>
                 </p:column>
             </p:dataTable>
+
+            <p:remoteCommand
+                name="rcMultipleDelete"
+                value="Sil"
+                action="#{twoDimModifyCtrl.multipleDelete}"
+                update="#{updateAjaxMB.buttonDeleteDirectly}"
+                />
         </h:form>
 
     </p:panel>

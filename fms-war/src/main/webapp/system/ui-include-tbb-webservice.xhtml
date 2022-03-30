@@ -1,0 +1,91 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://java.sun.com/jsf/html"
+      xmlns:p="http://primefaces.org/ui"
+      >
+
+    <h:head>
+        <title></title>
+        <style>
+            .webservice td {
+                padding: 15px 0;
+            }
+        </style>
+    </h:head>
+
+    <p:outputPanel id="id-tbb-web-service">
+        <br/>
+        <p:outputLabel value="Türkiye Bankalar Birliği (TBB) Web Service" style="font-size: 16px;font-weight: bolder"/>
+        <br/>
+        <br/>
+        <h:panelGrid 
+            columns="2"
+            style="width: 100%;"
+            class="webservice"
+            >
+
+            <p:outputLabel value="Web Service URL"/>
+            <p:outputLabel value="#{tbbService.tbbWebServiceUrl}"/>
+
+            <p:outputLabel value="Web Client : Get Bank Ids"/>
+            <h:form>
+                <p:commandButton 
+                    value="Çalıştır" 
+                    action="#{tbbService.tbbWebServiceGetIds}" 
+                    />
+            </h:form>   
+
+            <p:outputLabel value="Web Client : Get Bank Details"/>
+            <h:form id="uys_system_form">
+                <p:commandButton 
+                    value="Çalıştır" 
+                    action="#{tbbService.runGetBankDetails}" 
+                    />
+            </h:form>
+
+            <p:outputLabel value="Dosya Seçimi /home/telman/Desktop/bankalar_YYYYMMDD_HHmm.txt"/>
+            <h:form enctype="multipart/form-data">
+                <p:fileUpload 
+                    id="idBankalarPath" 
+                    listener="#{tbbService.upload}" 
+                    style="width: 95%;"  
+                    />
+            </h:form>
+
+            <p:outputLabel value="TBB-TSPB Banka Eşleştirme Tablosunu Oluştur"/>
+            <h:form>
+                <p:commandButton 
+                    value="Çalıştır" 
+                    action="#{tbbService.storeBanksToDb}" 
+                    />
+            </h:form>
+
+            <p:outputLabel value="Detaylı Eşleştirme (Yönetim Kurulu, Üst Yönetim, ...)"/>
+            <h:form>
+                <p:commandButton 
+                    value="Çalıştır" 
+                    action="#{tbbService.mergeWithTBB}" 
+                    />
+            </h:form>
+        </h:panelGrid>
+        <br/>
+        <br/>
+        <p:commandButton 
+            value="Temizle" 
+            action="#{tbbService.clearWarnings}" 
+            style="white-space: nowrap;"
+            rendered="true"
+            />
+        <br/>
+        <br/>
+        <p:dataList 
+            value="#{tbbService.warnings}" 
+            var="x" 
+            id="idWarningList"
+            lazy="true"
+            >
+            <h:outputText value="#{x}"/>
+        </p:dataList>
+    </p:outputPanel>
+</html>

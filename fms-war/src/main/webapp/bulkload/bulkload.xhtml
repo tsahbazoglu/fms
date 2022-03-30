@@ -1,0 +1,63 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://java.sun.com/jsf/html"
+      xmlns:p="http://primefaces.org/ui">
+
+    <h:head>
+        <title></title>
+    </h:head>
+
+    <h:body>
+        <br/>
+        <p:outputLabel value="Örnek Excell Dosya" style="font: bold normal 15px/20px arial,sans-serif;"/>
+        <br/>
+        <br/>
+        <p:panel>
+            <h:outputLink 
+                value="#{application.contextPath}/fmsdownload/gayrimenkul-yatirim-ortakliklari-net-aktif-deger-ve-varlik-degeri-v0.xlsx"
+                style="
+                text-decoration:none;
+                font-size: 14px;
+                color:#112978;
+                font-weight:bold;"
+                >
+                <h:outputText value="indir" />
+            </h:outputLink>  
+        </p:panel>
+        <br/>
+        <br/>
+        <br/>
+        <p:outputLabel value="Dosya Seçimi" style="font: bold normal 15px/20px arial,sans-serif;"/>
+        <br/>
+        <br/>
+        <h:form id="idInputFileForm"
+                enctype="multipart/form-data"
+                >
+            <p:fileUpload 
+                listener="#{fmsMultiFormBulkUpload.uploadExcell}"
+                invalidSizeMessage="Dosya Boyutu 4MB dan büyük olmamalı"
+                invalidFileMessage="#{fmsMultiFormBulkUpload.invalidFileMessage}"
+                fileLimitMessage="En fazla #{fmsMultiFormBulkUpload.fileLimit} dosya eklenebilir."
+                fileLimit="#{fmsMultiFormBulkUpload.fileLimit}"
+                cancelLabel="Vazgeç"
+                uploadLabel="Yükle"
+                label="Seç"
+                allowTypes="/(\.|\/)(xlsx)$/"
+                mode="advanced" 
+                update="@this"
+                />  
+            <br/>
+            <br/>
+            <br/>
+            <p:outputLabel value="Veri Tabanına Aktarım" style="font: bold normal 15px/20px arial,sans-serif;"/>
+            <br/>
+            <br/>
+            <p:commandButton
+                value="Aktarımı Başlat"
+                action="#{fmsMultiFormBulkUpload.localBulkLoadExcell}"
+                update="idMessageDialog"
+                />
+        </h:form>
+    </h:body>
+</html>

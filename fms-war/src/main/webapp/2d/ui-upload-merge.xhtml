@@ -1,0 +1,137 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:f="http://java.sun.com/jsf/core"
+      xmlns:h="http://java.sun.com/jsf/html"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:c="http://java.sun.com/jsp/jstl/core"
+      xmlns:mydynamic="http://java.sun.com/jsf/composite/mydinamic"
+      >
+
+    <h:head>
+        <title></title>
+    </h:head>
+
+    <h:panelGroup  
+        rendered="#{formService.myForm.myActions.upload}"
+        >
+        <br/>
+        <p:outputLabel value="Açıklama" style="font: bold normal 15px/20px arial,sans-serif;"/>
+        <br/>  
+        <p:panel>
+            <p:outputLabel value="yüklenen dosyalar sistem tarafında muhafıza edilmemektedir."/>
+            <br/>
+            <p:outputLabel value="dosya aracılığı ile aktarım sonrasında esas alınan veriler veritabanında tutulacak olan verilerdir."/>
+        </p:panel>
+        <br/>
+        <p:outputLabel value="Örnek Excell Dosya" style="font: bold normal 15px/20px arial,sans-serif;"/>
+        <br/>
+        <p:panel>
+            <h:outputLink 
+                value="#{application.contextPath}/fmsdownload/#{formService.myForm.uploadMerge.exampleFile}"
+                style="
+                text-decoration:none;
+                font-size: 14px;
+                color:#112978;
+                font-weight:bold;"
+                >
+                <h:outputText value="indir" />
+            </h:outputLink>  
+        </p:panel>
+        <br/>  
+        <br/>
+        <p:outputLabel 
+            value="Dosya Seçimi"
+            style="font: bold normal 15px/20px arial,sans-serif;"/>
+        <br/>
+        <p:panel>
+            <h:form enctype="multipart/form-data">
+                <p:fileUpload 
+                    listener="#{fmsBulkUpload.uploadExcell}"
+                    invalidSizeMessage="#{fmsBulkUpload.invalidSizeMessage}"
+                    invalidFileMessage="#{fmsBulkUpload.invalidFileMessage}"
+                    fileLimitMessage="#{fmsBulkUpload.fileLimitMessage}"
+                    fileLimit="#{fmsBulkUpload.fmsFileLimit}"
+                    sizeLimit="#{fmsBulkUpload.fmsSizeLimit}"
+                    cancelLabel="Vazgeç"
+                    uploadLabel="Yükle"
+                    label="Seç"
+                    allowTypes="/(\.|\/)(xlsx)$/"
+                    mode="advanced" 
+                    update="messages,:idMessageDialog,@this"
+                    >
+                    <p:growl id="messages" showDetail="true" />
+                </p:fileUpload>
+            </h:form>
+        </p:panel>
+        <br/>
+        <br/>
+        <p:outputLabel 
+            value="Ek Alanlar"
+            style="font: bold normal 15px/20px arial,sans-serif;"/>
+        <br/>
+        <h:form>
+            <p:panel>
+                <h:panelGrid columns="2">
+                    <c:forEach items="#{formService.myForm.uploadMerge.appendFields}" var="field">
+                        <p:outputLabel value="#{field.name}"/>
+                        <h:panelGroup>
+                            <mydynamic:uysSelectMenuTable
+                                myProjectKey="#{formService.myForm.projectKey}"
+                                myUpperNode="#{formService.myForm.upperNode}"
+                                myFormKey="#{formService.myForm.key}"
+                                myField="#{field}"                                    
+                                myFieldKey="#{field.key}"
+                                myreadonly="false" 
+                                myvalue="#{fmsBulkUpload.uploadedMergeObject[field.key]}"
+                                label="#{field.label}" 
+                                myitems="#{field.selectItemsCurrent}" 
+                                myrequired="#{field.required}"
+                                rendered="#{twoDimModifyCtrl.selectOneMenu eq field.componentType and field.rendered}"
+                                myconverter="#{field.myconverter}"
+                                isAjax="#{field.ajax.enable}"
+                                ajax_update="#{field.ajaxUpdate}"
+                                />
+                            <mydynamic:uysInputText 
+                                myreadonly="#{field.readonly}" 
+                                myrequired="#{field.required}"
+                                mystyle="#{field.style}"
+                                myvalue="#{fmsBulkUpload.uploadedMergeObject[field.key]}"
+                                myCalculateOnCrudView="#{field.calculateOnCrudView}"
+                                myCalculateOnListView="#{field.calculateOnListView}"
+                                myCalculateOnSave="#{field.calculateOnSave}"
+                                label="#{field.label}" 
+                                rendered="#{twoDimModifyCtrl.inputText eq field.componentType and field.rendered}"
+                                myConverter="#{field.myconverter}"
+                                myConverterInstance="#{field.converterInstance}" 
+                                myConverterFormat ="#{field.converterFormat}" 
+                                crudObject= "#{twoDimModifyCtrl.myObject}"
+                                myFieldKey= "#{field.key}"
+                                myMaxValue="#{field.maxValue}" 
+                                shouldCheckNegative="#{field.shouldCheckNegative}"
+                                /> 
+                            <mydynamic:uysDateTimeEntry 
+                                myvalue="#{fmsBulkUpload.uploadedMergeObject[field.key]}"
+                                label="#{field.label}" 
+                                rendered="#{twoDimModifyCtrl.inputDate eq field.componentType and field.rendered}"
+                                myconverter="#{field.myconverter}"
+                                myrequired="#{field.required}"
+                                mypattern="#{field.datePattern}"
+                                dateChange="#{twoDimModifyCtrl.dateChange}"
+                                />
+                        </h:panelGroup>
+                    </c:forEach>
+                </h:panelGrid>
+            </p:panel>
+            <br/>
+            <br/>
+            <p:commandButton 
+                value="Önizleme" 
+                style="width:100%"
+                action="#{fmsBulkUpload.previewUpload}" 
+                update=":id_kpb_bulk_preview,:idMessageDialog"
+                />    
+        </h:form>
+    </h:panelGroup>
+
+</html>
