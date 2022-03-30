@@ -118,6 +118,7 @@ public class MyForm extends FmsFormAbstract {
     private List<String> userConstantNoteList = new ArrayList<>();
     private List<String> ajaxFields = new ArrayList<>();
     private List<MyRule> workflowSteps = new ArrayList<>();
+    private List<Document> additionalRows = new ArrayList<>();
     private String workflowStartStep = "s0";
     private String schemaVersion;
     private Object actions;
@@ -963,6 +964,10 @@ public class MyForm extends FmsFormAbstract {
         return deleteChildsOnDeleteMsg;
     }
 
+    public List<Document> getAdditionalRows() {
+        return additionalRows;
+    }
+
     private static class OrderedKey {
 
         private final int orderno;
@@ -1010,6 +1015,7 @@ public class MyForm extends FmsFormAbstract {
             }
             this.myForm.selectAllOnPleaseSelect = dbObjectForm.getBoolean("selectAllOnPleaseSelect", false);
             this.myForm.childCountDefault = dbObjectForm.getInteger("child-count-default", 5);
+            this.myForm.additionalRows = dbObjectForm.getList("additional-rows", Document.class);
         }
 
         public Builder maskWorkflowRelation() {
@@ -1081,7 +1087,7 @@ public class MyForm extends FmsFormAbstract {
 
         public Builder maskUploadMerge() throws Exception {
 
-            Document dbo = (Document) dbObjectForm.get(UPLOAD_CONFIG);
+            Document dbo = dbObjectForm.get(UPLOAD_CONFIG, Document.class);
 
             if (dbo != null) {
                 this.myForm.uploadMerge = new MyMerge(dbo, this.myForm);
@@ -1330,6 +1336,9 @@ public class MyForm extends FmsFormAbstract {
                         return;
                     case "grid":
                         this.myForm.dimension = 2;
+                        return;
+                    case "bulkload":
+                        this.myForm.dimension = 10;
                         return;
                     //FIXME
                     case "out_of_project_pattern":
