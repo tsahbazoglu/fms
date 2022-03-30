@@ -15,7 +15,9 @@
         <param-name>primefaces.THEME</param-name>
         <param-value>redmond</param-value>       
         <!--<param-value>bootstrap</param-value>-->       
-        <!--<param-value>nova-light</param-value>-->       
+        <!--<param-value>nova-light</param-value>-->
+        <!--<param-value>luna-blue</param-value>-->       
+        <!--<param-value>vela</param-value>-->       
     </context-param>
     <context-param>
         <param-name>com.sun.faces.validateXml</param-name>
