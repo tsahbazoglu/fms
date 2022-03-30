@@ -1,11 +1,11 @@
 package tr.org.tspb.helper;
 
 import java.util.List;
-import javax.faces.model.SelectItem;
 import org.primefaces.model.menu.DefaultMenuItem;
 import org.primefaces.model.menu.DefaultMenuModel;
 import org.primefaces.model.menu.DefaultSubMenu;
 import org.primefaces.model.menu.MenuModel;
+import tr.org.tspb.datamodel.gui.FormDef;
 import tr.org.tspb.datamodel.gui.ModuleItem;
 
 /**
@@ -70,15 +70,15 @@ public class MenuModelCreator {
                     .label(moduleItem.getName())
                     .build();
             model.getElements().add(submenu);
-            for (SelectItem selectItem : moduleItem.getMyLinks()) {
-                createMenuItem(submenu, selectItem);
+            for (FormDef formDef : moduleItem.getMyLinks()) {
+                createMenuItem(submenu, formDef);
             }
         }
     }
 
-    private void createMenuItem(DefaultSubMenu submenu, SelectItem selectItem) {
+    private void createMenuItem(DefaultSubMenu submenu, FormDef formDef) {
         DefaultMenuItem item = DefaultMenuItem.builder()
-                .value(selectItem.getLabel())
+                .value(formDef.getLabel())
                 .build();
         item.setUrl("http://www.primefaces.org");
         item.setIcon("ui-icon-home");
