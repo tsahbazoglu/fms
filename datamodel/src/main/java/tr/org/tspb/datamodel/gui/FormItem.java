@@ -22,7 +22,6 @@ public class FormItem {
         this.name = doc.get(NAME).toString();
         this.form = (String) doc.get(FORM);
         this.menuOrder = ((Number) doc.get(MENU_ORDER)).intValue();
-
     }
 
     public String getKey() {
