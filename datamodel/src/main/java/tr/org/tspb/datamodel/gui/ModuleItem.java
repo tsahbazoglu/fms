@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Map;
 import javax.faces.model.SelectItem;
 import org.bson.Document;
+import org.junit.experimental.theories.FromDataPoints;
 import static tr.org.tspb.constants.ProjectConstants.FORM_KEY;
 import static tr.org.tspb.constants.ProjectConstants.PROJECT_KEY;
 import static tr.org.tspb.constants.ProjectConstants.NAME;
@@ -19,7 +20,7 @@ public class ModuleItem {
     private final String projectKey;
     private final String moduleKey;
     private final String name;
-    private List<SelectItem> myLinks;
+    private List<FormDef> myLinks;
     private final boolean rowSelected;
     private final int menuOrder;
     private MyProject project;
@@ -49,11 +50,11 @@ public class ModuleItem {
         return projectKey;
     }
 
-    public void createList(List<SelectItem> forms) {
+    public void createList(List<FormDef> forms) {
         this.myLinks = forms;
     }
 
-    public List<SelectItem> getMyLinks() {
+    public List<FormDef> getMyLinks() {
         return myLinks;
     }
 
