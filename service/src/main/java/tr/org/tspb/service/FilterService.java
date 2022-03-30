@@ -28,6 +28,8 @@ import static tr.org.tspb.constants.ProjectConstants.MONGO_ID;
 import static tr.org.tspb.constants.ProjectConstants.PERIOD;
 import static tr.org.tspb.constants.ProjectConstants.TEMPLATE;
 import static tr.org.tspb.constants.ProjectConstants.ZET_DIMENSION;
+import tr.org.tspb.converter.base.BsonConverter;
+import tr.org.tspb.converter.base.SelectOneObjectIdConverter;
 import tr.org.tspb.dao.refs.PlainRecord;
 import tr.org.tspb.dp.nullobj.PlainRecordData;
 import tr.org.tspb.exceptions.FormConfigException;
@@ -414,6 +416,18 @@ public class FilterService extends CommonSrv {
                     Document doc = mongoDbUtil.findOne(myItems.getDb(), myItems.getTable(),
                             Filters.eq(MONGO_ID, guiFiltersCurrent.get(myField.getKey())));
                     guiFiltersCurrent.put(myField.getKey(), PlainRecordData.getPlainRecord(doc, myItems));
+                }
+            }
+
+            if (myField.getComponentType().contains("selectOneMenu")) {
+                if (myField.getMyconverter() instanceof SelectOneObjectIdConverter) {
+                    if (guiFiltersCurrent.get(myField.getKey()) == null) {
+                        guiFiltersCurrent.put(myField.getKey(), SelectOneObjectIdConverter.SELECT_ALL);
+                    }
+                } else if (myField.getMyconverter() instanceof BsonConverter) {
+                    if (guiFiltersCurrent.get(myField.getKey()) == null) {
+                        guiFiltersCurrent.put(myField.getKey(), BsonConverter.SELECT_ALL);
+                    }
                 }
             }
         }
