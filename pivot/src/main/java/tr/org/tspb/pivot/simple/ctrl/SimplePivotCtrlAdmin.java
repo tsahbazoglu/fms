@@ -11,7 +11,6 @@ import javax.inject.Inject;
 import org.primefaces.model.FilterMeta;
 import org.primefaces.model.LazyDataModel;
 import org.primefaces.model.SortMeta;
-import org.primefaces.model.SortOrder;
 import tr.org.tspb.dao.FmsForm;
 import tr.org.tspb.pivot.simple.datamodel.ItemProvider;
 import tr.org.tspb.pivot.simple.datamodel.PivotRecord;
@@ -55,6 +54,11 @@ public class SimplePivotCtrlAdmin implements Serializable {
             @Override
             public String getRowKey(PivotRecord pivotRecord) {
                 return pivotRecord.getMongoIdAsString();
+            }
+
+            @Override
+            public int count(Map<String, FilterMeta> map) {
+                throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
             }
 
         };
