@@ -64,35 +64,6 @@
                     onclick="justClose();return false;"/>
             </h:panelGrid>
         </f:facet>
-
-        <script type="text/javascript">
-            function falseAndCloseAll() {
-                rcSave();
-                hideDialods();
-            }
-            function justClose() {
-                falsechange();
-                hideDialods();
-            }
-            function hideDialods() {
-                PF("wv_are_you_escape").hide();
-                PF('crudOperationDialog2').hide();
-            }
-            function falsechange() {
-                $("#id-status-data-change").val("false");
-            }
-            function truechange() {
-                $("#id-status-data-change").val("true");
-            }
-            function openAnotherPopup() {
-                if ($("#id-status-data-change").val() == "true") {
-                    PF('wv_are_you_escape').show();
-                } else {
-                    PF('crudOperationDialog2').hide();
-                }
-                return false;
-            }
-        </script>
     </p:dialog>
 
     <p:dialog 
@@ -112,26 +83,33 @@
         >
 
         <h:inputHidden id="id-status-data-change" value="false"/>
+        
         <script type="text/javascript">
-            // catch primefaces close and change its clikc event
-            // var dlg_close_span = $(".ui-icon-closethick");
-            var dlg_close_span = $("#idCrudOperation .ui-icon-closethick");
-            dlg_close_span.on("click", openAnotherPopup);
 
-            var form = $(document.getElementById("idTwoDlgTabView:crud2dForm"));
-            form.change(function () {
-                truechange();
-            });
-            form.keyup(function (e) {
-                if (e.which != 27) {
+            var dlg_close_span = $("#idCrudOperation .ui-icon-closethick");
+
+            if (#{formService.myForm.myActions.save}) {
+                // catch primefaces close and change its click event
+                // var dlg_close_span = $(".ui-icon-closethick");
+                dlg_close_span.on("click", openAnotherPopup);
+
+                var form = $(document.getElementById("idTwoDlgTabView:crud2dForm"));
+                form.change(function () {
                     truechange();
-                }
-            });
+                });
+                form.keyup(function (e) {
+                    if (e.which != 27) {
+                        truechange();
+                    }
+                });
+            }
+
             $(document).keyup(function (e) {
                 if (e.which == 27) {
                     dlg_close_span.click();
                 }
             });
+
         </script>
 
         <p:tabView id="idTwoDlgTabView">

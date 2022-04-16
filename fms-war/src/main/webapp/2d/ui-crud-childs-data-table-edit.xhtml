@@ -29,11 +29,13 @@
                 value="sil" 
                 action="#{twoDimModifyCtrl.delete}"
                 update="idTwoDlgTabView:crud2dForm:idDataTableChilds"
+                rendered="#{mainFrame.isTwoDim and formService.myForm.myActions.delete}"
                 />  
             <p:commandButton 
                 value="kaydet" 
                 action="#{twoDimModifyCtrl.saveRow}"
                 update="idTwoDlgTabView:crud2dForm:idDataTableChilds,#{updateAjaxMB.btn2dSave},:idTwoDlgTabView,id-tab-view:id-table-file-list"
+                rendered="#{mainFrame.isTwoDim and formService.myForm.myActions.save}"
                 />
         </f:facet>
     </p:toolbar>

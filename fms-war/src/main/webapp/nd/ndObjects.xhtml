@@ -18,48 +18,49 @@
             style="width: 94%"
             >
             <f:facet name="left">
-                <p:button  
-                    icon="ui-icon-home" 
-                    disabled="true">
-                </p:button> 
-                <p:commandButton 
-                    value="Kaydet"
-                    rendered="#{formService.myForm.myActions.save}"
-                    style="width: 150px;"
-                    action="#{pivotModifierCtrl.provideCrossCheck}"
-                    update="#{updateAjaxMB.btnNdSave}"
-                    />
-                <p:commandButton 
-                    value="Bu sayfa ile ilgili açıklamalar için tıklayınız" 
-                    action="#{pivotModifierCtrl.showAllNote}" 
-                    style="color: red;font-weight: bold;white-space: nowrap;"
-                    rendered="#{pivotModifierCtrl.selectedFormUserNote}"
-                    update=":idMessageDialog"
-                    />
-                <p:commandButton 
-                    value="Excele Aktar" 
-                    rendered="#{formService.myForm.myActions.download}"
-                    action="#{pivotModifierCtrl.downloadCsvFile}" 
-                    style="white-space: nowrap;"
-                    />
-
-                <p:commandButton 
-                    value="E-İmza Süreci" 
-                    action="#{pivotModifierCtrl.showEimza22}" 
-                    rendered="#{formService.myForm.myActions.eimza2D}"
-                    update=":idMessageDialog,:id_nd_esign_dialog"
-                    />  
-                <h:inputHidden
-                    id="id-hidden-text-json-data-to-model" 
-                    value="#{pivotModifierCtrl.pivotDataModelEdit.jsonDataToModel}"
-                    />
+                <h:panelGrid columns="6">
+                    <p:button  
+                        icon="pi pi-home" 
+                        disabled="true">
+                    </p:button> 
+                    <p:commandButton 
+                        value="Kaydet"
+                        rendered="#{formService.myForm.myActions.save}"
+                        style="width: 150px;"
+                        action="#{pivotModifierCtrl.provideCrossCheck}"
+                        update="#{updateAjaxMB.btnNdSave}"
+                        />
+                    <p:commandButton 
+                        value="Bu sayfa ile ilgili açıklamalar için tıklayınız" 
+                        action="#{pivotModifierCtrl.showAllNote}" 
+                        style="color: red;font-weight: bold;white-space: nowrap;"
+                        rendered="#{pivotModifierCtrl.selectedFormUserNote}"
+                        update=":idMessageDialog"
+                        />
+                    <p:commandButton 
+                        value="Excele Aktar" 
+                        rendered="#{formService.myForm.myActions.download}"
+                        action="#{pivotModifierCtrl.downloadCsvFile}" 
+                        style="white-space: nowrap;"
+                        />
+                    <p:commandButton 
+                        value="E-İmza Süreci" 
+                        action="#{pivotModifierCtrl.showEimza22}" 
+                        rendered="#{formService.myForm.myActions.eimza2D}"
+                        update=":idMessageDialog,:id_nd_esign_dialog"
+                        />  
+                    <h:inputHidden
+                        id="id-hidden-text-json-data-to-model" 
+                        value="#{pivotModifierCtrl.pivotDataModelEdit.jsonDataToModel}"
+                        />
+                </h:panelGrid>
             </f:facet>
         </p:toolbar>
     </h:form> 
 
     <br/>
 
-    <h:outputText value="Güncel Dönem Verisi" style="font-size: 22px;font-weight: bolder;color: #b3b3b3;"/>
+    <p:outputLabel value="Güncel Dönem Verisi" style="font-size: 22px;font-weight: bolder;"/>
     <br/>
     <br/>
     <h:form id="ndFilterForm">
@@ -67,7 +68,7 @@
             <tr>
                 <ui:repeat value="#{pivotModifierCtrl.zetDimension}" var="filterFieldStructure">
                     <td>
-                        <h:outputText value="#{filterFieldStructure.shortName} : "/>
+                        <p:outputLabel value="#{filterFieldStructure.shortName} : "/>
                         <p:selectOneMenu  
                             value="#{filterService.guiFilterCurrent[filterFieldStructure.field]}"
                             converter="#{filterFieldStructure.myconverter}"
@@ -175,6 +176,14 @@
     </h:panelGroup>
 
     <h:panelGroup id="currentMyGrid">
+
+
+        <style>
+            .handsontable table thead th {
+                white-space: pre-line;
+                /*max-width: 10px;*/
+            }
+        </style>
         <mygrid:mygrid 
             id="idCurrentMyGrid"
             rowHeaderWidh="#{pivotModifierCtrl.pivotDataModelEdit.handsonRowHeaderWidth}"

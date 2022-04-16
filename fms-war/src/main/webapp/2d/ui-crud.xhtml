@@ -31,106 +31,114 @@
         <p:toolbar
             id="id-2d-toolbar"
             style="width: 100%;"
+
+
             >
-            <f:facet name="left">              
-                <p:button  
-                    icon="ui-icon-home" 
-                    disabled="true">
-                </p:button>
-                <p:commandButton 
-                    onclick="PF('specialConfirmationDialog').show(); return false;"
-                    value="Sil" 
-                    transient="true"
-                    rendered="#{mainFrame.isTwoDim and formService.myForm.myActions.delete}"
-                    />  
-                <p:button
-                    onclick="rcSave();return false;"
-                    value="Kaydet" 
-                    rendered="#{mainFrame.isTwoDim and formService.myForm.myActions.save}"
-                    />
-                <p:button
-                    onclick="rcSaveAs();return false;"
-                    value="Farklı Kaydet" 
-                    rendered="#{mainFrame.isTwoDim and formService.myForm.myActions.saveAs}"
-                    />  
-                <p:commandButton 
-                    id="id_2d_button_esign"
-                    value="2:1 - Eimza Süreci" 
-                    action="#{twoDimModifyCtrl.showEimza}" 
-                    rendered="#{mainFrame.isTwoDim and formService.myForm.myActions.eimza1D}"
-                    update="#{updateAjaxMB.btn2dDlgEsign}"
-                    />
-                <!--rendered="# {twoDimModifyCtrl.dependOnSelectedFormRenderedMap['save']and twoDimModifyCtrl.myObject['resultType']['code']=='001'}"-->
-                <p:commandButton 
-                    id="buttonCopyObject"
-                    value="Kopyala" 
-                    action="#{twoDimModifyCtrl.copyObject}" 
-                    rendered="false"/>
+            <f:facet name="left">    
+                <h:panelGrid columns="20">
 
-                <p:commandButton 
-                    value="Ödeme İşlemi" 
-                    action="#{twoDimModifyCtrl.payment}" 
-                    style="white-space: nowrap;"
-                    update=":id-dlg-payment,:idMessageDialog"
-                    rendered="#{formService.myForm.myActions.payment}"
-                    />
+                    <p:button  
+                        icon="pi pi-home" 
+                        disabled="true">
+                    </p:button>
+                    <p:commandButton 
+                        icon="pi pi-trash" 
+                        onclick="PF('specialConfirmationDialog').show(); return false;"
+                        value="Sil" 
+                        transient="true"
+                        rendered="#{mainFrame.isTwoDim and formService.myForm.myActions.delete}"
+                        />  
+                    <p:button
+                        icon="pi pi-save" 
+                        onclick="rcSave();return false;"
+                        value="Kaydet" 
+                        rendered="#{mainFrame.isTwoDim and formService.myForm.myActions.save}"
+                        />
+                    <p:button
+                        icon="pi pi-clone" 
+                        onclick="rcSaveAs();return false;"
+                        value="Farklı Kaydet" 
+                        rendered="#{mainFrame.isTwoDim and formService.myForm.myActions.saveAs}"
+                        />  
+                    <p:commandButton 
+                        id="id_2d_button_esign"
+                        value="2:1 - Eimza Süreci" 
+                        action="#{twoDimModifyCtrl.showEimza}" 
+                        rendered="#{mainFrame.isTwoDim and formService.myForm.myActions.eimza1D}"
+                        update="#{updateAjaxMB.btn2dDlgEsign}"
+                        />
+                    <!--rendered="# {twoDimModifyCtrl.dependOnSelectedFormRenderedMap['save']and twoDimModifyCtrl.myObject['resultType']['code']=='001'}"-->
+                    <p:commandButton 
+                        id="buttonCopyObject"
+                        value="Kopyala" 
+                        action="#{twoDimModifyCtrl.copyObject}" 
+                        rendered="false"/>
 
-                <p:commandButton 
-                    value="indirmek için tıklayınız." 
-                    ajax="false" 
-                    icon="ui-icon-arrowthick-1-s"
-                    rendered="#{formService.myForm.myActions.pdf}"
-                    >
-                    <p:fileDownload value="#{twoDimModifyCtrl.file}"/>
-                </p:commandButton>
+                    <p:commandButton 
+                        value="Ödeme İşlemi" 
+                        action="#{twoDimModifyCtrl.payment}" 
+                        style="white-space: nowrap;"
+                        update=":id-dlg-payment,:idMessageDialog"
+                        rendered="#{formService.myForm.myActions.payment}"
+                        />
 
-                <p:commandButton 
-                    value="LDAP" 
-                    onclick="PF('wv_dlg_ldap').show(); return false;"
-                    style="white-space: nowrap;"
-                    update="id_dlg_ldap"
-                    rendered="#{formService.myForm.myActions.ldap}"
-                    >
-                </p:commandButton>
+                    <p:commandButton 
+                        value="indirmek için tıklayınız." 
+                        ajax="false" 
+                        icon="ui-icon-arrowthick-1-s"
+                        rendered="#{formService.myForm.myActions.pdf}"
+                        >
+                        <p:fileDownload value="#{twoDimModifyCtrl.file}"/>
+                    </p:commandButton>
 
-                <h:outputText 
-                    value="Tarihçe Etkin(siz)leştir" 
-                    style="white-space: nowrap;"
-                    rendered="#{roleMB[mainFrame.architectRole] and formService.myForm.myActions.save}"/>
+                    <p:commandButton 
+                        value="LDAP" 
+                        onclick="PF('wv_dlg_ldap').show(); return false;"
+                        style="white-space: nowrap;"
+                        update="id_dlg_ldap"
+                        rendered="#{formService.myForm.myActions.ldap}"
+                        >
+                    </p:commandButton>
 
-                <h:selectBooleanCheckbox  
-                    value="#{twoDimModifyCtrl.enableHistoryOnSave}" 
-                    readonly="true"
-                    rendered="#{roleMB[mainFrame.architectRole] and formService.myForm.myActions.save}"/>
+                    <h:outputText 
+                        value="Tarihçe Etkin(siz)leştir" 
+                        style="white-space: nowrap;"
+                        rendered="#{roleMB[mainFrame.architectRole] and formService.myForm.myActions.save}"/>
 
-                <h:selectOneMenu 
-                    value="#{twoDimModifyCtrl.transparentProperties['emailType']}" 
-                    rendered="#{formService.myForm.myActions.email}"
-                    >
-                    <f:selectItems value="#{twoDimModifyCtrl.emailTypes}"/>
-                </h:selectOneMenu> 
+                    <h:selectBooleanCheckbox  
+                        value="#{twoDimModifyCtrl.enableHistoryOnSave}" 
+                        readonly="true"
+                        rendered="#{roleMB[mainFrame.architectRole] and formService.myForm.myActions.save}"/>
 
-                <p:commandButton 
-                    id="buttonSendEmailId"
-                    value="Email Önizleme"
-                    action="#{twoDimModifyCtrl.actionEmail}"
-                    rendered="#{formService.myForm.myActions.email}"
-                    update=":idEmailPreview,:idMessageDialog"
-                    /> 
+                    <h:selectOneMenu 
+                        value="#{twoDimModifyCtrl.transparentProperties['emailType']}" 
+                        rendered="#{formService.myForm.myActions.email}"
+                        >
+                        <f:selectItems value="#{twoDimModifyCtrl.emailTypes}"/>
+                    </h:selectOneMenu> 
 
-                <c:forEach 
-                    items="#{formService.myForm.myActions.list}" 
-                    var="dynamicBtn"
-                    rendered="#{formService.myForm.hasWorkflowRelation}"
-                    >
-                    <p:commandButton  
-                        value="#{dynamicBtn.label}"
-                        action="#{dynamicBtn.execute}"
-                        immediate="true"
+                    <p:commandButton 
+                        id="buttonSendEmailId"
+                        value="Email Önizleme"
+                        action="#{twoDimModifyCtrl.actionEmail}"
+                        rendered="#{formService.myForm.myActions.email}"
+                        update=":idEmailPreview,:idMessageDialog"
                         /> 
-                </c:forEach>
 
-                <ui:include src="ui-workflow-btn.xhtml"/>
+                    <c:forEach 
+                        items="#{formService.myForm.myActions.list}" 
+                        var="dynamicBtn"
+                        rendered="#{formService.myForm.hasWorkflowRelation}"
+                        >
+                        <p:commandButton  
+                            value="#{dynamicBtn.label}"
+                            action="#{dynamicBtn.execute}"
+                            immediate="true"
+                            /> 
+                    </c:forEach>
+
+                    <ui:include src="ui-workflow-btn.xhtml"/>
+                </h:panelGrid>
 
             </f:facet>
 

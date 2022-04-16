@@ -10,20 +10,31 @@
 
     <h:body>
         <br/>
+        <p:outputLabel value="Açıklama" style="font: bold normal 15px/20px arial,sans-serif;"/>
+        <br/>
+        <br/>
+        <p:panel>
+            <p:outputLabel
+                value="yüklenen dosyalar sistem tarafında muhafıza edilmemektedir."
+                />
+            <br/>
+            <p:outputLabel
+                value="dosya aracılığı ile aktarım sonrasında esas alınan veriler veritabanında tutulacak olan verilerdir."
+                />
+        </p:panel>
+        <br/>
+        <br/>
+        <br/>
         <p:outputLabel value="Örnek Excell Dosya" style="font: bold normal 15px/20px arial,sans-serif;"/>
         <br/>
         <br/>
         <p:panel>
-            <h:outputLink 
-                value="#{application.contextPath}/fmsdownload/gayrimenkul-yatirim-ortakliklari-net-aktif-deger-ve-varlik-degeri-v0.xlsx"
-                style="
-                text-decoration:none;
-                font-size: 14px;
-                color:#112978;
-                font-weight:bold;"
+            <p:linkButton 
+                icon="pi pi-download"
+                value="İndir"
+                href="#{application.contextPath}/fmsdownload/gayrimenkul-yatirim-ortakliklari-net-aktif-deger-ve-varlik-degeri-v0.xlsx"
                 >
-                <h:outputText value="indir" />
-            </h:outputLink>  
+            </p:linkButton>  
         </p:panel>
         <br/>
         <br/>
@@ -45,7 +56,7 @@
                 label="Seç"
                 allowTypes="/(\.|\/)(xlsx)$/"
                 mode="advanced" 
-                update="@this"
+                update="@this,:idMessageDialog"
                 />  
             <br/>
             <br/>

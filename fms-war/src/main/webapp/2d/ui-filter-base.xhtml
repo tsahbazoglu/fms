@@ -106,18 +106,18 @@
                     </p:inputText> 
                 </h:panelGroup>
             </c:forEach>
-            <h:panelGroup>
+            <h:panelGrid columns="2">
                 <p:button
+                    icon="pi pi-filter"
                     onclick="rcBaseFilter();return false;"
                     value="ara"
-                    >
-                </p:button>
+                    />
                 <p:button
+                    icon="pi pi-filter-slash"
                     onclick="rcBaseFilterReset();return false;"
                     value="sıfırla"
-                    >
-                </p:button>
-            </h:panelGroup>
+                    />
+            </h:panelGrid>
         </p:panelGrid> 
 
         <p:remoteCommand 

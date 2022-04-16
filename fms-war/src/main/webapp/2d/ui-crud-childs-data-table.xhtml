@@ -79,6 +79,7 @@
 
         <p:ajax 
             event="rowSelect" 
+            disabled="#{not (mainFrame.isTwoDim and formService.myForm.myActions.save)}"
             listener="#{twoDimModifyCtrl.selectChildListener}"
             update="idTwoDlgTabView:crud-2d-child-form:id-dlg-child-row-edit"
             partialSubmit="true"
