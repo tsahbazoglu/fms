@@ -1,0 +1,137 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://java.sun.com/jsf/html"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:ui="http://java.sun.com/jsf/facelets"
+      xmlns:f="http://java.sun.com/jsf/core"
+      >
+    <h:head>
+        <title></title>
+    </h:head>
+    <f:event listener="#{mainFrame.downloadFileExistCheck}" type="preRenderView" />
+    <h:head>
+        <!--
+        FIXME:
+        these js had been placed here because of re-inserting at each ajax renderer issue
+        have a look to mygrid.xhtml for more detail
+        -->       
+        <f:facet name="first">
+            <meta http-equiv="X-UA-Compatible" content="IE=Edge" /> 
+            <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+            <meta name="viewport" content="width=device-width, initial-scale=1.0,maximum-scale=1.0, user-scale=0"/>
+            <meta name="apple-mobile-web-app-status-bar-style" content="yes"/> 
+        </f:facet>
+
+        <title><ui:insert name="title">TSPB : Türkiye Sermaye Piyasası Birliği</ui:insert></title>
+        <link type="text/css" href="./resources/css/noneie.css" rel="stylesheet"  />            
+        <script src="./resources/telmangrid/handsontable/handsontable.full.js"/>
+        <link rel="stylesheet" media="screen" href="./resources/telmangrid/handsontable/handsontable.full.css"/>
+        <script type="text/javascript" src="./resources/telmangrid/handsontable/init3dHandson.v1.js"/>
+
+    </h:head>
+    
+    <h:body>
+
+        <h:outputStylesheet name="css/core-layout.css" library="mobile-layout"/>
+
+
+        <h:form id="iceformTop">
+            <ui:include src="top.xhtml"/>
+        </h:form>
+        <h:form id="iceformLeft"> 
+            <ui:include src="menu.xhtml"/> 
+        </h:form> 
+        <p:panel 
+            id="idCenterTop"
+            > 
+            <h:panelGroup 
+                rendered="#{mainFrame.centerPage eq 'welcome'}"
+                >
+                <h:outputText escape="false" value="#{loginController.welcomeContent}"/>
+            </h:panelGroup>
+            <h:panelGroup 
+                rendered="#{mainFrame.centerPage eq 'about'}"
+                >
+                <h:outputText value="#{mainFrame.aboutContent}" escape="false"/>
+            </h:panelGroup>
+            <br/>
+            <h:panelGroup
+                rendered="#{mainFrame.centerPage eq 'template'}"
+                >
+                <ui:include 
+                    src="#{mainFrame.currEnumPage.pageActionPanel}"
+                    rendered="#{mainFrame.renderedDesktop}"
+                    />
+            </h:panelGroup>
+        </p:panel>
+        <br/>
+        <h:panelGroup 
+            id="idCenterCenter"
+            >  
+            <p:tabView 
+                id="id-tab-view"
+                rendered="#{mainFrame.centerPage eq 'template'}"
+                >
+                <p:tab 
+                    id="id-tab-data-input"
+                    title="Veri Girişi"                            
+                    >
+                    <h:panelGrid
+                        id="idContentObjectList"
+                        columns="#{mainFrame.position}" 
+                        columnClasses="#{mainFrame.positionStyle}"
+                        style="width: 100%;"
+                        >
+                        <h:panelGroup>
+                            <ui:insert name="contentObjectList">ContentObjectList</ui:insert>
+                        </h:panelGroup>
+                        <h:panelGroup>
+                            <ui:insert name="historyObjectsList">HistoryObjects</ui:insert>
+                        </h:panelGroup>
+                    </h:panelGrid>
+                </p:tab>
+                <p:tab 
+                    id="id-tab-attachments"
+                    title="Ekli Dosyalar" 
+                    rendered="#{formService.myForm.hasAttachedFiles}"
+                    >   
+                    <h:panelGroup>
+                        <ui:insert name="uploadPage">uploadPage</ui:insert>
+                    </h:panelGroup>
+                </p:tab>
+                <p:tab 
+                    id="id-tab-esign"
+                    title="E-İmzalı Bildirimler" 
+                    rendered="#{formService.myForm.esignable}"
+                    >
+                    <h:panelGrid 
+                        id="id_eimza"
+                        columns="1"
+                        style="width: 100%;"
+                        >
+                        <h:panelGroup
+                            rendered="#{formService.myForm.esignable}"
+                            >
+                            <ui:insert name="esignHistory">EsignPanel</ui:insert>
+                        </h:panelGroup>
+                    </h:panelGrid>
+                </p:tab>
+            </p:tabView>
+        </h:panelGroup>
+        <h:panelGrid 
+            columns="2"
+            columnClasses="VMiddleHLeftNowrap,VMiddleHRightNowrap"
+            width="100%">
+            <h:panelGroup>
+                <!-- Kullanım Koşulları ve Gizlilik-->
+            </h:panelGroup>
+            <h:panelGroup>
+                Copyright © 2012 Türkiye Sermaye Piyasaları Birliği
+            </h:panelGroup>
+        </h:panelGrid>
+        <ui:insert name="dimBasedialog"></ui:insert>
+        <ui:insert name="messageDialogs"></ui:insert>
+        <ui:insert name="htmlform"></ui:insert>
+    </h:body>
+</html>

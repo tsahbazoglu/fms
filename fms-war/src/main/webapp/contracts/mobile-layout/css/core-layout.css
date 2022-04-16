@@ -1,0 +1,54 @@
+/*
+To change this license header, choose License Headers in Project Properties.
+To change this template file, choose Tools | Templates
+and open the template in the editor.
+*/
+/* 
+    Created on : Apr 8, 2022, 10:50:10 PM
+    Author     : telman
+*/
+
+.itemStyleClass {
+    margin: 10px 20px 10px 5px;
+    text-align: left;          
+}
+.tableWidth{
+    width:100%;
+}
+.td1{
+    width:400px;
+} 
+.td-1{
+    width:139px;  
+}
+.td-2{
+    width:278px;  
+}
+.td-3{
+    width:417px; 
+}
+.td-8{
+    width:1114px; 
+    height:500px;
+}
+li{
+    margin: 20px 0;
+}
+.tableWidth{
+    width:100%;
+}
+.td1{
+    width:550px;
+} 
+.td2{
+    width:550px;
+}
+.small-font-size{
+    font-size: 10px;
+} 
+.medium-font-size{
+    font-size: 12px;
+} 
+.large-font-size{
+    font-size: 16px;
+}

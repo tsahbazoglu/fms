@@ -1,0 +1,97 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://java.sun.com/jsf/html"
+      xmlns:f="http://java.sun.com/jsf/core"
+      xmlns:p="http://primefaces.org/ui"
+      >
+
+    <h:head>
+        <title></title>
+    </h:head>
+
+    <h:panelGrid  columns="2" 
+                  width="100%;"
+                  columnClasses="VTopHLeftW100pNowrap,VTopHRightNowrap">
+
+        <h:panelGroup>
+            <img src="images/tspb_logo_large.png"/>
+            <br/>
+            <br/>
+        </h:panelGroup>
+
+        <h:panelGrid columns="10">
+
+            <p:splitButton value="web-layout" actionListener="#{cagatayCivici.changeTemplate('web-layout')}" ajax="false">
+                <p:menuitem value="mobile-layout" actionListener="#{cagatayCivici.changeTemplate('mobile-layout')}" ajax="false"/>
+            </p:splitButton>
+
+            <p:splitButton value="vela" actionListener="#{cagatayCivici.changeContract('vela')}" ajax="false">
+                <p:menuitem value="redmond" actionListener="#{cagatayCivici.changeContract('redmond')}" ajax="false"/>
+                <p:menuitem value="bootstrap" actionListener="#{cagatayCivici.changeContract('bootstrap')}" ajax="false"/>
+                <p:menuitem value="nova-light" actionListener="#{cagatayCivici.changeContract('nova-light')}" ajax="false"/>
+                <p:menuitem value="luna-blue" actionListener="#{cagatayCivici.changeContract('luna-blue')}" ajax="false"/>
+            </p:splitButton>
+
+            <p:commandButton
+                icon="pi pi-user"
+                action="#{loginController.showRoles}"
+                value="#{loginController.loggedUserDetail.username} - #{loginController.loggedUserDetail.commonName}"
+                title="#{loginController.loggedUserDetail.username} - #{loginController.loggedUserDetail.commonName}"
+                update="#{updateAjaxMB.btnDetay}"
+                />
+
+            <p:outputLabel 
+                value="SPK İlk Bildirim Tarihi"
+                rendered="#{roleMB['uysdesigner']}"
+                />
+
+            <p:outputLabel 
+                value=":"
+                rendered="#{roleMB['uysdesigner']}"
+                />
+
+            <h:panelGroup rendered="#{not empty loginController.loggedUserDetail and  roleMB['uysdesigner']}">
+                <h:outputText 
+                    value="Belirtilmemiş"
+                    rendered="#{empty loginController.loggedUserDetail.mapProjectInfo}"/>
+                <h:outputText 
+                    value="#{loginController.loggedUserDetail.mapProjectInfo['spk_notifacation_date']}"
+                    rendered="#{not empty loginController.loggedUserDetail.mapProjectInfo}"
+                    >
+                    <f:convertDateTime pattern="yyyy.MM.dd" timeZone="#{twoDimModifyCtrl.timeZone}"/>
+                </h:outputText>
+            </h:panelGroup> 
+
+            <p:commandButton 
+                value="Şifre Değiştirme"
+                immediate="true"
+                actionListener="#{designerMB.navigate}" 
+                style="width: 100%;"
+                onclick="updatePasswordDialog.show();"
+                rendered="false"
+                >
+                <f:attribute name="toPage" value="UPDATE_PASSWORD" />
+            </p:commandButton>
+
+            <p:commandButton 
+                icon="pi pi-sign-out"
+                value="çıkış"
+                immediate="true"
+                action="#{loginController.logout}"
+                update=":idMessageDialog"
+                >
+                <f:attribute name="toPage" value="PERSONNEL" />
+            </p:commandButton>
+
+            <p:linkButton
+                icon="pi pi-share-alt"
+                href="https://git.tspb.org.tr/explore/projects"
+                target="_blank"
+                />
+
+        </h:panelGrid>
+
+    </h:panelGrid>
+
+</html>

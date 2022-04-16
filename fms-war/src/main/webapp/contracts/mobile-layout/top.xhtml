@@ -1,0 +1,101 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://java.sun.com/jsf/facelets"
+      xmlns:h="http://java.sun.com/jsf/html"
+      xmlns:f="http://java.sun.com/jsf/core"
+      xmlns:p="http://primefaces.org/ui"
+      >
+
+    <h:head>
+        <title></title>
+    </h:head>
+
+    <p:panel>
+        <h:panelGroup>
+            <img src="images/tspb_logo_large.png"/>
+            <br/>
+            <p:outputLabel
+                value ="Üye Yönetim Sistemi"
+                style="font-weight: bold; font-size: 18px;"
+                />
+            <br/>
+            <p:outputLabel value="viewid : #{esignViewCtrl.viewId}"/>
+        </h:panelGroup>  
+    </p:panel>
+
+
+    <p:toolbar>
+        <f:facet name="left">
+            <h:panelGrid columns="10">
+
+                <p:commandButton
+                    icon="pi pi-user"
+                    action="#{loginController.showRoles}"
+                    update="#{updateAjaxMB.btnDetay}"
+                    />
+                <p:commandButton 
+                    icon="pi pi-sign-out"
+                    immediate="true"
+                    action="#{loginController.logout}"
+                    update=":idMessageDialog"
+                    >
+                    <f:attribute name="toPage" value="PERSONNEL" />
+                </p:commandButton>
+                <p:splitButton value="web-layout" actionListener="#{cagatayCivici.changeTemplate('web-layout')}" ajax="false">
+                    <p:menuitem value="mobile-layout" actionListener="#{cagatayCivici.changeTemplate('mobile-layout')}" ajax="false"/>
+                </p:splitButton>
+                <p:splitButton value="vela" actionListener="#{cagatayCivici.changeContract('vela')}" ajax="false">
+                    <p:menuitem value="redmond" actionListener="#{cagatayCivici.changeContract('redmond')}" ajax="false"/>
+                    <p:menuitem value="bootstrap" actionListener="#{cagatayCivici.changeContract('bootstrap')}" ajax="false"/>
+                    <p:menuitem value="nova-light" actionListener="#{cagatayCivici.changeContract('nova-light')}" ajax="false"/>
+                    <p:menuitem value="luna-blue" actionListener="#{cagatayCivici.changeContract('luna-blue')}" ajax="false"/>
+                </p:splitButton>
+                <p:outputLabel 
+                    value="SPK İlk Bildirim Tarihi"
+                    rendered="#{roleMB['uysdesigner']}"
+                    />
+                <p:outputLabel 
+                    value=":"
+                    rendered="#{roleMB['uysdesigner']}"
+                    />
+                <h:panelGroup rendered="#{not empty loginController.loggedUserDetail and  roleMB['uysdesigner']}">
+                    <h:outputText 
+                        value="Belirtilmemiş"
+                        rendered="#{empty loginController.loggedUserDetail.mapProjectInfo}"/>
+                    <h:outputText 
+                        value="#{loginController.loggedUserDetail.mapProjectInfo['spk_notifacation_date']}"
+                        rendered="#{not empty loginController.loggedUserDetail.mapProjectInfo}"
+                        >
+                        <f:convertDateTime pattern="yyyy.MM.dd" timeZone="#{twoDimModifyCtrl.timeZone}"/>
+                    </h:outputText>
+                </h:panelGroup> 
+                <p:commandButton 
+                    value="Şifre Değiştirme"
+                    immediate="true"
+                    actionListener="#{designerMB.navigate}" 
+                    style="width: 100%;"
+                    onclick="updatePasswordDialog.show();"
+                    rendered="false"
+                    >
+                    <f:attribute name="toPage" value="UPDATE_PASSWORD" />
+                </p:commandButton>
+                <p:linkButton
+                    icon="pi pi-share-alt"
+                    href="https://git.tspb.org.tr/explore/projects"
+                    target="_blank"
+                    />
+            </h:panelGrid>
+        </f:facet>
+    </p:toolbar>
+
+    <span jsfc="ui:remove">
+        This won't be compiled either <h:outputText value="#{mainFrame.myStyle}"/>
+    </span>
+    <ui:remove>
+        <input type="text" jsfc="h:inputText" value="#{mainFrame.myStyle}"/>
+    </ui:remove>
+    <span class="ui-icon ui-icon-trash" jsfc="ui:remove">
+
+    </span>
+</html>

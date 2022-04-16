@@ -1,0 +1,1016 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"   
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:h="http://java.sun.com/jsf/html"
+      xmlns:ui="http://java.sun.com/jsf/facelets"
+      xmlns:f="http://java.sun.com/jsf/core"
+      xmlns:c="http://java.sun.com/jsp/jstl/core"
+      >
+
+    <f:view contracts="#{cagatayCivici.layout}">
+
+        <h:head>
+            <title></title>
+        </h:head>
+
+        <h:body>
+            <ui:composition template="/template.xhtml">
+                <ui:define name="contentObjectList">
+                    <ui:include 
+                        src="#{mainFrame.currEnumPage.pageObjectListPath}"   
+                        rendered="#{mainFrame.renderedDesktop}"
+                        />
+                </ui:define>
+                <ui:define name="historyObjectsList">
+                    <h:panelGroup
+                        rendered="#{mainFrame.position eq 2}"
+                        >
+                        <br/>
+                        <br/>
+                        <br/>
+                    </h:panelGroup>
+                    <ui:include 
+                        src="#{mainFrame.currEnumPage.pageHistoryObjectListPath}"
+                        rendered="#{mainFrame.renderedDesktop}"
+                        /> 
+                </ui:define>
+                <ui:define name="esignHistory">
+                    <ui:include src="#{mainFrame.currEnumPage.esignHistory}"/> 
+                </ui:define>
+
+                <ui:define name="uploadPage">
+                    <ui:include src="#{mainFrame.currEnumPage.uploadPage}"/>
+                </ui:define>
+
+                <ui:define name="dimBasedialog">
+                    <h:panelGroup
+                        id="id-dim-based-dlgs"
+                        >
+                        <ui:include src="#{mainFrame.currEnumPage.dialogs}"/>
+                    </h:panelGroup>
+                </ui:define>
+
+                <ui:define name="messageDialogs">
+
+                    <p:ajaxStatus onstart="PF('statusDialog').show()" onsuccess="PF('statusDialog').hide()"/>
+
+                    <h:panelGroup
+                        id="id-dlgs"
+                        >
+                        <p:dialog 
+                            id="idStatusDialog"
+                            widgetVar="statusDialog" 
+                            modal="true" 
+                            draggable="false" 
+                            closable="false" 
+                            resizable="false" 
+                            showHeader="false">
+                            <p:graphicImage  url="/images/ajax-loader.gif" />
+                        </p:dialog> 
+
+                        <p:dialog
+                            id="idMessageDialog"
+                            widgetVar="messageDialog"
+                            resizable="false"
+                            header="#{dlgCtrl.title}"                        
+                            closable="true"
+                            closeOnEscape="true" 
+                            modal = "false"
+                            draggable="true"
+                            position="center"
+                            visible="false"
+                            width="700"
+                            height="400"
+                            >
+                            <h:panelGrid columns="1">
+
+                                <h:outputText 
+                                    value="#{dlgCtrl.message}"
+                                    style="text-align:left;display:block;font-weight: bold;#{dlgCtrl.style}"
+                                    escape="false"/>
+
+                                <p:commandButton
+                                    value="Kaydetmeden Çık"
+                                    action="#{twoDimModifyCtrl.doNotSave}"
+                                    rendered="#{dlgCtrl.renderedButon}"/>
+                                <p:button
+                                    value="Tamam"
+                                    onclick="PF('messageDialog').hide();return false;"
+                                    rendered="#{dlgCtrl.renderedOkButon}"
+                                    />
+                            </h:panelGrid>
+                        </p:dialog>
+
+
+                        <p:dialog 
+                            widgetVar="myFormulaDialog"
+                            id="myFormulaDialogId"
+                            closeOnEscape = "true"                     
+                            draggable = "true"
+                            resizable="true"
+                            width="450"
+                            header="Kontrol Formülü / Açıklama / Tarihçe"
+                            closable = "true"
+                            modal = "false"
+                            position = "center"
+                            visible="false"
+                            >
+                            <h:panelGrid>
+                                <h:outputText id="clientSideControlDialogText"/>
+                            </h:panelGrid>
+                        </p:dialog>
+
+                        <p:dialog
+                            id="id_dlg_ldap"
+                            widgetVar="wv_dlg_ldap"
+                            height="500"
+                            width="400"
+                            header="LDAP İşlemleri"
+                            >
+                            <h:form>
+                                <h:panelGrid columns="1" width="100%">
+                                    <h:outputText value="Kullancı Adı : #{twoDimModifyCtrl.myObject['kullanici']}"/>
+                                    <p:commandButton
+                                        value="Kullanıcı Oluştur | Güncelle" 
+                                        action="#{twoDimModifyCtrl.newLdapUser}" 
+                                        style="width: 100%;"
+                                        oncomplete="PF('wv_dlg_ldap').hide();"
+                                        update=":id_dlg_ldap,:idMessageDialog"
+                                        />
+                                    <p:commandButton
+                                        value="Şifre Güncelle" 
+                                        action="#{twoDimModifyCtrl.updateLdapPswd}" 
+                                        style="width: 100%;"
+                                        oncomplete="PF('wv_dlg_ldap').hide();"
+                                        update=":id_dlg_ldap,:idMessageDialog"
+                                        />
+                                    <br/>
+                                    <h:outputText value="Rol Ataması"/>
+                                    <p:selectManyMenu value="#{twoDimModifyCtrl.newroles}" style="width:100%">
+                                        <f:selectItem itemValue="tdubtdub" itemLabel="TDUB Admin (tdubtdub)"/>                                    
+                                        <f:selectItem itemValue="TDUB_BT_ADM" itemLabel="TDUB BT Yetkilisi (TDUB_BT_ADM)"/>
+                                        <f:selectItem itemValue="TDUB_UYS_UZM" itemLabel="TDUB Üye İşleri Yetkilisi (TDUB_UYS_UZM)"/>
+                                        <f:selectItem itemValue="B_KON_KUL" itemLabel="Üye Olmayan Kullanıcı (B_KON_KUL)"/>
+                                        <f:selectItem itemValue="B_UYE_UZM" itemLabel="Üye Değerleme Uzmanı Kullanıcı (B_UYE_UZM)"/>
+                                        <f:selectItem itemValue="T_TEM_VEK" itemLabel="Kuruluş Tam Yetkili Vekil (T_TEM_VEK)"/>
+                                        <f:selectItem itemValue="T_TEM_BIK" itemLabel="Kuruluş IK Temsilcisi (T_TEM_BIK)"/>
+                                        <f:selectItem itemValue="T_TEM_CAL" itemLabel="Kuruluş Operasyon Çalışanı (T_TEM_CAL)"/>
+                                        <f:selectItem itemValue="T_TEM_BRB" itemLabel="Bankacılık Raporu Bildiren (T_TEM_BRB)"/>
+                                        <f:selectItem itemValue="T_TEM_IMD" itemLabel="Tapu Raporu İş Kabul/Uzman Atama Moderatörü (T_TEM_IMD)"/>
+                                        <f:selectItem itemValue="T_TEM_BRT" itemLabel="Tapu Raporu Hazırlayan (T_TEM_BRT)"/>
+                                    </p:selectManyMenu>
+                                    <p:commandButton
+                                        value="EKLE" 
+                                        action="#{twoDimModifyCtrl.addUserToRole}" 
+                                        style="width: 100%;"
+                                        oncomplete="PF('wv_dlg_ldap').hide();"
+                                        update="#{updateAjaxMB.btnLdapAddUserToRole}"
+                                        />
+                                    <p:commandButton
+                                        value="ÇIKAR" 
+                                        action="#{twoDimModifyCtrl.removeUserToRole}" 
+                                        style="width: 100%;"
+                                        oncomplete="PF('wv_dlg_ldap').hide();"
+                                        update="#{updateAjaxMB.btnLdapAddUserToRole}"
+                                        />
+                                </h:panelGrid>
+                            </h:form>
+                        </p:dialog>
+
+                        <p:dialog widgetVar="updatePasswordDialog"
+                                  header="Şifre Güncelleme"                        
+                                  closable="true"
+                                  modal="true"
+                                  draggable="fasle"
+                                  closeOnEscape="true" 
+                                  position ="center"
+                                  height="200"
+                                  >
+                            <h:form>
+                                <h:panelGrid width="100%" columnClasses="VTopHLeftW100p">
+                                    <h:panelGrid columns="3" width="100%">
+                                        <h:outputText value="Eski Şifre"/>
+                                        <h:outputText value=":"/>
+                                        <h:inputSecret value="#{loginController.oldPassword}"/>
+                                        <h:outputText value="Yeni Şifre"/>
+                                        <h:outputText value=":"/>
+                                        <h:inputSecret value="#{loginController.newPassword}"/>
+                                        <h:outputText value="Yeni Şifre (Tekrar)"/>
+                                        <h:outputText value=":"/>
+                                        <h:inputSecret value="#{loginController.newPasswordAgain}"/>
+                                    </h:panelGrid>
+                                    <p:commandButton
+                                        value="Kaydet" 
+                                        action="#{loginController.changePassword}" 
+                                        style="width: 100%;"/>
+                                </h:panelGrid>
+                            </h:form>
+                        </p:dialog>
+
+
+
+
+                        <p:dialog  widgetVar="importDataDialog"
+                                   id="idImportDataDialog"
+                                   resizable="true"
+                                   header="Dosyadan Veri Yükleme"
+                                   closable = "true"
+                                   closeOnEscape = "true" 
+                                   modal = "false"
+                                   draggable = "true"
+                                   position = "center"
+                                   visible="false"
+                                   >
+                            <h:form id="id_import_form">  
+                                <h:panelGrid>
+                                    <h:outputText value="Dosya biçimi Excell formatında olmalı."/>
+                                    <h:outputText value="Excell dosyası aşağıdaki sırada verilen sütun isimlerini içermelidir."/>
+                                    <h:outputText value=""/>
+                                    <h:outputText value="#{importDataMB.importTextFormat}" id="id_import_text_format"/>
+                                    <h:outputText value=""/>
+                                    <p:fileUpload 
+                                        value="#{importDataMB.uploadedFile}"
+                                        listener="#{importDataMB.uploadImportDataMB}"
+                                        cancelLabel="Vazgeç"
+                                        uploadLabel="Yükle"
+                                        label="Seç"
+                                        invalidSizeMessage="Dosya Boyutu 2MB dan büyük olmamalı : "
+                                        invalidFileMessage="Geçersiz Dosya Tipi (Sadece PDF dosyalar eklenebilir) : "
+                                        fileLimitMessage="En fazla 2MB dosya eklenebilir."
+                                        fileLimit="2097152"
+                                        allowTypes="/(\.|\/)(xlsx)$/"
+                                        sizeLimit="2097152"
+                                        update="id_import_form:id_import_text_format,:id_import_form:id_import_success_data"
+                                        />
+                                    <h:panelGrid columns="2" id="id_my_uploaded_files">
+                                        <p:commandButton value="Veritabanına Yaz" action="#{importDataMB.writeToDb}"
+                                                         />
+                                    </h:panelGrid>   
+                                    <p:dataTable  
+                                        value="#{importDataMB.listOfToBeUpsert}" 
+                                        var="x" 
+                                        id="id_import_success_data"
+                                        lazy="true"
+                                        >
+                                        <p:column headerText="ldapUID">
+                                            #{x['ldapUID']}
+                                        </p:column>
+                                        <p:column headerText="periodValue">
+                                            #{x["periodValue"]}
+                                        </p:column>
+                                        <p:column headerText="genel_yonetim_giderleri">
+                                            #{x["genel_yonetim_giderleri"]}
+                                        </p:column>
+                                        <p:column headerText="personel_giderleri">
+                                            #{x["personel_giderleri"]}
+                                        </p:column>
+                                        <p:column headerText="calisan_sayisi">
+                                            #{x["calisan_sayisi"]}
+                                        </p:column>
+                                    </p:dataTable>
+                                </h:panelGrid>
+                            </h:form>
+                        </p:dialog>
+
+                        <p:dialog  
+                            id="id_dlg_error_warning"
+                            widgetVar="wv_dlg_error_warning"
+                            resizable="true"
+                            header="Hata/Uyarı"
+                            closable = "true"
+                            closeOnEscape = "true" 
+                            modal = "false"
+                            draggable = "true"
+                            position = "center"
+                            visible="false"
+                            >
+                            <h:outputText value="#{esignController.userErrorWarning}"/>
+                        </p:dialog>
+
+                        <p:dialog 
+                            widgetVar="widget_1d_delete_confirmation"
+                            modal="true"
+                            closeOnEscape="true"
+                            resizable="false"
+                            header=""
+                            >
+                            <p:panel>
+                                <h:panelGrid style="
+                                             width: 100%;
+                                             text-align: left;
+                                             font-weight: bolder;
+                                             font-size: 16px;
+                                             color: grey;"> 
+                                    <h:outputText 
+                                        rendered="false"
+                                        value="açıklama : &lt;/br>&lt;/br>" escape="false"/>
+                                    <h:inputTextarea  
+                                        rendered="false"
+                                        style="width: 100%;"
+                                        cols="35"
+                                        rows="6"
+                                        />  
+                                    <h:outputText value="&lt;/br>Silmek istediğinizden emin misiniz?&lt;/br>&lt;/br>" escape="false"/>
+                                </h:panelGrid>
+                            </p:panel>
+                            <f:facet name="footer">
+                                <h:panelGrid 
+                                    columns="2" 
+                                    style="width:100%"
+                                    cellspacing="10px;"
+                                    columnClasses="VTopHLeftW50pNowrap,VTopHLeftW50pNowrap"
+                                    >
+                                    <p:button
+                                        value="Evet"
+                                        onclick="yes1dDoDelete();"  
+                                        />   
+                                    <p:button 
+                                        value="Hayır (esc)"
+                                        onclick="no1dDoNotDelete();"
+                                        />
+                                </h:panelGrid>
+                            </f:facet>
+
+                        </p:dialog>
+
+                        <p:dialog
+                            header="Uyarı"
+                            visible="#{esignViewCtrl.preventedMultiTab}"
+                            >
+                            <p:panel>
+                                <ul>
+                                    <li>
+                                        Bir oturumda bir görünüm kısıtlaması aktivleştirildi.
+                                        <ul>
+                                            <li>
+                                                mevcut sayfa refresh edilmiş olabilir.
+                                            </li>
+                                            <li>
+                                                yeni sekme açılmış
+                                            </li>
+                                        </ul>
+                                    </li>
+                                    <li>
+                                        İşlem yapmak için bu sekmeyi kapatınız.
+                                    </li>
+                                </ul>
+                            </p:panel>
+                        </p:dialog>
+
+                        <p:dialog
+                            id="id_kpb_bulk_preview"
+                            resizable="true"
+                            widgetVar="id_kpb_bulk_preview"
+                            header="Önizleme"
+                            showHeader="true"
+                            closable="true"
+                            modal="false"
+                            draggable="true"
+                            closeOnEscape="true" 
+                            position="CENTER"
+                            height="500"
+                            width="80%"
+                            rendered="#{formService.myForm.myActions.upload}"
+                            maximizable="true"
+                            >
+                            <p:toolbar>
+                                <f:facet name="left">
+                                    <p:commandButton 
+                                        value="Veri Tabanına Aktarımı Onaylıyorum" 
+                                        action="#{fmsBulkUpload.bulkLoadExcell}"
+                                        update="#{updateAjaxMB.btnBulkLoad}"
+                                        /> 
+                                </f:facet>
+                            </p:toolbar>
+                            <p:panel>
+                                <h:outputText 
+                                    value=" UYARI : Bu işlemden sonra veriler kalıcı olarak değiştirilecek. Geriye Dönüş mümkün olmayacak !!!" 
+                                    style="color: red;font-weight: bold;font-size: 18px;"
+                                    />
+                                <br/>
+                                <style type="text/css">            
+                                    .css-new{
+                                        background-color: #fffff !important;
+                                        background-image: none !important;
+                                        color: #000000 !important;
+                                    }
+                                    .css-update{
+                                        background-color: #f38b8b !important;
+                                        background-image: none !important;
+                                        color: #000000 !important;
+                                    }
+                                </style>
+
+                                <p:dataTable 
+                                    value="#{fmsBulkUpload.listOfToBeUpsert}" 
+                                    var="x" 
+                                    style="white-space: nowrap;" 
+                                    rowStyleClass="#{x.style}"
+                                    resizableColumns="true"
+                                    >
+                                    <c:forEach items="#{formService.myForm.uploadMerge.importAndAppendedFields}" var="field">
+                                        <p:column headerText="#{formService.myForm.fields[field.key].name}">
+                                            <h:outputText value="#{x[field.key]}"/>
+                                        </p:column>
+                                    </c:forEach>
+                                    <p:column headerText="Eylem">
+                                        <h:outputText value="#{x.style eq 'css-new'  ? 'EKLE' : 'GÜNCELLE'}"/>
+                                    </p:column>
+                                </p:dataTable>
+                            </p:panel>
+                        </p:dialog>
+
+                        <p:dialog 
+                            widgetVar="specialConfirmationDialog"
+                            modal="true"
+                            closeOnEscape="true"
+                            resizable="false"
+                            header=""
+                            >
+                            <p:panel>
+                                <h:panelGrid style="
+                                             width: 100%;
+                                             text-align: left;
+                                             font-weight: bolder;
+                                             font-size: 16px;
+                                             color: grey;"> 
+                                    <h:outputText
+                                        rendered="false"
+                                        value="açıklama : &lt;/br>&lt;/br>" escape="false"/>
+                                    <h:inputTextarea  
+                                        rendered="false"
+                                        style="width: 100%;"
+                                        cols="35"
+                                        rows="6"
+                                        />  
+                                    <h:outputText value="#{formService.myForm.deleteChildsOnDelete?formService.myForm.deleteChildsOnDeleteMsg
+                                                           :'&lt;/br>Silmek istediğinizden emin misiniz?&lt;/br>&lt;/br>'}" 
+                                                  escape="false"/>
+                                </h:panelGrid>
+                            </p:panel>
+                            <f:facet name="footer">
+                                <h:panelGrid 
+                                    style="width:100%"
+                                    columns="2"
+                                    columnClasses="leftColumn,rightColumn"         
+                                    >
+                                    <p:button 
+                                        value="Evet"
+                                        onclick="yesDoDelete();return false;"  
+                                        />   
+                                    <p:button 
+                                        value="Hayır"
+                                        onclick="noDoNotDelete();return false;"
+                                        />
+                                </h:panelGrid>
+                            </f:facet>
+                        </p:dialog>
+
+                        <p:dialog 
+                            id="id_2d_DialogControlAndSave"
+                            resizable="false"
+                            widgetVar="2d_dialogControlAndSave"
+                            header="#{myMessageDialog.title}"
+                            showHeader="true"
+                            closable="true"
+                            modal="false"
+                            draggable="true"
+                            closeOnEscape="true" 
+                            position="#{myMessageDialog.position}"
+                            height="250"
+                            width="80%"
+                            >
+                            <h:form>
+                                <h:panelGrid columns="1" cellspacing="20">
+                                    <h:outputText value="
+                                                  &lt;ul&gt;
+                                                  &lt;li&gt;
+                                                  Verileriniz kaydedilmiştir. 
+                                                  &lt;/li&gt;
+                                                  &lt;li&gt;
+                                                  Ancak aşağıdaki Uyarı ve Hataların giderilmesi gerekmektedir. 
+                                                  &lt;/li&gt;
+                                                  &lt;li&gt;
+                                                  Hatalar giderilmedikçe veya Uyarılara ilişkin açıklama girilmedikçe form Birliğimize &lt;b&gt;gönderilemeyecektir.&lt;/b&gt;
+                                                  &lt;/li&gt;
+                                                  &lt;/ul&gt;" 
+                                                  rendered="#{not empty pivotModifierCtrl.failList}"
+                                                  escape="false"
+                                                  /> 
+                                    <h:outputText value="#{myMessageDialog.message}"
+                                                  rendered="#{empty twoDimModifyCtrl.failList}"
+                                                  escape="false"
+                                                  />   
+
+                                    <p:dataTable 
+                                        id="idFailDataTable"
+                                        value="#{twoDimModifyCtrl.failList}"
+                                        rendered="#{not empty twoDimModifyCtrl.failList}"
+                                        var="controlMap"
+                                        style="text-align: left;">
+                                        <p:column headerText="Kontrol Kodu">
+                                            <h:outputText value="#{controlMap.transferOrder}">
+                                                <f:convertNumber integerOnly="true" groupingUsed="false"/>
+                                            </h:outputText>
+                                        </p:column>
+                                        <p:column headerText="Açıklama">
+                                            <h:outputText value="#{controlMap.name}"/>
+                                        </p:column>
+                                        <p:column headerText="Hata Niteliği">
+                                            <h:outputText value="#{controlMap.description}"/>
+                                        </p:column>
+                                        <p:column headerText="Matematik İfade" 
+                                                  rendered="#{roleMB['uysuser']}">
+                                            <h:outputText value="#{controlMap.expression}"/>
+                                        </p:column> 
+
+                                        <p:column headerText="Sonuç Tipi">
+                                            <h:outputText value="#{controlMap.resultType}"/>
+                                        </p:column> 
+                                        <p:column headerText="Sonuç" rendered="#{roleMB[pivotModifierCtrl.selectedForm.myProject.adminAndViewerRole]}">
+                                            <h:outputText value="#{controlMap.controlResult}"/>
+                                        </p:column> 
+                                    </p:dataTable>
+
+                                    <p:dataTable 
+                                        id="idSuccessDataTable"
+                                        value="#{twoDimModifyCtrl.successList}"
+                                        var="controlMap"
+                                        style="white-space:nowrap;"
+                                        rendered="#{roleMB['uystester']}">
+                                        <p:column headerText="Kontrol Kodu">
+                                            <h:outputText value="#{controlMap.transferOrder}">
+                                                <f:convertNumber integerOnly="true" groupingUsed="false"/>
+                                            </h:outputText>
+                                        </p:column>
+                                        <p:column headerText="Açıklama">
+                                            <h:outputText value="#{controlMap.name}"/>
+                                        </p:column>
+                                        <p:column headerText="Hata Niteliği">
+                                            <h:outputText value="#{controlMap.description}"/>
+                                        </p:column>
+                                        <p:column headerText="Matematik İfade">
+                                            <h:outputText value="#{controlMap.expression}"/>
+                                        </p:column> 
+                                        <p:column headerText="Sonuç">
+                                            <h:outputText value="#{controlMap.controlResult}"/>
+                                        </p:column> 
+                                    </p:dataTable>
+                                </h:panelGrid>
+                            </h:form>
+                        </p:dialog>
+
+                        <p:dialog
+                            header="Uyarı"
+                            visible="#{esignViewCtrl.preventedMultiTab}"
+                            >
+                            <p:panel>
+                                <ul>
+                                    <li>
+                                        Bir oturumda bir görünüm kısıtlaması aktivleştirildi.
+                                        <ul>
+                                            <li>
+                                                mevcut sayfa refresh edilmiş olabilir.
+                                            </li>
+                                            <li>
+                                                yeni sekme açılmış
+                                            </li>
+                                        </ul>
+                                    </li>
+                                    <li>
+                                        İşlem yapmak için bu sekmeyi kapatınız.
+                                    </li>
+                                </ul>
+                            </p:panel>
+                        </p:dialog>
+
+                        <p:dialog 
+                            id="idToBeSignedDialog"
+                            widgetVar="#{esignController.dialogWidgetVar}"
+                            showHeader="true"
+                            header="Elektronik İmzalanacak Metin"
+                            closeOnEscape="true"
+                            position="center"
+                            width="60%"
+                            height="600"
+                            resizable="false"
+                            >
+                            <!--<h:form id="imzform" enctype="application/x-www-form-urlencoded">-->
+                            <!--<h:form id="imzform" enctype="multipart/form-data">-->
+                            <h:form id="imzform">
+                                <p:toolbar>
+                                    <f:facet name="left">
+                                        <p:linkButton
+                                            href="muhurdar?mhr=1&amp;base64=true&amp;contentId=#{esignController.crudObjectTextViewerID}&amp;viewId=#{esignViewCtrl.viewId}&amp;subject=TSPB E-Imza"
+                                            onclick="PF('poll').start();"
+                                            style="font-size: 20px;"
+                                            value="İmzala"
+                                            icon="fa fa-barcode" 
+                                            >
+                                        </p:linkButton>
+
+                                        <p:commandButton 
+                                            value="Elektronik imzalamadan bildirim yap" 
+                                            id ="id_btn_justNotify"
+                                            rendered="#{esignController.canNotifyWithoutEsign}"
+                                            action="#{esignController.justNotifyWithoutEsign}"
+                                            update="#{updateAjaxMB.btnNotifyWoEsing}"
+                                            >
+                                        </p:commandButton>
+                                    </f:facet>
+
+                                    <f:facet name="right">
+                                        <p:button 
+                                            value="Eimza Kurulumu"
+                                            onclick="PF('wv-esign-install-info').show();return;"
+                                            >
+                                        </p:button>
+                                    </f:facet>
+                                </p:toolbar>
+
+                                <h:panelGroup>
+                                    <h:outputText 
+                                        value="Döküman Bilgisi" 
+                                        style="font-size: 22px;font-weight: bolder;color: #b3b3b3;"
+                                        rendered="false"
+                                        />
+                                    <h:outputText 
+                                        value="#{esignController.crudObjectTextViewerID}"
+                                        style="font-size: 14px;color: #b3b3b3;"
+                                        />
+                                    <p:dataTable 
+                                        value="#{esignController.signedDocContentFields}" 
+                                        var="mymap"
+                                        >
+                                        <p:column>
+                                            <f:facet name="header" >Alan</f:facet>
+                                            <h:outputText value="#{mymap.key}"/>
+                                        </p:column>
+                                        <p:column>
+                                            <f:facet name="header" >Değer</f:facet>
+                                            <h:outputText value="#{mymap.value}"/>
+                                        </p:column>
+                                    </p:dataTable>
+                                    <!--
+                                                             regardning to 1.2.0.CR1 applet version no need any more to put content in inputHidden text
+                                                             content will be directly retrieved  from server 
+                                                             <h:inputHidden id="sourcedoc" value="# {esignController.crudObjectTextViewer}"></h:inputHidden>
+                                    -->
+                                    <div id="signresult"></div>
+                                    <h:inputHidden id="imz" value="#{esignController.imz64}" />
+                                    <p:commandButton 
+                                        value="Direk İmzala" 
+                                        id ="buttonEimzaOK"
+                                        action="#{esignController.esign}"
+                                        style="display: none;"
+                                        rendered="#{mainFrame.currEnumPage ne 'GENERAL_ND' and  formService.myForm.esignable}"
+                                        update="#{updateAjaxMB.btnEsignDirectly}"
+                                        >
+                                    </p:commandButton>
+                                    <h:inputHidden id="sourcedocid" value="#{esignController.crudObjectTextViewerID}"></h:inputHidden>
+                                    <!--action="# {crudOneDim.eimzala}" -->
+                                </h:panelGroup>
+                            </h:form>
+
+                            <h:form id="idMultiAjaxCollectorForm">
+                                <h:inputHidden id="imzCollectorIndex" value="#{esignController.esignChunkIndex}" />
+                                <h:inputHidden id="imzCollector" value="#{esignController.esignChunk}" />
+                                <p:commandButton 
+                                    id ="buttonEimzaCollector"
+                                    style="display: none;" 
+                                    action="#{esignController.esignCollector}"  
+                                    async="true"
+                                    update=":idMessageDialog"
+                                    />
+                            </h:form>
+                        </p:dialog>
+
+
+                        <p:dialog 
+                            id="id-esign-install-info"
+                            widgetVar="wv-esign-install-info"
+                            showHeader="true"
+                            header="Eimza Kurulumu"
+                            closeOnEscape="true"
+                            position="center"
+                            width="50%"
+                            height="500"
+                            resizable="false"
+                            >
+                            <style>
+                                .ahref{
+                                    font-weight: bold;
+                                }
+                                .ahref:link {
+                                    text-decoration: none;
+                                }
+                                .ahref:visited {
+                                    color:green;
+                                }
+                                .ahref:active {
+                                    text-decoration: underline;
+                                } 
+                                .ahref:hover {
+                                    color:red;
+                                    text-decoration: underline;
+                                }
+                            </style> 
+
+                            <p:panel>       
+                                <b>Mühürdar</b> eimza uygulama kurulumu:
+                                <ul style="display: none;">
+                                    <li>
+                                        Eski Java sürümlerine <a href="https://www.oracle.com/java/technologies/javase/javase8u211-later-archive-downloads.html" 
+                                                                 target="_blank"
+                                                                 class="ahref"
+                                                                 >Java SE 8 Archive Downloads (JDK 8u211 and later)</a> bağlantısı üzerinden erişebilrsiniz
+                                    </li>
+                                    <li>
+                                        <a 
+                                            href="https://uys.tspb.org.tr/1d/Muhurdar.zip" 
+                                            class="ahref"
+                                            >
+                                            https://uys.tspb.org.tr/1d/Muhurdar.zip
+                                        </a> 
+                                        bağlantısı üzerinden indirilen <b>Muhurdar.zip</b> dosyasını <b>C:\</b> sürücünüze çıkartınız
+                                    </li>
+                                    <li>
+                                        Kurulum işlemleri için <b>C:\Muhurdar</b> klasörü içindeki <b>README.txt</b> dosyasında belirtilen adımları uygulayınız.
+                                    </li>  
+                                </ul>
+
+                                <ul>
+                                    <li>
+                                        <a href="http://java.com" 
+                                           target="_blank"
+                                           class="ahref"
+                                           >
+                                            http://java.com
+                                        </a> 
+                                        sayfası üzeriden bilgisayarınıza <b>Java 8 update 291</b> sürümünü kurunuz
+                                    </li>
+                                    <li>
+                                        <a 
+                                            href="/public/muhurdar-agent-2.0.0-BETA3-installer.jar" 
+                                            class="ahref"
+                                            >
+                                            <b>Müdürdar</b>
+                                        </a> 
+                                        bağlantısı üzerinden indirilen <b>muhurdar-agent-2.0.0-BETA3-installer.jar</b> kurulum dosyasını çalıştırınız
+                                    </li>
+
+                                </ul>
+
+                                <br/>
+
+                                İmzalama İşlemi
+                                <ul>
+                                    <li>
+                                        Eimza Kartınızın takılı olduğundan emin olunuz
+                                    </li>
+                                    <li>
+                                        <b>İmzala</b> düğmesine basıldığında imzalanmak üzere <b>*.mhr</b> uzantılı bir dosya bilgisayarınıza indirilecek
+                                    </li>
+                                    <li>
+                                        İndirilen dosya üzerine tıklayınız
+                                    </li>
+                                    <li>
+                                        Bu aşamadan sonra Akıllı Kartınızı kullanarak dosyayı imzalayıp tarafımıza gönderebilirsiniz
+                                    </li>
+                                </ul> 
+                            </p:panel>
+                        </p:dialog>
+
+                        <p:dialog
+                            id="idSignedEimzaDialog"
+                            widgetVar="signedEimzaDialog"
+                            resizable="false"
+                            header="İmzalanan Metin"    
+                            showHeader="true"
+                            closable="true"
+                            closeOnEscape="true" 
+                            modal = "false"
+                            draggable="true"
+                            position="center"
+                            visible="false"
+                            width="60%"
+                            height="600"
+                            >
+
+                            <h:form>
+                                <p:toolbar>
+                                    <f:facet name="left">
+                                        <p:commandButton 
+                                            value="E-imzalı belgeyi indirmek için tıklayınız." 
+                                            ajax="false" 
+                                            icon="ui-icon-arrowthick-1-s"
+                                            actionListener="#{esignController.createDownloadFile}"
+                                            >
+                                            <p:fileDownload value="#{esignController.file}"/>
+                                        </p:commandButton>
+                                        <p:commandButton 
+                                            value="MetaData Hatasını Düzelt" 
+                                            action="#{esignController.correctMetada}"
+                                            rendered="#{roleMB['databankarchitect']}"
+                                            >
+                                        </p:commandButton>
+                                    </f:facet>
+                                </p:toolbar>
+                            </h:form>
+
+                            <h:panelGrid>
+                                <p:outputLabel 
+                                    value='db.fs.files.findOne(ObjectId("#{esignController.eimzaFileID}"))'
+                                    rendered="#{roleMB['databankarchitect']}"
+                                    />
+                                <p:outputLabel 
+                                    value='id : #{esignController.eimzaFileID}'
+                                    />
+
+                                <p:dataTable 
+                                    value="#{esignController.signedDocInfo}" 
+                                    var="mymap"
+                                    >
+                                    <f:facet name="header">E-İmzalama Bilgileri</f:facet>
+                                    <p:column>
+                                        <f:facet name="header" >Alan</f:facet>
+                                        <h:outputText value="#{mymap.key}"/> 
+                                    </p:column>
+                                    <p:column>
+                                        <f:facet name="header" >Değer</f:facet>
+                                        <h:outputText value="#{mymap.value}"/> 
+                                    </p:column>
+                                </p:dataTable>
+
+                                <p:dataTable 
+                                    value="#{esignController.signedDocContentFields}" 
+                                    var="mymap"
+                                    >
+                                    <f:facet name="header">E-İmzalanan Belge</f:facet>
+                                    <p:column>
+                                        <f:facet name="header" >Alan</f:facet>
+                                        <h:outputText value="#{mymap.key}"/> 
+                                    </p:column>
+                                    <p:column>
+                                        <f:facet name="header" >Değer</f:facet>
+                                        <h:outputText value="#{mymap.value}"/> 
+                                    </p:column>
+                                </p:dataTable>
+
+                                <p:dataTable value="#{esignController.signedEimzaAttachments}" var="x">
+                                    <f:facet name="header">
+                                        <h:outputText value="E-İmzalanan Belge Ekleri"/> 
+                                    </f:facet>
+                                    <p:column>
+                                        <f:facet name="header">
+                                            <h:outputText value="Dosya Adı"/> 
+                                        </f:facet>
+                                        <h:outputText value="#{x.fileName}" />
+                                    </p:column>
+                                    <p:column>
+                                        <f:facet name="header">
+                                            <h:outputText value="İndir"/> 
+                                        </f:facet>
+                                        <h:outputLink 
+                                            value="#{application.contextPath}/esignFileDownlodServlet/#{esignController.eimzaFileID}#{x.id}"
+                                            style="
+                                            text-decoration:none;
+                                            font-size: 14px;
+                                            color:#112978;
+                                            font-weight:bold;"
+                                            >
+                                            <h:outputText value="indir" />
+                                        </h:outputLink>                    
+                                    </p:column>
+                                </p:dataTable>
+                            </h:panelGrid>
+                        </p:dialog>
+
+                        <p:dialog
+                            header="Uyarı"
+
+                            visible="#{esignViewCtrl.preventedMultiTab}"
+                            >
+                            <p:panel>
+                                <ul>
+                                    <li>
+                                        Bir oturumda bir görünüm kısıtlaması aktivleştirildi.
+                                        <ul>
+                                            <li>
+                                                mevcut sayfa refresh edilmiş olabilir.
+                                            </li>
+                                            <li>
+                                                yeni sekme açılmış
+                                            </li>
+                                        </ul>
+                                    </li>
+                                    <li>
+                                        İşlem yapmak için bu sekmeyi kapatınız.
+                                    </li>
+                                </ul>
+                            </p:panel>
+                        </p:dialog>
+
+                        <p:dialog 
+                            id="idDialogControlAndSave"
+                            widgetVar="dialogControlAndSave"
+                            header="#{myMessageDialog.title}"
+                            showHeader="true"
+                            closable="true"
+                            modal="false"
+                            draggable="true"
+                            closeOnEscape="true" 
+                            position="#{myMessageDialog.position}"
+                            height="250"
+                            width="50%"
+                            >        
+                            <h:form>
+                                <p:panelGrid columns="1">
+                                    <h:outputText 
+                                        value="
+                                        &lt;ul&gt;
+                                        &lt;li&gt;
+                                        Verileriniz kaydedilmiştir. 
+                                        &lt;/li&gt;
+                                        &lt;li&gt;
+                                        Ancak aşağıdaki Uyarı ve Hataların giderilmesi gerekmektedir. 
+                                        &lt;/li&gt;
+                                        &lt;li&gt;
+                                        Hatalar giderilmedikçe veya Uyarılara ilişkin açıklama girilmedikçe form Birliğimize &lt;b&gt;gönderilemeyecektir.&lt;/b&gt;
+                                        &lt;/li&gt;
+                                        &lt;/ul&gt;" 
+                                        rendered="#{not empty pivotModifierCtrl.failList}"
+                                        escape="false"
+                                        /> 
+                                    <h:outputText 
+                                        value="Verileriniz Kaydedildi."
+                                        rendered="#{empty pivotModifierCtrl.failList}"/>   
+                                    <p:dataTable 
+                                        id="idFailDataTable"
+                                        value="#{pivotModifierCtrl.failList}"
+                                        rendered="#{not empty pivotModifierCtrl.failList}"
+                                        var="controlMap"
+                                        style="text-align: left;"
+                                        tableStyle="width:auto">
+                                        <p:column headerText="Kontrol Kodu">
+                                            <h:outputText value="#{controlMap.transferOrder}">
+                                                <f:convertNumber integerOnly="true" groupingUsed="false"/>
+                                            </h:outputText>
+                                        </p:column>
+                                        <p:column headerText="Açıklama">
+                                            <h:outputText value="#{controlMap.name}"/>
+                                        </p:column>
+                                        <p:column headerText="Hata Niteliği">
+                                            <h:outputText value="#{controlMap.description}"/>
+                                        </p:column>
+                                        <p:column headerText="Matematik İfade" 
+                                                  rendered="#{roleMB['uysuser']}">
+                                            <h:outputText value="#{controlMap.expression}"/>
+                                        </p:column> 
+
+                                        <p:column headerText="Sonuç Tipi">
+                                            <h:outputText value="#{controlMap.resultType}"/>
+                                        </p:column> 
+                                        <p:column headerText="Sonuç" rendered="#{roleMB[pivotModifierCtrl.selectedForm.myProject.adminAndViewerRole]}">
+                                            <h:outputText value="#{controlMap.controlResult}"/>
+                                        </p:column> 
+                                    </p:dataTable>
+
+                                    <p:dataTable 
+                                        id="idSuccessDataTable"
+                                        value="#{pivotModifierCtrl.successList}"
+                                        var="controlMap"
+                                        style="white-space: nowrap;"
+                                        tableStyle="width:auto" 
+                                        rendered="#{roleMB['uystester']}">
+                                        <p:column headerText="Kontrol Kodu">
+                                            <h:outputText value="#{controlMap.transferOrder}">
+                                                <f:convertNumber integerOnly="true" groupingUsed="false"/>
+                                            </h:outputText>
+                                        </p:column>
+                                        <p:column headerText="Açıklama">
+                                            <h:outputText value="#{controlMap.name}"/>
+                                        </p:column>
+                                        <p:column headerText="Hata Niteliği">
+                                            <h:outputText value="#{controlMap.description}"/>
+                                        </p:column>
+                                        <p:column headerText="Matematik İfade">
+                                            <h:outputText value="#{controlMap.expression}"/>
+                                        </p:column> 
+                                        <p:column headerText="Sonuç">
+                                            <h:outputText value="#{controlMap.controlResult}"/>
+                                        </p:column> 
+                                    </p:dataTable>
+                                </p:panelGrid>
+                            </h:form>
+                        </p:dialog>
+                    </h:panelGroup>
+                </ui:define>
+            </ui:composition>
+        </h:body>
+
+    </f:view>
+
+
+</html>
