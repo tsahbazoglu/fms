@@ -477,6 +477,7 @@ public class ProjectConstants {
     public final static String UYS_ND_ROW_SIZE = "uysNdRowSize";
     public final static String UYS_DOWNLOAD_ROLES = "uys_download_roles";
 
+    public final static String JAVALANG_INTEGER = "java.lang.Integer";
     public final static String JAVALANG_STRING = "java.lang.String";
     public final static String JAVALANG_DATE = "java.lang.Date";
     public final static String JAVAUTIL_DATE = "java.util.Date";
