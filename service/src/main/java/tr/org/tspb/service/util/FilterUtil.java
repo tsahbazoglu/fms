@@ -480,7 +480,7 @@ public class FilterUtil {
         }
 
         if (myForm.getMyNamedQueries() != null && myForm.getMyNamedQueries().get(DEFAULT_QUERY) instanceof Document) {
-            modifiedFilter.putAll(((Document) myForm.getMyNamedQueries().get(DEFAULT_QUERY)));
+            modifiedFilter.putAll(myForm.getMyNamedQueries().get(DEFAULT_QUERY, Document.class));
         } else if (myForm.getFindAndSaveFilter() != null) {
             modifiedFilter.putAll(myForm.getFindAndSaveFilter());
         } else {
@@ -491,8 +491,8 @@ public class FilterUtil {
 
         if (myNamedQueries != null && myNamedQueries.get(INCLUDE) != null) {
 
-            Document includeQuery = (Document) myNamedQueries.get(INCLUDE);
-            String onUserRole = (String) includeQuery.get(ON_USER_ROLE);
+            Document includeQuery = myNamedQueries.get(INCLUDE, Document.class);
+            String onUserRole = includeQuery.getString(ON_USER_ROLE);
             if (onUserRole != null && roleMap.isUserInRole(onUserRole)) {
                 Document query = mongoDbUtil.replaceToDollar((Document) includeQuery.get(QUERY));
                 modifiedFilter.putAll(query);
@@ -663,7 +663,7 @@ public class FilterUtil {
         }
 
         if (myForm.getMyNamedQueries() != null && myForm.getMyNamedQueries().get(DEFAULT_QUERY) instanceof Document) {
-            modifiedFilter.putAll(((Document) myForm.getMyNamedQueries().get(DEFAULT_QUERY)));
+            modifiedFilter.putAll(myForm.getMyNamedQueries().get(DEFAULT_QUERY, Document.class));
         } else if (myForm.getFindAndSaveFilter() != null) {
             modifiedFilter.putAll(myForm.getFindAndSaveFilter());
         } else {
