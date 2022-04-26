@@ -7,6 +7,7 @@ package tr.org.tspb.table;
 
 import com.mongodb.MongoWriteException;
 import com.mongodb.client.model.Filters;
+import com.mongodb.client.model.UpdateOptions;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.Serializable;
@@ -48,6 +49,7 @@ import static tr.org.tspb.constants.ProjectConstants.CREATE_USER;
 import static tr.org.tspb.constants.ProjectConstants.FORMS;
 import static tr.org.tspb.constants.ProjectConstants.INODE;
 import static tr.org.tspb.constants.ProjectConstants.JAVALANG_DATE;
+import static tr.org.tspb.constants.ProjectConstants.JAVALANG_INTEGER;
 import static tr.org.tspb.constants.ProjectConstants.JAVALANG_STRING;
 import static tr.org.tspb.constants.ProjectConstants.JAVAUTIL_DATE;
 import static tr.org.tspb.constants.ProjectConstants.JAVAUTIL_OBJECTID;
@@ -87,6 +89,11 @@ import tr.org.tspb.util.service.DlgCtrl;
 import tr.org.tspb.util.stereotype.MyController;
 import tr.org.tspb.util.tools.MongoDbUtilIntr;
 import tr.org.tspb.util.tools.MongoDbVersion;
+import com.google.common.cache.Cache;
+import com.google.common.cache.CacheBuilder;
+import java.util.UUID;
+import java.util.concurrent.TimeUnit;
+import javax.annotation.PostConstruct;
 
 /**
  *
@@ -160,6 +167,25 @@ public class FmsMultiFormBulkUpload implements Serializable {
     private FmsForm myForm5;
     private FmsForm myForm6;
 
+    private static final long TIMEOUT = 30;
+
+    private Cache<String, Object> tokens;
+
+    @PostConstruct
+    public void init() {
+        tokens = CacheBuilder.newBuilder().expireAfterWrite(TIMEOUT, TimeUnit.DAYS).build();
+    }
+
+    public String createToken(Object data) {
+        String token = UUID.randomUUID().toString();
+        tokens.put(token, data);
+        return token;
+    }
+
+    public Boolean isTokenValid(String token) {
+        return tokens.getIfPresent(token) != null;
+    }
+
     private void resetForms() throws NullNotExpectedException, MongoOrmFailedException {
         MyProject myProject = uysApplicationMB.getProject("gyonadvd");
         myForm1 = repositoryService.getMyFormLarge(myProject, "varlik_turu_bir");
@@ -200,12 +226,18 @@ public class FmsMultiFormBulkUpload implements Serializable {
             resetForms();
             resetUpsertList();
 
-            writeToList(listOfToBeUpsert1, myForm1, xssfWorkbook, 0);
-            writeToList(listOfToBeUpsert2, myForm2, xssfWorkbook, 1);
-            writeToList(listOfToBeUpsert3, myForm3, xssfWorkbook, 2);
-            writeToList(listOfToBeUpsert4, myForm4, xssfWorkbook, 3);
-            writeToList(listOfToBeUpsert5, myForm5, xssfWorkbook, 4);
-            writeToList(listOfToBeUpsert6, myForm6, xssfWorkbook, 5);
+            StringBuilder sb = new StringBuilder();
+
+            writeToList(sb, listOfToBeUpsert1, myForm1, xssfWorkbook, 0);
+            writeToList(sb, listOfToBeUpsert2, myForm2, xssfWorkbook, 1);
+            writeToList(sb, listOfToBeUpsert3, myForm3, xssfWorkbook, 2);
+            writeToList(sb, listOfToBeUpsert4, myForm4, xssfWorkbook, 3);
+            writeToList(sb, listOfToBeUpsert5, myForm5, xssfWorkbook, 4);
+            writeToList(sb, listOfToBeUpsert6, myForm6, xssfWorkbook, 5);
+
+            if (!sb.toString().isEmpty()) {
+                dialogController.showPopupError("Dosya Yükleme Esnasında oluşan hatalar :<br/><br/>".concat(sb.toString()));
+            }
 
         } catch (Exception ex) {
             resetUpsertList();
@@ -246,7 +278,6 @@ public class FmsMultiFormBulkUpload implements Serializable {
                 MyMap mm = ogmCreator.getCrudObject();
                 mm.putAll(dbo);
                 saveObject(fmsForm, loginController, mm, fmsForm);
-                Thread.sleep(50);
             }
         } else if (fmsForm.getUploadMerge().isUpdate()) {
             for (Document dbo : listOfToBeUpsert) {
@@ -261,7 +292,7 @@ public class FmsMultiFormBulkUpload implements Serializable {
                 }
                 mongoDbUtil.updateMany(fmsForm.getUploadMerge().getToDb(),
                         fmsForm.getUploadMerge().getToCollection(),
-                        search, dbo);
+                        search, dbo, new UpdateOptions().upsert(true));
                 try {
                     PostSaveResult postSaveResult = repositoryService.runEventPostSave(dbo, fmsForm, null);
                     //FIXME messagebundle
@@ -294,7 +325,7 @@ public class FmsMultiFormBulkUpload implements Serializable {
         listOfToBeUpsert6 = new ArrayList<>();
     }
 
-    private void writeToList(List<Document> listOfToBeUpsert, FmsForm myForm, XSSFWorkbook xssfWorkbook, int sheetNo)
+    private void writeToList(StringBuilder sb, List<Document> listOfToBeUpsert, FmsForm myForm, XSSFWorkbook xssfWorkbook, int sheetNo)
             throws IOException, Exception {
 
         MyMerge myMerge = myForm.getUploadMerge();
@@ -315,90 +346,11 @@ public class FmsMultiFormBulkUpload implements Serializable {
             }
 
             Document record = new Document().append(FORMS, myForm.getKey());
-
-            int columnn = 0;
-            XSSFCell cellll;
-
-            for (ExcellColumnDef excellColumnDef : myMerge.getWorkbookSheetColumnList()) {
-
-                cellll = row.getCell(columnn++);
-
-                if (cellll == null || cellll.getCellTypeEnum() == org.apache.poi.ss.usermodel.CellType.BLANK) {
-                    if (excellColumnDef.getToMyField().isRequired()) {
-                        throw new Exception(
-                                String.format("satır '%d' : sütun '%d' : %s' alanı zorunlu alandır", i, columnn, excellColumnDef.getToMyField().getName()));
-                    }
-                    record.append(excellColumnDef.getToMyField().getKey(), null);
-                    continue;
-                }
-
-                Object obtainedValue = null;
-
-                if (cellll.getCellTypeEnum() == org.apache.poi.ss.usermodel.CellType.STRING) {
-                    switch (excellColumnDef.getToMyField().getValueType()) {
-                        case JAVAUTIL_DATE:
-                        case JAVALANG_DATE:
-                            obtainedValue = dateFormat.parse(cellll.getStringCellValue());
-                            break;
-                        case JAVALANG_STRING:
-                            obtainedValue = cellll.getStringCellValue();
-                            break;
-                        default:
-                            obtainedValue = cellll.getStringCellValue();
-                            break;
-                    }
-                } else if (cellll.getCellTypeEnum() == org.apache.poi.ss.usermodel.CellType.NUMERIC) {
-                    switch (excellColumnDef.getToMyField().getValueType()) {
-                        case JAVAUTIL_DATE:
-                            obtainedValue = cellll.getDateCellValue();
-                            break;
-                        case JAVALANG_DATE:
-                            obtainedValue = cellll.getDateCellValue();
-                            break;
-                        case JAVALANG_STRING:
-                            obtainedValue = String.valueOf(((Number) cellll.getNumericCellValue()).longValue());
-                            break;
-                        case JAVAUTIL_OBJECTID:
-                            obtainedValue = cellll.getNumericCellValue();
-                            break;
-                        default:
-                            obtainedValue = cellll.getNumericCellValue();
-                            break;
-                    }
-                }
-
-                Object resolvedValue = obtainedValue;
-
-                if (excellColumnDef.getConverter() != null) {
-
-                    try {
-                        Document commandResult = mongoDbUtil.runCommand(myForm.getUploadMerge().getToDb(),
-                                excellColumnDef.getConverter().getCode(), resolvedValue);
-
-                        resolvedValue = commandResult.get(RETVAL);
-
-                    } catch (Exception ex) {
-                        throw new Exception(
-                                String.format("sayfa %d : satır '%d' : sütun '%d' : '%s' = %s alanının tespiti esnasında hata oluştu",
-                                        sheetNo, i, columnn, excellColumnDef.getToMyField().getName(), obtainedValue));
-                    }
-
-                    if (resolvedValue instanceof Document) {
-
-                        Document resolvedValueDoc = (Document) resolvedValue;
-                        String type = resolvedValueDoc.getString(TYPE);
-                        switch (type) {
-                            case "objectid":
-                                resolvedValue = new ObjectId(resolvedValueDoc.getString(VALUE));
-                                break;
-                            default:
-                                break;
-                        }
-                    }
-                }
-
-                record.append(excellColumnDef.getToMyField().getKey(), resolvedValue);
-
+            try {
+                appendField(myMerge, row, sheet, i, record, myForm);
+            } catch (Exception e) {
+                sb.append(e.getMessage().concat("</br>"));
+                continue;
             }
 
             if (!loginController.isUserInRole(myForm.getMyProject().getAdminAndViewerRole())) {
@@ -412,6 +364,105 @@ public class FmsMultiFormBulkUpload implements Serializable {
         }
         for (String message : listOfNotFoundMembers) {
             throw new Exception(message);
+        }
+    }
+
+    private void appendField(MyMerge myMerge, XSSFRow row, XSSFSheet sheet, int i, Document record, FmsForm myForm) throws Exception {
+
+        XSSFCell cellll;
+        int columnn = 0;
+
+        for (ExcellColumnDef excellColumnDef : myMerge.getWorkbookSheetColumnList()) {
+
+            cellll = row.getCell(columnn++);
+
+            if (cellll == null || cellll.getCellTypeEnum() == org.apache.poi.ss.usermodel.CellType.BLANK) {
+                if (excellColumnDef.getToMyField().isRequired()) {
+                    throw new Exception(
+                            String.format("sayfa '%s' : satır '%d' : sütun '%d' : %s' alanı zorunlu alandır", sheet.getSheetName(), i + 1, columnn, excellColumnDef.getToMyField().getName()));
+                }
+                record.append(excellColumnDef.getToMyField().getKey(), null);
+                continue;
+            }
+
+            Object obtainedValue = null;
+
+            if (cellll.getCellTypeEnum() == org.apache.poi.ss.usermodel.CellType.STRING) {
+                switch (excellColumnDef.getToMyField().getValueType()) {
+                    case JAVAUTIL_DATE:
+                    case JAVALANG_DATE:
+                        obtainedValue = dateFormat.parse(cellll.getStringCellValue());
+                        break;
+                    case JAVALANG_STRING:
+                        obtainedValue = cellll.getStringCellValue();
+                        break;
+                    default:
+                        obtainedValue = cellll.getStringCellValue();
+                        break;
+                }
+            } else if (cellll.getCellTypeEnum() == org.apache.poi.ss.usermodel.CellType.NUMERIC) {
+                switch (excellColumnDef.getToMyField().getValueType()) {
+                    case JAVAUTIL_DATE:
+                        obtainedValue = cellll.getDateCellValue();
+                        break;
+                    case JAVALANG_DATE:
+                        obtainedValue = cellll.getDateCellValue();
+                        break;
+                    case JAVALANG_STRING:
+                        obtainedValue = String.valueOf(((Number) cellll.getNumericCellValue()).longValue());
+                        break;
+                    case JAVAUTIL_OBJECTID:
+                        obtainedValue = cellll.getNumericCellValue();
+                        break;
+                    case JAVALANG_INTEGER:
+                        obtainedValue = new Double(cellll.getNumericCellValue()).intValue();
+                        break;
+                    default:
+                        obtainedValue = cellll.getNumericCellValue();
+                        break;
+                }
+            }
+
+            Object resolvedValue = null;
+
+            if (excellColumnDef.getConverter() != null && excellColumnDef.getConverter().getCode() != null) {
+
+                try {
+                    String token = sheet.getSheetName()
+                            .concat("__").concat(Integer.toString(columnn)
+                            .concat("__").concat(obtainedValue.toString()));
+                    
+                    if ((resolvedValue = tokens.getIfPresent(token)) == null) {
+                        Document commandResult = mongoDbUtil.runCommand(myForm.getUploadMerge().getToDb(),
+                                excellColumnDef.getConverter().getCode(), obtainedValue);
+                        resolvedValue = commandResult.get(RETVAL);
+
+                        if (resolvedValue instanceof Document) {
+                            Document resolvedValueDoc = (Document) resolvedValue;
+                            String type = resolvedValueDoc.getString(TYPE);
+                            switch (type) {
+                                case "objectid":
+                                    resolvedValue = new ObjectId(resolvedValueDoc.getString(VALUE));
+                                    break;
+                                default:
+                                    break;
+                            }
+                        }
+                        tokens.put(token, resolvedValue);
+                    }
+
+                } catch (Exception ex) {
+                    throw new Exception(
+                            String.format("sayfa %s : satır '%d' : sütun '%d' : '%s' = %s alanının tespiti esnasında hata oluştu",
+                                    sheet.getSheetName(), i, columnn, excellColumnDef.getToMyField().getName(), obtainedValue));
+                }
+
+            } else {
+                resolvedValue = obtainedValue;
+            }
+
+            record.append(excellColumnDef.getToMyField().getKey(), resolvedValue);
+
         }
     }
 
