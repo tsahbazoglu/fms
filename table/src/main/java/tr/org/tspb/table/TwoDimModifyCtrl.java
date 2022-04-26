@@ -19,8 +19,6 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.StringWriter;
-import java.lang.reflect.Method;
-import java.rmi.server.UID;
 import java.text.MessageFormat;
 import java.util.*;
 import javax.faces.context.FacesContext;
@@ -55,7 +53,6 @@ import java.text.ParseException;
 import javax.annotation.PostConstruct;
 import javax.faces.application.FacesMessage;
 import javax.faces.el.EvaluationException;
-import javax.faces.model.SelectItem;
 import javax.mail.MessagingException;
 import javax.script.ScriptException;
 import org.apache.commons.io.FileUtils;
@@ -121,6 +118,10 @@ public class TwoDimModifyCtrl extends FmsTable implements ActionListener {
     @Inject
     @OgmCreatorQualifier
     private OgmCreatorIntr ogmCreator;
+
+    private int rowCount = 0;
+    private int limit = 5000;
+    private final String DLG_DESC = "wvDescDlg";
 
     public static final String SESSION_KEY = "SESSION_KEY__CRUD_2D_MB";
 
@@ -476,9 +477,6 @@ public class TwoDimModifyCtrl extends FmsTable implements ActionListener {
 
         return null;
     }
-
-    private int rowCount = 0;
-    private int limit = 5000;
 
     private void search() {
         try {
@@ -1250,81 +1248,23 @@ public class TwoDimModifyCtrl extends FmsTable implements ActionListener {
     }
 
     public String sendForm() {
-
-        String failMessage = formService.getMyForm().getMyActions().getSendFormAction().getEnableResult().getFailMessage();
-
         try {
-
-            TagActionsAction tagActionsAction = formService.getMyForm()
-                    .getMyActions().getSendFormAction();
-
-            //Only java native variables can be pass through jsf attributes
-            String successMessage = tagActionsAction.getEnableResult().getSuccessMessage();
-
-            TimeZone timeZone = TimeZone.getTimeZone("Asia/Istanbul");
-            SIMPLE_DATE_FORMAT__3.setTimeZone(timeZone);
-
-            MyField periodField = formService.getMyForm().getFields().get(PERIOD);
-
-            String periodName = null;
-
-            if (periodField != null) {
-                periodName = mongoDbUtil.findOne(
-                        periodField.getItemsAsMyItems().getDb(),
-                        periodField.getItemsAsMyItems().getTable(),
-                        Filters.and(
-                                Filters.eq(FORMS, PERIOD),
-                                Filters.eq(MONGO_ID, getSearchObjectValue(PERIOD)))).getString(NAME);
-            }
-
-            successMessage = String.format("%s - ".concat(successMessage).concat(". Gönderim Tarihi :  %s"),
-                    periodName, SIMPLE_DATE_FORMAT__3.format(new Date()));
-
-            String myActionType = tagActionsAction.getEnableResult().getMyActionType();
-            String javaFunc = tagActionsAction.getEnableResult().getJavaFunc();
-            String code = tagActionsAction.getEnableResult().getMyaction();
-
-            List<TagActionsAction.Operation> operaiotns = tagActionsAction.getOperations();
-
-            if (operaiotns != null && !operaiotns.isEmpty()) {
-                callAdditionalAction(filterService.getTableFilterCurrent(), tagActionsAction);
-                putSearchObjectValue(PERIOD, SelectOneObjectIdConverter.NULL_VALUE);
-                resetActions();
-                actionSearchObject();
-                dialogController.showPopupInfo(successMessage, MESSAGE_DIALOG);
-            } else if (myActionType == null) {
-                if (code == null) {
-                    dialogController.showPopupWarning("Bu olay üzerinde eylem tanımlı değil.<br/>Sistem yöneticisi ile iletişime geçiniz.", MESSAGE_DIALOG);
-                } else {
-                    Document mySearchObject = repositoryService.expandCrudObject(formService.getMyForm(), getSearchObjectAsDbo());
-
-                    for (MyField myField : formService.getMyForm().getAutosetFields()) {
-                        if (mySearchObject.get(myField.getKey()) == null
-                                || SelectOneObjectIdConverter.NULL_VALUE.equals(mySearchObject.get(myField.getKey()))) {
-                            throw new Exception(
-                                    MessageFormat.format("arama kriterlerinde {0} belirsiz.", myField.getKey()));
-                        }
-                    }
-
-                    mongoDbUtil.runCommand(formService.getMyForm().getDb(), code, mySearchObject, null);
-
-                    putSearchObjectValue(PERIOD, SelectOneObjectIdConverter.NULL_VALUE);
-
-                    resetActions();
-
-                    actionSearchObject();
-
-                    dialogController.showPopupInfo(successMessage, MESSAGE_DIALOG);
-                }
-            } else if ("java".equals(myActionType)) {
-                Method method = this.getClass().getMethod(javaFunc, new Class[]{});
-                method.invoke(this, new Object[]{});
-            }
+            String successMessage = repositoryService
+                    .sendForm(formService.getMyForm(), (ObjectId) getSearchObjectValue(PERIOD), getSearchObjectAsDbo(), crudObject);
+            informAndReset(successMessage);
         } catch (Exception ex) {
-            dialogController.showPopupInfo(failMessage, MESSAGE_DIALOG);
+            dialogController
+                    .showPopupInfo(formService.getMyForm().getMyActions().getSendFormAction().getEnableResult().getFailMessage(),
+                            MESSAGE_DIALOG);
         }
         return null;
+    }
 
+    private void informAndReset(String successMessage) {
+        putSearchObjectValue(PERIOD, SelectOneObjectIdConverter.NULL_VALUE);
+        resetActions();
+        actionSearchObject();
+        dialogController.showPopupInfo(successMessage, MESSAGE_DIALOG);
     }
 
     public void showPopupError(String creditCardMsg) {
@@ -1645,8 +1585,6 @@ public class TwoDimModifyCtrl extends FmsTable implements ActionListener {
 
     }
 
-    private final String DLG_DESC = "wvDescDlg";
-
     public String showMyFieldDesc() {
         dialogController.showPopup(DLG_DESC);
         return null;
@@ -1807,7 +1745,6 @@ public class TwoDimModifyCtrl extends FmsTable implements ActionListener {
     }
 
     public String delete() {
-
         if (selectedChildRow != null) {
             MyMap toBeRemoved = null;
             for (MyMap mm : childRecords) {
