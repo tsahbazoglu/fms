@@ -7,7 +7,6 @@ import tr.org.tspb.service.RepositoryService;
 import static tr.org.tspb.constants.ProjectConstants.ADMIN_QUERY;
 import static tr.org.tspb.constants.ProjectConstants.DOLAR_SET;
 import static tr.org.tspb.constants.ProjectConstants.FIELDS_ROW;
-import static tr.org.tspb.constants.ProjectConstants.PERIOD;
 import static tr.org.tspb.constants.ProjectConstants.QUERY;
 import com.google.gson.Gson;
 import com.mongodb.client.model.Filters;
@@ -36,6 +35,7 @@ import static tr.org.tspb.constants.ProjectConstants.MESSAGE_DIALOG;
 import static tr.org.tspb.constants.ProjectConstants.MONGO_ID;
 import static tr.org.tspb.constants.ProjectConstants.ON_USER_ROLE;
 import static tr.org.tspb.constants.ProjectConstants.OPERATOR_LDAP_UID;
+import static tr.org.tspb.constants.ProjectConstants.PERIOD;
 import static tr.org.tspb.constants.ProjectConstants.RESULT;
 import static tr.org.tspb.constants.ProjectConstants.RETVAL;
 import static tr.org.tspb.constants.ProjectConstants.UPSERT_DATE;
@@ -45,12 +45,15 @@ import tr.org.tspb.converter.base.NumberConverter;
 import tr.org.tspb.converter.base.SelectOneObjectIdConverter;
 import tr.org.tspb.dao.MyField;
 import tr.org.tspb.dao.FmsForm;
+import tr.org.tspb.dao.MyActions;
 import tr.org.tspb.dao.MyMap;
 import tr.org.tspb.dao.TagEvent;
 import tr.org.tspb.exceptions.FormConfigException;
 import tr.org.tspb.exceptions.MongoOrmFailedException;
 import tr.org.tspb.exceptions.MoreThenOneInListException;
 import tr.org.tspb.exceptions.UserException;
+import tr.org.tspb.factory.cp.OgmCreatorIntr;
+import tr.org.tspb.factory.qualifier.OgmCreatorQualifier;
 import tr.org.tspb.pojo.MyConstraintFormula;
 import tr.org.tspb.service.DownloadService;
 
@@ -61,6 +64,10 @@ import tr.org.tspb.service.DownloadService;
 @MyController
 @MyQualifier(myEnum = ViewerController.crudPivot)
 public class PivotModifierCtrl extends PivotImpl {
+
+    @Inject
+    @OgmCreatorQualifier
+    private OgmCreatorIntr ogmCreator;
 
     private List<MyConstraintFormula> successList;
     private List<MyConstraintFormula> failList = new ArrayList<>();
@@ -351,11 +358,20 @@ public class PivotModifierCtrl extends PivotImpl {
                 && !formService.getMyForm().getUserNote().isEmpty();
     }
 
+    private void resetActions() {
+        MyActions myActions = ogmCreator
+                .getMyActions(formService.getMyForm(), loginController.getRoleMap(),
+                        new Document(filterService.getGuiFilterCurrent()), loginController.getLoggedUserDetail());
+        formService.getMyForm().initActions(myActions);
+    }
+
     public void valueChangeListenerZet(AjaxBehaviorEvent event) {
         try {
             filterService.createPivotFilterCurrentOnGuiChange();
             createDimensionIksIgrek(formService.getMyForm());
             refreshPivotData();
+            resetActions();
+            setEditable(formService.getMyForm().getMyActions().isSave());
         } catch (NullNotExpectedException | MongoOrmFailedException | MoreThenOneInListException | UserException | FormConfigException ex) {
             logger.error("error occured", ex);
             dialogController.showPopupInfo(ex.getMessage(), MESSAGE_DIALOG);
@@ -363,25 +379,24 @@ public class PivotModifierCtrl extends PivotImpl {
     }
 
     private void createPivotDataModel() {
-        if (editable) {
-            pivotDataModelEdit = new PivotDataModelHandson(
-                    formService.getMyForm().getHandsonColWidths(),
-                    formService.getMyForm().getHandsonRowHeaderWidth(),
-                    getIksDimension(),
-                    getIgrekDimension(),
-                    pivotData,
-                    cellControl);
-        } else {
-            pivotDataModelRead = new PivotDataModelReadonly(
-                    formService.getMyForm().getHandsonColWidths(),
-                    formService.getMyForm().getHandsonRowHeaderWidth(),
-                    getIksDimension(),
-                    getIgrekDimension(),
-                    pivotData,
-                    snapshotMapMultiDimension,
-                    cellControl,
-                    snapshotNullHandler);
-        }
+
+        pivotDataModelEdit = new PivotDataModelHandson(
+                formService.getMyForm().getHandsonColWidths(),
+                formService.getMyForm().getHandsonRowHeaderWidth(),
+                getIksDimension(),
+                getIgrekDimension(),
+                pivotData,
+                cellControl);
+
+        pivotDataModelRead = new PivotDataModelReadonly(
+                formService.getMyForm().getHandsonColWidths(),
+                formService.getMyForm().getHandsonRowHeaderWidth(),
+                getIksDimension(),
+                getIgrekDimension(),
+                pivotData,
+                snapshotMapMultiDimension,
+                cellControl,
+                snapshotNullHandler);
     }
 
     public Map<String, String> drawGUI() throws Exception {
@@ -689,6 +704,28 @@ public class PivotModifierCtrl extends PivotImpl {
             return ADMIN_QUERY;
         }
         return QUERY;
+    }
+
+    public String sendForm() {
+        try {
+
+            Document filter = new Document(filterService.getGuiFilterCurrent());
+
+            String successMessage = repositoryService
+                    .sendForm(formService.getMyForm(), (ObjectId) getSearchObjectValue(PERIOD), filter, null);
+
+            informAndReset(successMessage);
+        } catch (Exception ex) {
+            dialogController
+                    .showPopupInfo(formService.getMyForm().getMyActions().getSendFormAction().getEnableResult().getFailMessage(),
+                            MESSAGE_DIALOG);
+        }
+        return null;
+    }
+
+    private void informAndReset(String successMessage) {
+        resetActions();
+        dialogController.showPopupInfo(successMessage, MESSAGE_DIALOG);
     }
 
     /* **************************  GETTER/SETTER  *************************** */
