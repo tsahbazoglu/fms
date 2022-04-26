@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Matcher;
 import org.bson.Document;
 import org.bson.types.ObjectId;
 import static tr.org.tspb.constants.ProjectConstants.DIEZ;
@@ -23,6 +24,8 @@ import static tr.org.tspb.constants.ProjectConstants.REPLACEABLE_KEY_FMS_VALUE;
 import static tr.org.tspb.constants.ProjectConstants.REPLACEABLE_KEY_WORD_FOR_FUNCTONS_FILTER_PERIOD;
 import static tr.org.tspb.constants.ProjectConstants.REPLACEABLE_KEY_WORD_FOR_FUNCTONS_LOGIN_MEMBER_ID;
 import static tr.org.tspb.constants.ProjectConstants.VALUE;
+import static tr.org.tspb.dao.TagActionRef.pattern_fms_crud;
+import static tr.org.tspb.dao.TagActionRef.pattern_fms_filter;
 import tr.org.tspb.datamodel.expected.FmsScriptRunner;
 import tr.org.tspb.pojo.RoleMap;
 import tr.org.tspb.pojo.UserDetail;
@@ -122,16 +125,25 @@ public class TagEventCheckListDoc {
                 query.append(key, new Document(DOLAR_IN, filter.getList("array-value", String.class)));
             } else if (hasFmsValue) {
                 String fmsValue = filter.getString(REPLACEABLE_KEY_FMS_VALUE);
-                switch (fmsValue) {
-                    case REPLACEABLE_KEY_WORD_FOR_FUNCTONS_LOGIN_MEMBER_ID:
-                        query.append(key, userDetail.getDbo().getObjectId());
-                        break;
-                    case REPLACEABLE_KEY_WORD_FOR_FUNCTONS_FILTER_PERIOD:
-                        query.append(key, myFilter.get(PERIOD));
-                        break;
-                    default:
-                        throw new RuntimeException(fmsValue.concat(" is not supported"));
+                Matcher m;
+                Object value = null;
+                if ((m = pattern_fms_crud.matcher(fmsValue)).find()) {
+                    throw new RuntimeException(fmsValue.concat(" is not supported"));
+                } else if ((m = pattern_fms_filter.matcher(fmsValue)).find()) {
+                    value = myFilter == null ? null : myFilter.get(m.group(1));
+                } else {
+                    switch (fmsValue) {
+                        case REPLACEABLE_KEY_WORD_FOR_FUNCTONS_LOGIN_MEMBER_ID:
+                            value = userDetail.getDbo().getObjectId();
+                            break;
+                        case REPLACEABLE_KEY_WORD_FOR_FUNCTONS_FILTER_PERIOD:
+                            value = myFilter.get(PERIOD);
+                            break;
+                        default:
+                            throw new RuntimeException(fmsValue.concat(" is not supported"));
+                    }
                 }
+                query.append(key, value);
             } else if (hasFmsIdValue) {
                 String fmsValue = filter.getString(REPLACEABLE_KEY_FMS_ID_VALUE);
                 Object filterValue = null;
