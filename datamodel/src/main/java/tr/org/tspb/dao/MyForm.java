@@ -1746,19 +1746,19 @@ public class MyForm extends FmsFormAbstract {
                 this.myForm.defaultSortField = (Document) defaultSortField;
             }
 
-            this.myForm.esignEmailBccRecipients = (String) dbObjectForm.get(ESIGN_EMAIL_BCC_RECIPIENTS);
-            this.myForm.importTextFormat = (String) dbObjectForm.get(IMPORT_TEXT_FROMAT);
-            this.myForm.form = (String) dbObjectForm.get(FORM);
-            this.myForm.formType = (String) dbObjectForm.get(FORM_TYPE);
-            this.myForm.group = (String) dbObjectForm.get(GROUP);
-            this.myForm.name = (String) dbObjectForm.get(NAME);
-            this.myForm.key = (String) dbObjectForm.get(FORM_KEY);
+            this.myForm.esignEmailBccRecipients = dbObjectForm.getString(ESIGN_EMAIL_BCC_RECIPIENTS);
+            this.myForm.importTextFormat = dbObjectForm.getString(IMPORT_TEXT_FROMAT);
+            this.myForm.form = dbObjectForm.getString(FORM);
+            this.myForm.formType = dbObjectForm.getString(FORM_TYPE);
+            this.myForm.group = dbObjectForm.getString(GROUP);
+            this.myForm.name = dbObjectForm.getString(NAME);
+            this.myForm.key = dbObjectForm.getString(FORM_KEY);
             this.myForm.schemaVersion = dbObjectForm.getString(SCHEMA_VERSION);
-            this.myForm.shortName = (String) dbObjectForm.get(SHORT_NAME);
-            this.myForm.pageName = (String) dbObjectForm.get(PAGE_NAME);
-            this.myForm.projectKey = (String) dbObjectForm.get(PROJECT_KEY);
-            this.myForm.loginFkField = (String) dbObjectForm.get(LOGIN_FK);
-            this.myForm.controlCollection = (String) dbObjectForm.get(CONTROL_COLLECTION);
+            this.myForm.shortName = dbObjectForm.getString(SHORT_NAME);
+            this.myForm.pageName = dbObjectForm.getString(PAGE_NAME);
+            this.myForm.projectKey = dbObjectForm.getString(PROJECT_KEY);
+            this.myForm.loginFkField = dbObjectForm.getString(LOGIN_FK);
+            this.myForm.controlCollection = dbObjectForm.getString(CONTROL_COLLECTION);
 
             //boolean properties
             this.myForm.historyRendered = Boolean.TRUE.equals(dbObjectForm.get(HISTORY_RENDERED));
@@ -1772,13 +1772,13 @@ public class MyForm extends FmsFormAbstract {
 
             // json properties
             if (dbObjectForm.get(CONSTRAINT_ITEMS) instanceof Document) {
-                this.myForm.constraintItems = (Document) dbObjectForm.get(CONSTRAINT_ITEMS);
+                this.myForm.constraintItems = dbObjectForm.get(CONSTRAINT_ITEMS, Document.class);
             }
             if (dbObjectForm.get(ACCESS_CONTROL_LEVEL_TWO) instanceof Document) {
-                this.myForm.accessControlLevelTwo = (Document) dbObjectForm.get(ACCESS_CONTROL_LEVEL_TWO);
+                this.myForm.accessControlLevelTwo = dbObjectForm.get(ACCESS_CONTROL_LEVEL_TWO, Document.class);
             }
             if (dbObjectForm.get(EXCEL_FORMAT) instanceof Document) {
-                this.myForm.excelFormat = (Document) dbObjectForm.get(EXCEL_FORMAT);
+                this.myForm.excelFormat = dbObjectForm.get(EXCEL_FORMAT, Document.class);
             }
 
             this.myForm.eventPreSave = TagEvent.value(dbObjectForm.get(EVENT_PRE_SAVE, Document.class), this.myForm.myProject.getRegistredFunctions());
@@ -1788,10 +1788,10 @@ public class MyForm extends FmsFormAbstract {
             this.myForm.eventPreDelete = TagEvent.value(dbObjectForm.get(EVENT_PRE_DELETE, Document.class), this.myForm.myProject.getRegistredFunctions());
 
             if (dbObjectForm.get(SUB_GROUPS) instanceof Document) {
-                this.myForm.subGroups = ((Document) dbObjectForm.get(SUB_GROUPS));
+                this.myForm.subGroups = dbObjectForm.get(SUB_GROUPS, Document.class);
             }
             if (dbObjectForm.get(MY_NAMED_QUERIES) instanceof Document) {
-                this.myForm.myNamedQueries = (Document) dbObjectForm.get(MY_NAMED_QUERIES);
+                this.myForm.myNamedQueries = dbObjectForm.get(MY_NAMED_QUERIES, Document.class);
             }
 
             // code properties
