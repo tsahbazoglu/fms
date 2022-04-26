@@ -17,32 +17,39 @@ import java.io.Reader;
 import tr.org.tspb.util.tools.DocumentRecursive;
 import tr.org.tspb.util.stereotype.MyServices;
 import java.io.Serializable;
+import java.lang.reflect.Method;
 import java.lang.reflect.Type;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
+import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.TimeZone;
 import java.util.regex.Pattern;
 import javax.inject.Inject;
 import org.bson.Document;
 import org.bson.conversions.Bson;
 import org.bson.types.ObjectId;
+import tr.org.tspb.common.qualifier.MyCtrlServiceQualifier;
 import tr.org.tspb.common.qualifier.MyLoginQualifier;
 import tr.org.tspb.common.services.AppScopeSrvCtrl;
 import tr.org.tspb.common.services.BaseService;
 import tr.org.tspb.common.services.LoginController;
+import tr.org.tspb.converter.base.SelectOneObjectIdConverter;
 import tr.org.tspb.dao.MyActions;
 import tr.org.tspb.dao.MyField;
 import tr.org.tspb.dao.MyFile;
 import tr.org.tspb.dao.FmsForm;
 import tr.org.tspb.dao.MyMap;
 import tr.org.tspb.dao.MyProject;
+import tr.org.tspb.dao.TagActionsAction;
 import tr.org.tspb.dao.TagEvent;
 import tr.org.tspb.datamodel.custom.TuikData;
 import tr.org.tspb.datamodel.gui.FormItem;
@@ -56,6 +63,7 @@ import tr.org.tspb.pojo.DatabaseUser;
 import tr.org.tspb.pojo.PostSaveResult;
 import tr.org.tspb.pojo.PreSaveResult;
 import tr.org.tspb.pojo.UserDetail;
+import tr.org.tspb.tags.FmsCheck;
 import tr.org.tspb.util.qualifier.KeepOpenQualifier;
 import tr.org.tspb.util.tools.MongoDbUtilIntr;
 import tr.org.tspb.uys.freedesign.MyLicense;
@@ -88,6 +96,10 @@ public class RepositoryService implements Serializable {
 
     @Inject
     private BaseService baseService;
+
+    @Inject
+    @MyCtrlServiceQualifier
+    private CtrlService ctrlService;
 
     private final Map<String, FmsForm> cacheMyFormLarge = new HashMap<>();
 
@@ -816,6 +828,119 @@ public class RepositoryService implements Serializable {
 
     public MyFile findFileAsMyFile(String ion_uploaded_files, String objectID) throws IOException {
         return mongoDbUtil.findFileAsMyFile(baseService.getProperties().getUploadTable(), new ObjectId(objectID));
+    }
+
+    public String sendForm(FmsForm fmsForm, ObjectId period, Document filterDoc, MyMap crudObject) throws Exception {
+
+        String failMessage = fmsForm.getMyActions().getSendFormAction().getEnableResult().getFailMessage();
+
+        try {
+
+            TagActionsAction tagActionsAction = fmsForm.getMyActions().getSendFormAction();
+
+            //Only java native variables can be pass through jsf attributes
+            String successMessage = tagActionsAction.getEnableResult().getSuccessMessage();
+
+            TimeZone timeZone = TimeZone.getTimeZone("Asia/Istanbul");
+            SIMPLE_DATE_FORMAT__3.setTimeZone(timeZone);
+
+            MyField periodField = fmsForm.getFields().get(PERIOD);
+
+            String periodName = null;
+
+            if (periodField != null) {
+                Bson filter = Filters.and(
+                        Filters.eq(FORMS, PERIOD),
+                        Filters.eq(MONGO_ID, period));
+                periodName = mongoDbUtil.findOne(
+                        periodField.getItemsAsMyItems().getDb(),
+                        periodField.getItemsAsMyItems().getTable(),
+                        filter)
+                        .getString(NAME);
+            }
+
+            successMessage = String.format(successMessage, SIMPLE_DATE_FORMAT__3.format(new Date()), periodName);
+
+            String myActionType = tagActionsAction.getEnableResult().getMyActionType();
+            String javaFunc = tagActionsAction.getEnableResult().getJavaFunc();
+            String code = tagActionsAction.getEnableResult().getMyaction();
+
+            List<TagActionsAction.Operation> operaiotns = tagActionsAction.getOperations();
+
+            if (operaiotns != null && !operaiotns.isEmpty()) {
+                callAdditionalAction(fmsForm, filterService.getTableFilterCurrent(), tagActionsAction, crudObject);
+                return successMessage;
+            }
+
+            if (myActionType == null) {
+                if (code == null) {
+                    // develope PopupException 
+                    throw new Exception("Bu olay üzerinde eylem tanımlı değil.<br/>Sistem yöneticisi ile iletişime geçiniz.");
+                } else {
+                    Document mySearchObject = expandCrudObject(fmsForm, filterDoc);
+
+                    for (MyField myField : fmsForm.getAutosetFields()) {
+                        if (mySearchObject.get(myField.getKey()) == null
+                                || SelectOneObjectIdConverter.NULL_VALUE.equals(mySearchObject.get(myField.getKey()))) {
+                            throw new Exception(
+                                    MessageFormat.format("arama kriterlerinde {0} belirsiz.", myField.getKey()));
+                        }
+                    }
+                    mongoDbUtil.runCommand(fmsForm.getDb(), code, mySearchObject, null);
+                    return successMessage;
+                }
+            } else if ("java".equals(myActionType)) {
+                Method method = this.getClass().getMethod(javaFunc, new Class[]{});
+                method.invoke(this, new Object[]{});
+            }
+        } catch (Exception ex) {
+            // develope PopupException 
+            throw new Exception(failMessage);
+        }
+        return null;
+
+    }
+
+    public void callAdditionalAction(FmsForm form, Document filter, TagActionsAction fmsAction, MyMap crudObject) {
+
+        ctrlService.init(form.getMyProject().getConfigTable());
+
+        if (fmsAction.isEnable()) {
+            if (fmsAction.getActionFunc() != null) {
+                mongoDbUtil.runCommand(fmsAction.getDb(), fmsAction.getActionFunc(), filter, loginController.getRolesAsSet());
+            }
+
+            if (fmsAction.getOperations() != null) {
+
+                List<FmsCheck> fmsChecks = fmsAction.getCheckList();
+
+                Boolean ifcase = null;
+
+                if (fmsChecks != null) {
+                    for (FmsCheck fmsCheck : fmsChecks) {
+                        ifcase = (ifcase == null) ? fmsCheck.execute() : ifcase && fmsCheck.execute();
+                    }
+                }
+
+                for (TagActionsAction.Operation operation : fmsAction.getOperations()) {
+                    if (ifcase == null || operation.getIfcase() == ifcase) {
+                        switch (operation.getOp()) {
+                            case "upsert":
+                                mongoDbUtil.upsertOne(operation.getDb(), operation.getTable(), operation.getFilter(), operation.getSet());
+                                break;
+                            case "update":
+                                mongoDbUtil.updateMany(operation.getDb(), operation.getTable(), operation.getFilter(), operation.getSet());
+                                break;
+                            case "copy":
+                                Document doc = mongoDbUtil.findOne(operation.getDb(), operation.getTable(), operation.getFilter());
+                                doc.remove(MONGO_ID);
+                                crudObject.clear();
+                                crudObject.putAll(doc);
+                        }
+                    }
+                }
+            }
+        }
     }
 
 }
