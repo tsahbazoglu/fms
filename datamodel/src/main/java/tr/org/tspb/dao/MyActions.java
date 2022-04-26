@@ -350,15 +350,14 @@ public class MyActions {
                         myActions.sendFormAction = new TagActionsAction(enable, enableResult, action,
                                 myActions.myForm.getMyProject().getRegistredFunctions(),
                                 searchObject, userDetail, fmsScriptRunner);
+                        break;
                     case ACTION_NORECORD:
                         myActions.norecordAction = new TagActionsAction(enable, enableResult, action,
                                 myActions.myForm.getMyProject().getRegistredFunctions(),
                                 searchObject, userDetail, fmsScriptRunner);
                         break;
                 }
-
             }
-
             return this;
         }
 
