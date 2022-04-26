@@ -68,6 +68,7 @@ public class UpdateAjaxMB implements Serializable {
     private String btnEditDetail;
     private String buttonDeleteDirectly;
     private String btnNdSave;
+    private String btnNdSendForms;
     private String btnPostCreditCard;
     private String btnRunTbb;
     private String btnMergeTbb;
@@ -172,7 +173,14 @@ public class UpdateAjaxMB implements Serializable {
         btnNdSave = ID_MSG_DLG
                 .concat(COMMA).concat(ID_CENTER_TOP)
                 .concat(COMMA).concat(ID_CURRENT_MYGRID_EDITABLE)
-                .concat(COMMA).concat(ID_DLG_CTRL_AND_SAVE);
+                .concat(COMMA).concat(ID_DLG_CTRL_AND_SAVE)
+                .concat(COMMA).concat("id-tab-view:nd-form:id-nd-toolbar");
+
+        btnNdSendForms = ID_MSG_DLG
+                .concat(COMMA).concat(ID_CENTER_TOP)
+                .concat(COMMA).concat(ID_CURRENT_MYGRID_EDITABLE)
+                .concat(COMMA).concat(ID_DLG_CTRL_AND_SAVE)
+                .concat(COMMA).concat("id-tab-view:nd-form:id-nd-toolbar");
         //
         action1dUploadFile = ID_UPLOADED_FILES;
         actionEsignAjaxPoll = ID_PNL_ESIGN_HISTORY;
@@ -182,7 +190,10 @@ public class UpdateAjaxMB implements Serializable {
         pnlEsignHistory = ID_PNL_ESIGN_HISTORY;
         filterNdDataAndTop = ID_CURRENT_MYGRID_EDITABLE
                 .concat(COMMA).concat(ID_CURRENT_MYGRID_READONLY)
-                .concat(COMMA).concat(ID_CENTER_TOP);
+                .concat(COMMA).concat(ID_CENTER_TOP)
+                .concat(COMMA).concat("id-tab-view:nd-form:id-nd-toolbar")
+                .concat(COMMA).concat("id-tab-view:currentMyGridReadOnly")
+                .concat(COMMA).concat("id-tab-view:currentMyGrid");
 
         filterNdDataCurrent = ID_CURRENT_MYGRID_EDITABLE.concat(COMMA).concat(ID_CURRENT_MYGRID_READONLY);
         filterNdDataHistory = ID_HISTORY_MYGRID_READONLY;
@@ -417,6 +428,10 @@ public class UpdateAjaxMB implements Serializable {
 
     public String getBtnPageShowDesc() {
         return btnPageShowDesc;
+    }
+
+    public String getBtnNdSendForms() {
+        return btnNdSendForms;
     }
 
 }
