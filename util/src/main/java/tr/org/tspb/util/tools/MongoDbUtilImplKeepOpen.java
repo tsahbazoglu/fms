@@ -742,12 +742,14 @@ public class MongoDbUtilImplKeepOpen implements MongoDbUtilIntr {
         updateMany(myForm.getDb(), myForm.getTable(), filter, record);
     }
 
-    public void updateMany(String database, String collection, Bson filter, Document record, UpdateOptions uo) {
+    public void updateMany(String database, String collection, 
+            Bson filter, Document record, UpdateOptions uo) {
         mongoClient.getDatabase(database).getCollection(collection)
                 .updateMany(filter, new Document(DOLAR_SET, record), uo);
     }
 
-    public void updateMany(String database, String collection, Bson filter, Document record) {
+    public void updateMany(String database, String collection,
+            Bson filter, Document record) {
         mongoClient.getDatabase(database).getCollection(collection)
                 .updateMany(filter, new Document(DOLAR_SET, record));
     }
