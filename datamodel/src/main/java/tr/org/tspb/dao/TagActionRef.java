@@ -76,12 +76,13 @@ public class TagActionRef {
                     query.put(key, crudValue instanceof ObjectId ? crudValue : "no result");
                 }
             } else if (fmsValue != null) {
-                Matcher m = pattern_fms_crud.matcher(fmsValue);
-                if (m.find()) {
-                    Object crudValue = crudObject == null ? null : crudObject.get(m.group(1));
-                    query.put(key, crudValue == null ? "no result" : crudValue);
+                Matcher m;
+                Object crudValue = null;
+                if ((m = pattern_fms_crud.matcher(fmsValue)).find()) {
+                    crudValue = crudObject == null ? null : crudObject.get(m.group(1));
+                } else if ((m = pattern_fms_filter.matcher(fmsValue)).find()) {
+                    crudValue = filter == null ? null : filter.get(m.group(1));
                 } else {
-                    Object crudValue;
                     switch (fmsValue) {
                         case ProjectConstants.REPLACEABLE_KEY_WORD_FOR_FUNCTONS_FILTER_MEMBER:
                             crudValue = filter.get(MEMBER);
@@ -98,8 +99,8 @@ public class TagActionRef {
                         default:
                             throw new RuntimeException("could not find replaceble word");
                     }
-                    query.put(key, crudValue == null ? "no result" : crudValue);
                 }
+                query.put(key, crudValue == null ? "no result" : crudValue);
             } else if (strValue != null) {
                 query.put(key, strValue);
             } else if (numberValue != null) {
