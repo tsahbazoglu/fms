@@ -53,6 +53,7 @@ import tr.org.tspb.common.services.AppScopeSrvCtrl;
 import tr.org.tspb.service.RepositoryService;
 import tr.org.tspb.constants.ProjectConstants;
 import tr.org.tspb.dao.FmsForm;
+import tr.org.tspb.dao.MyField;
 import tr.org.tspb.dao.MyProject;
 import tr.org.tspb.datamodel.gui.FormDef;
 import tr.org.tspb.datamodel.gui.FormItem;
@@ -84,8 +85,13 @@ public class MainFrame implements Serializable {
     private JSONObject jsonSchemaMyField = new JSONObject(
             new JSONTokener(JSONSchemaTest.class.getResourceAsStream("myFieldSchema.json")));
 
+    private JSONObject jsonSchemaFieldItems = new JSONObject(
+            new JSONTokener(JSONSchemaTest.class.getResourceAsStream("fms-field-items-schema.json")));
+
     private Schema schemaMyNamedQueries = SchemaLoader.load(jsonSchemaMyNamedQueries);
     private Schema schemaMyMyField = SchemaLoader.load(jsonSchemaMyField);
+    private Schema schemaFieldItems = SchemaLoader.load(jsonSchemaFieldItems);
+
     private static final String COMMA = ",";
     private static final String ID_CENTER_MIDDLE = "idCenterCenter";
     private static final String ID_CENTER_TOP = "idCenterTop";
@@ -117,6 +123,12 @@ public class MainFrame implements Serializable {
             JSONObject jsonMyField = new JSONObject(new JSONTokener(myFormXs.getField(key).getDbo().toJson()));
             try {
                 schemaMyMyField.validate(jsonMyField);
+
+//                // begin validate items
+//                Document itemsDoc = myFormXs.getField(key).getDbo().get("items", Document.class);
+//                JSONObject jsonMyFieldItems = new JSONObject(new JSONTokener(itemsDoc.toJson()));
+//                schemaFieldItems.validate(jsonMyFieldItems);
+//                // end validate items
             } catch (Exception ex) {
                 throw new RuntimeException("myField:".concat(ex.getMessage()), ex);
             }
@@ -935,11 +947,19 @@ public class MainFrame implements Serializable {
     private void createPivotForm(FmsForm fmsForm) throws Exception {
 
         filterService.createBaseFilter(fmsForm);
+        for (String key : filterService.getBaseFilterCurrent().keySet()) {
+            if (filterService.getGuiFilterCurrent().get(key) == null) {
+                filterService.getGuiFilterCurrent()
+                        .put(key, filterService.getBaseFilterCurrent().get(key));
+            }
+        }
 
         FmsForm myFormLarge = repositoryService.getMyFormLargeWithBaseFilter(myProject, fmsForm.getKey());
 
+        verify(myFormLarge);
+
         myFormLarge.initActions(repositoryService.getAndCacheMyAction(myFormLarge,
-                filterService.getBaseFilterCurrent()));
+                new Document(filterService.getGuiFilterCurrent())));
 
         formService.setMyForm(myFormLarge);
 
