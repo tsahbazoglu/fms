@@ -1123,7 +1123,7 @@ public class MyField {
                     : "white-space:nowrap;".concat(this.myField.dbo.getString(STYLE));
 
             Object datePattern = this.myField.dbo.get(MY_DATE_PATTERN);
-            
+
             this.myField.myDatePattern = (datePattern instanceof String) ? datePattern.toString() : "yyyy.MM.dd HH:mm";
 
             // maskLabelStyle
