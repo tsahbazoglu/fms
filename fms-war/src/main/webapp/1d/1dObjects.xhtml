@@ -6,8 +6,7 @@
       xmlns:mygrid="http://java.sun.com/jsf/composite/telmangrid"
       xmlns:mydynamic="http://java.sun.com/jsf/composite/mydinamic"
       xmlns:c="http://java.sun.com/jsp/jstl/core"
-      xmlns:f="http://xmlns.jcp.org/jsf/core"
-      xmlns:ui="http://xmlns.jcp.org/jsf/facelets">
+      xmlns:f="http://xmlns.jcp.org/jsf/core">
 
     <h:head>
         <title></title>
@@ -51,85 +50,91 @@
         style="width: 94%"
         >
         <f:facet name="left">
-            <p:commandButton 
-                icon="ui-icon-home" 
-                disabled="true">
-            </p:commandButton>
-            <p:commandButton 
-                onclick="PF('widget_1d_delete_confirmation').show();return false;"
-                value="Sil" 
-                transient="true"
-                rendered="#{formService.myForm.myActions.delete}"
-                icon="ui-icon-trash"
-                /> 
-            <p:commandButton 
-                id ="buttonDelete1dObjectId"
-                style="display: none;"
-                value="Direk Sil" 
-                action="#{crudOneDim.deleteObject}" 
-                rendered="#{formService.myForm.myActions.delete}"
-                icon="ui-icon-trash"
-                update="idMessageDialog"
-                /> 
-
-            <p:button 
-                id="mySaveButton"
-                onclick="rcOneDimSave();return false;"
-                value="Kaydet"
-                rendered="#{formService.myForm.myActions.save}"
-                />  
-
-            <p:commandButton 
-                id ="buttonCopyObject"
-                value="Kopyala" 
-                action="#{crudOneDim.copyObject}" 
-                rendered="false"/>
-            <p:commandButton 
-                value="Bu sayfa ile ilgili açıklamalar için tıklayınız" 
-                action="#{crudOneDim.showAllNote}" 
-                style="white-space: nowrap;"
-                rendered="#{crudOneDim.selectedFormUserNote}"
-                update=":idMessageDialog"
-                />
-            <h:outputText 
-                value="Tarihçe Etkin(siz)leştir" 
-                style="white-space: nowrap;" 
-                rendered="#{mainFrame.adminRole}"
-                />
-            <h:selectBooleanCheckbox  
-                value="#{crudOneDim.enableHistoryOnSave}" 
-                rendered="#{mainFrame.adminRole}"
-                readonly="true"/>
-            <!--            <span class="ui-separator">
-                            <span class="ui-icon ui-icon-grip-dotted-vertical" />
-                        </span>-->
-            <p:commandButton
-                id="buttonEimza"
-                value="E-İmza Süreci" 
-                action="#{crudOneDim.showEimza}" 
-                rendered="#{formService.myForm.myActions.esign}"
-                update=":idToBeSignedDialog,:idMessageDialog,:id_dlg_error_warning"/> 
-
-            <h:selectOneMenu 
-                value="#{crudOneDim.transparentProperties['emailType']}" 
-                rendered="#{formService.myForm.myActions.email}">
-                <f:selectItems value="#{crudOneDim.emailTypes}"/>
-            </h:selectOneMenu> 
-            <p:commandButton 
-                id="buttonSendEmailId"
-                value="Email Önizleme"
-                action="#{crudOneDim.actionEmail}"
-                rendered="#{formService.myForm.myActions.email}"/> 
-            <h:form>
+            <h:panelGrid columns="15">
+                <p:button 
+                    icon="pi pi-home" 
+                    disabled="true">
+                </p:button>
                 <p:commandButton 
-                    id="id_downlod_button"
-                    value="Islak imza formatında indirmek için tıklayınız."
-                    ajax="false"
-                    icon="ui-icon-arrowthick-1-s"
-                    rendered="#{formService.myForm.myActions.customDownload}">
-                    <p:fileDownload value="#{crudOneDim.file}"/>
-                </p:commandButton> 
-            </h:form>
+                    onclick="PF('widget_1d_delete_confirmation').show();return false;"
+                    value="Sil" 
+                    transient="true"
+                    rendered="#{formService.myForm.myActions.delete}"
+                    icon="ui-icon-trash"
+                    /> 
+                <p:commandButton 
+                    id ="buttonDelete1dObjectId"
+                    style="display: none;"
+                    value="Direk Sil" 
+                    action="#{crudOneDim.deleteObject}" 
+                    rendered="#{formService.myForm.myActions.delete}"
+                    icon="ui-icon-trash"
+                    update="idMessageDialog"
+                    /> 
+                <p:button 
+                    id="mySaveButton"
+                    onclick="rcOneDimSave();return false;"
+                    value="Kaydet"
+                    rendered="#{formService.myForm.myActions.save}"
+                    /> 
+                <p:commandButton 
+                    id ="buttonCopyObject"
+                    value="Kopyala" 
+                    action="#{crudOneDim.copyObject}" 
+                    rendered="false"/>
+                <p:commandButton 
+                    value="Bu sayfa ile ilgili açıklamalar için tıklayınız" 
+                    action="#{crudOneDim.showAllNote}" 
+                    style="white-space: nowrap;"
+                    rendered="#{crudOneDim.selectedFormUserNote}"
+                    update=":idMessageDialog"
+                    />
+                <h:outputText 
+                    value="Tarihçe Etkin(siz)leştir" 
+                    style="white-space: nowrap;" 
+                    rendered="#{mainFrame.adminRole}"
+                    />
+                <h:selectBooleanCheckbox  
+                    value="#{crudOneDim.enableHistoryOnSave}" 
+                    rendered="#{mainFrame.adminRole}"
+                    readonly="true"/>
+                <!--            <span class="ui-separator">
+                                <span class="ui-icon ui-icon-grip-dotted-vertical" />
+                            </span>-->
+                <p:commandButton
+                    id="buttonEimza"
+                    value="E-İmza Süreci" 
+                    action="#{crudOneDim.showEimza}" 
+                    rendered="#{formService.myForm.myActions.esign}"
+                    update=":idToBeSignedDialog,:idMessageDialog,:id_dlg_error_warning"/> 
+
+                <h:selectOneMenu 
+                    value="#{crudOneDim.transparentProperties['emailType']}" 
+                    rendered="#{formService.myForm.myActions.email}">
+                    <f:selectItems value="#{crudOneDim.emailTypes}"/>
+                </h:selectOneMenu> 
+                <p:commandButton 
+                    id="buttonSendEmailId"
+                    value="Email Önizleme"
+                    action="#{crudOneDim.actionEmail}"
+                    rendered="#{formService.myForm.myActions.email}"/> 
+                <h:form>
+                    <p:commandButton 
+                        id="id_downlod_button"
+                        value="Islak imza formatında indirmek için tıklayınız."
+                        ajax="false"
+                        icon="ui-icon-arrowthick-1-s"
+                        rendered="#{formService.myForm.myActions.customDownload}">
+                        <p:fileDownload value="#{crudOneDim.file}"/>
+                    </p:commandButton> 
+                </h:form>
+                <p:commandButton 
+                    value="#{formService.myForm.myActions.sendFormAction.enableResult.caption}" 
+                    actionListener="#{twoDimModifyCtrl.sendForm}" 
+                    rendered="#{formService.myForm.myActions.sendForms}"
+                    style="white-space: nowrap;"
+                    />
+            </h:panelGrid>
         </f:facet>
     </p:toolbar>
 
