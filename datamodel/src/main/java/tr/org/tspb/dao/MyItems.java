@@ -604,6 +604,8 @@ public class MyItems {
                         case ProjectConstants.REPLACEABLE_KEY_WORD_FOR_FUNCTONS_LOGIN_MEMBER_ID:
                             result.put(key, loginMemberId == null ? "no result" : loginMemberId);
                             break;
+                        case ProjectConstants.REPLACEABLE_KEY_WORD_FOR_FUNCTONS_LOGIN_MEMBER_TYPE:
+                        //result.put(key, userDetail.getDbo().getMemberType());
                         default:
                             throw new RuntimeException("could not find replaceble word");
                     }
