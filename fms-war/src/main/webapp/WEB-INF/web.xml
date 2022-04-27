@@ -13,11 +13,12 @@
     </context-param>
     <context-param>
         <param-name>primefaces.THEME</param-name>
-        <param-value>redmond</param-value>       
+        <!--<param-value>redmond</param-value>-->       
         <!--<param-value>bootstrap</param-value>-->       
         <!--<param-value>nova-light</param-value>-->
         <!--<param-value>luna-blue</param-value>-->       
         <!--<param-value>vela</param-value>-->       
+        <param-value>#{templateThemeHandler.contract}</param-value>       
     </context-param>
     <context-param>
         <param-name>com.sun.faces.validateXml</param-name>
@@ -55,7 +56,7 @@
         </session-timeout>
     </session-config>
     <welcome-file-list>
-        <welcome-file>protected/main.xhtml</welcome-file>
+        <welcome-file>index.xhtml</welcome-file>
     </welcome-file-list>
     
     <login-config>
