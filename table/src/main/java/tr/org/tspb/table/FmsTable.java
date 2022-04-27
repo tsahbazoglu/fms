@@ -16,7 +16,6 @@ import tr.org.tspb.common.services.LdapService;
 import tr.org.tspb.common.services.MailService;
 import tr.org.tspb.service.RepositoryService;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.StringWriter;
 import java.text.MessageFormat;
@@ -30,7 +29,6 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.TreeMap;
 import javax.faces.application.FacesMessage;
 import javax.faces.context.FacesContext;
 import javax.faces.model.SelectItem;
@@ -38,11 +36,6 @@ import javax.inject.Inject;
 import javax.mail.MessagingException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
-import org.apache.poi.ss.usermodel.Cell;
-import org.apache.poi.xssf.usermodel.XSSFCell;
-import org.apache.poi.xssf.usermodel.XSSFRow;
-import org.apache.poi.xssf.usermodel.XSSFSheet;
-import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.bson.Document;
 import org.bson.types.Code;
 import org.bson.types.ObjectId;
@@ -61,10 +54,8 @@ import tr.org.tspb.dao.MyField;
 import tr.org.tspb.dao.FmsForm;
 import tr.org.tspb.dao.MyItems;
 import tr.org.tspb.dao.MyMap;
-import tr.org.tspb.dao.MyMerge;
 import tr.org.tspb.dao.MyNotifies;
 import tr.org.tspb.dp.nullobj.PlainRecordData;
-import tr.org.tspb.pojo.ExcellColumnDef;
 import tr.org.tspb.pojo.UserDetail;
 import com.google.gson.reflect.TypeToken;
 import java.lang.reflect.Type;
@@ -116,9 +107,6 @@ public abstract class FmsTable extends FmsTableView {
     private String crudObjectTextViewer;
     private String imz64;
     private UploadedFile uploadedFile;
-    private UploadedFile uploadedFileKpbDb;
-
-    private Map<String, Object> uploadedMergeObject = new HashMap<>();
 
     // mapRequired
     protected Map mapRequired = new HashMap();
@@ -129,7 +117,6 @@ public abstract class FmsTable extends FmsTableView {
     private int fileLimit = 1;
     private String mongoUploadFileType = "/(\\.|\\/)(pdf)$/";
     private String invalidFileMessage = "Geçersiz Dosya Tipi (Sadece PDF dosyalar eklenebilir) : ";
-    private List<Document> listOfToBeUpsert = new ArrayList<>();
     protected String toBeDeletedFileID;
     private boolean enableHistoryOnSave = true;
     private String headerTitle;
@@ -306,14 +293,6 @@ public abstract class FmsTable extends FmsTableView {
         this.invalidFileMessage = invalidFileMessage;
     }
 
-    public Map<String, Object> getUploadedMergeObject() {
-        return Collections.unmodifiableMap(uploadedMergeObject);
-    }
-
-    public void setUploadedMergeObject(Map<String, Object> uploadedMergeObject) {
-        this.uploadedMergeObject = uploadedMergeObject;
-    }
-
     /**
      * @return the mongoUploadFileType
      */
@@ -403,227 +382,7 @@ public abstract class FmsTable extends FmsTableView {
 
     }
 
-    public void uploadExcell(FileUploadEvent event) {
-
-        uysApplicationMB.initKpbMemberCache();
-
-        listOfToBeUpsert = new ArrayList<>();
-
-        uploadedFileKpbDb = event.getFile();
-
-        try {
-            MyMerge myMerge = formService.getMyForm().getUploadMerge();
-
-            if (myMerge == null) {
-                dialogController.showPopupError("upload merge config has not been defined");
-                return;
-            }
-
-            InputStream is = uploadedFileKpbDb.getInputStream();
-
-            XSSFWorkbook xssfWorkbook = new XSSFWorkbook(is);
-            XSSFSheet sheet = xssfWorkbook.getSheetAt(0);
-
-            int rowcount = sheet.getLastRowNum() + 1;
-            int startrow = myMerge.getWorkbookSheetStartRow();
-
-            List<String> listOfNotFoundMembers = new ArrayList<>();
-
-            for (int i = startrow; i < rowcount; i++) {
-                XSSFRow row = sheet.getRow(i);
-                //empty rows is resolved to null
-                if (row == null) {
-                    continue;
-                }
-
-                TreeMap<String, ExcellColumnDef> sortedExcellColumns = new TreeMap<>();
-
-                sortedExcellColumns.putAll(myMerge.getWorkbookSheetColumnMap());
-
-                Document record = new Document().append(FORMS, formService.getMyForm().getKey());
-
-                int columnn = 0;
-                XSSFCell cellll;
-
-                for (String key : sortedExcellColumns.keySet()) {
-
-                    ExcellColumnDef excellColumnDef = myMerge.getWorkbookSheetColumnMap().get(key);
-
-                    cellll = row.getCell(columnn++);
-
-                    if (cellll == null) {
-                        record.append(excellColumnDef.getToMyField().getKey(), null);
-                        continue;
-                    }
-
-                    if (cellll.getCellType() == Cell.CELL_TYPE_BLANK) {
-                        record.append(excellColumnDef.getToMyField().getKey(), "");
-                        continue;
-                    }
-
-                    Object obtainedValue = null;
-
-                    if (cellll.getCellType() == Cell.CELL_TYPE_STRING) {
-                        switch (excellColumnDef.getToMyField().getValueType()) {
-                            case JAVAUTIL_DATE:
-                                obtainedValue = cellll.getDateCellValue();
-                                break;
-                            case JAVALANG_DATE:
-                                obtainedValue = cellll.getDateCellValue();
-                                break;
-                            case JAVALANG_STRING:
-                                obtainedValue = cellll.getStringCellValue();
-                                break;
-                            default:
-                                obtainedValue = cellll.getStringCellValue();
-                                break;
-                        }
-                    } else if (cellll.getCellType() == Cell.CELL_TYPE_NUMERIC) {
-                        switch (excellColumnDef.getToMyField().getValueType()) {
-                            case JAVAUTIL_DATE:
-                                obtainedValue = cellll.getDateCellValue();
-                                break;
-                            case JAVALANG_DATE:
-                                obtainedValue = cellll.getDateCellValue();
-                                break;
-                            case JAVALANG_STRING:
-                                obtainedValue = String.valueOf(((Number) cellll.getNumericCellValue()).longValue());
-                                break;
-                            default:
-                                obtainedValue = cellll.getNumericCellValue();
-                                break;
-                        }
-                    }
-
-                    Object resolvedValue = obtainedValue;
-
-                    if (excellColumnDef.getConverter() != null) {
-
-                        Document commandResult = mongoDbUtil.runCommand(formService.getMyForm().getUploadMerge().getToDb(),
-                                excellColumnDef.getConverter().getCode(), resolvedValue);
-
-                        resolvedValue = commandResult.get(RETVAL);
-
-                        if (resolvedValue instanceof Document) {
-                            String type = ((Document) resolvedValue).get(TYPE).toString();
-                            switch (type) {
-                                case "objectid":
-                                    resolvedValue = new ObjectId(((Document) resolvedValue).get(VALUE).toString());
-                                    break;
-                                default:
-                                    break;
-                            }
-                        }
-                    }
-
-                    record.append(excellColumnDef.getToMyField().getKey(), resolvedValue);
-
-                }
-                listOfToBeUpsert.add(record);
-            }
-
-            if (!listOfNotFoundMembers.isEmpty()) {
-                showNOKMessage("Kayıtlı üye listesinde aşağıdaki kurum isimleri tespit edilemedi : ");
-            }
-            for (String message : listOfNotFoundMembers) {
-                showNOKMessage(message);
-            }
-
-        } catch (Exception ex) {
-            logger.error("error occured", ex);
-            dialogController.showPopupError(ex.getMessage());
-        }
-
-    }
-
-    public String previewUpload() {
-
-        try {
-            localPreviewUpload();
-            dialogController.showPopup("id_kpb_bulk_preview");
-        } catch (NullNotExpectedException ex) {
-            dialogController.showPopupError(ex.getMessage());
-        }
-        return null;
-    }
-
-    public void localPreviewUpload() throws NullNotExpectedException {
-
-        if (formService.getMyForm().getUploadMerge() == null) {
-            throw new NullNotExpectedException("form.".concat(UPLOAD_CONFIG).concat(". has not been defined."));
-        }
-
-        if (listOfToBeUpsert == null) {
-            throw new NullNotExpectedException("Dosya Yükleme İşlemi Yapılmamış");
-        }
-
-        if (formService.getMyForm().getUploadMerge().isInsert()) {
-            for (Document dbo : listOfToBeUpsert) {
-                dbo.putAll(uploadedMergeObject);
-                dbo.put(STYLE, "css-new");
-            }
-        } else if (formService.getMyForm().getUploadMerge().isUpdate()) {
-            for (Document dbo : listOfToBeUpsert) {
-
-                Document searchDBObject = new Document();
-                searchDBObject.put(formService.getMyForm().getLoginFkField(), dbo.get(formService.getMyForm().getLoginFkField()));
-
-                searchDBObject.putAll(uploadedMergeObject);
-
-                Document record = mongoDbUtil.findOne(formService.getMyForm().getUploadMerge().getToDb(),
-                        formService.getMyForm().getUploadMerge().getToCollection(), searchDBObject);
-
-                dbo.putAll(uploadedMergeObject);
-                dbo.put(STYLE, record == null ? "css-new" : "css-update");
-            }
-        }
-    }
-
-    public String bulkLoadExcell() {
-        try {
-            bulkLoadExcell();
-        } catch (Exception ex) {
-            logger.error("error occured", ex);
-            dialogController.showPopupError(ex.getMessage());
-        }
-        return null;
-    }
-
-    public void localBulkLoadExcell() throws Exception {
-
-        List<String> upsertKeys = null;
-        if (!formService.getMyForm().getUploadMerge().getUpsertFields().isEmpty()) {
-            upsertKeys = new ArrayList<>();
-            for (MyField field : formService.getMyForm().getUploadMerge().getUpsertFields()) {
-                upsertKeys.add(field.getKey());
-            }
-        }
-
-        if (formService.getMyForm().getUploadMerge().isInsert()) {
-            for (Document dbo : listOfToBeUpsert) {
-                dbo.putAll(uploadedMergeObject);
-                MyMap mm = ogmCreator.getCrudObject();
-                mm.putAll(dbo);
-                saveObject(formService.getMyForm(), loginController, mm);
-            }
-        } else if (formService.getMyForm().getUploadMerge().isUpdate()) {
-            for (Document dbo : listOfToBeUpsert) {
-                dbo.putAll(uploadedMergeObject);
-                Document search = new Document(FORMS, formService.getMyForm().getKey());
-                if (upsertKeys != null) {
-                    for (String key : upsertKeys) {
-                        search.put(key, dbo.get(key));
-                    }
-                } else {
-                    search.putAll(dbo);
-                }
-                mongoDbUtil.updateMany(formService.getMyForm().getUploadMerge().getToDb(),
-                        formService.getMyForm().getUploadMerge().getToCollection(),
-                        search, dbo);
-            }
-        }
-    }
-
+   
     public String getToBeDeletedFileID() {
         return toBeDeletedFileID;
     }
@@ -932,7 +691,7 @@ public abstract class FmsTable extends FmsTableView {
         return saveOneDimensionObject(operatedObject, username, myForm, ip, "payment-service-no-session");
     }
 
-    private ObjectId saveOneDimensionObject(Document operatedObject, String username, FmsForm myForm, String ip, String sessionId)
+    public ObjectId saveOneDimensionObject(Document operatedObject, String username, FmsForm myForm, String ip, String sessionId)
             throws MessagingException, NullNotExpectedException, LdapException, FormConfigException, MongoOrmFailedException, UserException {
 
         FmsForm inode = (FmsForm) operatedObject.get(INODE);
@@ -1102,10 +861,23 @@ public abstract class FmsTable extends FmsTableView {
         }
         //end : provide uploaded file relation
 
-        PostSaveResult postSaveResult = repositoryService.runEventPostSave(operatedObject, myForm, null);
-
-        if (postSaveResult.getMsg() != null) {
-            dialogController.showPopupInfoWithOk(postSaveResult.getMsg(), MESSAGE_DIALOG);
+        try {
+            PostSaveResult postSaveResult = repositoryService.runEventPostSave(operatedObject, myForm, null);
+            //FIXME messagebundle
+            if (postSaveResult.getMsg() != null) {
+                dialogController.showPopupInfoWithOk(postSaveResult.getMsg(), MESSAGE_DIALOG);
+            }
+        } catch (Exception ex) {
+            logger.error("error occured", ex);
+            StringBuilder dlgSb = new StringBuilder();
+            dlgSb.append("Kayıt Sonrası tetikleyici çalıştırılıyor iken bir hata oluştu. ");
+            dlgSb.append("<br/><br/>");
+            dlgSb.append("Lütfen bu durumu sistem yöneticisine bildiriniz.");
+//            dialogController.showPopupError(dlgSb.toString());
+            FacesContext.getCurrentInstance().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_FATAL,
+                            "Hata",
+                            dlgSb.toString().replace("<br/>", "")));
         }
 
         if (formService.getMyForm().getMyNotifies() != null) {
@@ -1327,22 +1099,6 @@ public abstract class FmsTable extends FmsTableView {
     public void resetHistory() {
         historyColumnModel = new ArrayList();
         versionHistory = new ArrayList();
-    }
-
-    public UploadedFile getUploadedFileKpbDb() {
-        return uploadedFileKpbDb;
-    }
-
-    public void setUploadedFileKpbDb(UploadedFile uploadedFileKpbDb) {
-        this.uploadedFileKpbDb = uploadedFileKpbDb;
-    }
-
-    public List<Document> getListOfToBeUpsert() {
-        return Collections.unmodifiableList(listOfToBeUpsert);
-    }
-
-    public void setListOfToBeUpsert(List<Document> listOfToBeUpsert) {
-        this.listOfToBeUpsert = listOfToBeUpsert;
     }
 
     public Map<String, MyField> getComponentMapChilds() {
