@@ -1,0 +1,39 @@
+
+.handsontable th{
+    background-color :  var(--surface-a);
+    color : var(--text-color);
+}
+
+.handsontable tbody th.ht__highlight, .handsontable thead th.ht__highlight{
+    background-color :  var(--surface-c);
+    color: var(--surface-a);
+}
+
+
+
+
+
+.handsontable table.htCore tbody tr th{
+    font-size: 14px;
+    color: gray;
+};
+.handsontable table.htCore tbody tr td{
+    font-size: 12px;
+    color: gray;
+};
+.handsontable table.htCore{
+    color: gray;
+};
+.handsontable table.htCore th{
+    text-align: left;
+
+    color: gray;
+};
+.handsontable table.htCore tbody tr td{
+    font-size: 12px;
+    color: gray;
+};
+.handsontable .htCore thead th div span{
+    font-size: 14px;
+    color: gray;
+} 

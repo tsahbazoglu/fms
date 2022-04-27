@@ -30,12 +30,12 @@ if (!telmangrid.clarity) {
             var offset = 20;
             var rowHeigth = 24;
             var divWidth = offset + rowHeaderWidth + colCount * colWidths + "px";
-            var divHeigth = offset + rowHeigth + rowHeaders.length * rowHeigth + "px";
+            var divHeigth = 100 + offset + rowHeigth + rowHeaders.length * rowHeigth + "px";
 
             /**
-             * jsf id include a ":" wich is not recognized by jquery as $("#ccid")
+             * jsf id include a char ":" wich is not recognized by jquery as $("#ccid")
              * A workaround is to use pure js function getElementById(ccid)
-             * Retrived js object is converted then to jquery object just like an id
+             * Retrived javasript object is converted then to jquery object just like an id
              */
             var jqueryDiv = $(document.getElementById(ccid));
             jqueryDiv.css({
@@ -60,6 +60,10 @@ if (!telmangrid.clarity) {
                     var jsfData = JSON.stringify(this.getData());
                     var hiddenTextJsonDataToModel = $(document.getElementById("id-tab-view:nd-form:id-hidden-text-json-data-to-model"));
                     hiddenTextJsonDataToModel.val(jsfData);
+
+                    var hiddenTextStatusSaved = $(document.getElementById("id-tab-view:nd-form:id-hidden-text-saved-status"));
+                    hiddenTextStatusSaved.prop("value", false);
+                   
                 },
                 cells: function (row, col, prop) {
                     // Conditional formatting

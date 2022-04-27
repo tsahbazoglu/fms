@@ -10,10 +10,47 @@
       >
     <h:head>
         <title></title>
+        <script>
+            function setStatusToSaved() {
+                var hiddenTextStatusSaved = $(document.getElementById("id-tab-view:nd-form:id-hidden-text-saved-status"));
+                hiddenTextStatusSaved.prop("value", true);
+            }
+            function checkSavedStatus() {
+                var hiddenTextStatusSaved = $(document.getElementById("id-tab-view:nd-form:id-hidden-text-saved-status"));
+                if (hiddenTextStatusSaved.prop("value") == "false"
+                        || hiddenTextStatusSaved.prop("value") == false) {
+                    PF("wv_pivot_not_saved_data").show();
+                } else {
+                    rcPivotSendForms();
+                    PF("wv_pivot_not_saved_data").hide();
+                }
+            }
+            function hideNotSavedDlg() {
+                PF("wv_pivot_not_saved_data").hide();
+            }
+
+        </script>
     </h:head>
+
+    <p:dialog  
+        resizable="false"
+        closeOnEscape="true"
+        closable="true"
+        widgetVar="wv_pivot_not_saved_data"
+        >        
+        <p:panel>
+            <br/>
+            <p:outputLabel value="Kayıt edilmeyen veri değişiklikleri tespit edildi"/>
+            <br/>
+            <br/>
+            <br/>
+        </p:panel>         
+    </p:dialog>
+
 
     <h:form id="nd-form">
         <p:toolbar 
+            id="id-nd-toolbar"
             rendered="#{not esignViewCtrl.preventedMultiTab}"
             style="width: 94%"
             >
@@ -22,13 +59,29 @@
                     <p:button  
                         icon="pi pi-home" 
                         disabled="true">
-                    </p:button> 
+                    </p:button>
+
                     <p:commandButton 
                         value="Kaydet"
                         rendered="#{formService.myForm.myActions.save}"
                         style="width: 150px;"
                         action="#{pivotModifierCtrl.provideCrossCheck}"
                         update="#{updateAjaxMB.btnNdSave}"
+                        oncomplete="setStatusToSaved();hideNotSavedDlg();"
+                        />
+                    <p:button
+                        value="#{formService.myForm.myActions.sendFormAction.enableResult.caption}" 
+                        rendered="#{formService.myForm.myActions.sendForms}"
+                        onclick="checkSavedStatus();
+                                return false;"
+                        >
+                    </p:button>
+                    <p:remoteCommand 
+                        name="rcPivotSendForms"
+                        value="#{formService.myForm.myActions.sendFormAction.enableResult.caption}" 
+                        actionListener="#{pivotModifierCtrl.sendForm}" 
+                        rendered="#{formService.myForm.myActions.sendForms}"
+                        update="#{updateAjaxMB.btnNdSendForms}"
                         />
                     <p:commandButton 
                         value="Bu sayfa ile ilgili açıklamalar için tıklayınız" 
@@ -52,6 +105,10 @@
                     <h:inputHidden
                         id="id-hidden-text-json-data-to-model" 
                         value="#{pivotModifierCtrl.pivotDataModelEdit.jsonDataToModel}"
+                        />
+                    <h:inputHidden
+                        id="id-hidden-text-saved-status" 
+                        value="false"
                         />
                 </h:panelGrid>
             </f:facet>
@@ -153,15 +210,6 @@
             </tr>
         </table>
     </h:form>
-    <!--    
-          neden h:panelGroup kullandın?
-    
-          http://stackoverflow.com/questions/3756256/jsf-primefaces-problem-with-rendered-components-with-ajax
-    
-          Çünkü eğer sadece mygrid:mygrid id="idCurrentMyGrid" olursa,
-    
-          rendered=false durumlarında ajax request bunu dikkate almıyor ve ajax geri dönüşünde burası guncellenmiyor.
-    -->
 
     <h:panelGroup id="currentMyGridReadOnly">
         <mygrid:mygridHistory 
@@ -176,8 +224,6 @@
     </h:panelGroup>
 
     <h:panelGroup id="currentMyGrid">
-
-
         <style>
             .handsontable table thead th {
                 white-space: pre-line;
@@ -197,6 +243,12 @@
     </h:panelGroup>
     <br/>
     <br/>
+
+    <script>
+        $(document.getElementById("id-tab-view:currentMyGrid")).bind("click", function (event) {
+            hideNotSavedDlg();
+        })
+    </script>
 
 
 </html>

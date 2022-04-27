@@ -1,0 +1,65 @@
+
+{
+    "$schema": "http://json-schema.org/draft-04/schema#",
+    "title": "fms-field-items",
+    "description": "Fms Field Items Description",
+    "type": "object",
+    "properties": {
+        "func": {
+            "type": "string"
+        },
+        "list": {
+            "type": "array",
+            "items": {
+                "type": "object",
+                "properties": {
+
+                }
+            }
+        },
+        "ref": {
+            "type": "object",
+            "properties": {
+                "db": {
+                    "type": "string"
+                },
+                "itemTable": {
+                    "type": "string"
+                },
+                "query": {
+                    "type": "object",
+                    "properties": {
+                        "func": {
+                            "type": "string"
+                        },
+                        "list": {
+                            "type": "array",
+                            "items": {
+                                "type": "object",
+                                "properties": {
+                                    "key": {
+                                        "type": "string"
+                                    },
+                                    "string-value": {
+                                        "type": "string"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "v": {
+                    "type": "array",
+                    "items": {
+                        "type": "object"
+                    }
+                },
+                "sort": {
+                    "type": "object"
+                }
+            }
+        }
+    },
+    "required": [],
+    "additionalProperties": false    
+}

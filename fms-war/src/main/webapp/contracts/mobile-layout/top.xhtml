@@ -42,14 +42,15 @@
                     >
                     <f:attribute name="toPage" value="PERSONNEL" />
                 </p:commandButton>
-                <p:splitButton value="web-layout" actionListener="#{cagatayCivici.changeTemplate('web-layout')}" ajax="false">
-                    <p:menuitem value="mobile-layout" actionListener="#{cagatayCivici.changeTemplate('mobile-layout')}" ajax="false"/>
+                <p:splitButton value="web-layout" actionListener="#{templateThemeHandler.changeTemplate('web-layout')}" ajax="false">
+                    <p:menuitem value="mobile-layout" actionListener="#{templateThemeHandler.changeTemplate('mobile-layout')}" ajax="false"/>
+                    <p:menuitem value="web-layout_1" actionListener="#{templateThemeHandler.changeTemplate('web-layout_1')}" ajax="false"/>
                 </p:splitButton>
-                <p:splitButton value="vela" actionListener="#{cagatayCivici.changeContract('vela')}" ajax="false">
-                    <p:menuitem value="redmond" actionListener="#{cagatayCivici.changeContract('redmond')}" ajax="false"/>
-                    <p:menuitem value="bootstrap" actionListener="#{cagatayCivici.changeContract('bootstrap')}" ajax="false"/>
-                    <p:menuitem value="nova-light" actionListener="#{cagatayCivici.changeContract('nova-light')}" ajax="false"/>
-                    <p:menuitem value="luna-blue" actionListener="#{cagatayCivici.changeContract('luna-blue')}" ajax="false"/>
+                <p:splitButton value="vela" actionListener="#{templateThemeHandler.changeContract('vela')}" ajax="false">
+                    <p:menuitem value="redmond" actionListener="#{templateThemeHandler.changeContract('redmond')}" ajax="false"/>
+                    <p:menuitem value="bootstrap" actionListener="#{templateThemeHandler.changeContract('bootstrap')}" ajax="false"/>
+                    <p:menuitem value="nova-light" actionListener="#{templateThemeHandler.changeContract('nova-light')}" ajax="false"/>
+                    <p:menuitem value="luna-blue" actionListener="#{templateThemeHandler.changeContract('luna-blue')}" ajax="false"/>
                 </p:splitButton>
                 <p:outputLabel 
                     value="SPK İlk Bildirim Tarihi"
